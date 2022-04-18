@@ -1,0 +1,68 @@
+{
+  "name": "juanvillacortac",
+  "version": "0.0.6",
+  "keywords": [
+    "motion",
+    "animations",
+    "svelte",
+    "sveltekit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/juanvillacortac/motion-kit"
+  },
+  "scripts": {
+    "dev": "svelte-kit dev",
+    "build": "svelte-kit build",
+    "build:node": "ADAPTER=node svelte-kit build",
+    "start:node": "node build/index.js",
+    "preview": "svelte-kit preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "package": "svelte-kit package",
+    "gql:fetch": "gq https://graphql.datocms.com/ -H \"Authorization: Bearer $DATOCMS_API_KEY\" --introspect > src/lib/schema.graphql",
+    "postbuild@comment": "cp node_modules/sharp/build .vercel_build_output/functions/node/render -r;cp node_modules/sharp/vendor/8.11.3/linux-x64/lib/libvips-cpp.so.42 .vercel_build_output/functions/node/render/;ls .vercel_build_output/functions/node/render/"
+  },
+  "devDependencies": {
+    "@poppanator/sveltekit-svg": "^0.2.3",
+    "@sveltejs/adapter-auto": "^1.0.0-next.33",
+    "@sveltejs/adapter-cloudflare": "^1.0.0-next.16",
+    "@sveltejs/adapter-netlify": "^1.0.0-next.0",
+    "@sveltejs/adapter-node": "^1.0.0-next.73",
+    "@sveltejs/adapter-static": "^1.0.0-next.29",
+    "@sveltejs/adapter-vercel": "^1.0.0-next.47",
+    "@sveltejs/kit": "^1.0.0-next.303",
+    "@types/three": "^0.135.0",
+    "@windicss/plugin-icons": "^1.0.2",
+    "carbon-preprocess-svelte": "^0.6.0",
+    "graphql": "^16.3.0",
+    "graphqurl": "^1.0.1",
+    "rollup-plugin-polyfill": "^3.0.0",
+    "svelte": "^3.46.4",
+    "svelte-check": "^2.4.6",
+    "svelte-preprocess": "^4.10.4",
+    "svelte-windicss-preprocess": "~4.2.6",
+    "svelte2tsx": "^0.4.14",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.3",
+    "vite-imagetools": "^4.0.3",
+    "vite-plugin-windicss": "^1.8.3",
+    "windicss": "^3.5.1"
+  },
+  "type": "module",
+  "dependencies": {
+    "@juanvillacortac/g-query": "^0.2.2",
+    "@leveluptuts/g-query": "^0.2.3",
+    "@leveluptuts/svelte-toy": "^0.0.18",
+    "caravaggio": "^3.7.2",
+    "caravaggio-plugin-nextjs": "^0.4.2",
+    "carbon-icons-svelte": "^10.45.1",
+    "graphql-tag": "^2.12.6",
+    "html-minifier": "^4.0.0",
+    "monaco-editor": "^0.33.0",
+    "sharp": "^0.29.3",
+    "svelte-datocms": "^0.6.3",
+    "svelte-marquee-text-widget": "^1.1.0",
+    "three": "^0.135.0"
+  }
+}
