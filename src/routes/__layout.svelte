@@ -1,8 +1,6 @@
 <script lang="ts">
   import 'virtual:windi.css'
-  import '$lib/styles/icons.css'
   import '$lib/styles/base.css'
-  import '$lib/styles/components.css'
 
   import Favicons from '$lib/components/Favicons.svelte'
   import { height } from '$lib/components/nav/Header.svelte'
@@ -45,3 +43,12 @@
 <Favicons favicon="/images/logo.svg" themeColor="#000" titleName="Print Ya!" />
 
 <slot />
+
+<style>
+  :global(html) {
+    --windi-bg: #fcfcfc;
+    --windi-hover-bg: #f6f6f6;
+    --windi-text: #1f2937;
+    --windi-bc: #e5e7eb;
+  }
+</style>

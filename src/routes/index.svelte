@@ -1,69 +1,121 @@
 <script lang="ts">
-  import type monaco from 'monaco-editor'
-  import { onMount } from 'svelte'
-  import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
-  import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
-  import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
-  import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
-  import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
   import { useWindiCSS } from '$lib/windicss'
   import Iframe from '$lib/Iframe.svelte'
+  import type Processor from 'windicss'
+  import Editor from '$lib/components/Editor.svelte'
+  import { HSplitPane, VSplitPane } from 'svelte-split-pane'
+  import { PaintBrush24, Copy16 } from 'carbon-icons-svelte'
+  import { browser } from '$app/env'
+  import { onMount } from 'svelte'
 
-  let divEl: HTMLDivElement = null
-  let editor: monaco.editor.IStandaloneCodeEditor
-  let Monaco: typeof monaco
+  let formatHtml: () => {}
+  let formatCss: () => {}
 
-  onMount(async () => {
-    // @ts-ignore
-    self.MonacoEnvironment = {
-      getWorker: function (_moduleId: any, label: string) {
-        if (label === 'json') {
-          return new jsonWorker()
-        }
-        if (label === 'css' || label === 'scss' || label === 'less') {
-          return new cssWorker()
-        }
-        if (label === 'html' || label === 'handlebars' || label === 'razor') {
-          return new htmlWorker()
-        }
-        if (label === 'typescript' || label === 'javascript') {
-          return new tsWorker()
-        }
-        return new editorWorker()
-      },
-    }
+  const format = () => {
+    formatHtml()
+    formatCss()
+  }
 
-    Monaco = await import('monaco-editor')
-
-    editor = Monaco.editor.create(divEl, {
-      value: '',
-      language: 'html',
-      automaticLayout: true,
+  onMount(() => {
+    document.addEventListener('keydown', function (event) {
+      if (event.altKey && event.shiftKey && event.key == 'F') {
+        format()
+      }
     })
-
-    editor.onDidChangeModelContent(() => {
-      rendered = editor.getValue()
-    })
-
-    return () => {
-      editor.dispose()
-    }
   })
 
-  let rendered = ''
+  let html = ''
   let css = ''
-  $: css = useWindiCSS(rendered, '', null).generatedCSS
+  let finalCss = ''
+  let processor: Processor
+  $: {
+    const { processor: p, generatedCSS } = useWindiCSS(html, css, null)
+    processor = p
+    finalCss = generatedCSS
+  }
 </script>
 
-<div class="h-screen grid grid-cols-1 md:grid-cols-2">
-  <div bind:this={divEl} class="h-full w-full" />
-  <Iframe
-    props={{
-      html: rendered,
-      css,
-      fixedCss: '',
-      dark: false,
-      classes: '',
-    }}
-  />
-</div>
+{#if browser}
+  <div class="flex flex-col h-screen w-full text-gray-700">
+    <div
+      class="bg-white flex shadow-lg w-full p-4 justify-between items-center"
+    >
+      <h2 class="font-bold text-xl">Print Ya!</h2>
+      <div class="flex space-x-4">
+        <PaintBrush24 on:click={format} />
+      </div>
+    </div>
+    <div class="h-full bg-light-500">
+      <HSplitPane>
+        <VSplitPane slot="left">
+          <div class="flex h-full w-full p-4" slot="top">
+            <div
+              class="bg-white rounded-lg flex flex-col h-full shadow w-full relative overflow-hidden"
+            >
+              <div class="flex w-full p-4 justify-between items-center">
+                <h2 class="font-bold text-xs w-full text-gray-700 block">
+                  Template
+                </h2>
+                <button
+                  class="border-transparent rounded border-2 p-1 duration-200 hover:border-gray-100"
+                  on:click={() => navigator.clipboard.writeText(html)}
+                >
+                  <Copy16 />
+                </button>
+              </div>
+              {#if processor}
+                <Editor
+                  bind:format={formatHtml}
+                  bind:modelValue={html}
+                  language="html"
+                  bind:processor
+                />
+              {/if}
+            </div>
+          </div>
+          <div class="flex h-full w-full p-4" slot="down">
+            <div
+              class="bg-white rounded-lg flex flex-col h-full shadow w-full overflow-hidden"
+            >
+              <h2 class="font-bold text-xs w-full p-4 text-gray-700">Style</h2>
+              {#if processor}
+                <Editor
+                  bind:format={formatCss}
+                  bind:modelValue={css}
+                  language="css"
+                  bind:processor
+                />
+              {/if}
+            </div>
+          </div>
+        </VSplitPane>
+        <div class="flex h-full w-full relative" slot="right">
+          <div
+            class="flex h-full w-full inset-0 absolute select-none pointer-events-none"
+          >
+            <Iframe
+              props={{
+                html,
+                css: finalCss,
+                fixedCss: '',
+                dark: false,
+                classes: '',
+              }}
+            />
+          </div>
+        </div>
+      </HSplitPane>
+    </div>
+  </div>
+{/if}
+
+<style>
+  :global(.splitpanes__pane) {
+    background-color: transparent !important;
+  }
+
+  :global(.splitpanes__splitter) {
+    border: none !important;
+    background-color: transparent !important;
+  }
+</style>

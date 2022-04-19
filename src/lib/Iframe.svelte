@@ -62,4 +62,11 @@
   }
 </script>
 
-<div bind:this={container} />
+<div bind:this={container} class="flex h-full w-full" />
+
+<style>
+  div > :global(iframe) {
+    width: 100%;
+    height: 100%;
+  }
+</style>

@@ -1,5 +1,6 @@
 import { defineConfig } from 'windicss/helpers'
 import filters from 'windicss/plugin/filters'
+import forms from 'windicss/plugin/forms'
 import aspectRatio from 'windicss/plugin/aspect-ratio'
 import lineClamp from 'windicss/plugin/line-clamp'
 import typography from 'windicss/plugin/typography'
@@ -32,7 +33,7 @@ export default defineConfig({
   },
   plugins: [
     filters,
-    // forms,
+    forms,
     aspectRatio,
     lineClamp,
     typography,
