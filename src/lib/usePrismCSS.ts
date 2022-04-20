@@ -1,10 +1,14 @@
 import Prism from 'prismjs'
-import 'prismjs/components/prism-css'
+import 'prismjs/components/prism-css.js'
 
 export function usePrismCSS(getStyle: () => string) {
   const style = getStyle()
   const plainCSS = style
-  const highlightedCSS = Prism.highlight(style, Prism.languages.css, 'css').trim()
+  const highlightedCSS = Prism.highlight(
+    style,
+    Prism.languages.css,
+    'css'
+  ).trim()
 
   return {
     plainCSS,
