@@ -7,8 +7,13 @@
   import { Sun24, Moon24, Settings24 } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
-  import FieldEditor from '$lib/components/FieldEditor.svelte'
-  import { compile } from 'handlebars'
+  import { onMount } from 'svelte'
+
+  let Handlebars
+
+  onMount(async () => {
+    Handlebars = await import('handlebars-esm')
+  })
 
   const editor = persistentWritable('editorState', {
     html: '',
@@ -20,8 +25,8 @@
   let finalHtml = ''
   let processor: Processor
   let errorMsg = ''
-  $: {
-    const template = compile($editor.html)
+  $: if (browser && Handlebars) {
+    const template = Handlebars.default.compile($editor.html)
     try {
       finalHtml = template(JSON.parse($editor.fields || '{}'))
       errorMsg = ''

@@ -17,8 +17,8 @@
   import { basicSetup, hoverPreview } from '$lib/editorplugin'
   import { indentWithTab } from '@codemirror/commands'
   import prettier from 'prettier'
-  import prettierHtml from 'prettier/parser-html'
-  import prettierCss from 'prettier/parser-postcss'
+  import prettierHtml from 'prettier/esm/parser-html.mjs'
+  import prettierCss from 'prettier/esm/parser-postcss.mjs'
   import {
     Copy16,
     PaintBrushAlt16,

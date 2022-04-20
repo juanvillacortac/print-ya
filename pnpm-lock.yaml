@@ -45,6 +45,7 @@ specifiers:
   graphql-tag: ^2.12.6
   graphqurl: ^1.0.1
   handlebars: ^4.7.7
+  handlebars-esm: ^1.0.0
   html-minifier: ^4.0.0
   prettier: ^2.6.2
   prism-theme-vars: ^0.2.2
@@ -100,6 +101,7 @@ dependencies:
   codemirror-theme-vars: 0.1.1
   graphql-tag: 2.12.6_graphql@16.3.0
   handlebars: 4.7.7
+  handlebars-esm: 1.0.0
   html-minifier: 4.0.0
   prettier: 2.6.2
   prism-theme-vars: 0.2.2
@@ -4088,6 +4090,12 @@ packages:
       - utf-8-validate
     dev: true
 
+  /handlebars-esm/1.0.0:
+    resolution: {integrity: sha512-/MqFf8MDEJQn67GMufDN8jK6ftZD8kTMZdFr8GE48X6pm/kwTg27VqXFyGQ1hfDhiwuGEQtPLrQetXCeIvnnkg==}
+    dependencies:
+      rollup: 2.70.1
+    dev: false
+
   /handlebars/4.7.7:
     resolution: {integrity: sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==}
     engines: {node: '>=0.4.7'}
@@ -5734,7 +5742,6 @@ packages:
     hasBin: true
     optionalDependencies:
       fsevents: 2.3.2
-    dev: true
 
   /run-async/2.4.1:
     resolution: {integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==}
