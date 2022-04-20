@@ -44,15 +44,17 @@ specifiers:
   graphql: ^16.3.0
   graphql-tag: ^2.12.6
   graphqurl: ^1.0.1
+  handlebars: ^4.7.7
   html-minifier: ^4.0.0
-  monaco-editor: ^0.33.0
   prettier: ^2.6.2
   prism-theme-vars: ^0.2.2
+  prismjs: ^1.28.0
   rollup-plugin-polyfill: ^3.0.0
   sharp: ^0.29.3
   svelte: ^3.46.4
   svelte-check: ^2.4.6
   svelte-datocms: ^0.6.3
+  svelte-fullscreen: ^2.0.0
   svelte-marquee-text-widget: ^1.1.0
   svelte-preprocess: ^4.10.4
   svelte-split-pane: ^0.1.2
@@ -97,12 +99,14 @@ dependencies:
   carbon-icons-svelte: 10.45.1
   codemirror-theme-vars: 0.1.1
   graphql-tag: 2.12.6_graphql@16.3.0
+  handlebars: 4.7.7
   html-minifier: 4.0.0
-  monaco-editor: 0.33.0
   prettier: 2.6.2
   prism-theme-vars: 0.2.2
+  prismjs: 1.28.0
   sharp: 0.29.3
   svelte-datocms: 0.6.3
+  svelte-fullscreen: 2.0.0
   svelte-marquee-text-widget: 1.1.0
   svelte-split-pane: 0.1.2
   svelte-splitpanes: 0.6.3
@@ -4084,6 +4088,19 @@ packages:
       - utf-8-validate
     dev: true
 
+  /handlebars/4.7.7:
+    resolution: {integrity: sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==}
+    engines: {node: '>=0.4.7'}
+    hasBin: true
+    dependencies:
+      minimist: 1.2.6
+      neo-async: 2.6.2
+      source-map: 0.6.1
+      wordwrap: 1.0.0
+    optionalDependencies:
+      uglify-js: 3.15.3
+    dev: false
+
   /has-ansi/2.0.0:
     resolution: {integrity: sha1-NPUEnOHs3ysGSa8+8k5F7TVBbZE=}
     engines: {node: '>=0.10.0'}
@@ -4958,10 +4975,6 @@ packages:
     hasBin: true
     dev: false
 
-  /monaco-editor/0.33.0:
-    resolution: {integrity: sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==}
-    dev: false
-
   /mri/1.1.4:
     resolution: {integrity: sha512-6y7IjGPm8AzlvoUrwAaw1tLnUBudaS3752vcd8JtrpGGQn+rXIe63LFVHm/YMwtqAuh+LJPCFdlLYPWM1nYn6w==}
     engines: {node: '>=4'}
@@ -5012,6 +5025,10 @@ packages:
   /negotiator/0.6.3:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
+
+  /neo-async/2.6.2:
+    resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
+    dev: false
 
   /nextgen-events/1.5.2:
     resolution: {integrity: sha512-0ZEIRQywH5Oxt2IYYufRltQg/KjXhKM7f7MHve+ZIRaKnIR1PPYEXAl2WBmej5Sf0Qh2GgE/21sMRZVuOyxLzw==}
@@ -5456,6 +5473,11 @@ packages:
     resolution: {integrity: sha512-EL9ifuU/F8tEldoCa2sspiiLWysCL54xDbf2gN/ubwdtbuJROqOGopG5kSwunapwaioT+jLUQ/Ky+7jnv62xJA==}
     dev: false
 
+  /prismjs/1.28.0:
+    resolution: {integrity: sha512-8aaXdYvl1F7iC7Xm1spqSaY/OJBpYW3v+KJ+F17iYxvdc8sfjW194COK5wVhMZX45tGteiBQgdvD/nhxcRwylw==}
+    engines: {node: '>=6'}
+    dev: false
+
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
 
@@ -5766,6 +5788,11 @@ packages:
       mkdirp: 0.5.6
       rimraf: 2.7.1
     dev: true
+
+  /screenfull/5.2.0:
+    resolution: {integrity: sha512-9BakfsO2aUQN2K9Fdbj87RJIEZ82Q9IGim7FqM5OsebfoFC6ZHXgDq/KvniuLTPdeM8wY2o6Dj3WQ7KeQCj3cA==}
+    engines: {node: '>=0.10.0'}
+    dev: false
 
   /scuid/1.1.0:
     resolution: {integrity: sha512-MuCAyrGZcTLfQoH2XoBlQ8C6bzwN88XT/0slOGz0pn8+gIP85BOAfYa44ZXQUTOwRwPU0QvgU+V+OSajl/59Xg==}
@@ -6211,6 +6238,12 @@ packages:
       datocms-listen: 0.1.8
       datocms-structured-text-to-html-string: 1.3.0
       datocms-structured-text-utils: 1.2.0
+    dev: false
+
+  /svelte-fullscreen/2.0.0:
+    resolution: {integrity: sha512-Sg03gZAyYtW7gqTA9WoFXY2m4CkFmRFu/+n7bmGJnYt/qxtO0N2tdQ61lZwbgN2AAMh2zF/185CTBI9vv3zvKQ==}
+    dependencies:
+      screenfull: 5.2.0
     dev: false
 
   /svelte-hmr/0.14.11_svelte@3.46.4:
@@ -6714,6 +6747,10 @@ packages:
     engines: {node: '>= 12'}
     hasBin: true
     dev: true
+
+  /wordwrap/1.0.0:
+    resolution: {integrity: sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus=}
+    dev: false
 
   /wrap-ansi/3.0.1:
     resolution: {integrity: sha1-KIoE2H7aXChuBg3+jxNc6NAH+Lo=}

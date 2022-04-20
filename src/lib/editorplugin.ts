@@ -16,7 +16,7 @@ import { lintKeymap } from '@codemirror/lint'
 
 import { hoverTooltip } from '@codemirror/tooltip'
 import type Processor from 'windicss'
-// import { usePrismCSS } from './usePrismCSS'
+import { usePrismCSS } from './usePrismCSS'
 
 const tabSize = new Compartment()
 
@@ -66,8 +66,8 @@ export const hoverPreview = (processor: Processor) => {
         above: true,
         create() {
           const dom = document.createElement('div')
-          // const { highlightedCSS } = usePrismCSS(() => result.styleSheet.build())
-          const highlightedCSS = result.styleSheet.build()
+          const { highlightedCSS } = usePrismCSS(() => result.styleSheet.build())
+          // const highlightedCSS = result.styleSheet.build()
           console.log(result)
           dom.className = 'text-sm p-2'
           dom.innerHTML = `<pre><code>${highlightedCSS}</code></pre>`

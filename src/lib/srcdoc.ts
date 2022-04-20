@@ -20,7 +20,7 @@ export default `<!DOCTYPE html>
       }
 
       *:hover::-webkit-scrollbar-thumb {
-        background-color: #e4e4e7;
+        background-color: rgba(156, 163, 175, 0.7);
       }
       .dark *:hover::-webkit-scrollbar-thumb {
         background-color: #333;
@@ -37,10 +37,6 @@ export default `<!DOCTYPE html>
       }
       body {
         padding: 12px;
-      }
-      #container {
-        display: flex;
-        align-items: center;
       }
     </style>
     <div id="container"></div>

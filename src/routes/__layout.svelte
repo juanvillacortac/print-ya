@@ -46,9 +46,15 @@
 
 <style>
   :global(html) {
-    --windi-bg: #fcfcfc;
+    --windi-bg: white;
     --windi-hover-bg: #f6f6f6;
     --windi-text: #1f2937;
     --windi-bc: #e5e7eb;
+  }
+  :global(html.dark) {
+    --windi-bg: rgb(31, 41, 55);
+    --windi-hover-bg: #f6f6f6;
+    --windi-text: #1f2937;
+    --windi-bc: rgb(75, 85, 99);
   }
 </style>

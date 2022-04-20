@@ -19,9 +19,20 @@
   import prettier from 'prettier'
   import prettierHtml from 'prettier/parser-html'
   import prettierCss from 'prettier/parser-postcss'
+  import {
+    Copy16,
+    PaintBrushAlt16,
+    Maximize16,
+    Code24,
+    ColorPalette24,
+    Json24,
+  } from 'carbon-icons-svelte'
+  import { tooltip } from './tooltip'
+  import Fullscreen from 'svelte-fullscreen'
 
   export let language: 'html' | 'css' | 'json'
 
+  export let title = ''
   export let modelValue = ''
   let divEl: HTMLDivElement = null
 
@@ -46,7 +57,10 @@
         })
         break
       case 'json':
-        str = JSON.stringify(JSON.parse(str), null, 2)
+        try {
+          str = JSON.stringify(JSON.parse(str), null, 2)
+        } catch {}
+        break
     }
     view.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: str },
@@ -88,7 +102,20 @@
 
     state = EditorState.create({
       doc: modelValue,
-      extensions: [...extensions, keymap.of([indentWithTab])],
+      extensions: [
+        ...extensions,
+        keymap.of([indentWithTab]),
+        keymap.of([
+          {
+            preventDefault: true,
+            run: () => {
+              format()
+              return true
+            },
+            key: 'Shift-Alt-f',
+          },
+        ]),
+      ],
     })
 
     view = new EditorView({
@@ -103,9 +130,62 @@
       view?.destroy()
     }
   })
+
+  let titleHeight = 0
 </script>
 
-<div bind:this={divEl} class="h-full w-full" />
+<Fullscreen let:onToggle>
+  <div
+    class="bg-white dark:bg-gray-800 rounded-xl flex flex-col h-full shadow w-full relative overflow-hidden relative"
+  >
+    <div
+      bind:this={divEl}
+      class="w-full overflow-hidden absolute inset-0"
+      style="padding-top: {titleHeight}px"
+    />
+    <div
+      class="flex w-full p-2 justify-between items-center"
+      bind:clientHeight={titleHeight}
+    >
+      <div class="flex space-x-2 items-center">
+        {#if language === 'html'}
+          <Code24 />
+        {:else if language === 'css'}
+          <ColorPalette24 />
+        {:else if language === 'json'}
+          <Json24 />
+        {/if}
+        <h2 class="font-bold text-xs w-full block">{title}</h2>
+      </div>
+      <div class="items-center flex space-x-1">
+        <button
+          class="border-transparent rounded border-2 p-1 duration-200 hover:border-gray-300"
+          on:click={format}
+          title="Format document (Shift+Alt+F)"
+          use:tooltip
+        >
+          <PaintBrushAlt16 class="font-bold" />
+        </button>
+        <button
+          class="border-transparent rounded border-2 p-1 duration-200 hover:border-gray-300"
+          on:click={() => navigator.clipboard.writeText(modelValue)}
+          title="Copy to clipboard"
+          use:tooltip
+        >
+          <Copy16 class="font-bold" />
+        </button>
+        <button
+          class="border-transparent rounded border-2 p-1 duration-200 hover:border-gray-300"
+          on:click={onToggle}
+          title="Toggle fullscreen"
+          use:tooltip
+        >
+          <Maximize16 class="font-bold" />
+        </button>
+      </div>
+    </div>
+  </div>
+</Fullscreen>
 
 <style>
   div {
