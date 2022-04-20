@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { toPng } from 'html-to-image'
+  import { toPng, toSvg } from 'html-to-image'
 
   let element: HTMLDivElement
   let shadow: ShadowRoot
@@ -42,16 +42,16 @@
   }
 
   export const saveImage = () => {
-    toPng(element).then((dataUrl) => {
+    toSvg(element, { skipFonts: true }).then((dataUrl) => {
       var dl = document.createElement('a')
-      document.body.appendChild(dl) // This line makes it work in Firefox.
+      document.body.appendChild(dl)
       dl.setAttribute('href', dataUrl)
-      dl.setAttribute('download', 'template.png')
+      dl.setAttribute('download', `template-${+new Date()}.svg`)
       dl.click()
     })
   }
 </script>
 
-<div class="p-4">
+<div class="h-full w-full p-4">
   <div bind:this={element} class="h-[fit-content]" />
 </div>
