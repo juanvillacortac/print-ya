@@ -38,6 +38,10 @@ export default `<!DOCTYPE html>
       body {
         padding: 12px;
       }
+      #container {
+        pointer-events: none;
+        user-select: none;
+      }
     </style>
     <div id="container"></div>
     <script>

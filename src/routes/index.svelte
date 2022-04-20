@@ -4,10 +4,11 @@
   import type Processor from 'windicss'
   import Editor from '$lib/components/Editor.svelte'
   import { HSplitPane, VSplitPane } from 'svelte-split-pane'
-  import { Sun24, Moon24, Settings24 } from 'carbon-icons-svelte'
+  import { Sun24, Moon24, Error32, Warning32 } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
   import { onMount } from 'svelte'
+  import { fade } from 'svelte/transition'
 
   let Handlebars
 
@@ -94,8 +95,11 @@
           <div class="flex h-full w-full relative" slot="top">
             {#if errorMsg}
               <div
-                class="absolute z-20 bg-red-500 bg-opacity-75 inset-0 w-full h-full p-4 flex flex-col space-y-6 text-white overflow-auto"
+                transition:fade={{ duration: 200 }}
+                class="absolute z-20 bg-red-500 bg-opacity-50 backdrop-filter blur-20px inset-0 w-full h-full p-4 flex flex-col space-y-6 text-white overflow-auto"
+                style="will-change: backdrop-filter"
               >
+                <Warning32 class="w-24 h-24" />
                 <pre>{errorMsg}</pre>
               </div>
             {/if}
