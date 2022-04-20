@@ -9,6 +9,7 @@
   import { persistentWritable, preferences } from '$lib'
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
+  import Preview from '$lib/components/Preview.svelte'
 
   let Handlebars
 
@@ -45,17 +46,23 @@
     processor = p
     finalCss = generatedCSS
   }
+
+  let save: () => void
 </script>
 
 {#if browser}
   <div
-    class="flex flex-col h-screen w-full text-gray-700 dark:text-white overflow-hidden"
+    class="flex flex-col h-screen w-full text-gray-700 overflow-hidden dark:text-white"
   >
     <div
-      class="bg-white dark:bg-gray-800 flex shadow w-full p-4 justify-between items-center z-50"
+      class="bg-white flex shadow w-full p-4 z-50 justify-between items-center dark:bg-gray-800"
     >
       <h2 class="font-bold text-xl">Print Ya!</h2>
-      <div class="flex space-x-4">
+      <div class="flex space-x-4 items-center">
+        <button
+          class="rounded-lg font-bold border-2 border-blue-500 text-sm py-2 px-2 transform-gpu text-blue-500 duration-200 hover:shadow hover:-translate-y-px"
+          on:click={save}>Export as image</button
+        >
         {#if !$preferences.darkMode}
           <Sun24
             on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
@@ -96,17 +103,18 @@
             {#if errorMsg}
               <div
                 transition:fade={{ duration: 200 }}
-                class="absolute z-20 bg-red-500 bg-opacity-50 backdrop-filter blur-20px inset-0 w-full h-full p-4 flex flex-col space-y-6 text-white overflow-auto"
+                class="flex flex-col h-full space-y-6 bg-red-500 bg-opacity-50 text-white w-full p-4 inset-0 z-20 absolute backdrop-filter overflow-auto blur-20px"
                 style="will-change: backdrop-filter"
               >
-                <Warning32 class="w-24 h-24" />
+                <Warning32 class="h-24 w-24" />
                 <pre>{errorMsg}</pre>
               </div>
             {/if}
             <div
               class="flex h-full w-full inset-0 absolute select-none checkerboard overflow-auto"
             >
-              <Iframe
+              <Preview html={finalHtml} css={finalCss} bind:saveImage={save} />
+              <!-- <Iframe
                 props={{
                   html: finalHtml,
                   css: finalCss,
@@ -114,10 +122,10 @@
                   dark: false,
                   classes: '',
                 }}
-              />
+              /> -->
             </div>
           </div>
-          <div class="flex h-full w-full relative p-4" slot="down">
+          <div class="flex h-full w-full p-4 relative" slot="down">
             <Editor
               title="Template fields"
               language="json"
