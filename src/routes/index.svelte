@@ -39,7 +39,11 @@
   })
 
   $: if (data && browser) {
-    editor.set(JSON.parse(window.decodeURIComponent(data)))
+    const decoded = window.decodeURIComponent(window.atob(data))
+    try {
+      const payload = JSON.parse(decoded)
+      $editor = payload
+    } catch {}
   }
 
   let finalCss = ''
@@ -87,7 +91,9 @@
             navigator.clipboard.writeText(
               `${window.location.protocol}//${window.location.host}${
                 window.location.pathname
-              }?data=${window.encodeURIComponent(JSON.stringify($editor))}`
+              }?data=${window.encodeURIComponent(
+                window.btoa(JSON.stringify($editor))
+              )}`
             )}
           title="Copy share link"
           use:tooltip
