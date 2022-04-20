@@ -20,7 +20,7 @@
 {#if visible}
   <div
     transition:fly={{ y: 2 }}
-    class="absolute p-1 bg-white border-gray-200 border dark:border-gray-700 dark:text-white text-xs rounded dark:bg-gray-800 z-20 text-gray-700"
+    class="bg-white border rounded border-gray-200 text-xs p-1 text-gray-700 z-20 z-999 absolute dark:bg-gray-800 dark:border-gray-700 dark:text-white"
     style="top: {y + 5}px; left: {x + 5}px;"
     bind:clientWidth={width}
   >

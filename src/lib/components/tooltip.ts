@@ -18,12 +18,12 @@ export function tooltip(element: HTMLElement) {
     if (event.pageX + tooltipComponent.width >= window.innerWidth) {
       tooltipComponent?.$set({
         x: event.pageX - tooltipComponent.width,
-        y: event.pageY,
+        y: event.pageY + 5,
       })
     } else {
       tooltipComponent?.$set({
         x: event.pageX,
-        y: event.pageY,
+        y: event.pageY + 5,
       })
     }
   }
@@ -31,12 +31,12 @@ export function tooltip(element: HTMLElement) {
     if (event.pageX + tooltipComponent.width >= window.innerWidth) {
       tooltipComponent?.$set({
         x: event.pageX - tooltipComponent.width,
-        y: event.pageY,
+        y: event.pageY + 5,
       })
     } else {
       tooltipComponent?.$set({
         x: event.pageX,
-        y: event.pageY,
+        y: event.pageY + 5,
       })
     }
   }

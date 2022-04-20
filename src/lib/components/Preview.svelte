@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { toPng, toSvg } from 'html-to-image'
+  import { toPng } from 'html-to-image'
 
   let element: HTMLDivElement
   let shadow: ShadowRoot
@@ -42,16 +42,16 @@
   }
 
   export const saveImage = () => {
-    toSvg(element, { skipFonts: true }).then((dataUrl) => {
+    toPng(element, { skipFonts: true }).then((dataUrl) => {
       var dl = document.createElement('a')
       document.body.appendChild(dl)
       dl.setAttribute('href', dataUrl)
-      dl.setAttribute('download', `template-${+new Date()}.svg`)
+      dl.setAttribute('download', `template-${+new Date()}.png`)
       dl.click()
     })
   }
 </script>
 
-<div class="h-full w-full p-4">
+<div class="p-4">
   <div bind:this={element} class="h-[fit-content]" />
 </div>

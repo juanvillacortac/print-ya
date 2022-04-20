@@ -1,27 +1,46 @@
+<script lang="ts" context="module">
+  import type { Load } from '@sveltejs/kit'
+  export const load: Load = ({ url }) => {
+    const data = url.searchParams.get('data')
+
+    return {
+      props: {
+        data,
+      },
+    }
+  }
+</script>
+
 <script lang="ts">
   import { useWindiCSS } from '$lib/windicss'
-  import Iframe from '$lib/Iframe.svelte'
   import type Processor from 'windicss'
   import Editor from '$lib/components/Editor.svelte'
   import { HSplitPane, VSplitPane } from 'svelte-split-pane'
-  import { Sun24, Moon24, Error32, Warning32 } from 'carbon-icons-svelte'
+  import { Sun24, Moon24, Warning32, Share24 } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import Preview from '$lib/components/Preview.svelte'
+  import { tooltip } from '$lib/components/tooltip'
 
-  let Handlebars
+  export let data: string
 
-  onMount(async () => {
-    Handlebars = await import('handlebars-esm')
-  })
+  let Handlebars: any
 
   const editor = persistentWritable('editorState', {
     html: '',
     css: '',
     fields: '',
   })
+
+  onMount(async () => {
+    Handlebars = await import('handlebars-esm')
+  })
+
+  $: if (data && browser) {
+    editor.set(JSON.parse(window.atob(data)))
+  }
 
   let finalCss = ''
   let finalHtml = ''
@@ -63,14 +82,34 @@
           class="rounded-lg font-bold border-2 border-blue-500 text-sm py-2 px-2 transform-gpu text-blue-500 duration-200 hover:shadow hover:-translate-y-px"
           on:click={save}>Export as image</button
         >
+        <button
+          on:click={() =>
+            navigator.clipboard.writeText(
+              `${window.location.protocol}//${window.location.host}${
+                window.location.pathname
+              }?data=${window.btoa(JSON.stringify($editor))}`
+            )}
+          title="Copy share link"
+          use:tooltip
+        >
+          <Share24 />
+        </button>
         {#if !$preferences.darkMode}
-          <Sun24
+          <button
             on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
-          />
+            title="Toggle theme"
+            use:tooltip
+          >
+            <Sun24 />
+          </button>
         {:else}
-          <Moon24
+          <button
             on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
-          />
+            title="Toggle theme"
+            use:tooltip
+          >
+            <Moon24 />
+          </button>
         {/if}
       </div>
     </div>
