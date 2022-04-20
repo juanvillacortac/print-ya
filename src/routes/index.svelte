@@ -39,13 +39,13 @@
   })
 
   $: if (data && browser) {
-    editor.set(JSON.parse(window.atob(data)))
+    editor.set(JSON.parse(window.decodeURIComponent(data)))
   }
 
   let finalCss = ''
   let finalHtml = ''
-  let processor: Processor
   let errorMsg = ''
+  let processor: Processor
   $: if (browser && Handlebars) {
     const template = Handlebars.default.compile($editor.html)
     try {
@@ -87,7 +87,7 @@
             navigator.clipboard.writeText(
               `${window.location.protocol}//${window.location.host}${
                 window.location.pathname
-              }?data=${window.btoa(JSON.stringify($editor))}`
+              }?data=${window.encodeURIComponent(JSON.stringify($editor))}`
             )}
           title="Copy share link"
           use:tooltip
