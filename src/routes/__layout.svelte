@@ -36,6 +36,7 @@
 </script>
 
 <svelte:head>
+  <title>Print Ya!</title>
   <link rel="preconnect" href="https://caravaggio-cdn.vercel.app" />
   {@html fontsTag}
 </svelte:head>
