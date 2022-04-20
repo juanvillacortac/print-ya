@@ -26,9 +26,11 @@
     const imports = css.match(/@import\ url\((.*?)\);/gim)
 
     if (shadowDomCssImports) document.head.removeChild(shadowDomCssImports)
-    shadowDomCssImports = document.createElement('style')
-    shadowDomCssImports.innerHTML = imports.join('\n')
-    document.head.append(shadowDomCssImports)
+    if (imports?.length) {
+      shadowDomCssImports = document.createElement('style')
+      shadowDomCssImports.innerHTML = imports.join('\n')
+      document.head.append(shadowDomCssImports)
+    }
   }
 
   $: if (html != null && shadow) {
