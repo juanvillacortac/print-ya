@@ -119,6 +119,7 @@ dependencies:
   svelte-split-pane: 0.1.2
   svelte-splitpanes: 0.6.3
   three: 0.135.0
+  windicss: 3.5.1
 
 devDependencies:
   '@poppanator/sveltekit-svg': 0.2.3_svelte@3.46.4
@@ -144,7 +145,6 @@ devDependencies:
   typescript: 4.6.3
   vite-imagetools: 4.0.3
   vite-plugin-windicss: 1.8.3
-  windicss: 3.5.1
 
 packages:
 
@@ -6821,7 +6821,6 @@ packages:
     resolution: {integrity: sha512-E1hYZATcZFci/XhGS0sJAMRxULjnK+glNukE78Ku7xeb3jxgMY55fFOdIrav+GjQCsgR+IZxPq9/DwmO6eyc4Q==}
     engines: {node: '>= 12'}
     hasBin: true
-    dev: true
 
   /wordwrap/1.0.0:
     resolution: {integrity: sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus=}
