@@ -16,14 +16,20 @@
   import type Processor from 'windicss'
   import Editor from '$lib/components/Editor.svelte'
   import { HSplitPane, VSplitPane } from 'svelte-split-pane'
-  import { Sun24, Moon24, Warning32, Share24 } from 'carbon-icons-svelte'
+  import {
+    Sun24,
+    Moon24,
+    Warning32,
+    Share24,
+    Add16,
+    Subtract16,
+  } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import Preview from '$lib/components/Preview.svelte'
   import { tooltip } from '$lib/components/tooltip'
-  import CompilerWorker from '$lib/compiler.worker?worker'
   import type {
     CompilerMessage,
     CompilerPostMessage,
@@ -52,7 +58,10 @@
   let errorMsg = ''
   let processor: Processor
 
-  onMount(() => {
+  onMount(async () => {
+    const CompilerWorker = await import('$lib/compiler.worker?worker').then(
+      (m) => m.default
+    )
     compiler = new CompilerWorker()
 
     compiler.onmessage = ({ data }: MessageEvent<CompilerMessage>) => {
@@ -62,8 +71,8 @@
       errorMsg = ''
     }
 
-    compiler.onerror = ({ error }) => {
-      errorMsg = error.message
+    compiler.onerror = (event) => {
+      errorMsg = event.message
       finalHtml = $editor.html
     }
   })
@@ -143,24 +152,18 @@
       <HSplitPane>
         <VSplitPane slot="left">
           <div class="flex h-full w-full p-4" slot="top">
-            {#if processor}
-              <Editor
-                title="Template"
-                bind:modelValue={$editor.html}
-                language="html"
-                bind:processor
-              />
-            {/if}
+            <Editor
+              title="Template"
+              bind:modelValue={$editor.html}
+              language="html"
+            />
           </div>
           <div class="flex h-full w-full p-4" slot="down">
-            {#if processor}
-              <Editor
-                title="Style"
-                bind:modelValue={$editor.css}
-                language="css"
-                bind:processor
-              />
-            {/if}
+            <Editor
+              title="Style"
+              bind:modelValue={$editor.css}
+              language="css"
+            />
           </div>
         </VSplitPane>
         <VSplitPane slot="right" topPanelSize="60%" downPanelSize="40%">
@@ -168,7 +171,7 @@
             {#if errorMsg}
               <div
                 transition:fade={{ duration: 200 }}
-                class="flex flex-col h-full space-y-6 bg-red-500 bg-opacity-50 text-white w-full p-4 inset-0 z-20 absolute backdrop-filter overflow-auto blur-20px"
+                class="flex flex-col h-full space-y-6 bg-red-500 bg-opacity-50 text-white w-full p-4 text-sm inset-0 z-20 absolute backdrop-filter overflow-auto blur-20px"
                 style="will-change: backdrop-filter"
               >
                 <Warning32 class="h-24 w-24" />
@@ -179,6 +182,22 @@
               class="flex h-full w-full inset-0 absolute select-none checkerboard overflow-auto"
             >
               <Preview html={finalHtml} css={finalCss} bind:saveImage={save} />
+            </div>
+            <div class="absolute right-1rem bottom-1rem flex space-x-1">
+              <button
+                class="rounded border-2 p-1 duration-200 hover:border-gray-300 bg-white dark:bg-gray-700"
+                title="Format document (Shift+Alt+F)"
+                use:tooltip
+              >
+                <Add16 class="font-bold" />
+              </button>
+              <button
+                class="rounded border-2 p-1 duration-200 hover:border-gray-300 bg-white dark:bg-gray-700"
+                title="Copy to clipboard"
+                use:tooltip
+              >
+                <Subtract16 class="font-bold" />
+              </button>
             </div>
           </div>
           <div class="flex h-full w-full p-4 relative" slot="down">

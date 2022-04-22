@@ -4,7 +4,11 @@ import { CSSParser, HTMLParser } from 'windicss/utils/parser'
 
 import type { Config } from 'windicss/types/interfaces'
 
-export function useWindiCSS(htmlCode: string, styleCode: string, config: Config | undefined) {
+export function useWindiCSS(
+  htmlCode: string,
+  styleCode: string,
+  config?: Config | undefined
+) {
   const processor = new Windi(config)
 
   const preflightStyles = processor.preflight(htmlCode, true, true, true)
@@ -14,8 +18,8 @@ export function useWindiCSS(htmlCode: string, styleCode: string, config: Config 
   const utilityStyles = processor.interpret(
     new HTMLParser(htmlCode)
       .parseClasses()
-      .map(i => i.result)
-      .join(' '),
+      .map((i) => i.result)
+      .join(' ')
   ).styleSheet
 
   const generatedCSS = new StyleSheet()

@@ -29,6 +29,7 @@
   } from 'carbon-icons-svelte'
   import { tooltip } from './tooltip'
   import Fullscreen from 'svelte-fullscreen'
+  import Windi from 'windicss'
 
   export let language: 'html' | 'css' | 'json'
 
@@ -78,12 +79,11 @@
     }
   })
 
-  export let processor: Processor = null
   async function initEditor() {
     const extensions = [basicSetup, reactivePlugin]
 
-    if (processor) {
-      console.log(processor)
+    if (language == 'html' || language == 'css') {
+      const processor = new Windi()
       extensions.push(hoverPreview(processor))
     }
 

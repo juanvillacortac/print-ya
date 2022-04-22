@@ -80,6 +80,7 @@
     "caravaggio-plugin-nextjs": "^0.4.2",
     "carbon-icons-svelte": "^10.45.1",
     "codemirror-theme-vars": "^0.1.1",
+    "ejs": "^3.1.7",
     "graphql-tag": "^2.12.6",
     "handlebars": "^4.7.7",
     "handlebars-esm": "^1.0.0",
