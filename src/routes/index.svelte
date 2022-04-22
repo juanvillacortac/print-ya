@@ -23,6 +23,9 @@
     Share24,
     Add16,
     Subtract16,
+    ZoomIn16,
+    ZoomOut16,
+    ZoomFit16,
   } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
@@ -99,6 +102,11 @@
   //   finalCss = generatedCSS
   // }
 
+  let scale = 1
+
+  const zoomIn = () => scale = Math.max(0.1, Math.min(scale + 0.1, 2))
+  const zoomOut = () => scale = Math.max(0.1, Math.min(scale - 0.1, 2))
+
   let save: () => void
 </script>
 
@@ -129,23 +137,11 @@
         >
           <Share24 />
         </button>
-        {#if !$preferences.darkMode}
-          <button
-            on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
-            title="Toggle theme"
-            use:tooltip
-          >
-            <Sun24 />
-          </button>
-        {:else}
-          <button
-            on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
-            title="Toggle theme"
-            use:tooltip
-          >
-            <Moon24 />
-          </button>
-        {/if}
+        <button
+          on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
+        >
+          <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
+        </button>
       </div>
     </div>
     <div class="h-full bg-light-500 dark:bg-gray-900">
@@ -171,7 +167,7 @@
             {#if errorMsg}
               <div
                 transition:fade={{ duration: 200 }}
-                class="flex flex-col h-full space-y-6 bg-red-500 bg-opacity-50 text-white w-full p-4 text-sm inset-0 z-20 absolute backdrop-filter overflow-auto blur-20px"
+                class="flex flex-col h-full space-y-6 bg-red-500 bg-opacity-50 text-white text-sm w-full p-4 inset-0 z-20 absolute backdrop-filter overflow-auto blur-20px"
                 style="will-change: backdrop-filter"
               >
                 <Warning32 class="h-24 w-24" />
@@ -181,22 +177,34 @@
             <div
               class="flex h-full w-full inset-0 absolute select-none checkerboard overflow-auto"
             >
-              <Preview html={finalHtml} css={finalCss} bind:saveImage={save} />
+              <div class="origin-top-left transition-transform duration-200 absolute" style="transform: scale({scale})">
+                <Preview html={finalHtml} css={finalCss} bind:saveImage={save} />
+              </div>
             </div>
-            <div class="absolute right-1rem bottom-1rem flex space-x-1">
+            <div class="flex space-x-1 right-1rem bottom-1rem absolute">
               <button
-                class="rounded border-2 p-1 duration-200 hover:border-gray-300 bg-white dark:bg-gray-700"
-                title="Format document (Shift+Alt+F)"
+                class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                title="Zoom Out"
                 use:tooltip
+                on:click={zoomOut}
               >
-                <Add16 class="font-bold" />
+                <ZoomOut16 class="font-bold" />
               </button>
               <button
-                class="rounded border-2 p-1 duration-200 hover:border-gray-300 bg-white dark:bg-gray-700"
-                title="Copy to clipboard"
+                class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                title="Reset zoom"
                 use:tooltip
+                on:click={() => scale = 1}
               >
-                <Subtract16 class="font-bold" />
+                <ZoomFit16 class="font-bold" />
+              </button>
+              <button
+                class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                title="Zoom In"
+                use:tooltip
+                on:click={zoomIn}
+              >
+                <ZoomIn16 class="font-bold" />
               </button>
             </div>
           </div>

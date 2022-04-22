@@ -36,13 +36,15 @@
   $: if (html != null && shadow) {
     if (containerEl) shadow.removeChild(containerEl)
     containerEl = document.createElement('div')
-    containerEl.style.height = 'fit-content'
+    containerEl.style.position = 'absolute'
+    containerEl.style.padding = '1rem'
     containerEl.innerHTML = html
     shadow.appendChild(containerEl)
   }
 
   export const saveImage = () => {
-    toPng(element, { skipFonts: true }).then((dataUrl) => {
+    if (!containerEl) return
+    toPng(containerEl, { skipFonts: true }).then((dataUrl) => {
       var dl = document.createElement('a')
       document.body.appendChild(dl)
       dl.setAttribute('href', dataUrl)
@@ -52,6 +54,4 @@
   }
 </script>
 
-<div class="p-4">
-  <div bind:this={element} class="h-[fit-content]" />
-</div>
+<div bind:this={element} class="relative" />
