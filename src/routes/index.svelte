@@ -23,19 +23,18 @@
   import { fade } from 'svelte/transition'
   import Preview from '$lib/components/Preview.svelte'
   import { tooltip } from '$lib/components/tooltip'
+  import CompilerWorker from '$lib/compiler.worker?worker'
+  import type {
+    CompilerMessage,
+    CompilerPostMessage,
+  } from '$lib/compiler.worker'
 
   export let data: string
-
-  let Handlebars: any
 
   const editor = persistentWritable('editorState', {
     html: '',
     css: '',
     fields: '',
-  })
-
-  onMount(async () => {
-    Handlebars = await import('handlebars-esm')
   })
 
   $: if (data && browser) {
@@ -46,29 +45,50 @@
     } catch {}
   }
 
+  let compiler: Worker
+
   let finalCss = ''
   let finalHtml = ''
   let errorMsg = ''
   let processor: Processor
-  $: if (browser && Handlebars) {
-    const template = Handlebars.default.compile($editor.html)
-    try {
-      finalHtml = template(JSON.parse($editor.fields || '{}'))
+
+  onMount(() => {
+    compiler = new CompilerWorker()
+
+    compiler.onmessage = ({ data }: MessageEvent<CompilerMessage>) => {
+      processor = data.processor
+      finalHtml = data.html
+      finalCss = data.css
       errorMsg = ''
-    } catch (err) {
-      errorMsg = err.message
+    }
+
+    compiler.onerror = ({ error }) => {
+      errorMsg = error.message
       finalHtml = $editor.html
     }
-  }
-  $: {
-    const { processor: p, generatedCSS } = useWindiCSS(
-      $editor.html,
-      $editor.css,
-      null
-    )
-    processor = p
-    finalCss = generatedCSS
-  }
+  })
+
+  $: compiler?.postMessage($editor as CompilerPostMessage)
+
+  // $: if (browser && Handlebars) {
+  //   const template = Handlebars.default.compile($editor.html)
+  //   try {
+  //     finalHtml = template(JSON.parse($editor.fields || '{}'))
+  //     errorMsg = ''
+  //   } catch (err) {
+  //     errorMsg = err.message
+  //     finalHtml = $editor.html
+  //   }
+  // }
+  // $: {
+  //   const { processor: p, generatedCSS } = useWindiCSS(
+  //     $editor.html,
+  //     $editor.css,
+  //     null
+  //   )
+  //   processor = p
+  //   finalCss = generatedCSS
+  // }
 
   let save: () => void
 </script>
@@ -159,15 +179,6 @@
               class="flex h-full w-full inset-0 absolute select-none checkerboard overflow-auto"
             >
               <Preview html={finalHtml} css={finalCss} bind:saveImage={save} />
-              <!-- <Iframe
-                props={{
-                  html: finalHtml,
-                  css: finalCss,
-                  fixedCss: '',
-                  dark: false,
-                  classes: '',
-                }}
-              /> -->
             </div>
           </div>
           <div class="flex h-full w-full p-4 relative" slot="down">
