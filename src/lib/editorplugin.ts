@@ -58,7 +58,6 @@ export const hoverPreview = (processor: Processor) => {
       if ((start === pos && side < 0) || (end === pos && side > 0)) return null
       const word = text.slice(start - from, end - from)
       const result = processor.interpret(word)
-      console.log(result)
       if (result.ignored.length > 0) return null
       return {
         pos: start,

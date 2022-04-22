@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { toPng } from 'html-to-image'
+  import { preferences } from '$lib'
 
   let element: HTMLDivElement
   let shadow: ShadowRoot
@@ -28,16 +29,17 @@
     if (shadowDomCssImports) document.head.removeChild(shadowDomCssImports)
     if (imports?.length) {
       shadowDomCssImports = document.createElement('style')
-      shadowDomCssImports.innerHTML = imports.join('\n')
       document.head.append(shadowDomCssImports)
     }
   }
+
+  export let border = false
 
   $: if (html != null && shadow) {
     if (containerEl) shadow.removeChild(containerEl)
     containerEl = document.createElement('div')
     containerEl.style.position = 'absolute'
-    containerEl.style.padding = '1rem'
+    containerEl.style.outline = border ? `1px dashed ${$preferences.darkMode ? 'white' : 'gray'}` : 'none'
     containerEl.innerHTML = html
     shadow.appendChild(containerEl)
   }
@@ -54,4 +56,4 @@
   }
 </script>
 
-<div bind:this={element} class="relative" />
+<div bind:this={element} class="p-px relative" />

@@ -25,13 +25,14 @@ if (browser) {
       // const template = hb.default.compile(data.html)
       // const html = template(JSON.parse(data.fields || '{}'))
       const payload = JSON.parse(data.fields || '{}')
-      const { generatedCSS } = useWindiCSS(data.html, data.css)
       // const script = `<script>\n${Object.entries(payload).map(([k, v]) => `  let ${k} = ${JSON.stringify(v)}`).join('\n')}\n</script>`
       // const component = `${script}\n${data.html}`
       // const { css, js } = compile(component, { generate: 'ssr', hydratable: false })
       // console.log(js.code)
       // const html = await jsx.render(`(props) => (${data.html})`, payload)
       const html = ejs.render(replaceAll(replaceAll(data.html, '{{', '<%'), '}}', ' %>'), payload)
+      const css = ejs.render(replaceAll(replaceAll(data.css, '{{', '<%'), '}}', ' %>'), payload)
+      const { generatedCSS } = useWindiCSS(html, css)
       postMessage({
         html,
         css: generatedCSS,

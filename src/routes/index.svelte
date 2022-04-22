@@ -26,6 +26,7 @@
     ZoomIn16,
     ZoomOut16,
     ZoomFit16,
+    Checkbox16,
   } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
@@ -80,6 +81,8 @@
     }
   })
 
+  let border = false
+
   $: compiler?.postMessage($editor as CompilerPostMessage)
 
   // $: if (browser && Handlebars) {
@@ -102,10 +105,10 @@
   //   finalCss = generatedCSS
   // }
 
-  let scale = 1
+  let scale = 100
 
-  const zoomIn = () => scale = Math.max(0.1, Math.min(scale + 0.1, 2))
-  const zoomOut = () => scale = Math.max(0.1, Math.min(scale - 0.1, 2))
+  const zoomIn = () => scale = Math.max(10, Math.min(scale + 10, 200))
+  const zoomOut = () => scale = Math.max(10, Math.min(scale - 10, 200))
 
   let save: () => void
 </script>
@@ -147,7 +150,7 @@
     <div class="h-full bg-light-500 dark:bg-gray-900">
       <HSplitPane>
         <VSplitPane slot="left">
-          <div class="flex h-full w-full p-4" slot="top">
+          <div class="flex h-full w-full p-4 relative" slot="top">
             <Editor
               title="Template"
               bind:modelValue={$editor.html}
@@ -176,36 +179,55 @@
             {/if}
             <div
               class="flex h-full w-full inset-0 absolute select-none checkerboard overflow-auto"
+              on:mousewheel={(e) => {
+                if (e.ctrlKey) {
+                  e.preventDefault()
+                  if (e.deltaY > 0) {
+                    zoomOut()
+                  } else {
+                    zoomIn()
+                  }
+                }
+              }}
             >
-              <div class="origin-top-left transition-transform duration-200 absolute" style="transform: scale({scale})">
-                <Preview html={finalHtml} css={finalCss} bind:saveImage={save} />
+              <div class="origin-top-left transition-transform duration-200 absolute" style="transform: scale({scale / 100})">
+                <Preview html={finalHtml} css={finalCss} bind:saveImage={save} bind:border />
               </div>
-            </div>
-            <div class="flex space-x-1 right-1rem bottom-1rem absolute">
-              <button
-                class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
-                title="Zoom Out"
-                use:tooltip
-                on:click={zoomOut}
-              >
-                <ZoomOut16 class="font-bold" />
-              </button>
-              <button
-                class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
-                title="Reset zoom"
-                use:tooltip
-                on:click={() => scale = 1}
-              >
-                <ZoomFit16 class="font-bold" />
-              </button>
-              <button
-                class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
-                title="Zoom In"
-                use:tooltip
-                on:click={zoomIn}
-              >
-                <ZoomIn16 class="font-bold" />
-              </button>
+              <div class="flex space-x-1 right-1rem bottom-1rem absolute items-center">
+                <p class="font-bold text-xs">{Number.parseInt(scale)}%</p>
+                <button
+                  class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  title="Zoom Out"
+                  use:tooltip
+                  on:click={zoomOut}
+                >
+                  <ZoomOut16 class="font-bold" />
+                </button>
+                <button
+                  class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  title="Reset zoom"
+                  use:tooltip
+                  on:click={() => scale = 100}
+                >
+                  <ZoomFit16 class="font-bold" />
+                </button>
+                <button
+                  class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  title="Zoom In"
+                  use:tooltip
+                  on:click={zoomIn}
+                >
+                  <ZoomIn16 class="font-bold" />
+                </button>
+                <button
+                  class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  title="Toggle border"
+                  use:tooltip
+                  on:click={() => border = !border}
+                >
+                  <Checkbox16 class="font-bold" />
+                </button>
+              </div>
             </div>
           </div>
           <div class="flex h-full w-full p-4 relative" slot="down">
