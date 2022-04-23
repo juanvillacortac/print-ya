@@ -1,4 +1,9 @@
-import { EditorView, drawSelection, highlightSpecialChars, keymap } from '@codemirror/view'
+import {
+  EditorView,
+  drawSelection,
+  highlightSpecialChars,
+  keymap,
+} from '@codemirror/view'
 import { Compartment, EditorState } from '@codemirror/state'
 import { history, historyKeymap } from '@codemirror/history'
 import { foldGutter, foldKeymap } from '@codemirror/fold'
@@ -52,7 +57,8 @@ export const hoverPreview = (processor: Processor) => {
   return [
     hoverTooltip((view, pos, side) => {
       const { from, to, text } = view.state.doc.lineAt(pos)
-      let start = pos; let end = pos
+      let start = pos
+      let end = pos
       while (start > from && /[^\s"';`]/.test(text[start - from - 1])) start--
       while (end < to && /[^\s"';`]/.test(text[end - from])) end++
       if ((start === pos && side < 0) || (end === pos && side > 0)) return null
@@ -65,7 +71,9 @@ export const hoverPreview = (processor: Processor) => {
         above: true,
         create() {
           const dom = document.createElement('div')
-          const { highlightedCSS } = usePrismCSS(() => result.styleSheet.build())
+          const { highlightedCSS } = usePrismCSS(() =>
+            result.styleSheet.build()
+          )
           // const highlightedCSS = result.styleSheet.build()
           console.log(result)
           dom.className = 'text-sm p-2'
