@@ -39,7 +39,9 @@
     if (containerEl) shadow.removeChild(containerEl)
     containerEl = document.createElement('div')
     containerEl.style.position = 'absolute'
-    containerEl.style.outline = border ? `1px dashed ${$preferences.darkMode ? 'white' : 'gray'}` : 'none'
+    containerEl.style.outline = border
+      ? `1px dashed ${$preferences.darkMode ? 'white' : 'gray'}`
+      : 'none'
     containerEl.innerHTML = html
     shadow.appendChild(containerEl)
   }

@@ -107,8 +107,8 @@
 
   let scale = 100
 
-  const zoomIn = () => scale = Math.max(10, Math.min(scale + 10, 200))
-  const zoomOut = () => scale = Math.max(10, Math.min(scale - 10, 200))
+  const zoomIn = () => (scale = Math.max(10, Math.min(scale + 10, 200)))
+  const zoomOut = () => (scale = Math.max(10, Math.min(scale - 10, 200)))
 
   let save: () => void
 </script>
@@ -179,7 +179,7 @@
             {/if}
             <div
               class="flex h-full w-full inset-0 absolute select-none checkerboard overflow-auto"
-              on:mousewheel={(e) => {
+              on:wheel={(e) => {
                 if (e.ctrlKey) {
                   e.preventDefault()
                   if (e.deltaY > 0) {
@@ -190,11 +190,23 @@
                 }
               }}
             >
-              <div class="origin-top-left transition-transform duration-200 absolute" style="transform: scale({scale / 100})">
-                <Preview html={finalHtml} css={finalCss} bind:saveImage={save} bind:border />
+              <div class="absolute w-full h-full overflow-auto">
+                <div
+                  class="origin-top-left transition-transform duration-200"
+                  style="transform: scale({scale / 100})"
+                >
+                  <Preview
+                    html={finalHtml}
+                    css={finalCss}
+                    bind:saveImage={save}
+                    bind:border
+                  />
+                </div>
               </div>
-              <div class="flex space-x-1 right-1rem bottom-1rem absolute items-center">
-                <p class="font-bold text-xs">{Number.parseInt(scale)}%</p>
+              <div
+                class="flex space-x-1 right-1rem bottom-1rem absolute items-center"
+              >
+                <p class="font-bold text-xs">{scale}%</p>
                 <button
                   class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Zoom Out"
@@ -207,7 +219,7 @@
                   class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Reset zoom"
                   use:tooltip
-                  on:click={() => scale = 100}
+                  on:click={() => (scale = 100)}
                 >
                   <ZoomFit16 class="font-bold" />
                 </button>
@@ -223,7 +235,7 @@
                   class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Toggle border"
                   use:tooltip
-                  on:click={() => border = !border}
+                  on:click={() => (border = !border)}
                 >
                   <Checkbox16 class="font-bold" />
                 </button>
