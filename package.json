@@ -37,6 +37,7 @@
     "carbon-preprocess-svelte": "^0.6.0",
     "graphql": "^16.3.0",
     "graphqurl": "^1.0.1",
+    "prisma": "^3.12.0",
     "rollup-plugin-polyfill": "^3.0.0",
     "svelte": "^3.46.4",
     "svelte-check": "^2.4.6",
@@ -50,7 +51,6 @@
   },
   "type": "module",
   "dependencies": {
-    "windicss": "^3.5.1",
     "@codemirror/autocomplete": "^0.19.15",
     "@codemirror/closebrackets": "^0.19.2",
     "@codemirror/commands": "^0.19.8",
@@ -79,6 +79,7 @@
     "caravaggio": "^3.7.2",
     "caravaggio-plugin-nextjs": "^0.4.2",
     "carbon-icons-svelte": "^10.45.1",
+    "chrome-aws-lambda": "^10.1.0",
     "codemirror-theme-vars": "^0.1.1",
     "ejs": "^3.1.7",
     "graphql-tag": "^2.12.6",
@@ -90,12 +91,14 @@
     "prettier": "^2.6.2",
     "prism-theme-vars": "^0.2.2",
     "prismjs": "^1.28.0",
+    "puppeteer-core": "^13.6.0",
     "sharp": "^0.29.3",
     "svelte-datocms": "^0.6.3",
     "svelte-fullscreen": "^2.0.0",
     "svelte-marquee-text-widget": "^1.1.0",
     "svelte-split-pane": "^0.1.2",
     "svelte-splitpanes": "^0.6.3",
-    "three": "^0.135.0"
+    "three": "^0.135.0",
+    "windicss": "^3.5.1"
   }
 }

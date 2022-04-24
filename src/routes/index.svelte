@@ -12,8 +12,6 @@
 </script>
 
 <script lang="ts">
-  import { useWindiCSS } from '$lib/windicss'
-  import type Processor from 'windicss'
   import Editor from '$lib/components/Editor.svelte'
   import { HSplitPane, VSplitPane } from 'svelte-split-pane'
   import {
@@ -21,8 +19,6 @@
     Moon24,
     Warning32,
     Share24,
-    Add16,
-    Subtract16,
     ZoomIn16,
     ZoomOut16,
     ZoomFit16,
@@ -30,14 +26,9 @@
   } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
-  import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import Preview from '$lib/components/Preview.svelte'
   import { tooltip } from '$lib/components/tooltip'
-  import type {
-    CompilerMessage,
-    CompilerPostMessage,
-  } from '$lib/compiler.worker'
 
   export let data: string
 
@@ -45,6 +36,7 @@
     html: '',
     css: '',
     fields: '',
+    windi: true,
   })
 
   $: if (data && browser) {
@@ -55,55 +47,9 @@
     } catch {}
   }
 
-  let compiler: Worker
-
-  let finalCss = ''
-  let finalHtml = ''
   let errorMsg = ''
-  let processor: Processor
 
-  onMount(async () => {
-    const CompilerWorker = await import('$lib/compiler.worker?worker').then(
-      (m) => m.default
-    )
-    compiler = new CompilerWorker()
-
-    compiler.onmessage = ({ data }: MessageEvent<CompilerMessage>) => {
-      processor = data.processor
-      finalHtml = data.html
-      finalCss = data.css
-      errorMsg = ''
-    }
-
-    compiler.onerror = (event) => {
-      errorMsg = event.message
-      finalHtml = $editor.html
-    }
-  })
-
-  let border = false
-
-  $: compiler?.postMessage($editor as CompilerPostMessage)
-
-  // $: if (browser && Handlebars) {
-  //   const template = Handlebars.default.compile($editor.html)
-  //   try {
-  //     finalHtml = template(JSON.parse($editor.fields || '{}'))
-  //     errorMsg = ''
-  //   } catch (err) {
-  //     errorMsg = err.message
-  //     finalHtml = $editor.html
-  //   }
-  // }
-  // $: {
-  //   const { processor: p, generatedCSS } = useWindiCSS(
-  //     $editor.html,
-  //     $editor.css,
-  //     null
-  //   )
-  //   processor = p
-  //   finalCss = generatedCSS
-  // }
+  let border = true
 
   let scale = 100
 
@@ -178,7 +124,7 @@
               </div>
             {/if}
             <div
-              class="flex h-full w-full inset-0 absolute select-none checkerboard overflow-auto"
+              class="flex h-full w-full absolute select-none checkerboard overflow-auto"
               on:wheel={(e) => {
                 if (e.ctrlKey) {
                   e.preventDefault()
@@ -196,8 +142,8 @@
                   style="transform: scale({scale / 100})"
                 >
                   <Preview
-                    html={finalHtml}
-                    css={finalCss}
+                    template={$editor}
+                    bind:error={errorMsg}
                     bind:saveImage={save}
                     bind:border
                   />
@@ -206,9 +152,9 @@
               <div
                 class="flex space-x-1 right-1rem bottom-1rem absolute items-center"
               >
-                <p class="font-bold text-xs">{scale}%</p>
+                <p class="font-bold text-xs pr-4">{scale}%</p>
                 <button
-                  class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded border-2 border-gray-500 dark:border-2 dark:border-transparent shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Zoom Out"
                   use:tooltip
                   on:click={zoomOut}
@@ -216,7 +162,7 @@
                   <ZoomOut16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded border-2 border-gray-500 dark:border-2 dark:border-transparent shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Reset zoom"
                   use:tooltip
                   on:click={() => (scale = 100)}
@@ -224,7 +170,7 @@
                   <ZoomFit16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded border-2 border-gray-500 dark:border-2 dark:border-transparent shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Zoom In"
                   use:tooltip
                   on:click={zoomIn}
@@ -232,7 +178,7 @@
                   <ZoomIn16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white border-transparent rounded border-2 shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded border-2 border-gray-500 dark:border-2 dark:border-transparent shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Toggle border"
                   use:tooltip
                   on:click={() => (border = !border)}
