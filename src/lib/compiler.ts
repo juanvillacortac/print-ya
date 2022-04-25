@@ -33,7 +33,7 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
         payload
       )
     }
-    if (source.windi) {
+    if (source.windi || source.windi === undefined) {
       const { generatedCSS } = useWindiCSS(html, css)
       css = generatedCSS
     }
