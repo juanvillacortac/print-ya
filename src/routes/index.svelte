@@ -136,7 +136,7 @@
                 }
               }}
             >
-              <div class="absolute w-full h-full overflow-auto">
+              <div class="h-full w-full absolute overflow-auto">
                 <div
                   class="origin-top-left transition-transform duration-200"
                   style="transform: scale({scale / 100})"
@@ -154,7 +154,7 @@
               >
                 <p class="font-bold text-xs pr-4">{scale}%</p>
                 <button
-                  class="bg-white rounded border-2 border-gray-500 dark:border-2 dark:border-transparent shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Zoom Out"
                   use:tooltip
                   on:click={zoomOut}
@@ -162,7 +162,7 @@
                   <ZoomOut16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded border-2 border-gray-500 dark:border-2 dark:border-transparent shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Reset zoom"
                   use:tooltip
                   on:click={() => (scale = 100)}
@@ -170,7 +170,7 @@
                   <ZoomFit16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded border-2 border-gray-500 dark:border-2 dark:border-transparent shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Zoom In"
                   use:tooltip
                   on:click={zoomIn}
@@ -178,7 +178,7 @@
                   <ZoomIn16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded border-2 border-gray-500 dark:border-2 dark:border-transparent shadow p-1 transform transition-transform duration-200 dark:bg-gray-700 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Toggle border"
                   use:tooltip
                   on:click={() => (border = !border)}

@@ -14,7 +14,7 @@
     html: '',
     css: '',
     fields: '',
-    useWindi: true,
+    windi: true,
   }
 
   export let error = ''

@@ -11,7 +11,7 @@ export type TemplateSource = {
   html: string
   css: string
   fields?: string
-  useWindi?: boolean
+  windi?: boolean
 }
 
 export const compile = (source: TemplateSource): CompiledTemplate => {
@@ -33,7 +33,7 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
         payload
       )
     }
-    if (source.useWindi) {
+    if (source.windi) {
       const { generatedCSS } = useWindiCSS(html, css)
       css = generatedCSS
     }
