@@ -1,13 +1,10 @@
 import preprocess from 'svelte-preprocess'
-import { windi } from 'svelte-windicss-preprocess'
 import { optimizeImports } from 'carbon-preprocess-svelte'
 import { imagetools } from 'vite-imagetools'
 import auto from '@sveltejs/adapter-auto'
 import node from '@sveltejs/adapter-node'
 import svg from '@poppanator/sveltekit-svg'
 import WindiCSS from 'vite-plugin-windicss'
-import pollyfills from 'rollup-plugin-polyfill'
-import path from 'path'
 
 const adapter = () => {
   switch (process.env.ADAPTER?.toLowerCase()) {
@@ -17,10 +14,6 @@ const adapter = () => {
       return auto()
   }
 }
-
-const GITPOD_HMR_HOST = process.env.GITPOD_HMR_HOST?.substring(
-  'https://'.length
-)
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

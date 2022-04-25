@@ -1,9 +1,9 @@
 <script lang="ts">
+  import '../web-components'
   import 'virtual:windi.css'
   import '$lib/styles/base.css'
 
   import Favicons from '$lib/components/Favicons.svelte'
-  import { height } from '$lib/components/nav/Header.svelte'
   import { preferences } from '$lib'
   import { browser } from '$app/env'
 
@@ -28,11 +28,6 @@
   <noscript>
     <link rel="stylesheet" href=${fontsURL} />
   </noscript>`
-
-  $: cssGlobals = {
-    navbarHeight: `${$height}px`,
-    navbarHeightNegative: `-${$height}px`,
-  }
 </script>
 
 <svelte:head>

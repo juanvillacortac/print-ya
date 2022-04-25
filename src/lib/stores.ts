@@ -1,12 +1,6 @@
 import type { Writable } from 'svelte/store'
 import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
-import type { PageData } from './models/page'
-
-export const layoutStore = writable({
-  bg: '#cbccd1',
-  gradientVisible: true,
-})
 
 export function persistentWritable<T>(
   key: string,
@@ -46,7 +40,3 @@ export function persistentWritable<T>(
 export const preferences = persistentWritable('preferences', {
   darkMode: false,
 })
-
-export const pageData = writable<PageData>(null)
-
-export const listsMap = writable<Record<string, number>>({})

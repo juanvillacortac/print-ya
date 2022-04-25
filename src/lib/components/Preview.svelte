@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { toPng } from 'html-to-image'
+  import { toPng, toSvg } from 'html-to-image'
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
+  import { shared } from './store'
 
   let element: HTMLDivElement
   let shadow: ShadowRoot
@@ -25,6 +26,7 @@
   }
 
   let compiler: Worker
+  let debug = false
 
   onMount(async () => {
     shadow = element.attachShadow({ mode: 'open' })
@@ -33,9 +35,14 @@
       (m) => m.default
     )
 
+    shared.set('something')
+
     compiler = new CompilerWorker()
 
     compiler.onmessage = ({ data }: MessageEvent<CompiledTemplate>) => {
+      if (debug) {
+        console.log(data)
+      }
       compiled = data
       error = ''
     }
@@ -114,12 +121,12 @@
 
   export const saveImage = () => {
     if (!containerEl) return
-    toPng(containerEl.getElementsByTagName('div')[0], { skipFonts: true }).then(
+    toSvg(containerEl.getElementsByTagName('div')[0], { skipFonts: true }).then(
       (dataUrl) => {
         var dl = document.createElement('a')
         document.body.appendChild(dl)
         dl.setAttribute('href', dataUrl)
-        dl.setAttribute('download', `template-${+new Date()}.png`)
+        dl.setAttribute('download', `template-${+new Date()}.svg`)
         dl.click()
       }
     )
