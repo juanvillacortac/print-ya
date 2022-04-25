@@ -1,5 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit'
 import { compile, type TemplateSource } from '$lib/compiler'
+import puppeteer from 'puppeteer-core'
 import chromium from 'chrome-aws-lambda'
 
 export const get: RequestHandler = async ({ url }) => {
@@ -25,7 +26,7 @@ export const get: RequestHandler = async ({ url }) => {
   let file = null
 
   try {
-    browser = await chromium.puppeteer.launch({
+    browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath,
