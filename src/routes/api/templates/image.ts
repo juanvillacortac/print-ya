@@ -3,7 +3,9 @@ import { compile, type TemplateSource } from '$lib/compiler'
 import chromium from 'chrome-aws-lambda'
 
 export const get: RequestHandler = async ({ url }) => {
-  const decoded = atob(url.searchParams.get('data'))
+  const decoded = Buffer.from(url.searchParams.get('data'), 'base64').toString(
+    'utf8'
+  )
   const payload: TemplateSource = JSON.parse(decoded)
   const { css, html } = compile(payload)
 
