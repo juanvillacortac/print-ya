@@ -1,5 +1,4 @@
 <script lang="ts">
-  import '../web-components'
   import 'virtual:windi.css'
   import '$lib/styles/base.css'
 

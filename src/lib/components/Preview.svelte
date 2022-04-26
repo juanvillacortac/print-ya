@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import { toPng, toSvg } from 'html-to-image'
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
-  import { shared } from './store'
 
   let element: HTMLDivElement
   let shadow: ShadowRoot
@@ -35,8 +34,6 @@
       (m) => m.default
     )
 
-    shared.set('something')
-
     compiler = new CompilerWorker()
 
     compiler.onmessage = ({ data }: MessageEvent<CompiledTemplate>) => {
@@ -51,6 +48,10 @@
       error = event.message
       compiled.html = template.html
     }
+  })
+
+  onDestroy(() => {
+    compiler?.terminate()
   })
 
   $: compiler?.postMessage(template)
