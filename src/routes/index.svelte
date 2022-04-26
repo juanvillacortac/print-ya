@@ -23,20 +23,46 @@
     ZoomOut16,
     ZoomFit16,
     Checkbox16,
+    Script24,
+    Settings24,
+    Checkbox24,
+    CloudUpload24,
   } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
   import { fade } from 'svelte/transition'
   import Preview from '$lib/components/Preview.svelte'
   import { tooltip } from '$lib/components/tooltip'
+  import FieldEditor from '$lib/components/FieldEditor.svelte'
+  import { notifications } from '$lib/components/notifications'
+  import type { TemplateSource } from '$lib/compiler'
 
   export let data: string
 
-  const editor = persistentWritable('editorState', {
+  const modes = [
+    {
+      type: 'editor',
+      title: 'Template editor',
+      icon: Script24,
+    },
+    {
+      type: 'settings',
+      title: 'Template settings',
+      icon: Settings24,
+    },
+  ]
+
+  let mode: 'editor' | 'settings' | string = 'editor'
+
+  const editor = persistentWritable<TemplateSource>('editorState', {
+    name: 'Template test',
     html: '',
     css: '',
     fields: '',
     windi: true,
+    width: 300,
+    height: 300,
+    sizeUnit: 'px',
   })
 
   $: if (data && browser) {
@@ -46,6 +72,19 @@
       $editor = payload
     } catch {}
   }
+
+  let saveHandler
+
+  const persist = () => {
+    saved = true
+  }
+
+  $: if ($editor) {
+    saved = false
+    setTimeout(persist, 1000)
+  }
+
+  let saved = false
 
   let errorMsg = ''
 
@@ -63,7 +102,7 @@
   <div
     class="flex flex-col h-screen w-full text-gray-700 overflow-hidden dark:text-white"
   >
-    <div
+    <!-- <div
       class="bg-white flex shadow w-full p-4 z-50 justify-between items-center dark:bg-gray-800"
     >
       <h2 class="font-bold text-xl">Print Ya!</h2>
@@ -82,37 +121,116 @@
               )}`
             )}
           title="Copy share link"
+          class="flex"
           use:tooltip
         >
           <Share24 />
         </button>
         <button
           on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
+          class="flex relative"
+          title="Toggle theme"
+          use:tooltip
+          style="width: 24px; height: 24px"
         >
-          <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
+          <div class="absolute">
+            <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
+          </div>
         </button>
       </div>
+    </div> -->
+    <div
+      class="bg-white border-b flex border-light-900 w-full p-2 px-4 z-50 justify-between items-center dark:bg-gray-800  dark:border-gray-800"
+    >
+      <input
+        class="bg-transparent border-none ring-transparent !focus:outline-none p-0"
+        placeholder="Template name"
+        type="text"
+        bind:value={$editor.name}
+      />
+      {#if saved}
+        <div
+          class="flex space-x-2 text-gray-400 dark:text-gray-600 items-center"
+          transition:fade={{ duration: 200 }}
+        >
+          <CloudUpload24 />
+          <p>Saved!</p>
+        </div>
+      {/if}
     </div>
-    <div class="h-full bg-light-500 dark:bg-gray-900">
-      <HSplitPane>
-        <VSplitPane slot="left">
-          <div class="flex h-full w-full p-4 relative" slot="top">
-            <Editor
-              title="Template"
-              bind:modelValue={$editor.html}
-              language="html"
-            />
+    <div class="flex h-full w-full">
+      <div
+        class="bg-white border-r flex flex-col space-y-6 border-light-900 p-4 text-gray-500 z-20 dark:bg-gray-900 dark:border-gray-800"
+      >
+        {#each modes as m}
+          <button
+            title={m.title}
+            use:tooltip
+            class="flex hover:text-black dark:hover:text-white"
+            class:text-black={mode == m.type}
+            class:dark:text-white={mode == m.type}
+            on:click={() => (mode = m.type)}
+          >
+            <svelte:component this={m.icon} />
+          </button>
+        {/each}
+        <button
+          on:click={() => {
+            navigator.clipboard.writeText(
+              `${window.location.protocol}//${window.location.host}${
+                window.location.pathname
+              }?data=${window.encodeURIComponent(
+                window.btoa(JSON.stringify($editor))
+              )}`
+            )
+            notifications.send('Copied to clipboard!', 'default', 1000)
+          }}
+          title="Copy share link"
+          class="flex hover:text-black dark:hover:text-white"
+          use:tooltip
+        >
+          <Share24 />
+        </button>
+        <button
+          on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
+          class="flex relative hover:text-black dark:hover:text-white"
+          title="Toggle theme"
+          use:tooltip
+          style="width: 24px; height: 24px"
+        >
+          <div class="absolute pointer-events-none">
+            <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
           </div>
-          <div class="flex h-full w-full p-4" slot="down">
-            <Editor
-              title="Style"
-              bind:modelValue={$editor.css}
-              language="css"
-            />
-          </div>
-        </VSplitPane>
-        <VSplitPane slot="right" topPanelSize="60%" downPanelSize="40%">
-          <div class="flex h-full w-full relative" slot="top">
+        </button>
+      </div>
+      <div class="h-full bg-light-500 w-full dark:bg-gray-900">
+        <HSplitPane>
+          <svelte:fragment slot="left">
+            {#if mode == 'editor'}
+              <VSplitPane>
+                <div class="flex h-full w-full p-4 relative" slot="top">
+                  <Editor
+                    title="Template"
+                    bind:modelValue={$editor.html}
+                    language="html"
+                  />
+                </div>
+                <div class="flex h-full w-full p-4" slot="down">
+                  <Editor
+                    title="Style"
+                    bind:modelValue={$editor.css}
+                    language="css"
+                  />
+                </div>
+              </VSplitPane>
+            {/if}
+            {#if mode == 'settings'}
+              <div class="flex h-full w-full p-4">
+                <FieldEditor bind:template={$editor} />
+              </div>
+            {/if}
+          </svelte:fragment>
+          <div class="flex h-full w-full relative" slot="right">
             {#if errorMsg}
               <div
                 transition:fade={{ duration: 200 }}
@@ -154,7 +272,7 @@
               >
                 <p class="font-bold text-xs pr-4">{scale}%</p>
                 <button
-                  class="bg-white rounded border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded flex border-2 border-transparent shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Zoom Out"
                   use:tooltip
                   on:click={zoomOut}
@@ -162,7 +280,7 @@
                   <ZoomOut16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded flex border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Reset zoom"
                   use:tooltip
                   on:click={() => (scale = 100)}
@@ -170,7 +288,7 @@
                   <ZoomFit16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded flex border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Zoom In"
                   use:tooltip
                   on:click={zoomIn}
@@ -178,7 +296,7 @@
                   <ZoomIn16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="bg-white rounded flex border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
                   title="Toggle border"
                   use:tooltip
                   on:click={() => (border = !border)}
@@ -188,16 +306,8 @@
               </div>
             </div>
           </div>
-          <div class="flex h-full w-full p-4 relative" slot="down">
-            <Editor
-              title="Template fields"
-              language="json"
-              bind:modelValue={$editor.fields}
-            />
-            <!-- <FieldEditor /> -->
-          </div>
-        </VSplitPane>
-      </HSplitPane>
+        </HSplitPane>
+      </div>
     </div>
   </div>
 {/if}

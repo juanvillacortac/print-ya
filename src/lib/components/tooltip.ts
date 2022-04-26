@@ -15,30 +15,26 @@ export function tooltip(element: HTMLElement) {
       },
       target: document.body,
     })
-    if (event.pageX + tooltipComponent.width >= window.innerWidth) {
-      tooltipComponent?.$set({
-        x: event.pageX - tooltipComponent.width,
-        y: event.pageY + 5,
-      })
-    } else {
-      tooltipComponent?.$set({
-        x: event.pageX,
-        y: event.pageY + 5,
-      })
+    let x = event.pageX
+    let y = event.pageY + 5
+    if (x + tooltipComponent.width + 10 >= window.innerWidth) {
+      x = x - tooltipComponent.width
     }
+    if (event.pageY + tooltipComponent.height * 2 >= window.innerHeight) {
+      y = y - tooltipComponent.height - 10
+    }
+    tooltipComponent?.$set({ x, y })
   }
   function mouseMove(event) {
-    if (event.pageX + tooltipComponent.width >= window.innerWidth) {
-      tooltipComponent?.$set({
-        x: event.pageX - tooltipComponent.width,
-        y: event.pageY + 5,
-      })
-    } else {
-      tooltipComponent?.$set({
-        x: event.pageX,
-        y: event.pageY + 5,
-      })
+    let x = event.pageX
+    let y = event.pageY + 5
+    if (x + tooltipComponent.width + 20 >= window.innerWidth) {
+      x = x - tooltipComponent.width
     }
+    if (y + tooltipComponent.height * 2 >= window.innerHeight) {
+      y = y - tooltipComponent.height - 10
+    }
+    tooltipComponent?.$set({ x, y })
   }
   function mouseLeave() {
     tooltipComponent.$destroy()
@@ -47,14 +43,20 @@ export function tooltip(element: HTMLElement) {
   }
 
   element.addEventListener('mouseenter', mouseEnter)
-  element.addEventListener('mouseleave', mouseLeave)
+  element.addEventListener('mouseover', mouseMove)
   element.addEventListener('mousemove', mouseMove)
+  element.addEventListener('mouseleave', mouseLeave)
 
   return {
+    update() {
+      tooltipComponent?.$destroy()
+    },
     destroy() {
+      tooltipComponent?.$destroy()
       element.removeEventListener('mouseover', mouseEnter)
-      element.removeEventListener('mouseleave', mouseLeave)
+      element.removeEventListener('mouseover', mouseMove)
       element.removeEventListener('mousemove', mouseMove)
+      element.removeEventListener('mouseleave', mouseLeave)
     },
   }
 }

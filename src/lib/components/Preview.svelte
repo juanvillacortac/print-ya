@@ -78,18 +78,11 @@
 
   export let border = false
 
-  export let width: string | number = 300
-  export let height: string | number = 300
-
   $: if (compiled.html && shadow) {
     if (containerEl) shadow.removeChild(containerEl)
     containerEl = document.createElement('div')
     const innerEl = document.createElement('div')
     containerEl.style.overflow = 'visible'
-    containerEl.style.width = `${width}${typeof width === 'number' ? 'px' : ''}`
-    containerEl.style.height = `${height}${
-      typeof height === 'number' ? 'px' : ''
-    }`
     containerEl.style.outline = border
       ? `2px dashed ${
           $preferences.darkMode
@@ -99,13 +92,10 @@
       : 'none'
     containerEl.style.outlineOffset = '-2px'
     containerEl = document.createElement('div')
-    containerEl.style.overflow = 'visible'
-    containerEl.style.width = `${width}${typeof width === 'number' ? 'px' : ''}`
-    containerEl.style.height = `${height}${
-      typeof height === 'number' ? 'px' : ''
-    }`
-    innerEl.style.width = `${width}${typeof width === 'number' ? 'px' : ''}`
-    innerEl.style.height = `${height}${typeof height === 'number' ? 'px' : ''}`
+    containerEl.style.width = `${compiled.width}`
+    containerEl.style.height = `${compiled.height}`
+    innerEl.style.width = `${compiled.width}`
+    innerEl.style.height = `${compiled.height}`
     containerEl.style.outline = border
       ? `2px dashed ${
           $preferences.darkMode

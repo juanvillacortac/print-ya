@@ -30,6 +30,7 @@
   import { tooltip } from './tooltip'
   import Fullscreen from 'svelte-fullscreen'
   import Windi from 'windicss'
+  import { notifications } from './notifications'
 
   export let language: 'html' | 'css' | 'json'
 
@@ -66,6 +67,7 @@
     view.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: str },
     })
+    notifications.send('Document formated', 'default', 1000)
   }
 
   const reactivePlugin = ViewPlugin.define((view) => {
@@ -136,11 +138,11 @@
 
 <Fullscreen let:onToggle>
   <div
-    class="bg-white dark:bg-gray-800 rounded-xl flex flex-col h-full shadow w-full relative overflow-hidden relative"
+    class="bg-white rounded-xl flex flex-col h-full shadow w-full relative overflow-hidden dark:bg-gray-800 "
   >
     <div
       bind:this={divEl}
-      class="w-full overflow-hidden absolute inset-0"
+      class="w-full inset-0 overflow-hidden absolute"
       style="padding-top: {titleHeight}px"
     />
     <div
@@ -157,9 +159,9 @@
         {/if}
         <h2 class="font-bold text-xs w-full block">{title}</h2>
       </div>
-      <div class="items-center flex space-x-1">
+      <div class="flex space-x-1 items-center">
         <button
-          class="border-transparent rounded border-2 p-1 duration-200 hover:border-gray-300"
+          class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
           on:click={format}
           title="Format document (Shift+Alt+F)"
           use:tooltip
@@ -167,15 +169,18 @@
           <PaintBrushAlt16 class="font-bold" />
         </button>
         <button
-          class="border-transparent rounded border-2 p-1 duration-200 hover:border-gray-300"
-          on:click={() => navigator.clipboard.writeText(modelValue)}
+          class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+          on:click={() => {
+            navigator.clipboard.writeText(modelValue)
+            notifications.send('Copied to clipboard!', 'default', 1000)
+          }}
           title="Copy to clipboard"
           use:tooltip
         >
           <Copy16 class="font-bold" />
         </button>
         <button
-          class="border-transparent rounded border-2 p-1 duration-200 hover:border-gray-300"
+          class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
           on:click={onToggle}
           title="Toggle fullscreen"
           use:tooltip

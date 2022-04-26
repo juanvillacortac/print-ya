@@ -6,6 +6,7 @@
   import Favicons from '$lib/components/Favicons.svelte'
   import { preferences } from '$lib'
   import { browser } from '$app/env'
+  import Toast from '$lib/components/Toast.svelte'
 
   $: if (browser)
     document.documentElement.classList.toggle('dark', $preferences.darkMode)
@@ -39,6 +40,7 @@
 <Favicons favicon="/images/logo.svg" themeColor="#000" titleName="Print Ya!" />
 
 <slot />
+<Toast />
 
 <style>
   :global(html) {

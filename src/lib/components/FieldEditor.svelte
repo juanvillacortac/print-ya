@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { TemplateSource } from '$lib/compiler'
+
   import { Settings24 } from 'carbon-icons-svelte'
   let titleHeight = 0
   let showGradient = true
@@ -10,6 +12,10 @@
       )
     })
   }
+
+  export let template: TemplateSource
+
+  let units = ['px', 'mm', 'cm', 'in']
 </script>
 
 <div
@@ -26,27 +32,43 @@
   >
     <div class="w-full h-full flex-col flex p-4 overflow-auto" use:scroll>
       <div class="flex-col flex space-y-4">
-        <div class="flex flex-col">
-          <label class="block text-sm font-bold mb-2" for="fieldId">
-            Field id
-          </label>
-          <input
-            class="appearance-none border border-gray-300 dark:border-gray-600 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
-            id="fieldId"
-            type="text"
-            placeholder="Ex. firstText"
-          />
-        </div>
-        <div class="flex flex-col">
-          <label class="block text-sm font-bold mb-2" for="fieldId">
-            Field id
-          </label>
-          <input
-            class="appearance-none border border-gray-300 dark:border-gray-600 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
-            id="fieldId"
-            type="text"
-            placeholder="Ex. firstText"
-          />
+        <div class="flex space-x-4 w-full">
+          <div class="flex flex-col w-full">
+            <label class="block text-sm font-bold mb-2" for="fieldId">
+              Width
+            </label>
+            <input
+              class="appearance-none border border-gray-300 dark:border-gray-600 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
+              id="fieldId"
+              type="number"
+              placeholder="Ex. 200"
+              bind:value={template.width}
+            />
+          </div>
+          <div class="flex flex-col w-full">
+            <label class="block text-sm font-bold mb-2" for="fieldId">
+              Height
+            </label>
+            <input
+              class="appearance-none border border-gray-300 dark:border-gray-600 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
+              type="number"
+              placeholder="Ex. 200"
+              bind:value={template.height}
+            />
+          </div>
+          <div class="flex flex-col w-full">
+            <label class="block text-sm font-bold mb-2" for="fieldId">
+              Size unit
+            </label>
+            <select
+              class="appearance-none border border-gray-300 dark:border-gray-600 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white dark:bg-gray-700"
+              bind:value={template.sizeUnit}
+            >
+              {#each units as unit}
+                <option value={unit}>{unit}</option>
+              {/each}
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -57,7 +79,7 @@
   >
     <div class="flex space-x-2 items-center py-1">
       <Settings24 />
-      <h2 class="font-bold text-xs w-full block">Template fields</h2>
+      <h2 class="font-bold text-xs w-full block">Template settings</h2>
     </div>
   </div>
 </div>

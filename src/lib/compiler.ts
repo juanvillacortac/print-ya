@@ -3,15 +3,22 @@ import ejs from 'ejs'
 import { useWindiCSS } from './windicss'
 
 export type CompiledTemplate = {
+  title?: string
   html: string
   css: string
+  width?: string
+  height?: string
 }
 
 export type TemplateSource = {
+  name?: string
   html: string
   css: string
   fields?: string
   windi?: boolean
+  width?: number
+  height?: number
+  sizeUnit?: string
 }
 
 export const compile = (source: TemplateSource): CompiledTemplate => {
@@ -38,6 +45,8 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
       css = generatedCSS
     }
     return {
+      width: `${source.width}${source.sizeUnit}`,
+      height: `${source.height}${source.sizeUnit}`,
       html,
       css,
     }
