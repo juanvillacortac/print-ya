@@ -1,7 +1,14 @@
 <script lang="ts" context="module">
   import type { Load } from '@sveltejs/kit'
-  export const load: Load = ({ url }) => {
+  export const load: Load = ({ url, session }) => {
     const data = url.searchParams.get('data')
+
+    if (!session.userId) {
+      return {
+        status: 301,
+        redirect: `/login?callbackUrl=${encodeURIComponent('/playground')}`,
+      }
+    }
 
     return {
       props: {
@@ -25,8 +32,8 @@
     Checkbox16,
     Script24,
     Settings24,
-    Checkbox24,
     CloudUpload24,
+    Logout24,
   } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { persistentWritable, preferences } from '$lib'
@@ -36,6 +43,8 @@
   import FieldEditor from '$lib/components/FieldEditor.svelte'
   import { notifications } from '$lib/components/notifications'
   import type { TemplateSource } from '$lib/compiler'
+  import { del } from '$lib/api'
+  import { goto } from '$app/navigation'
 
   export let data: string
 
@@ -99,9 +108,7 @@
 </script>
 
 {#if browser}
-  <div
-    class="flex flex-col h-screen w-full text-gray-700 overflow-hidden dark:text-white"
-  >
+  <div class="flex flex-col h-screen w-full overflow-hidden">
     <!-- <div
       class="bg-white flex shadow w-full p-4 z-50 justify-between items-center dark:bg-gray-800"
     >
@@ -143,14 +150,14 @@
       class="bg-white border-b flex border-light-900 w-full p-2 px-4 z-50 justify-between items-center dark:bg-gray-800  dark:border-gray-800"
     >
       <input
-        class="bg-transparent border-none ring-transparent !focus:outline-none p-0"
+        class="bg-transparent border-none ring-transparent p-0 !focus:outline-none"
         placeholder="Template name"
         type="text"
         bind:value={$editor.name}
       />
       {#if saved}
         <div
-          class="flex space-x-2 text-gray-400 dark:text-gray-600 items-center"
+          class="flex space-x-2 text-gray-400 items-center dark:text-gray-600"
           transition:fade={{ duration: 200 }}
         >
           <CloudUpload24 />
@@ -160,48 +167,77 @@
     </div>
     <div class="flex h-full w-full">
       <div
-        class="bg-white border-r flex flex-col space-y-6 border-light-900 p-4 text-gray-500 z-20 dark:bg-gray-900 dark:border-gray-800"
+        class="bg-white border-r flex flex-col h-full space-y-6 border-light-900 p-4 text-gray-400 z-20 justify-between dark:bg-gray-900 dark:border-gray-800"
       >
-        {#each modes as m}
+        <div class="flex flex-col h-full space-y-6">
+          <a class="relative" href="/" title="Home" use:tooltip>
+            <div
+              class="rounded-lg h-auto bg-gray-100 -left-4px w-[calc(100%+8px)] absolute dark:bg-gray-800"
+              style="aspect-ratio: 1/1"
+            />
+            <h1
+              class="font-logo font-black text-transparent text-center text-2xl select-none pointer-events-none rainbow-bg relative !bg-clip-text"
+            >
+              PY!
+            </h1>
+          </a>
+          {#each modes as m}
+            <button
+              title={m.title}
+              use:tooltip
+              class="flex hover:text-black dark:hover:text-white"
+              class:text-black={mode == m.type}
+              class:dark:text-white={mode == m.type}
+              on:click={() => (mode = m.type)}
+            >
+              <svelte:component this={m.icon} />
+            </button>
+          {/each}
           <button
-            title={m.title}
-            use:tooltip
+            on:click={() => {
+              navigator.clipboard.writeText(
+                `${window.location.protocol}//${window.location.host}${
+                  window.location.pathname
+                }?data=${window.encodeURIComponent(
+                  window.btoa(JSON.stringify($editor))
+                )}`
+              )
+              notifications.send('Copied to clipboard!', 'default', 1000)
+            }}
+            title="Copy share link"
             class="flex hover:text-black dark:hover:text-white"
-            class:text-black={mode == m.type}
-            class:dark:text-white={mode == m.type}
-            on:click={() => (mode = m.type)}
+            use:tooltip
           >
-            <svelte:component this={m.icon} />
+            <Share24 />
           </button>
-        {/each}
-        <button
-          on:click={() => {
-            navigator.clipboard.writeText(
-              `${window.location.protocol}//${window.location.host}${
-                window.location.pathname
-              }?data=${window.encodeURIComponent(
-                window.btoa(JSON.stringify($editor))
-              )}`
-            )
-            notifications.send('Copied to clipboard!', 'default', 1000)
-          }}
-          title="Copy share link"
-          class="flex hover:text-black dark:hover:text-white"
-          use:tooltip
-        >
-          <Share24 />
-        </button>
-        <button
-          on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
-          class="flex relative hover:text-black dark:hover:text-white"
-          title="Toggle theme"
-          use:tooltip
-          style="width: 24px; height: 24px"
-        >
-          <div class="absolute pointer-events-none">
-            <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
-          </div>
-        </button>
+        </div>
+        <div class="flex flex-col space-y-6">
+          <button
+            on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
+            class="flex relative hover:text-black dark:hover:text-white"
+            title="Toggle theme"
+            use:tooltip
+            style="width: 24px; height: 24px"
+          >
+            <div class="absolute pointer-events-none">
+              <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
+            </div>
+          </button>
+          <button
+            on:click={() => {
+              del(`/login`, {}).then(() => {
+                notifications.send('Log out successfully', 'default', 1000)
+                goto('/login')
+              })
+            }}
+            class="flex relative justify-self-end self-end hover:text-black dark:hover:text-white"
+            title="Log out"
+            use:tooltip
+            style="width: 24px; height: 24px"
+          >
+            <Logout24 />
+          </button>
+        </div>
       </div>
       <div class="h-full bg-light-500 w-full dark:bg-gray-900">
         <HSplitPane>
@@ -272,7 +308,7 @@
               >
                 <p class="font-bold text-xs pr-4">{scale}%</p>
                 <button
-                  class="bg-white rounded flex border-2 border-transparent shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="preview-button"
                   title="Zoom Out"
                   use:tooltip
                   on:click={zoomOut}
@@ -280,7 +316,7 @@
                   <ZoomOut16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded flex border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="preview-button"
                   title="Reset zoom"
                   use:tooltip
                   on:click={() => (scale = 100)}
@@ -288,7 +324,7 @@
                   <ZoomFit16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded flex border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="preview-button"
                   title="Zoom In"
                   use:tooltip
                   on:click={zoomIn}
@@ -296,7 +332,7 @@
                   <ZoomIn16 class="font-bold" />
                 </button>
                 <button
-                  class="bg-white rounded flex border-2 border-gray-500 shadow p-1 transform transition-transform duration-200 dark:border-transparent dark:bg-gray-700 dark:border-2 hover:-translate-y-px dark:hover:border-gray-300"
+                  class="preview-button"
                   title="Toggle border"
                   use:tooltip
                   on:click={() => (border = !border)}
@@ -328,6 +364,22 @@
   }
   :global(.separator:hover) {
     opacity: 0.4;
+  }
+
+  .preview-button {
+    @apply bg-white border-transparent rounded flex border-2 shadow p-1 transform transition-transform duration-200;
+  }
+
+  .preview-button:hover {
+    @apply -translate-y-px;
+  }
+
+  :global(.dark) .preview-button {
+    @apply border-transparent bg-gray-700 border-2  border-gray-300;
+  }
+
+  :global(.dark) .preview-button:hover {
+    @apply border-gray-300;
   }
 
   .checkerboard {

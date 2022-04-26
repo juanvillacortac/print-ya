@@ -1,0 +1,81 @@
+async function send({
+  method,
+  path,
+  data = {},
+  headers,
+  timeout = 120000,
+}): Promise<Record<string, any>> {
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+  const opts = { method, headers: {}, body: null, signal: controller.signal }
+  if (Object.keys(data).length > 0) {
+    const parsedData = data
+    for (const [key, value] of Object.entries(data)) {
+      if (value === '') {
+        parsedData[key] = null
+      }
+    }
+    if (parsedData) {
+      opts.headers['Content-Type'] = 'application/json'
+      opts.body = JSON.stringify(parsedData)
+    }
+  }
+
+  if (headers) {
+    opts.headers = {
+      ...opts.headers,
+      ...headers,
+    }
+  }
+  const response = await fetch(`${path}`, opts)
+
+  clearTimeout(id)
+
+  const contentType = response.headers.get('content-type')
+
+  let responseData = {}
+  if (contentType) {
+    if (contentType?.indexOf('application/json') !== -1) {
+      responseData = await response.json()
+    } else if (contentType?.indexOf('text/plain') !== -1) {
+      responseData = await response.text()
+    } else {
+      return {}
+    }
+  } else {
+    return {}
+  }
+  if (!response.ok) throw responseData
+  return responseData
+}
+
+export function get<T = Record<string, unknown>>(
+  path: string,
+  headers?: Record<string, unknown>
+): Promise<T> {
+  return send({ method: 'GET', path, headers }) as Promise<T>
+}
+
+export function del<T = Record<string, unknown>>(
+  path: string,
+  data: Record<string, unknown>,
+  headers?: Record<string, unknown>
+): Promise<T> {
+  return send({ method: 'DELETE', path, data, headers }) as Promise<T>
+}
+
+export function post<T = Record<string, unknown>>(
+  path: string,
+  data: Record<string, unknown>,
+  headers?: Record<string, unknown>
+): Promise<T> {
+  return send({ method: 'POST', path, data, headers }) as Promise<T>
+}
+
+export function put<T = Record<string, unknown>>(
+  path: string,
+  data: Record<string, unknown>,
+  headers?: Record<string, unknown>
+): Promise<T> {
+  return send({ method: 'PUT', path, data, headers }) as Promise<T>
+}

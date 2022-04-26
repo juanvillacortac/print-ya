@@ -11,7 +11,7 @@
     document.documentElement.classList.toggle('dark', $preferences.darkMode)
 
   const fontsURL =
-    'https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&family=Roboto:wght@300;400;500;700;900&display=swap'
+    'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,900;1,700&family=Square+Peg&family=Roboto:wght@300;400;500;700;900&display=swap'
 
   const fontsTag = `<link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
@@ -38,7 +38,9 @@
 
 <Favicons favicon="/images/logo.svg" themeColor="#000" titleName="Print Ya!" />
 
-<slot />
+<div class=" bg-white text-gray-700 relative  dark:bg-gray-800 dark:text-white">
+  <slot />
+</div>
 <Toast />
 
 <style>

@@ -3,7 +3,6 @@ import ejs from 'ejs'
 import { useWindiCSS } from './windicss'
 
 export type CompiledTemplate = {
-  title?: string
   html: string
   css: string
   width?: string

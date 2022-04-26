@@ -21,6 +21,8 @@ export default defineConfig({
       },
       colors,
       fontFamily: {
+        title: ['Montserrat', 'sans-serif'],
+        logo: ['Square Peg', 'sans-serif'],
       },
       spacing: {
         128: '32rem',

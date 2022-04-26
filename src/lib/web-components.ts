@@ -83,7 +83,6 @@ if (browser) {
             // the native string attributes and the types you expect
             // in your svelte components
             template,
-            debug: true,
           },
         })
       }
