@@ -7,7 +7,7 @@
   export let options: CaravaggioOptions
   export let showOriginal: string = null
 
-  $: url = src.endsWith(showOriginal) ? src : useCaravaggio(src, options)
+  $: url = src?.endsWith(showOriginal) ? src : useCaravaggio(src, options)
 </script>
 
 {#if href}

@@ -10,7 +10,9 @@ declare namespace App {
     host?: string
     userAgent?: string
   }
-  interface Stuff {}
+  interface Stuff extends Record<string, unknown> {
+    subtitle?: string
+  }
 }
 
 interface SessionData {

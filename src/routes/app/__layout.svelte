@@ -1,8 +1,6 @@
 <script>
   import { goto } from '$app/navigation'
-
   import { page } from '$app/stores'
-
   import { preferences } from '$lib'
   import { del } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
@@ -32,7 +30,7 @@
     {
       icon: Settings24,
       title: 'User settings',
-      href: '/app/stores',
+      href: '/app/settings',
     },
   ]
 
@@ -62,8 +60,8 @@
               title={p.title}
               use:tooltip
               class="flex hover:text-black dark:hover:text-white"
-              class:text-black={path == p.href}
-              class:dark:text-white={path == p.href}
+              class:text-black={path?.startsWith(p.href)}
+              class:dark:text-white={path?.startsWith(p.href)}
               href={p.href}
             >
               <svelte:component this={p.icon} />

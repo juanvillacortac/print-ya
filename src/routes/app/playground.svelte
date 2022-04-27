@@ -1,23 +1,3 @@
-<script lang="ts" context="module">
-  import type { Load } from '@sveltejs/kit'
-  export const load: Load = ({ url, session }) => {
-    const data = url.searchParams.get('data')
-
-    if (!session.userId) {
-      return {
-        status: 301,
-        redirect: `/login?callbackUrl=${encodeURIComponent('/playground')}`,
-      }
-    }
-
-    return {
-      props: {
-        data,
-      },
-    }
-  }
-</script>
-
 <script lang="ts">
   import Editor from '$lib/components/Editor.svelte'
   import { HSplitPane, VSplitPane } from 'svelte-split-pane'

@@ -1,9 +1,12 @@
+type Fetch = (info: RequestInfo, init?: RequestInit) => Promise<Response>
+
 async function send({
   method,
   path,
   data = {},
-  headers,
+  headers = {},
   timeout = 120000,
+  fetch: fetcher = fetch,
 }): Promise<Record<string, any>> {
   const controller = new AbortController()
   const id = setTimeout(() => controller.abort(), timeout)
@@ -27,7 +30,7 @@ async function send({
       ...headers,
     }
   }
-  const response = await fetch(`${path}`, opts)
+  const response = await fetcher(`${path}`, opts)
 
   clearTimeout(id)
 
@@ -51,9 +54,12 @@ async function send({
 
 export function get<T = Record<string, unknown>>(
   path: string,
-  headers?: Record<string, unknown>
+  options?: {
+    headers?: Record<string, unknown>
+    fetch?: Fetch
+  }
 ): Promise<T> {
-  return send({ method: 'GET', path, headers }) as Promise<T>
+  return send({ method: 'GET', path, ...options }) as Promise<T>
 }
 
 export function del<T = Record<string, unknown>>(

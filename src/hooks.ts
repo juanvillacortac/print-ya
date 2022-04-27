@@ -10,7 +10,7 @@ export const handle = handleSession(
     cookie: { secure: false },
   },
   async function ({ event, resolve }) {
-    let response
+    let response: Response
 
     // Set default locale if user preferred locale does not match
     try {
@@ -45,6 +45,18 @@ export const handle = handleSession(
           path: '/',
           expires: new Date('Thu, 01 Jan 1970 00:00:01 GMT'),
         })
+      )
+    }
+
+    if (
+      event.url.pathname.split('/').slice(1)[0] === 'app' &&
+      !event.locals.session?.data?.userId
+    ) {
+      return Response.redirect(
+        `${event.url.origin}/login?callbackUrl=${encodeURIComponent(
+          event.url.pathname
+        )}`,
+        303
       )
     }
 

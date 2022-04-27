@@ -19,7 +19,6 @@ export const post: RequestHandler = async (event) => {
 
 export const get: RequestHandler = async (event) => {
   const { userId } = await db.getUserDetails(event)
-  console.log(userId)
   if (!userId) {
     return {
       status: 200,
@@ -39,11 +38,11 @@ export const get: RequestHandler = async (event) => {
 }
 
 export async function del({ locals }) {
-	locals.session.destroy()
+  locals.session.destroy()
 
-	return {
-		body: {
-			ok: true
-		}
-	};
+  return {
+    body: {
+      ok: true,
+    },
+  }
 }

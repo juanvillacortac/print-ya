@@ -14,7 +14,7 @@ model User {
   id            String   @id @unique @default(cuid())
   email         String   @unique
   password      String?
-  stores        Store[]  @relation(references: [id], name: "users_store")
+  stores        Store[]  @relation(name: "users_store")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   storesUpdated Store[]  @relation("store_updatedBy")
@@ -22,24 +22,40 @@ model User {
 
 model Store {
   id              String     @id @default(cuid())
-  users           User[]     @relation("users_store")
+  user            User       @relation("users_store", fields: [userId], references: [id])
+  userId          String
   name            String?
   templates       Template[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   updatedBy       User?      @relation("store_updatedBy", fields: [updatedByUserId], references: [id])
   updatedByUserId String?
+
+  slug       String          @unique
+  logo       String?
+  favicon    String?
+  categories StoreCategory[]
+}
+
+model StoreCategory {
+  id        String     @id @default(cuid())
+  store     Store      @relation(fields: [storeId], references: [id])
+  storeId   String
+  name      String
+  templates Template[]
 }
 
 model Template {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String
-  published String
-  draft     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  store     Store?   @relation(fields: [storeId], references: [id])
-  storeId   String?
-  public    Boolean
+  id              String         @id @default(cuid())
+  name            String
+  slug            String
+  published       String
+  draft           String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  store           Store?         @relation(fields: [storeId], references: [id])
+  storeId         String?
+  public          Boolean
+  storeCategory   StoreCategory? @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
+  storeCategoryId String?
 }
