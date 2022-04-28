@@ -26,6 +26,7 @@ export function tooltip(element: HTMLElement) {
     tooltipComponent?.$set({ x, y })
   }
   function mouseMove(event) {
+    if (!tooltipComponent) return
     let x = event.pageX
     let y = event.pageY + 5
     if (x + tooltipComponent.width + 20 >= window.innerWidth) {
