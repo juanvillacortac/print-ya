@@ -3,7 +3,7 @@
   import { get } from '$lib/api'
 
   export const load: Load = async ({ params, fetch }) => {
-    const data = await get(`/app/stores/${params.slug}.json`, { fetch })
+    const data = await get(`/api/stores/${params.slug}`, { fetch })
     if (!data.store)
       return {
         status: 404,

@@ -8,7 +8,7 @@
   {#each $notifications as notification (notification.id)}
     <div
       animate:flip
-      class="toast bg-white border rounded border-gray-200 mb-10px p-1 text-gray-700 z-20 z-999 flex dark:bg-gray-800 dark:border-gray-700 dark:text-white pointer-events-none"
+      class="bg-white border rounded flex font-bold border-gray-200 text-xs mb-10px py-1 px-2 text-gray-700 z-20 z-999 toast pointer-events-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       in:fly={{ y: 30 }}
       out:fly={{ y: -30 }}
     >

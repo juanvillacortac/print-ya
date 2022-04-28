@@ -2,6 +2,26 @@
   import 'virtual:windi.css'
   import '$lib/styles/base.css'
 
+  import NProgress from 'nprogress'
+  import { navigating } from '$app/stores'
+
+  // NProgress css
+  import '$lib/styles/__nprogress.css'
+
+  NProgress.configure({
+    minimum: 0.16,
+    showSpinner: false,
+  })
+
+  $: {
+    if ($navigating) {
+      NProgress.start()
+    }
+    if (!$navigating) {
+      NProgress.done()
+    }
+  }
+
   import Favicons from '$lib/components/Favicons.svelte'
   import { preferences } from '$lib'
   import { browser } from '$app/env'

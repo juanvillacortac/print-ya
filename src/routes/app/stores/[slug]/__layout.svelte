@@ -6,7 +6,7 @@
   import { Launch16 } from 'carbon-icons-svelte'
 
   export const load: Load = async ({ params, fetch }) => {
-    const data = await get(`/app/stores/${params.slug}.json`, { fetch })
+    const data = await get(`/api/stores/${params.slug}`, { fetch })
     if (!data.store)
       return {
         status: 404,
@@ -24,6 +24,14 @@
 
 <script>
   export let store
+  import { page } from '$app/stores'
+  import { invalidate } from '$app/navigation'
+  import { browser } from '$app/env'
+
+  $: path = $page.url.pathname
+  $: if (path && store && browser) {
+    invalidate(`/api/stores/${store.slug}`)
+  }
 </script>
 
 <h2 class="font-bold font-title text-black mb-4 text-3xl dark:text-white">

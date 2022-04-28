@@ -45,6 +45,7 @@ export function ErrorHandler(e: {
       error: truncatedError.error || truncatedError.message,
     },
   }
+  console.log(payload.body.error)
   if (truncatedError?.name === 'NotFoundError') {
     payload.status = 404
   }

@@ -109,13 +109,20 @@
       <div
         class="flex mx-auto space-x-6 p-4 py-2 items-center justify-center uppercase lg:w-7/10"
       >
-        {#each store.categories as category}
+        {#each store.categories.slice(0, 4) as category}
           <a
             href={category.name}
             class="font-bold font-title text-black dark:text-white hover:text-blue-500"
             >{category.name}</a
           >
         {/each}
+        {#if store.categories.length > 4}
+          <a
+            href="./{store.name}"
+            class="font-bold font-title text-black dark:text-white hover:text-blue-500"
+            >More</a
+          >
+        {/if}
       </div>
     </div>
   </div>

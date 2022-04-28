@@ -55,6 +55,7 @@ specifiers:
   html-minifier: ^4.0.0
   html-to-image: ^1.9.0
   jsx-template-engine: ^1.0.0
+  nprogress: ^0.2.0
   prettier: ^2.6.2
   prism-theme-vars: ^0.2.2
   prisma: ^3.12.0
@@ -123,6 +124,7 @@ dependencies:
   html-minifier: 4.0.0
   html-to-image: 1.9.0
   jsx-template-engine: 1.0.0
+  nprogress: 0.2.0
   prettier: 2.6.2
   prism-theme-vars: 0.2.2
   prismjs: 1.28.0
@@ -5390,6 +5392,10 @@ packages:
       console-control-strings: 1.1.0
       gauge: 3.0.2
       set-blocking: 2.0.0
+    dev: false
+
+  /nprogress/0.2.0:
+    resolution: {integrity: sha1-y480xTIT2JVyP8urkH6UIq28r7E=}
     dev: false
 
   /nth-check/2.0.1:

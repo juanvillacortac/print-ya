@@ -97,7 +97,7 @@
         </div>
       </div>
       <div
-        class="h-full bg-light-500 w-full p-4 overflow-auto dark:bg-gray-900"
+        class="h-full bg-light-500 w-full p-6 overflow-auto dark:bg-gray-900"
       >
         <slot />
       </div>

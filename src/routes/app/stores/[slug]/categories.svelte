@@ -1,17 +1,65 @@
 <script lang="ts">
-  import { page } from '$app/stores'
-  import type { Store } from '$lib/db'
+  import { invalidate } from '$app/navigation'
 
+  import { page } from '$app/stores'
+  import { post } from '$lib/api'
+  import { notifications } from '$lib/components/notifications'
+  import type { Store } from '$lib/db'
+  import type { StoreCategory } from '@prisma/client'
+
+  let store: Store
   $: store = $page.stuff.store as Store
   $: categories = store.categories
 
-  let editMap: Record<string, string> = {}
+  let selected: StoreCategory = {
+    id: '',
+    name: '',
+    storeId: store?.id,
+  }
+
+  const saveCategory = async () => {
+    try {
+      const _ = await post<StoreCategory>(
+        `/api/stores/${store.slug}/categories`,
+        {
+          ...selected,
+          storeId: store.id,
+        }
+      )
+      notifications.send(
+        'Category ' + (selected.id ? 'updated' : 'created'),
+        'default',
+        3000
+      )
+      await invalidate(`/api/stores/${store.slug}`)
+    } catch ({ message }) {
+      notifications.send(message, 'default', 3000)
+    }
+    selected = {
+      id: '',
+      name: '',
+      storeId: store.id,
+    }
+  }
 </script>
 
 <div class="flex flex-col mx-auto max-w-prose space-y-4">
   <h3 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
     Categories
   </h3>
+  <div class="flex space-x-4 justify-between items">
+    <input
+      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+      type="text"
+      placeholder="Category name"
+      bind:value={selected.name}
+    />
+    <button
+      class="rounded font-bold border-2 border-blue-500 text-xs py-2 px-4 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+      disabled={!selected?.name}
+      on:click={saveCategory}>{selected?.id ? 'Save' : 'Create'}</button
+    >
+  </div>
   <div class="shadow relative overflow-x-auto sm:rounded-lg">
     <table class="text-sm text-left w-full text-gray-500 dark:text-gray-400">
       <thead
@@ -36,27 +84,15 @@
               scope="row"
               class="font-bold py-4 px-6 text-gray-900 whitespace-nowrap dark:text-white"
             >
-              {#if editMap[c.id] || editMap[c.id] === ''}
-                <input
-                  type="text"
-                  bind:value={editMap[c.id]}
-                  class="bg-transparent border-none text-sm py-0 px-0 appearance-none focus:outline-none"
-                />
-              {:else}
-                {c.name}
-              {/if}
+              {c.name}
             </th>
             <td class="py-4 px-6">{c._count.templates} products</td>
             <td class="text-right py-4 px-6">
               <button
-                on:click={() =>
-                  editMap[c.id] || editMap[c.id] === ''
-                    ? (editMap[c.id] = null)
-                    : (editMap[c.id] = c.name)}
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                >{editMap[c.id] || editMap[c.id] === ''
-                  ? 'Save'
-                  : 'Edit'}</button
+                disabled={selected.id == c.id}
+                on:click={() => (selected = c)}
+                class="font-medium text-blue-600 dark:text-blue-500 hover:underline disabled:opacity-70 disabled:pointer-not-allowed"
+                >Edit</button
               >
             </td>
           </tr>
