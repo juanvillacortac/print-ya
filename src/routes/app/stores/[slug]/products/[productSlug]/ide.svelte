@@ -31,6 +31,12 @@
   export let data: string
 
   const modes = [
+    {
+      type: 'editor',
+      title: 'Template editor',
+      icon: Script24,
+    },
+    {
       type: 'settings',
       title: 'Template settings',
       icon: Settings24,
