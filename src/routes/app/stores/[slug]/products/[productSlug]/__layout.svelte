@@ -5,9 +5,12 @@
   import { tooltip } from '$lib/components/tooltip'
   import { Launch16 } from 'carbon-icons-svelte'
 
-  export const load: Load = async ({ params, fetch }) => {
-    const data = await get(`/api/stores/${params.slug}`, { fetch })
-    if (!data.store)
+  export const load: Load = async ({ params, fetch, stuff }) => {
+    const data = await get(
+      `/api/stores/${params.slug}/products/${params.productSlug}`,
+      { fetch }
+    )
+    if (!data)
       return {
         status: 404,
       }
@@ -16,7 +19,8 @@
         ...data,
       },
       stuff: {
-        ...data,
+        ...stuff,
+        product: data,
       },
     }
   }

@@ -21,41 +21,51 @@ model User {
 }
 
 model Store {
-  id              String     @id @default(cuid())
-  user            User       @relation("users_store", fields: [userId], references: [id])
+  id              String   @id @default(cuid())
+  user            User     @relation("users_store", fields: [userId], references: [id])
   userId          String
   name            String?
-  templates       Template[]
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  updatedBy       User?      @relation("store_updatedBy", fields: [updatedByUserId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  updatedBy       User?    @relation("store_updatedBy", fields: [updatedByUserId], references: [id])
   updatedByUserId String?
 
   slug       String          @unique
   logo       String?
   favicon    String?
   categories StoreCategory[]
+  products   Product[]
 }
 
 model StoreCategory {
-  id        String     @id @default(cuid())
-  store     Store      @relation(fields: [storeId], references: [id])
-  storeId   String
-  name      String
-  templates Template[]
+  id       String    @id @default(cuid())
+  store    Store     @relation(fields: [storeId], references: [id])
+  storeId  String
+  name     String
+  products Product[]
 }
 
-model Template {
-  id              String         @id @default(cuid())
-  name            String
-  slug            String
-  published       String
-  draft           String
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  store           Store?         @relation(fields: [storeId], references: [id])
-  storeId         String?
-  public          Boolean
+model Product {
+  id   String @id @default(cuid())
+  name String
+  slug String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store   Store?  @relation(fields: [storeId], references: [id])
+  storeId String?
+
+  public Boolean
+
+  designImage String?
+
+  price Decimal
+
+  isTemplate    Boolean
+  template      String?
+  templateDraft String?
+
   storeCategory   StoreCategory? @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
   storeCategoryId String?
 }

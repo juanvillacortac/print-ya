@@ -34,7 +34,7 @@
     },
   ]
 
-  $: showLayout = !path.split('/').includes('playground')
+  $: showLayout = !path.split('/').includes('ide')
 </script>
 
 {#if showLayout}

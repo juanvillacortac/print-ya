@@ -4,7 +4,7 @@ import type { Store as _Store, StoreCategory } from '@prisma/client'
 export type Store = _Store & {
   categories?: (StoreCategory & {
     _count: {
-      templates: number
+      products: number
     }
   })[]
 }
@@ -33,7 +33,7 @@ export const getStoreBySlug = ({ slug }: { slug: string }): Promise<Store> =>
         include: {
           _count: {
             select: {
-              templates: true,
+              products: true,
             },
           },
         },

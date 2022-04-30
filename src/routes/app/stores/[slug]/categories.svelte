@@ -86,7 +86,7 @@
             >
               {c.name}
             </th>
-            <td class="py-4 px-6">{c._count.templates} products</td>
+            <td class="py-4 px-6">{c._count.products} products</td>
             <td class="text-right py-4 px-6">
               <button
                 disabled={selected.id == c.id}
