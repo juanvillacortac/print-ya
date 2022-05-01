@@ -9,6 +9,10 @@ export type Product = _Product & {
   storeCategory?: StoreCategory
 }
 
+export type StripedProduct = Omit<_Product, 'templateDraft'> & {
+  storeCategory?: StoreCategory
+}
+
 export const getProductBySlug = ({
   slug,
   storeId,
@@ -26,17 +30,33 @@ export const getProductBySlug = ({
     },
   })
 
-export const getProductsByStore = ({
+export const getProductsByStore = async ({
   storeId,
+  published,
 }: {
   storeId: string
-}): Promise<Product[]> =>
+  published?: boolean
+}): Promise<StripedProduct[]> =>
   prisma.product.findMany({
     where: {
       storeId,
+      public: published,
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      createdAt: true,
+      designImage: true,
+      isTemplate: true,
+      price: true,
+      public: true,
+      slug: true,
+      store: true,
       storeCategory: true,
+      storeCategoryId: true,
+      storeId: true,
+      updatedAt: true,
+      template: true,
     },
   })
 

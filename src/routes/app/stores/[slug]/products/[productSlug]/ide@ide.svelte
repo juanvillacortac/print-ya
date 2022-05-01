@@ -78,6 +78,7 @@
     try {
       await post(`/api/stores/${store.slug}/products`, {
         ...product,
+        template: JSON.stringify($editor),
         templateDraft: JSON.stringify($editor),
       })
       saving = true

@@ -8,6 +8,8 @@
     Code32,
     ColorPalette32,
     Launch16,
+    OrderDetails32,
+    Product32,
   } from 'carbon-icons-svelte'
 
   $: store = $page.stuff.store as Store
@@ -19,9 +21,14 @@
       href: `/app/stores/${store.slug}/categories`,
     },
     {
-      icon: Code32,
-      title: 'Templates',
-      href: `/app/stores/${store.slug}/templates`,
+      icon: Product32,
+      title: 'Products',
+      href: `/app/stores/${store.slug}/products`,
+    },
+    {
+      icon: OrderDetails32,
+      title: 'Orders',
+      href: `/app/stores/${store.slug}/orders`,
     },
     {
       icon: ColorPalette32,

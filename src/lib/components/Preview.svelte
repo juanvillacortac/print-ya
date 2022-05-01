@@ -9,6 +9,7 @@
 
   let styleEl: HTMLStyleElement
   let containerEl: HTMLDivElement
+  let innerEl: HTMLDivElement
 
   export let template: TemplateSource = {
     html: '',
@@ -78,11 +79,10 @@
   }
 
   export let border = false
+  export let fitParent = false
 
-  $: if (compiled.html && shadow) {
-    if (containerEl) shadow.removeChild(containerEl)
-    containerEl = document.createElement('div')
-    const innerEl = document.createElement('div')
+  const refreshLayout = () => {
+    if (!containerEl || !innerEl) return
     containerEl.style.overflow = 'visible'
     containerEl.style.outline = border
       ? `2px dashed ${
@@ -105,9 +105,30 @@
         }`
       : 'none'
     containerEl.style.outlineOffset = '-2px'
+  }
+
+  $: if (compiled.html && shadow) {
+    if (containerEl) shadow.removeChild(containerEl)
+    containerEl = document.createElement('div')
+    innerEl = document.createElement('div')
+    refreshLayout()
     innerEl.innerHTML = compiled.html
     containerEl.appendChild(innerEl)
     shadow.appendChild(containerEl)
+    if (fitParent) {
+      const parent = element.parentElement
+      console.log(parent)
+      if (parent) {
+        const scale = Math.min(
+          parent.clientWidth / containerEl.clientWidth,
+          parent.clientHeight / containerEl.clientHeight
+        )
+        console.log(innerEl.clientWidth)
+        containerEl.style.transformOrigin = `top left`
+        containerEl.style.transform = `scale(${scale})`
+        containerEl.style.margin = 'auto'
+      }
+    }
   }
 
   export const saveImage = () => {
@@ -124,4 +145,4 @@
   }
 </script>
 
-<div bind:this={element} class="relative" />
+<div bind:this={element} class="flex h-full w-full relative" />

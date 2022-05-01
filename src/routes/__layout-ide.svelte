@@ -1,12 +1,39 @@
+<script context="module" lang="ts">
+  import type { Load } from '@sveltejs/kit'
+  import { get } from '$lib/api'
+
+  export const load: Load = async ({ params, fetch }) => {
+    const data = await get(`/api/stores/${params.slug}`, { fetch })
+    const product = await get(
+      `/api/stores/${params.slug}/products/${params.productSlug}`,
+      { fetch }
+    )
+    if (!data.store)
+      return {
+        status: 404,
+      }
+    return {
+      stuff: {
+        ...data,
+        product,
+      },
+    }
+  }
+</script>
+
 <script lang="ts">
   import 'virtual:windi.css'
-  import '$lib/styles/base.css'
+  import { browser } from '$app/env'
+  import { Favicons, preferences } from '$lib'
+  import { page } from '$app/stores'
+  import type { Product, Store } from '$lib/db'
 
   import NProgress from 'nprogress'
   import { navigating } from '$app/stores'
 
   // NProgress css
   import '$lib/styles/__nprogress.css'
+  import { onDestroy } from 'svelte'
 
   NProgress.configure({
     minimum: 0.16,
@@ -27,12 +54,6 @@
       NProgress.done()
     }
   })
-
-  import Favicons from '$lib/components/Favicons.svelte'
-  import { preferences } from '$lib'
-  import { browser } from '$app/env'
-  import Toast from '$lib/components/Toast.svelte'
-  import { onDestroy } from 'svelte'
 
   $: if (browser)
     document.documentElement.classList.toggle('dark', $preferences.darkMode)
@@ -55,32 +76,21 @@
   <noscript>
     <link rel="stylesheet" href=${fontsURL} />
   </noscript>`
+
+  let store = $page.stuff.store as Store
+  let product = $page.stuff.product as Product
+
+  $: pageTitle = product.name + ' | ' + 'Print Ya!'
 </script>
 
 <svelte:head>
-  <title>Print Ya!</title>
+  <title>{pageTitle}</title>
   <link rel="preconnect" href="https://caravaggio-cdn.vercel.app" />
   {@html fontsTag}
 </svelte:head>
 
-<Favicons favicon="/images/logo.svg" themeColor="#000" titleName="Print Ya!" />
+<Favicons favicon={store.favicon} themeColor="#000" titleName={store.name} />
 
 <div class=" bg-white text-gray-700 relative  dark:bg-gray-800 dark:text-white">
   <slot />
 </div>
-<Toast />
-
-<style>
-  :global(html) {
-    --windi-bg: white;
-    --windi-hover-bg: #f6f6f6;
-    --windi-text: #1f2937;
-    --windi-bc: #e5e7eb;
-  }
-  :global(html.dark) {
-    --windi-bg: rgb(31, 41, 55);
-    --windi-hover-bg: #f6f6f6;
-    --windi-text: #1f2937;
-    --windi-bc: rgb(75, 85, 99);
-  }
-</style>
