@@ -13,10 +13,10 @@
       href="/app/stores/{store.slug}/products/{product.slug}/ide"
     >
       <div
-        class="rounded-lg bg-gray-100 w-full p-2 overflow-hidden pointer-events-none select-none dark:bg-gray-700"
+        class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none dark:bg-gray-700"
         style="aspect-ratio: 1/1"
       >
-        <div class="h-full w-full">
+        <div class="flex h-full w-full items-center justify-center">
           <Preview template={JSON.parse(product.template)} fitParent />
         </div>
       </div>

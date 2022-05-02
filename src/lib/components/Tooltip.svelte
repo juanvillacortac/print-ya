@@ -21,7 +21,7 @@
 {#if visible}
   <div
     transition:fly={{ y: 2 }}
-    class="bg-white border rounded border-gray-200 text-xs p-1 text-gray-700 z-20 z-999 absolute pointer-events-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+    class="bg-white border rounded border-gray-300 text-xs p-1 text-gray-700 z-20 z-999 absolute pointer-events-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
     style="top: {y + 5}px; left: {x + 5}px;"
     bind:clientWidth={width}
     bind:clientHeight={height}

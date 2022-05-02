@@ -93,8 +93,8 @@
       : 'none'
     containerEl.style.outlineOffset = '-2px'
     containerEl = document.createElement('div')
-    containerEl.style.width = `${compiled.width}`
-    containerEl.style.height = `${compiled.height}`
+    containerEl.style.width = fitParent ? '100%' : `${compiled.width}`
+    containerEl.style.height = fitParent ? '100%' : `${compiled.height}`
     innerEl.style.width = `${compiled.width}`
     innerEl.style.height = `${compiled.height}`
     containerEl.style.outline = border
@@ -115,18 +115,23 @@
     innerEl.innerHTML = compiled.html
     containerEl.appendChild(innerEl)
     shadow.appendChild(containerEl)
-    if (fitParent) {
+    scaleLayout()
+  }
+
+  const scaleLayout = () => {
+    if (fitParent && innerEl) {
       const parent = element.parentElement
       console.log(parent)
       if (parent) {
         const scale = Math.min(
-          parent.clientWidth / containerEl.clientWidth,
-          parent.clientHeight / containerEl.clientHeight
+          parent.clientWidth / innerEl.offsetWidth,
+          parent.clientHeight / innerEl.offsetHeight
         )
-        console.log(innerEl.clientWidth)
-        containerEl.style.transformOrigin = `top left`
-        containerEl.style.transform = `scale(${scale})`
-        containerEl.style.margin = 'auto'
+        containerEl.style.display = 'flex'
+        containerEl.style.alignItems = 'center'
+        containerEl.style.justifyContent = 'center'
+        innerEl.style.transformOrigin = 'center'
+        innerEl.style.transform = `scale(${scale})`
       }
     }
   }
@@ -145,4 +150,6 @@
   }
 </script>
 
-<div bind:this={element} class="flex h-full w-full relative" />
+<svelte:window on:resize|passive={scaleLayout} />
+
+<div bind:this={element} class="relative" />
