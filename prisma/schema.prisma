@@ -39,6 +39,7 @@ model Store {
 
 model StoreCategory {
   id       String    @id @default(cuid())
+  slug     String
   store    Store     @relation(fields: [storeId], references: [id])
   storeId  String
   name     String
@@ -58,9 +59,10 @@ model Product {
 
   public Boolean
 
+  description String?
   designImage String?
 
-  price Decimal
+  price Float
 
   isTemplate    Boolean
   template      String?

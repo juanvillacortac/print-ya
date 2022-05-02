@@ -14,6 +14,7 @@
   let selected: StoreCategory = {
     id: '',
     name: '',
+    slug: '',
     storeId: store?.id,
   }
 
@@ -38,6 +39,7 @@
     selected = {
       id: '',
       name: '',
+      slug: '',
       storeId: store.id,
     }
   }

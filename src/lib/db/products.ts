@@ -60,7 +60,9 @@ export const getProductsByStore = async ({
     },
   })
 
-export const upsertProduct = async (product: Product): Promise<Product> => {
+export const upsertProduct = async (
+  product: Partial<Product>
+): Promise<Product> => {
   let c: Product
   if (product.id) {
     c = await getProductBySlug({ slug: product.slug, storeId: product.storeId })

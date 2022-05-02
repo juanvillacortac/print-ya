@@ -53,6 +53,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@bytemd/plugin-gfm": "^1.13.1",
     "@codemirror/autocomplete": "^0.19.15",
     "@codemirror/closebrackets": "^0.19.2",
     "@codemirror/commands": "^0.19.8",
@@ -80,10 +81,12 @@
     "@leveluptuts/svelte-toy": "^0.0.18",
     "@prisma/client": "^3.12.0",
     "bcrypt": "^5.0.1",
+    "bytemd": "^1.13.1",
     "caravaggio": "^3.7.2",
     "caravaggio-plugin-nextjs": "^0.4.2",
     "carbon-icons-svelte": "^10.45.1",
     "chrome-aws-lambda": "^10.1.0",
+    "cl-editor": "^2.3.0",
     "codemirror-theme-vars": "^0.1.1",
     "cookie": "^0.5.0",
     "ejs": "^3.1.7",
@@ -107,6 +110,8 @@
     "svelte-split-pane": "^0.1.2",
     "svelte-splitpanes": "^0.6.3",
     "three": "^0.135.0",
+    "typewriter-document": "^0.6.50",
+    "typewriter-editor": "^0.7.8",
     "windicss": "^3.5.1"
   }
 }

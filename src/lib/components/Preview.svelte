@@ -3,6 +3,7 @@
   import { toPng, toSvg } from 'html-to-image'
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
+  import { RGBADepthPacking } from 'three'
 
   let element: HTMLDivElement
   let shadow: ShadowRoot
@@ -84,27 +85,11 @@
   const refreshLayout = () => {
     if (!containerEl || !innerEl) return
     containerEl.style.overflow = 'visible'
-    containerEl.style.outline = border
-      ? `2px dashed ${
-          $preferences.darkMode
-            ? 'rgba(255, 255, 255, 0.5)'
-            : 'rgba(10, 10, 10, 0.4)'
-        }`
-      : 'none'
-    containerEl.style.outlineOffset = '-2px'
     containerEl = document.createElement('div')
     containerEl.style.width = fitParent ? '100%' : `${compiled.width}`
     containerEl.style.height = fitParent ? '100%' : `${compiled.height}`
     innerEl.style.width = `${compiled.width}`
     innerEl.style.height = `${compiled.height}`
-    containerEl.style.outline = border
-      ? `2px dashed ${
-          $preferences.darkMode
-            ? 'rgba(255, 255, 255, 0.5)'
-            : 'rgba(10, 10, 10, 0.4)'
-        }`
-      : 'none'
-    containerEl.style.outlineOffset = '-2px'
   }
 
   $: if (compiled.html && shadow) {
@@ -118,10 +103,52 @@
     scaleLayout()
   }
 
+  $: if (containerEl) {
+    let containerStyles = shadow.getElementById('container-styles')
+    if (!containerStyles) {
+      containerStyles = document.createElement('style')
+      containerStyles.id = 'container-styles'
+      shadow.append(containerStyles)
+    } else {
+      document.getElementById('container-styles')?.remove()
+    }
+    containerStyles.innerHTML = `.outlined {
+      position: relative;  
+    }
+    .outlined:after {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: '';
+      outline: ${
+        border
+          ? `2px dashed ${
+              $preferences.darkMode
+                ? 'rgba(255, 255, 255, 0.5)'
+                : 'rgba(10, 10, 10, 0.4)'
+            }`
+          : 'none'
+      };
+      outline-offset: -2px;
+    }`
+
+    containerEl.classList.toggle('outlined', true)
+    // containerEl.style.outline = border
+    //   ? `2px dashed ${
+    //       $preferences.darkMode
+    //         ? 'rgba(255, 255, 255, 0.5)'
+    //         : 'rgba(10, 10, 10, 0.4)'
+    //     }`
+    //   : 'none'
+    // containerEl.style.outlineOffset = '-2px'
+    innerEl.style.position = 'relative'
+  }
+
   const scaleLayout = () => {
     if (fitParent && innerEl) {
       const parent = element.parentElement
-      console.log(parent)
       if (parent) {
         const scale = Math.min(
           parent.clientWidth / innerEl.offsetWidth,

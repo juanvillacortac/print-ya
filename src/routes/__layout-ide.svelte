@@ -4,11 +4,11 @@
 
   export const load: Load = async ({ params, fetch }) => {
     const data = await get(`/api/stores/${params.slug}`, { fetch })
-    const product = await get(
+    const product: Product = await get(
       `/api/stores/${params.slug}/products/${params.productSlug}`,
       { fetch }
     )
-    if (!data.store)
+    if (!data.store || !product || !product.isTemplate)
       return {
         status: 404,
       }

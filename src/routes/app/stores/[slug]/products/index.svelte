@@ -1,11 +1,21 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import Preview from '$lib/components/Preview.svelte'
+  import { tooltip } from '$lib/components/tooltip'
   import type { Store, StripedProduct } from '$lib/db'
+  import { Add32 } from 'carbon-icons-svelte'
   const store = $page.stuff.store as Store
   const products = $page.stuff.products as StripedProduct[]
 </script>
 
+<a
+  class="rounded-full flex bg-blue-500 shadow-lg text-white p-3 transform right-6 bottom-6 duration-200 fixed hover:scale-95"
+  title="Add new product"
+  href="products/new"
+  use:tooltip
+>
+  <Add32 />
+</a>
 <div class="mx-auto grid gap-6 grid-cols-1 lg:w-9/10 lg:grid-cols-4">
   {#each products as product}
     <a
@@ -23,12 +33,15 @@
       <h4 class="font-title font-bold text-black dark:text-white">
         {product.name}
       </h4>
-      <a
-        href="/app/stores/{store.slug}/products?category={product.storeCategory
-          .name}"
-        class="text-xs text-blue-500 hover:underline"
-        >{product.storeCategory.name}</a
-      >
+      <div class="flex justify-between items-center">
+        <a
+          href="/app/stores/{store.slug}/products?category={product
+            .storeCategory.slug}"
+          class="text-xs text-blue-500 hover:underline"
+          >{product.storeCategory.name}</a
+        >
+        <p>{product.price.toLocaleString()}</p>
+      </div>
     </a>
   {/each}
 </div>

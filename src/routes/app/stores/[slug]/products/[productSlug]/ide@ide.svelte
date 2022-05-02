@@ -14,6 +14,7 @@
     Settings24,
     CloudUpload24,
     Logout24,
+    ArrowLeft20,
   } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { preferences } from '$lib'
@@ -158,7 +159,17 @@
     <div
       class="bg-white border-b flex border-light-900 w-full p-2 px-4 z-50 justify-between items-center dark:bg-gray-800  dark:border-gray-800"
     >
-      <h2>{$editor.name}</h2>
+      <div class="flex space-x-4 items-center">
+        <a
+          href="../"
+          class="flex text-gray-400 hover:text-black dark:hover:text-white"
+          title="Go back to product page"
+          use:tooltip
+        >
+          <ArrowLeft20 />
+        </a>
+        <h2>{$editor.name}</h2>
+      </div>
       {#if saved}
         <div
           class="flex space-x-2 text-gray-500 items-center dark:text-gray-500"

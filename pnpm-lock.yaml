@@ -1,6 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@bytemd/plugin-gfm': ^1.13.1
   '@codemirror/autocomplete': ^0.19.15
   '@codemirror/closebrackets': ^0.19.2
   '@codemirror/commands': ^0.19.8
@@ -39,11 +40,13 @@ specifiers:
   '@types/three': ^0.135.0
   '@windicss/plugin-icons': ^1.0.2
   bcrypt: ^5.0.1
+  bytemd: ^1.13.1
   caravaggio: ^3.7.2
   caravaggio-plugin-nextjs: ^0.4.2
   carbon-icons-svelte: ^10.45.1
   carbon-preprocess-svelte: ^0.6.0
   chrome-aws-lambda: ^10.1.0
+  cl-editor: ^2.3.0
   codemirror-theme-vars: ^0.1.1
   cookie: ^0.5.0
   ejs: ^3.1.7
@@ -79,11 +82,14 @@ specifiers:
   three: ^0.135.0
   tslib: ^2.4.0
   typescript: ^4.6.3
+  typewriter-document: ^0.6.50
+  typewriter-editor: ^0.7.8
   vite-imagetools: ^4.0.3
   vite-plugin-windicss: ^1.8.4
   windicss: ^3.5.1
 
 dependencies:
+  '@bytemd/plugin-gfm': 1.13.1_bytemd@1.13.1
   '@codemirror/autocomplete': 0.19.15
   '@codemirror/closebrackets': 0.19.2
   '@codemirror/commands': 0.19.8
@@ -111,10 +117,12 @@ dependencies:
   '@leveluptuts/svelte-toy': 0.0.18
   '@prisma/client': 3.12.0_prisma@3.12.0
   bcrypt: 5.0.1
+  bytemd: 1.13.1
   caravaggio: 3.7.2
   caravaggio-plugin-nextjs: 0.4.2_caravaggio@3.7.2
   carbon-icons-svelte: 10.45.1
   chrome-aws-lambda: 10.1.0_puppeteer-core@13.6.0
+  cl-editor: 2.3.0
   codemirror-theme-vars: 0.1.1
   cookie: 0.5.0
   ejs: 3.1.7
@@ -138,6 +146,8 @@ dependencies:
   svelte-split-pane: 0.1.2
   svelte-splitpanes: 0.6.3
   three: 0.135.0
+  typewriter-document: 0.6.50
+  typewriter-editor: 0.7.8_svelte@3.47.0
   windicss: 3.5.1
 
 devDependencies:
@@ -730,6 +740,14 @@ packages:
     dependencies:
       '@babel/helper-validator-identifier': 7.16.7
       to-fast-properties: 2.0.0
+    dev: false
+
+  /@bytemd/plugin-gfm/1.13.1_bytemd@1.13.1:
+    resolution: {integrity: sha512-V6ioQtGAW4T73Va2wVG8nGhGulPKi6FcPCN3yn4aE+FUV4/1j5lXXOEk7nPsfj9ZSlmmkappAc7BWnuKie2N4w==}
+    peerDependencies:
+      bytemd: ^1.5.0
+    dependencies:
+      bytemd: 1.13.1
     dev: false
 
   /@codemirror/autocomplete/0.19.15:
@@ -1916,6 +1934,10 @@ packages:
       svgo: 2.8.0
     dev: true
 
+  /@popperjs/core/2.11.5:
+    resolution: {integrity: sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==}
+    dev: false
+
   /@prisma/client/3.12.0_prisma@3.12.0:
     resolution: {integrity: sha512-4NEQjUcWja/NVBvfuDFscWSk1/rXg3+wj+TSkqXCb1tKlx/bsUE00rxsvOvGg7VZ6lw1JFpGkwjwmsOIc4zvQw==}
     engines: {node: '>=12.6'}
@@ -2074,6 +2096,16 @@ packages:
       '@types/node': 17.0.27
     dev: true
 
+  /@types/codemirror/5.60.5:
+    resolution: {integrity: sha512-TiECZmm8St5YxjFUp64LK0c8WU5bxMDt9YaAek1UqUb9swrSCoJhh92fWu1p3mTEqlHjhB5sY7OFBhWroJXZVg==}
+    dependencies:
+      '@types/tern': 0.23.4
+    dev: false
+
+  /@types/estree/0.0.51:
+    resolution: {integrity: sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==}
+    dev: false
+
   /@types/js-yaml/4.0.5:
     resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
     dev: false
@@ -2128,6 +2160,12 @@ packages:
       '@types/node': 17.0.27
     dev: true
 
+  /@types/tern/0.23.4:
+    resolution: {integrity: sha512-JAUw1iXGO1qaWwEOzxTKJZ/5JxVeON9kvGZ/osgZaJImBnyjyn0cjovPsf6FNLmyGY8Vw9DoXZCMlfMkMwHRWg==}
+    dependencies:
+      '@types/estree': 0.0.51
+    dev: false
+
   /@types/three/0.135.0:
     resolution: {integrity: sha512-l7WLhIHjhHMtlpyTSltPPAKLpiMwgMD1hXHj59AVUpYRoZP7Fd9NNOSRSvZBCPLpTHPYojgQvSJCoza9zoL7bg==}
     dev: true
@@ -2147,6 +2185,18 @@ packages:
     dependencies:
       '@types/node': 17.0.27
     optional: true
+
+  /@typewriter/delta/1.0.2:
+    resolution: {integrity: sha512-O2KTUYuEdrkhjiwg3eoPCkMCkI9FniT60ev8nd/pe7PkqeLcgDqk1ukjcVHCbPs0ooq2ztZuSuxM4zqAvEqSjg==}
+    dependencies:
+      fast-diff: 1.2.0
+    dev: false
+
+  /@typewriter/document/0.7.1:
+    resolution: {integrity: sha512-98PlbmZOhyY3HazK+nktE9sX9sjKLc0GPGrqLhvSkTieGi4xrcmeRO5dZLr06sJKd8W9no3NvNEvRQaGgGnXNA==}
+    dependencies:
+      '@typewriter/delta': 1.0.2
+    dev: false
 
   /@windicss/config/1.8.4:
     resolution: {integrity: sha512-i4fFGFfZoRess6WMkauykHC3PFd9xKYVx7lSuLfMK7sgo6x3+l4dY42GbsWMHyLqH1sTMfyt1LgfXSIKYJozSA==}
@@ -2507,6 +2557,12 @@ packages:
       base64-js: 1.5.1
       ieee754: 1.2.1
 
+  /bytemd/1.13.1:
+    resolution: {integrity: sha512-Sd8vq6/viHlkFmgZBgDRvnPiY5nomSqexirJ3hUDKbg+0MILMJkXNtXAxp25aT0hpG6jOm4asO8rSOxVTdZF0w==}
+    dependencies:
+      '@types/codemirror': 5.60.5
+    dev: false
+
   /bytes/3.0.0:
     resolution: {integrity: sha1-0ygVQE1olpn4Wk6k+odV3ROpYEg=}
     engines: {node: '>= 0.8'}
@@ -2732,6 +2788,10 @@ packages:
     dependencies:
       lambdafs: 2.1.1
       puppeteer-core: 13.6.0
+    dev: false
+
+  /cl-editor/2.3.0:
+    resolution: {integrity: sha512-TxTzuL3529Cmnxy4Q9djcKkZUZJLxuFvFomh6pfbAv72nTB4FCZUE7JhEF5PXeAWRstU+u6BD9ZTif9w0hGQfw==}
     dev: false
 
   /clean-css/4.2.4:
@@ -3692,6 +3752,10 @@ packages:
       '@types/yauzl': 2.10.0
     transitivePeerDependencies:
       - supports-color
+
+  /fast-diff/1.2.0:
+    resolution: {integrity: sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==}
+    dev: false
 
   /fast-glob/3.2.11:
     resolution: {integrity: sha512-xrO3+1bxSo3ZVHAnqzyuewYT6aMFHRAd4Kcs92MAonjwQZLsK9d0SF1IyQ3k5PoirxTW0Oe/RqFgMQ6TcNE5Ew==}
@@ -6859,6 +6923,22 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
+
+  /typewriter-document/0.6.50:
+    resolution: {integrity: sha512-QPR5eYaQXYfv21XUMCCPFi3GQJV8CvN02Q3t6dclRET01FpvFi0UVzCkKTrF/9wTwINu/k2tcWtadaa3/86Rxw==}
+    dependencies:
+      fast-diff: 1.2.0
+    dev: false
+
+  /typewriter-editor/0.7.8_svelte@3.47.0:
+    resolution: {integrity: sha512-42+pS5tZ54P8mAQDGdAKDV4LdS/R8QVa0g1ry+c30h0Ew81qP3MQLd5x1qFWddocFt0A5kxi6BjbqL13uPcFWw==}
+    peerDependencies:
+      svelte: 3.x
+    dependencies:
+      '@popperjs/core': 2.11.5
+      '@typewriter/document': 0.7.1
+      svelte: 3.47.0
+    dev: false
 
   /ua-parser-js/0.7.31:
     resolution: {integrity: sha512-qLK/Xe9E2uzmYI3qLeOmI0tEOt+TBBQyUIAh4aAgU05FVYzeZrKUdkAZfBNVGRaHVgV0TDkdEngJSw/SyQchkQ==}

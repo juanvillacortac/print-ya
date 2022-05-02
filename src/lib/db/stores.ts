@@ -1,4 +1,4 @@
-import { prisma } from './common'
+import { prisma, slugify } from './common'
 import type { Store as _Store, StoreCategory } from '@prisma/client'
 
 export type Store = _Store & {
@@ -64,9 +64,22 @@ export const upsertStoreCategory = async (
       },
     })
   }
+  let slug = slugify(category.name)
+  const coincidences = await prisma.storeCategory.findMany({
+    where: {
+      slug: {
+        startsWith: slug,
+      },
+      storeId: category.storeId,
+    },
+  })
+  if (coincidences.length) {
+    slug = `${slug}-${coincidences.length}`
+  }
   return await prisma.storeCategory.create({
     data: {
       name: category.name,
+      slug,
       store: {
         connect: {
           id: category.storeId,
