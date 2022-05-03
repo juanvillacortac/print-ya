@@ -80,6 +80,7 @@ export const upsertProduct = async (
         price: product.price,
         designImage: product.designImage,
         public: product.public,
+        description: product.description,
         storeCategory: {
           connect: {
             id: product.storeCategoryId,
@@ -120,8 +121,8 @@ export const upsertProduct = async (
           id: product.storeCategoryId,
         },
       },
-      template: product.template,
-      templateDraft: product.templateDraft,
+      template: '',
+      templateDraft: '',
       isTemplate: product.isTemplate,
       slug,
     },

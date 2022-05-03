@@ -20,7 +20,7 @@
   {#each products as product}
     <a
       class="bg-white rounded-xl flex flex-col h-full space-y-2 shadow w-full p-4 transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-95"
-      href="/app/stores/{store.slug}/products/{product.slug}/ide"
+      href="/app/stores/{store.slug}/products/{product.slug}"
     >
       <div
         class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none dark:bg-gray-700"

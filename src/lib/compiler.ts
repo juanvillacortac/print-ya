@@ -22,7 +22,7 @@ export type TemplateSource = {
 
 export const compile = (source: TemplateSource): CompiledTemplate => {
   try {
-    let { html, css, fields } = source
+    let { html = '', css = '', fields = '' } = source
     if (fields?.trim()) {
       const payload = JSON.parse(fields || '{}')
       // const script = `<script>\n${Object.entries(payload).map(([k, v]) => `  let ${k} = ${JSON.stringify(v)}`).join('\n')}\n</script>`

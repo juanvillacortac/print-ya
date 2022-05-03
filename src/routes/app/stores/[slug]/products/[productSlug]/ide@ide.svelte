@@ -94,7 +94,7 @@
   let timeout: NodeJS.Timeout
 
   $: if ($editor) {
-    if (!(!browser || product.templateDraft === JSON.stringify($editor))) {
+    if (!(!browser || product?.templateDraft === JSON.stringify($editor))) {
       saved = false
       if (timeout) {
         clearTimeout(timeout)
@@ -161,7 +161,7 @@
     >
       <div class="flex space-x-4 items-center">
         <a
-          href="../"
+          href="."
           class="flex text-gray-400 hover:text-black dark:hover:text-white"
           title="Go back to product page"
           use:tooltip

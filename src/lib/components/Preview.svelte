@@ -1,9 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
-  import { toPng, toSvg } from 'html-to-image'
+  import { toPng } from 'html-to-image'
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
-  import { RGBADepthPacking } from 'three'
 
   let element: HTMLDivElement
   let shadow: ShadowRoot
@@ -21,7 +20,7 @@
 
   export let error = ''
 
-  let compiled: CompiledTemplate = {
+  export let compiled: CompiledTemplate = {
     html: '',
     css: '',
   }
@@ -92,7 +91,7 @@
     innerEl.style.height = `${compiled.height}`
   }
 
-  $: if (compiled.html && shadow) {
+  $: if ((compiled.html || compiled.html === '') && shadow) {
     if (containerEl) shadow.removeChild(containerEl)
     containerEl = document.createElement('div')
     innerEl = document.createElement('div')
@@ -165,7 +164,7 @@
 
   export const saveImage = () => {
     if (!containerEl) return
-    toSvg(containerEl.getElementsByTagName('div')[0], { skipFonts: true }).then(
+    toPng(containerEl.getElementsByTagName('div')[0], { skipFonts: true }).then(
       (dataUrl) => {
         var dl = document.createElement('a')
         document.body.appendChild(dl)
