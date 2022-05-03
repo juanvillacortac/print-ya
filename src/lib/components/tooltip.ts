@@ -1,3 +1,4 @@
+import { navigating } from '$app/stores'
 import Tooltip from './Tooltip.svelte'
 
 export function tooltip(element: HTMLElement) {
@@ -42,6 +43,14 @@ export function tooltip(element: HTMLElement) {
     // NOTE: restore the `title` attribute
     element.setAttribute('title', title)
   }
+
+  navigating.subscribe((n) => {
+    if (n && tooltipComponent) {
+      tooltipComponent?.$destroy()
+      // NOTE: restore the `title` attribute
+      element.setAttribute('title', title)
+    }
+  })
 
   element.addEventListener('mouseenter', mouseEnter)
   element.addEventListener('mouseover', mouseMove)

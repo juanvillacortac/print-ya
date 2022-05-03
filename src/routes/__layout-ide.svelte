@@ -34,6 +34,10 @@
   // NProgress css
   import '$lib/styles/__nprogress.css'
   import { onDestroy } from 'svelte'
+  import Toast from '$lib/components/Toast.svelte'
+  import { invalidate } from '$app/navigation'
+
+  $: path = $page.url.pathname
 
   NProgress.configure({
     minimum: 0.16,
@@ -47,6 +51,12 @@
     if (!$navigating) {
       NProgress.done()
     }
+  }
+
+  $: if (path && browser) {
+    invalidate(
+      `/api/stores/${$page.params.slug}/products/${$page.params.productSlug}`
+    )
   }
 
   onDestroy(() => {
@@ -91,6 +101,7 @@
 
 <Favicons favicon={store.favicon} themeColor="#000" titleName={store.name} />
 
+<Toast />
 <div class=" bg-white text-gray-700 relative  dark:bg-gray-800 dark:text-white">
   <slot />
 </div>

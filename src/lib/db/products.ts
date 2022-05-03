@@ -4,6 +4,7 @@ import type {
   Store as _Store,
   StoreCategory,
 } from '@prisma/client'
+import type { TemplateSource } from '$lib/compiler'
 
 export type Product = _Product & {
   storeCategory?: StoreCategory
@@ -104,6 +105,25 @@ export const upsertProduct = async (
   if (coincidences.length) {
     slug = `${slug}-${coincidences.length}`
   }
+
+  const defaultTemplate: TemplateSource = {
+    html: `<div class="flex h-full w-full items-center justify-center">
+    <h1
+      class="font-black border-4 border-red-500 rounded-2xl text-center leading-none p-2 pb-2.5 text-red-500 text-4xl uppercase"
+    >
+      Change me!
+    </h1>
+  </div>
+  `,
+    css: '',
+    fields: '',
+    sizeUnit: 'cm',
+    width: 8,
+    height: 8,
+    windi: true,
+    name: product.name,
+  }
+
   return await prisma.product.create({
     data: {
       name: product.name,
@@ -121,8 +141,8 @@ export const upsertProduct = async (
           id: product.storeCategoryId,
         },
       },
-      template: '',
-      templateDraft: '',
+      template: JSON.stringify(defaultTemplate),
+      templateDraft: JSON.stringify(defaultTemplate),
       isTemplate: product.isTemplate,
       slug,
     },

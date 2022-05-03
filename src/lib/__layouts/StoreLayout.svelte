@@ -50,7 +50,7 @@
 
 <div class=" bg-white text-gray-700 relative  dark:bg-gray-800 dark:text-white">
   <div class="flex flex-col w-full items-center">
-    <div class="flex mx-auto p-4 justify-between items-center lg:w-7/10">
+    <div class="flex mx-auto w-full p-4 justify-between items-center lg:w-7/10">
       <Image
         src={store.logo}
         class="bg-white rounded p-px h-2rem sm:h-2rem"

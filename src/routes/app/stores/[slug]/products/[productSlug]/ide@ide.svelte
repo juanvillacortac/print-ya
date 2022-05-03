@@ -77,13 +77,28 @@
 
   const persist = async () => {
     try {
+      saving = true
+      await post(`/api/stores/${store.slug}/products`, {
+        ...product,
+        templateDraft: JSON.stringify($editor),
+      })
+      saved = true
+    } catch (err) {
+      notifications.send(err.message, 'default', 3000)
+    } finally {
+      saving = false
+    }
+  }
+
+  const toProduction = async () => {
+    try {
+      saving = true
       await post(`/api/stores/${store.slug}/products`, {
         ...product,
         template: JSON.stringify($editor),
         templateDraft: JSON.stringify($editor),
       })
-      saving = true
-      saved = true
+      notifications.send('Template published', 'default', 3000)
     } catch (err) {
       notifications.send(err.message, 'default', 3000)
     } finally {
@@ -176,7 +191,7 @@
           transition:fade={{ duration: 200 }}
         >
           <CloudUpload24 />
-          <p>Saved!</p>
+          <p>Saved as draft</p>
         </div>
       {/if}
     </div>
@@ -224,6 +239,14 @@
             use:tooltip
           >
             <Share24 />
+          </button>
+          <button
+            on:click={toProduction}
+            title="Save as public template"
+            class="flex text-blue-500"
+            use:tooltip
+          >
+            <CloudUpload24 />
           </button>
         </div>
         <div class="flex flex-col space-y-6">
