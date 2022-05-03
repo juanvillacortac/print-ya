@@ -47,7 +47,7 @@
   let mode: 'editor' | 'settings' | string = 'editor'
 
   const editor = writable(
-    JSON.parse(($page.stuff.product as Product)?.templateDraft || '') || {
+    JSON.parse(($page.stuff.product as Product)?.templateDraft || 'null') || {
       name: 'Template test',
       html: '',
       css: '',

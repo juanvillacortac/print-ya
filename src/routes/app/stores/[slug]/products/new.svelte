@@ -14,6 +14,7 @@
   export let product: Partial<Product> = {
     price: 0.01,
     public: true,
+    isTemplate: false,
   }
 
   const submit = async () => {
@@ -22,6 +23,7 @@
         ...product,
         template: '',
         templateDraft: '',
+        storeId: store.id,
       })
       alert('fine')
       console.log(data)

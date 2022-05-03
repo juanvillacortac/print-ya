@@ -33,14 +33,14 @@
       <h4 class="font-title font-bold text-black dark:text-white">
         {product.name}
       </h4>
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-end">
         <a
           href="/app/stores/{store.slug}/products?category={product
             .storeCategory.slug}"
           class="text-xs text-blue-500 hover:underline"
           >{product.storeCategory.name}</a
         >
-        <p>{product.price.toLocaleString()}</p>
+        <p class="font-bold text-2xl">${product.price.toLocaleString()}</p>
       </div>
     </a>
   {/each}

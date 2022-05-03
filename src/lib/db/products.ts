@@ -1,4 +1,4 @@
-import { prisma } from './common'
+import { prisma, slugify } from './common'
 import type {
   Product as _Product,
   Store as _Store,
@@ -51,6 +51,7 @@ export const getProductsByStore = async ({
       price: true,
       public: true,
       slug: true,
+      description: true,
       store: true,
       storeCategory: true,
       storeCategoryId: true,
@@ -63,6 +64,7 @@ export const getProductsByStore = async ({
 export const upsertProduct = async (
   product: Partial<Product>
 ): Promise<Product> => {
+  console.log(product)
   let c: Product
   if (product.id) {
     c = await getProductBySlug({ slug: product.slug, storeId: product.storeId })
@@ -88,12 +90,26 @@ export const upsertProduct = async (
       },
     })
   }
+  let slug = slugify(product.name)
+  const coincidences = await prisma.product.findMany({
+    where: {
+      slug: {
+        startsWith: slug,
+      },
+      storeId: product.storeId,
+    },
+  })
+  console.log(slug)
+  if (coincidences.length) {
+    slug = `${slug}-${coincidences.length}`
+  }
   return await prisma.product.create({
     data: {
       name: product.name,
       price: product.price,
       designImage: product.designImage,
       public: product.public,
+      description: product.description,
       store: {
         connect: {
           id: product.storeId,
@@ -107,7 +123,7 @@ export const upsertProduct = async (
       template: product.template,
       templateDraft: product.templateDraft,
       isTemplate: product.isTemplate,
-      slug: product.slug,
+      slug,
     },
   })
 }
