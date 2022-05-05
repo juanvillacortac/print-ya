@@ -73,6 +73,7 @@ specifiers:
   svelte-datocms: ^0.6.3
   svelte-fullscreen: ^2.0.0
   svelte-kit-cookie-session: ^2.1.3
+  svelte-markdown: ^0.2.2
   svelte-marquee-text-widget: ^1.1.0
   svelte-preprocess: ^4.10.6
   svelte-split-pane: ^0.1.2
@@ -142,6 +143,7 @@ dependencies:
   svelte-datocms: 0.6.3
   svelte-fullscreen: 2.0.0
   svelte-kit-cookie-session: 2.1.3
+  svelte-markdown: 0.2.2_svelte@3.47.0
   svelte-marquee-text-widget: 1.1.0
   svelte-split-pane: 0.1.2
   svelte-splitpanes: 0.6.3
@@ -2138,6 +2140,10 @@ packages:
 
   /@types/lodash/4.14.182:
     resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
+    dev: false
+
+  /@types/marked/4.0.3:
+    resolution: {integrity: sha512-HnMWQkLJEf/PnxZIfbm0yGJRRZYYMhb++O9M36UCTA9z53uPvVoSlAwJr3XOpDEryb7Hwl1qAx/MV6YIW1RXxg==}
     dev: false
 
   /@types/node/14.18.15:
@@ -5125,6 +5131,12 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
+  /marked/4.0.15:
+    resolution: {integrity: sha512-esX5lPdTfG4p8LDkv+obbRCyOKzB+820ZZyMOXJZygZBHrH9b3xXR64X4kT3sPe9Nx8qQXbmcz6kFSMt4Nfk6Q==}
+    engines: {node: '>= 12'}
+    hasBin: true
+    dev: false
+
   /md5/2.3.0:
     resolution: {integrity: sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==}
     dependencies:
@@ -6649,6 +6661,16 @@ packages:
 
   /svelte-kit-cookie-session/2.1.3:
     resolution: {integrity: sha512-7Xk3CNbpLAi1KodlsV5W5jULQ2NxQunaXtAYqAuzIEXIq2EwC4oDa25kdmHjNe33epV0t4r0WwxZOuSdJPsapg==}
+    dev: false
+
+  /svelte-markdown/0.2.2_svelte@3.47.0:
+    resolution: {integrity: sha512-bNxpG3gRbC2UjAFakIMcLEzVq5db2Md57aeU4wKCuffSfD6f7RkvtYDqbrAk2ycC55t3wykOy0E7KDuvVKyDYA==}
+    peerDependencies:
+      svelte: ^3.0.0
+    dependencies:
+      '@types/marked': 4.0.3
+      marked: 4.0.15
+      svelte: 3.47.0
     dev: false
 
   /svelte-marquee-text-widget/1.1.0:

@@ -8,7 +8,13 @@
   import Toast from '$lib/components/Toast.svelte'
   import { page } from '$app/stores'
   import Image from '$lib/components/caravaggio/Image.svelte'
-  import { Moon24, Search16, Sun24, ShoppingBag24 } from 'carbon-icons-svelte'
+  import {
+    Moon24,
+    Search16,
+    Sun24,
+    ShoppingBag24,
+    Favorite24,
+  } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
 
@@ -48,8 +54,12 @@
 
 <Favicons favicon={store.favicon} themeColor="#000" titleName={store.name} />
 
-<div class=" bg-white text-gray-700 relative  dark:bg-gray-800 dark:text-white">
-  <div class="flex flex-col w-full items-center">
+<div
+  class=" bg-white top-0 left-0  text-gray-700 relative dark:bg-gray-800 dark:text-white"
+>
+  <div
+    class="bg-white border-b flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
+  >
     <div class="flex mx-auto w-full p-4 justify-between items-center lg:w-7/10">
       <Image
         src={store.logo}
@@ -92,6 +102,15 @@
         </button>
         <button
           on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
+          class="flex relative hover:text-pink-500"
+          title="Favorites"
+          use:tooltip
+          style="width: 24px; height: 24px"
+        >
+          <Favorite24 />
+        </button>
+        <button
+          on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
           class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
           title="Bag"
           use:tooltip
@@ -105,7 +124,7 @@
         </button>
       </div>
     </div>
-    <div class="border-t border-b w-full dark:border-gray-600">
+    <div class="border-t w-full <lg:hidden dark:border-gray-600">
       <div
         class="flex mx-auto space-x-6 p-4 py-2 items-center justify-center uppercase lg:w-7/10"
       >
