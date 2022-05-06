@@ -54,9 +54,7 @@
 
 <Favicons favicon={store.favicon} themeColor="#000" titleName={store.name} />
 
-<div
-  class=" bg-white top-0 left-0  text-gray-700 relative dark:bg-gray-800 dark:text-white"
->
+<div class="top-0 left-0 text-gray-700 relative dark:text-white">
   <div
     class="bg-white border-b flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
   >
@@ -156,11 +154,14 @@
     --windi-hover-bg: #f6f6f6;
     --windi-text: #1f2937;
     --windi-bc: #e5e7eb;
+
+    @apply bg-white;
   }
   :global(html.dark) {
     --windi-bg: rgb(31, 41, 55);
     --windi-hover-bg: #f6f6f6;
     --windi-text: #1f2937;
     --windi-bc: rgb(75, 85, 99);
+    @apply bg-gray-800;
   }
 </style>

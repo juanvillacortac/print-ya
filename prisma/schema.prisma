@@ -62,6 +62,9 @@ model Product {
   description String?
   designImage String?
 
+  minQuantity Int?
+  modifiers   ProductModifier[]
+
   price Float
 
   isTemplate    Boolean
@@ -70,4 +73,15 @@ model Product {
 
   storeCategory   StoreCategory? @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
   storeCategoryId String?
+}
+
+model ProductModifier {
+  id            String   @id @default(cuid())
+  name          String
+  userValueType String
+  price         Float    @default(0)
+  isLikeTax     Boolean  @default(false)
+  active        Boolean  @default(true)
+  product       Product? @relation(fields: [productId], references: [id])
+  productId     String?
 }

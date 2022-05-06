@@ -3,6 +3,7 @@
   import { get } from '$lib/api'
   import type { Product, Store } from '$lib/db'
   import Preview from '$lib/components/Preview.svelte'
+  import Markdown from 'svelte-markdown'
   import { tooltip } from '$lib/components/tooltip'
   import {
     Checkbox16,
@@ -38,7 +39,7 @@
 </script>
 
 <div
-  class="flex flex-col mx-auto space-y-4 w-full py-12 px-4 lg:max-w-9/10 lg:px-6"
+  class="flex flex-col mx-auto space-y-4 w-full py-12 px-4 lg:max-w-8/10 lg:px-6"
 >
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
   <div
@@ -124,6 +125,9 @@
       <p class="font-bold text-4xl">
         ${product.price.toLocaleString()} <span class="text-lg">/ unit</span>
       </p>
+      <div class="prose-sm !w-full">
+        <Markdown source={product.description} />
+      </div>
     </div>
   </div>
 </div>

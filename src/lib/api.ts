@@ -70,9 +70,9 @@ export function del<T = Record<string, unknown>>(
   return send({ method: 'DELETE', path, data, headers }) as Promise<T>
 }
 
-export function post<T = Record<string, unknown>>(
+export function post<T = Record<string, unknown>, I = Record<string, unknown>>(
   path: string,
-  data: Record<string, unknown>,
+  data: I,
   headers?: Record<string, unknown>
 ): Promise<T> {
   return send({ method: 'POST', path, data, headers }) as Promise<T>
