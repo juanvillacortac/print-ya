@@ -76,12 +76,22 @@ model Product {
 }
 
 model ProductModifier {
-  id            String   @id @default(cuid())
-  name          String
-  userValueType String
-  price         Float    @default(0)
-  isLikeTax     Boolean  @default(false)
-  active        Boolean  @default(true)
-  product       Product? @relation(fields: [productId], references: [id])
-  productId     String?
+  id        String                @id @default(cuid())
+  name      String
+  type      String                @default("select")
+  active    Boolean               @default(true)
+  product   Product?              @relation(fields: [productId], references: [id])
+  productId String?
+  items     ProductModifierItem[]
+}
+
+model ProductModifierItem {
+  id         String  @id @default(cuid())
+  name       String
+  cost       Float   @default(0)
+  percentage Boolean @default(false)
+  active     Boolean @default(true)
+
+  productModifier   ProductModifier? @relation(fields: [productModifierId], references: [id])
+  productModifierId String?
 }

@@ -1,11 +1,16 @@
 import { prisma, slugify } from './common'
 import type {
   Product as _Product,
-  ProductModifier,
+  ProductModifier as _ProductModifier,
+  ProductModifierItem,
   Store as _Store,
   StoreCategory,
 } from '@prisma/client'
 import type { TemplateSource } from '$lib/compiler'
+
+export type ProductModifier = _ProductModifier & {
+  items?: ProductModifierItem[]
+}
 
 export type Product = _Product & {
   storeCategory?: StoreCategory
@@ -33,6 +38,13 @@ export const getProductBySlug = ({
       modifiers: {
         where: {
           active: true,
+        },
+        include: {
+          items: {
+            where: {
+              active: true,
+            },
+          },
         },
       },
     },
@@ -75,6 +87,10 @@ export const upsertProduct = async (
 ): Promise<Product> => {
   console.log(product)
   let c: Product
+  console.log(
+    product.modifiers.map((m) => m.items).reduce((a, b) => [...a, ...b], []),
+    []
+  )
   if (product.id) {
     c = await getProductBySlug({ slug: product.slug, storeId: product.storeId })
     if (!c && !product.id) {
@@ -101,34 +117,74 @@ export const upsertProduct = async (
     })
     const transactions = product.modifiers.map((m) =>
       prisma.productModifier.upsert({
+        include: {
+          items: {
+            where: {
+              active: true,
+            },
+          },
+        },
         create: {
           name: m.name,
-          isLikeTax: m.isLikeTax,
-          price: m.price,
-          userValueType: m.userValueType,
           id: undefined,
           product: {
             connect: {
               id: product.id,
             },
           },
+          type: m.type,
+          items: {
+            create: m.items?.map((i) => ({
+              name: i.name,
+              cost: i.cost,
+              percentage: i.percentage,
+            })),
+          },
         },
         update: {
           name: m.name,
-          isLikeTax: m.isLikeTax,
-          price: m.price,
-          userValueType: m.userValueType,
+          type: m.type,
           active: m.active,
+          items: {
+            create: m.items
+              ?.filter((i) => !i.id)
+              .map((i) => ({
+                name: i.name,
+                cost: i.cost,
+                percentage: i.percentage,
+              })),
+          },
         },
         where: {
           id: m.id,
         },
       })
     )
-    const modifiers = await prisma.$transaction(transactions)
+    const itemsTransactions = product.modifiers
+      .map((m) => m.items.filter((i) => i.id))
+      .reduce((a, b) => [...a, ...b], [])
+      .map((i) =>
+        prisma.productModifierItem.update({
+          where: {
+            id: i.id,
+          },
+          data: {
+            active: i.active,
+            name: i.name,
+            cost: i.cost,
+            percentage: i.percentage,
+          },
+        })
+      )
+
+    const _modifiers = await prisma.$transaction(transactions)
+    const _items = await prisma.$transaction(itemsTransactions)
+    const final = await getProductBySlug({
+      storeId: product.storeId,
+      slug: product.slug,
+    })
     return {
-      ...updated,
-      modifiers: modifiers.filter((m) => m.active),
+      ...final,
     }
   }
   let slug = slugify(product.name)
@@ -187,9 +243,14 @@ export const upsertProduct = async (
           .filter((m) => m.active)
           .map((m) => ({
             name: m.name,
-            isLikeTax: m.isLikeTax,
-            price: m.price,
-            userValueType: m.userValueType,
+            type: m.type,
+            items: {
+              create: m.items.map((i) => ({
+                name: i.name,
+                cost: i.cost,
+                percentage: i.percentage,
+              })),
+            },
           })),
       },
       slug,
