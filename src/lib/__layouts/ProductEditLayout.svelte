@@ -47,13 +47,14 @@
 
   const submit = async () => {
     try {
-      const data = await post<
-        Product,
-        Partial<Product & { modifiers: ProductModifier[] }>
-      >(`/api/stores/${store.slug}/products`, {
-        ...product,
-        storeId: store.id,
-      })
+      const data = await post<Product, Partial<Product>>(
+        `/api/stores/${store.slug}/products`,
+        {
+          ...product,
+          modifiers,
+          storeId: store.id,
+        }
+      )
       notifications.send(
         `Product ${product.id ? 'updated' : 'created'}`,
         'default',
@@ -73,13 +74,16 @@
 
   let scale = 100
 
-  let modifiers: Partial<ProductModifier & { internalId?: string }>[] = []
+  let modifiers: (ProductModifier & { internalId?: string })[] =
+    product?.modifiers || []
 
   const addModifier = () => {
     modifiers = [
       ...modifiers,
       {
         internalId: (Math.random() + 1).toString(36).substring(7),
+        id: '',
+        productId: undefined,
         active: true,
         name: '',
         price: 0,
@@ -99,7 +103,7 @@
   const deleteModifier = (idx: number) => {
     const modifier = modifiers[idx]
     if (modifier.id) {
-      modifier.active = false
+      modifiers[idx].active = false
     } else {
       modifiers.splice(idx, 1)
       modifiers = [...modifiers]
@@ -248,7 +252,7 @@
           >
             <thead
               class="bg-gray-50 text-xs text-gray-700 uppercase !z-30 dark:bg-gray-700 dark:text-gray-400"
-              class:sr-only={!modifiers?.length}
+              class:sr-only={!modifiers?.filter((m) => m.active).length}
             >
               <tr>
                 <th
@@ -279,7 +283,7 @@
             <tbody class="z-10 relative">
               {#each modifiers?.filter((m) => m.active) as m, idx (m.id || m.internalId)}
                 <tr
-                  transition:fly={{ x: -20 }}
+                  in:fly={{ x: -20 }}
                   class="bg-white dark:bg-gray-800"
                   class:border-b={idx !== modifiers.length - 1}
                   class:dark:border-gray-700={idx !== modifiers.length - 1}
@@ -335,7 +339,7 @@
                 <tr
                   class="bg-gray-50 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400"
                 >
-                  <td class="text-center py-4 px-6" colspan="4">
+                  <td class="text-center py-4 px-6" colspan="5">
                     <div
                       class="flex space-x-2 w-full justify-center items-center"
                     >

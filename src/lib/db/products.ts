@@ -1,6 +1,7 @@
 import { prisma, slugify } from './common'
 import type {
   Product as _Product,
+  ProductModifier,
   Store as _Store,
   StoreCategory,
 } from '@prisma/client'
@@ -8,6 +9,7 @@ import type { TemplateSource } from '$lib/compiler'
 
 export type Product = _Product & {
   storeCategory?: StoreCategory
+  modifiers?: ProductModifier[]
 }
 
 export type StripedProduct = Omit<_Product, 'templateDraft'> & {
@@ -28,6 +30,11 @@ export const getProductBySlug = ({
     },
     include: {
       storeCategory: true,
+      modifiers: {
+        where: {
+          active: true,
+        },
+      },
     },
   })
 
@@ -59,6 +66,7 @@ export const getProductsByStore = async ({
       storeId: true,
       updatedAt: true,
       template: true,
+      minQuantity: true,
     },
   })
 
@@ -72,7 +80,7 @@ export const upsertProduct = async (
     if (!c && !product.id) {
       throw new Error('not allowed')
     }
-    return await prisma.product.update({
+    const updated = await prisma.product.update({
       where: {
         id: c?.id,
       },
@@ -91,6 +99,37 @@ export const upsertProduct = async (
         templateDraft: product.templateDraft,
       },
     })
+    const transactions = product.modifiers.map((m) =>
+      prisma.productModifier.upsert({
+        create: {
+          name: m.name,
+          isLikeTax: m.isLikeTax,
+          price: m.price,
+          userValueType: m.userValueType,
+          id: undefined,
+          product: {
+            connect: {
+              id: product.id,
+            },
+          },
+        },
+        update: {
+          name: m.name,
+          isLikeTax: m.isLikeTax,
+          price: m.price,
+          userValueType: m.userValueType,
+          active: m.active,
+        },
+        where: {
+          id: m.id,
+        },
+      })
+    )
+    const modifiers = await prisma.$transaction(transactions)
+    return {
+      ...updated,
+      modifiers: modifiers.filter((m) => m.active),
+    }
   }
   let slug = slugify(product.name)
   const coincidences = await prisma.product.findMany({
@@ -101,7 +140,6 @@ export const upsertProduct = async (
       storeId: product.storeId,
     },
   })
-  console.log(slug)
   if (coincidences.length) {
     slug = `${slug}-${coincidences.length}`
   }
@@ -144,6 +182,16 @@ export const upsertProduct = async (
       template: JSON.stringify(defaultTemplate),
       templateDraft: JSON.stringify(defaultTemplate),
       isTemplate: product.isTemplate,
+      modifiers: {
+        create: product.modifiers
+          .filter((m) => m.active)
+          .map((m) => ({
+            name: m.name,
+            isLikeTax: m.isLikeTax,
+            price: m.price,
+            userValueType: m.userValueType,
+          })),
+      },
       slug,
     },
   })
