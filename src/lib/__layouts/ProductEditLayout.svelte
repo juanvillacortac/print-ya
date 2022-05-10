@@ -17,6 +17,7 @@
   import Preview from '$lib/components/Preview.svelte'
   import { writable } from 'svelte/store'
   import ProductModifiersEditor from './ProductModifiersEditor.svelte'
+  import { browser } from '$app/env'
 
   export let product: Partial<Product> = {
     price: 0.01,
@@ -94,6 +95,8 @@
   let modifiers: (ProductModifier & { internalId?: string })[] = [
     ...(product?.modifiers || []),
   ]
+
+  $: browser ? console.log(modifiers) : null
 
   const zoomIn = () => (scale = Math.max(10, Math.min(scale + 10, 200)))
   const zoomOut = () => (scale = Math.max(10, Math.min(scale - 10, 200)))

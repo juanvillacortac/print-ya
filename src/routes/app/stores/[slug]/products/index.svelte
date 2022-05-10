@@ -86,7 +86,11 @@
           {/if}
         </div>
       </a>
-      <p class="font-bold text-sm">${product.price.toLocaleString()}</p>
+      <p class="font-bold text-sm">
+        ${product.price.toLocaleString()}{!product.public
+          ? ' - Unpublished'
+          : ''}
+      </p>
       <a class="font-title font-bold text-black dark:text-white" {href}>
         {product.name}
       </a>

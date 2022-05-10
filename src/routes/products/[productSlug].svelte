@@ -13,9 +13,9 @@
   } from 'carbon-icons-svelte'
 
   export const load: Load = async ({ params, fetch, stuff }) => {
-    const store = stuff.store as Store
+    const store = stuff.store
     const data = await get(
-      `/api/stores/${store.slug}/products/${params.productSlug}`,
+      `/api/stores/${store?.slug}/products/${params.productSlug}`,
       { fetch }
     )
     if (!data)
@@ -133,22 +133,6 @@
 </div>
 
 <style>
-  .preview-button {
-    @apply bg-white border-transparent rounded flex border-2 shadow p-1 transform transition-transform duration-200;
-  }
-
-  .preview-button:hover {
-    @apply -translate-y-px;
-  }
-
-  :global(.dark) .preview-button {
-    @apply border-transparent bg-gray-700 border-2  border-gray-300;
-  }
-
-  :global(.dark) .preview-button:hover {
-    @apply border-gray-300;
-  }
-
   .checkerboard {
     --black-cell: rgba(55, 65, 81, 0.2);
     background-image: linear-gradient(

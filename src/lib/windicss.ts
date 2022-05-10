@@ -7,7 +7,7 @@ import type { Config } from 'windicss/types/interfaces'
 export function useWindiCSS(
   htmlCode: string,
   styleCode: string,
-  config?: Config | undefined
+  config: Config = { darkMode: false }
 ) {
   const processor = new Windi(config)
 

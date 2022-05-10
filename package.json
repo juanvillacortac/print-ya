@@ -87,6 +87,7 @@
     "carbon-icons-svelte": "^10.45.1",
     "chrome-aws-lambda": "^10.1.0",
     "cl-editor": "^2.3.0",
+    "cleanslate": "^0.10.1",
     "codemirror-theme-vars": "^0.1.1",
     "cookie": "^0.5.0",
     "ejs": "^3.1.7",

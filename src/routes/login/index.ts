@@ -4,7 +4,6 @@ import type { RequestHandler } from '@sveltejs/kit'
 
 export const post: RequestHandler = async (event) => {
   const { email, password, isLogin } = await event.request.json()
-  console.log(password)
 
   try {
     const { body } = await db.login({ email, password, isLogin })

@@ -47,6 +47,7 @@ specifiers:
   carbon-preprocess-svelte: ^0.6.0
   chrome-aws-lambda: ^10.1.0
   cl-editor: ^2.3.0
+  cleanslate: ^0.10.1
   codemirror-theme-vars: ^0.1.1
   cookie: ^0.5.0
   ejs: ^3.1.7
@@ -124,6 +125,7 @@ dependencies:
   carbon-icons-svelte: 10.45.1
   chrome-aws-lambda: 10.1.0_puppeteer-core@13.6.0
   cl-editor: 2.3.0
+  cleanslate: 0.10.1
   codemirror-theme-vars: 0.1.1
   cookie: 0.5.0
   ejs: 3.1.7
@@ -2818,6 +2820,10 @@ packages:
     dependencies:
       escape-string-regexp: 4.0.0
     dev: true
+
+  /cleanslate/0.10.1:
+    resolution: {integrity: sha1-WvcafDtbANCFhq0gUOWnvaKFBnY=}
+    dev: false
 
   /cli-cursor/2.1.0:
     resolution: {integrity: sha1-s12sN2R5+sw+lHR9QdDQ9SOP/LU=}

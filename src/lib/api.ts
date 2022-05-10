@@ -48,6 +48,7 @@ async function send({
   } else {
     return {}
   }
+  if (response.status === 404) return responseData
   if (!response.ok) throw responseData
   return responseData
 }

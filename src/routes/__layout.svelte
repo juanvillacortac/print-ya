@@ -1,9 +1,32 @@
+<script context="module" lang="ts">
+  import type { Load } from '@sveltejs/kit'
+
+  export const load: Load = async (input) => {
+    const layout = getLayoutType(input)
+    const { notFound, response } = await getLayoutData(layout, input)
+    if (notFound) {
+      return {
+        status: 404,
+      }
+    }
+    return {
+      props: {
+        layout,
+      },
+      stuff: {
+        ...response,
+        layout,
+      },
+    }
+  }
+</script>
+
 <script lang="ts">
   import 'virtual:windi.css'
   import '$lib/styles/base.css'
 
   import NProgress from 'nprogress'
-  import { navigating } from '$app/stores'
+  import { navigating, page } from '$app/stores'
 
   // NProgress css
   import '$lib/styles/__nprogress.css'
@@ -28,11 +51,18 @@
     }
   })
 
-  import Favicons from '$lib/components/Favicons.svelte'
   import { preferences } from '$lib'
   import { browser } from '$app/env'
   import Toast from '$lib/components/Toast.svelte'
-  import { onDestroy } from 'svelte'
+  import { onDestroy, SvelteComponent, SvelteComponentTyped } from 'svelte'
+  import {
+    getLayoutData,
+    getLayoutType,
+    type LayoutType,
+  } from '$lib/utils/layout'
+  import StoreLayout from '$lib/__layouts/StoreLayout.svelte'
+  import AppLayout from '$lib/__layouts/AppLayout.svelte'
+  import type { InstantiableSvelteComponentTyped } from 'svelte-markdown'
 
   $: if (browser)
     document.documentElement.classList.toggle('dark', $preferences.darkMode)
@@ -55,19 +85,33 @@
   <noscript>
     <link rel="stylesheet" href=${fontsURL} />
   </noscript>`
+
+  $: storeNotFound = layout === 'store' && !$page.stuff.store
+
+  let layouts: Record<LayoutType, InstantiableSvelteComponentTyped>
+  $: layouts = {
+    app: AppLayout,
+    store: storeNotFound ? AppLayout : StoreLayout,
+  }
+
+  const layoutProps: Record<LayoutType, () => any> = {
+    app: () => ({}),
+    store: () => ({
+      store: storeNotFound ? {} : $page.stuff.store,
+    }),
+  }
+
+  export let layout: LayoutType = 'app'
 </script>
 
 <svelte:head>
-  <title>Print Ya!</title>
   <link rel="preconnect" href="https://caravaggio-cdn.vercel.app" />
   {@html fontsTag}
 </svelte:head>
 
-<Favicons favicon="/images/logo.svg" themeColor="#000" titleName="Print Ya!" />
-
-<div class=" bg-white text-gray-700 relative  dark:bg-gray-800 dark:text-white">
+<svelte:component this={layouts[layout]} {...layoutProps[layout]()}>
   <slot />
-</div>
+</svelte:component>
 <Toast />
 
 <style>
@@ -76,11 +120,13 @@
     --windi-hover-bg: #f6f6f6;
     --windi-text: #1f2937;
     --windi-bc: #e5e7eb;
+    @apply bg-white text-gray-700;
   }
   :global(html.dark) {
     --windi-bg: rgb(31, 41, 55);
     --windi-hover-bg: #f6f6f6;
     --windi-text: #1f2937;
     --windi-bc: rgb(75, 85, 99);
+    @apply bg-gray-800 text-white;
   }
 </style>

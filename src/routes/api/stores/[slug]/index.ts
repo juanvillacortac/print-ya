@@ -3,11 +3,10 @@ import { ErrorHandler } from '$lib/db'
 import type { RequestHandler } from '@sveltejs/kit'
 
 export const get: RequestHandler = async (event) => {
-  const { userId } = await db.getUserDetails(event)
   const { slug } = event.params
   try {
     const store = await db.getStoreBySlug({ slug })
-    if (store.userId !== userId) {
+    if (!store) {
       return {
         status: 404,
       }

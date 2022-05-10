@@ -1,4 +1,5 @@
 <script lang="ts">
+  import 'cleanslate'
   import { onMount, onDestroy } from 'svelte'
   import { toPng } from 'html-to-image'
   import { preferences } from '$lib'
@@ -61,6 +62,9 @@
     if (styleEl) shadow.removeChild(styleEl)
     styleEl = document.createElement('style')
     styleEl.innerHTML = compiled.css
+      .replace('html {', ':host > * {')
+      .replace('body {', ':host > * {')
+    console.log(styleEl.innerHTML)
     shadow.appendChild(styleEl)
 
     const imports = compiled.css.match(/@import\ url\((.*?)\);/gim)
@@ -124,9 +128,7 @@
       outline: ${
         border
           ? `2px dashed ${
-              $preferences.darkMode
-                ? 'rgba(255, 255, 255, 0.5)'
-                : 'rgba(10, 10, 10, 0.4)'
+              $preferences.darkMode ? 'rgba 255, 0.5)' : 'rgba(10, 10, 10, 0.4)'
             }`
           : 'none'
       };
@@ -178,4 +180,4 @@
 
 <svelte:window on:resize|passive={scaleLayout} />
 
-<div bind:this={element} class="relative" />
+<div bind:this={element} class="relative cleanslate" />

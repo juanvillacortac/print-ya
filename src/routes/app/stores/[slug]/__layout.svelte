@@ -54,7 +54,7 @@
   </a>
   <a
     class="border-transparent flex hover:border-current"
-    href="/app/stores/{store.slug}/preview"
+    href="/?store={store.slug}"
     target="__blank"
     title="Go to site"
     use:tooltip
