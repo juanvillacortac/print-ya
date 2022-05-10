@@ -21,19 +21,24 @@ export function search<T>(
   test: string | string[],
   fields?: string[]
 ): T[] {
-  let c = []
-  if (test == undefined || test == null) {
+  try {
+    let c = []
+    if (test == undefined || test == null) {
+      return c
+    }
+    if (typeof test == 'string') {
+      const regex = new RegExp('\\b' + test, 'i')
+      c = collection.filter(matcher(regex, fields))
+    } else {
+      let found = []
+      test.forEach((t) => {
+        const regex = new RegExp('\\b' + t + '\\b', 'i')
+        found = [...found, ...collection.filter(matcher(regex, fields))]
+      })
+    }
     return c
+  } catch (error) {
+    console.error(error)
+    return collection
   }
-  if (typeof test == 'string') {
-    const regex = new RegExp('\\b' + test, 'i')
-    c = collection.filter(matcher(regex, fields))
-  } else {
-    let found = []
-    test.forEach((t) => {
-      const regex = new RegExp('\\b' + t + '\\b', 'i')
-      found = [...found, ...collection.filter(matcher(regex, fields))]
-    })
-  }
-  return c
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/env'
+  import { goto } from '$app/navigation'
 
   import { page } from '$app/stores'
   import Preview from '$lib/components/Preview.svelte'
@@ -14,7 +15,7 @@
 
   let textSearch = ''
   let categoryId = ''
-  let visibility: boolean | '' = ''
+  let visibility: boolean | '' = true
 
   $: filteredProducts = search(products, textSearch, ['name'])
     .filter((p) => (categoryId ? p.storeCategoryId === categoryId : true))
@@ -24,7 +25,7 @@
 </script>
 
 <a
-  class="rounded-full flex bg-blue-500 shadow-lg text-white p-3 transform right-6 bottom-6 duration-200 fixed hover:scale-95"
+  class="rounded-full flex bg-blue-500 shadow-lg text-white p-3 transform right-6 bottom-6 z-20 duration-200 fixed hover:scale-95"
   title="Add new product"
   href="products/new"
   use:tooltip
@@ -60,17 +61,23 @@
 </div>
 <div class="mx-auto grid gap-6 grid-cols-1 lg:w-9/10 lg:grid-cols-4">
   {#each filteredProducts as product (product.id)}
-    <a
+    {@const href = `/app/stores/${store.slug}/products/${product.slug}`}
+    <div
+      role="link"
       in:fly={{ y: 20 }}
       animate:flip={{ duration: 400 }}
-      class="bg-white rounded-xl flex flex-col h-full space-y-2 shadow w-full p-4 transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-95"
-      href="/app/stores/{store.slug}/products/{product.slug}"
+      class="bg-white rounded-xl cursor-pointer flex flex-col h-full space-y-2 shadow w-full p-4 transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-98"
+      on:click={() => goto(href)}
+      style="will-change: transform"
     >
-      <div
-        class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none dark:bg-gray-700"
+      <a
+        class="rounded-lg bg-gray-100 w-full overflow-hidden select-none dark:bg-gray-700"
         style="aspect-ratio: 1/1"
+        {href}
       >
-        <div class="flex h-full w-full items-center justify-center">
+        <div
+          class="flex h-full w-full items-center justify-center pointer-events-none"
+        >
           {#if browser}
             <Preview
               template={JSON.parse(product?.template || '{}')}
@@ -78,11 +85,11 @@
             />
           {/if}
         </div>
-      </div>
+      </a>
       <p class="font-bold text-sm">${product.price.toLocaleString()}</p>
-      <h4 class="font-title font-bold text-black dark:text-white">
+      <a class="font-title font-bold text-black dark:text-white" {href}>
         {product.name}
-      </h4>
+      </a>
       <div class="flex justify-between items-end">
         <a
           href="/app/stores/{store.slug}/products?category={product
@@ -91,6 +98,6 @@
           >{product.storeCategory.name}</a
         >
       </div>
-    </a>
+    </div>
   {/each}
 </div>

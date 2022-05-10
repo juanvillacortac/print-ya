@@ -1,7 +1,7 @@
 <script lang="ts">
   import 'bytemd/dist/index.css'
   import { page } from '$app/stores'
-  import type { Product, Store } from '$lib/db'
+  import type { Product, ProductModifier, Store } from '$lib/db'
   const store = $page.stuff.store as Store
   import { Editor } from 'bytemd'
   import { post } from '$lib/api'
@@ -16,7 +16,6 @@
   import { tooltip } from '$lib/components/tooltip'
   import Preview from '$lib/components/Preview.svelte'
   import { writable } from 'svelte/store'
-  import type { ProductModifier } from '@prisma/client'
   import ProductModifiersEditor from './ProductModifiersEditor.svelte'
 
   export let product: Partial<Product> = {
@@ -41,6 +40,28 @@
   let title = product.name
 
   const submit = async () => {
+    for (let m of modifiers?.filter((m) => m.active)) {
+      if (!m.name) {
+        alert('Modifiers should have a title')
+        return
+      }
+      if (m.type == 'select' || m.type == 'multiple') {
+        if (!m.items?.filter((i) => i.active).length) {
+          alert('Selection and multiple selection modifier should have items')
+          return
+        }
+        for (let i of m.items) {
+          if (!i.name) {
+            alert('Modifier items should have a title')
+            return
+          }
+          if (!m.name) {
+            alert('Modifiers should have a title')
+            return
+          }
+        }
+      }
+    }
     try {
       const data = await post<Product, Partial<Product>>(
         `/api/stores/${store.slug}/products`,
@@ -60,7 +81,6 @@
         return
       }
       title = data.name
-      console.log(data.modifiers)
       modifiers = data.modifiers
     } catch (err) {
       console.log(err.message, err.error)

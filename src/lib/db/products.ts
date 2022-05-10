@@ -80,6 +80,9 @@ export const getProductsByStore = async ({
       template: true,
       minQuantity: true,
     },
+    orderBy: {
+      name: 'asc',
+    },
   })
 
 export const upsertProduct = async (

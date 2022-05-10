@@ -63,7 +63,7 @@
       >
         {#each products.slice(0, 3) as product (product.id)}
           <a
-            class="bg-white rounded-xl flex h-full space-x-4 shadow w-full p-4 transform transition-transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-95"
+            class="bg-white rounded-xl flex h-full space-x-4 shadow w-full p-4 transform transition-transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-95 "
             href="/app/stores/{store.slug}/products/{product.slug}"
           >
             <div
@@ -78,25 +78,25 @@
               </div>
             </div>
             <div
-              class="flex flex-col flex-grow h-full space-y-1 justify-between"
+              class="flex space-x-1 w-full top-4 right-4 text-gray-400 justify-end absolute"
             >
-              <div class="flex space-x-1 w-full text-gray-400 justify-end">
-                <button
-                  class="flex relative hover:text-pink-500"
-                  title="Favorites"
-                  use:tooltip
-                  style="width: 24px; height: 24px"
-                >
-                  <Favorite24 />
-                </button>
-                <button
-                  class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
-                  title="Add to Bag"
-                  use:tooltip
-                >
-                  <ShoppingBag24 />
-                </button>
-              </div>
+              <button
+                class="flex relative hover:text-pink-500"
+                title="Favorites"
+                use:tooltip
+                style="width: 24px; height: 24px"
+              >
+                <Favorite24 />
+              </button>
+              <button
+                class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
+                title="Add to Bag"
+                use:tooltip
+              >
+                <ShoppingBag24 />
+              </button>
+            </div>
+            <div class="flex flex-col flex-grow h-full space-y-1 justify-end">
               <div class="flex flex-col space-y-1">
                 <p class="font-bold text-xs">
                   ${product.price.toLocaleString()}
