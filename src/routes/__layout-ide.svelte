@@ -8,6 +8,7 @@
       `/api/stores/${params.slug}/products/${params.productSlug}`,
       { fetch }
     )
+    console.log(product.templateDraft)
     if (!data.store || !product || !product.isTemplate)
       return {
         status: 404,

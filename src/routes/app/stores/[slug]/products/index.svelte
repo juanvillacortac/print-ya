@@ -79,10 +79,7 @@
           class="flex h-full w-full items-center justify-center pointer-events-none"
         >
           {#if browser}
-            <Preview
-              template={JSON.parse(product?.template || '{}')}
-              fitParent
-            />
+            <Preview template={product?.template || {}} fitParent />
           {/if}
         </div>
       </a>

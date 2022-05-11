@@ -54,7 +54,7 @@
         <div
           class="flex h-full w-full items-center justify-center checkerboard"
         >
-          <Preview template={JSON.parse(product?.template || '{}')} fitParent />
+          <Preview template={product?.template || {}} fitParent />
         </div>
       </div>
       <!-- <div class="flex h-full w-full relative" style="aspect-ratio: 1/1"> -->

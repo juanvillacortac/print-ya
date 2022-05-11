@@ -18,6 +18,7 @@
   import { writable } from 'svelte/store'
   import ProductModifiersEditor from './ProductModifiersEditor.svelte'
   import { browser } from '$app/env'
+  import type { TemplateSource } from '$lib/compiler'
 
   export let product: Partial<Product> = {
     price: 0.01,
@@ -26,7 +27,7 @@
   }
 
   const editor = writable(
-    JSON.parse(product?.template || 'null') || {
+    (product?.template as TemplateSource) || {
       name: 'Template test',
       html: '',
       css: '',

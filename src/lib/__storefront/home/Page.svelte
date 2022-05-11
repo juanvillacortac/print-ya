@@ -2,19 +2,16 @@
   import type { Load } from '@sveltejs/kit'
   import { get } from '$lib/api'
 
-  export const load: Load = async ({ params, fetch, stuff }) => {
+  export const load: Load = async ({ fetch, stuff }) => {
     const data = await get<StripedProduct[]>(
-      `/api/stores/${params.slug}/products`,
+      `/api/stores/${stuff.store.slug}/products`,
       { fetch }
     )
     return {
       props: {
-        ...stuff,
-        products: data.filter((p) => p.public),
-      },
-      stuff: {
-        ...stuff,
-        products: data,
+        data: {
+          products: data.filter((p) => p.public),
+        },
       },
     }
   }
@@ -25,7 +22,9 @@
   import HomeIntro from '$lib/__storefront/home/HomeIntro.svelte'
   import { Viewport } from '$lib'
 
-  export let products: StripedProduct[]
+  export let data: any
+
+  $: products = data.products as StripedProduct[]
 </script>
 
 <HomeIntro {products} />

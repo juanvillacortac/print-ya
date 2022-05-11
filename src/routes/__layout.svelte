@@ -2,21 +2,15 @@
   import type { Load } from '@sveltejs/kit'
 
   export const load: Load = async (input) => {
-    const layout = getLayoutType(input)
-    const { notFound, response } = await getLayoutData(layout, input)
-    if (notFound) {
+    const { notFound, response: stuff } = await getLayoutData(input)
+    if (notFound || !validateLayoutRoute(input)) {
       return {
         status: 404,
+        stuff,
       }
     }
     return {
-      props: {
-        layout,
-      },
-      stuff: {
-        ...response,
-        layout,
-      },
+      stuff,
     }
   }
 </script>
@@ -26,7 +20,7 @@
   import '$lib/styles/base.css'
 
   import NProgress from 'nprogress'
-  import { navigating, page } from '$app/stores'
+  import { navigating, page, session } from '$app/stores'
 
   // NProgress css
   import '$lib/styles/__nprogress.css'
@@ -54,10 +48,10 @@
   import { preferences } from '$lib'
   import { browser } from '$app/env'
   import Toast from '$lib/components/Toast.svelte'
-  import { onDestroy, SvelteComponent, SvelteComponentTyped } from 'svelte'
+  import { onDestroy } from 'svelte'
   import {
     getLayoutData,
-    getLayoutType,
+    validateLayoutRoute,
     type LayoutType,
   } from '$lib/utils/layout'
   import StoreLayout from '$lib/__layouts/StoreLayout.svelte'
@@ -88,20 +82,20 @@
 
   $: storeNotFound = layout === 'store' && !$page.stuff.store
 
-  let layouts: Record<LayoutType, InstantiableSvelteComponentTyped>
+  let layouts: Record<LayoutType, () => InstantiableSvelteComponentTyped>
   $: layouts = {
-    app: AppLayout,
-    store: storeNotFound ? AppLayout : StoreLayout,
+    app: () => AppLayout,
+    store: () => (storeNotFound ? AppLayout : StoreLayout),
   }
 
   const layoutProps: Record<LayoutType, () => any> = {
     app: () => ({}),
     store: () => ({
-      store: storeNotFound ? {} : $page.stuff.store,
+      store: $page.stuff.store,
     }),
   }
 
-  export let layout: LayoutType = 'app'
+  $: layout = $session.layout
 </script>
 
 <svelte:head>
@@ -109,7 +103,7 @@
   {@html fontsTag}
 </svelte:head>
 
-<svelte:component this={layouts[layout]} {...layoutProps[layout]()}>
+<svelte:component this={layouts[layout]()} {...layoutProps[layout]()}>
   <slot />
 </svelte:component>
 <Toast />

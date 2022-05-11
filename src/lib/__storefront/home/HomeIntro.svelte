@@ -71,10 +71,7 @@
               style="aspect-ratio: 1/1"
             >
               <div class="flex h-full w-full items-center justify-center">
-                <Preview
-                  template={JSON.parse(product?.template || '{}')}
-                  fitParent
-                />
+                <Preview template={product?.template || {}} fitParent />
               </div>
             </div>
             <div

@@ -28,6 +28,7 @@
   import { writable } from 'svelte/store'
   import { page } from '$app/stores'
   import type { Product, Store } from '$lib/db'
+  import type { TemplateSource } from '$lib/compiler'
 
   export let data: string
 
@@ -46,8 +47,10 @@
 
   let mode: 'editor' | 'settings' | string = 'editor'
 
+  $: console.log('abc', $page.stuff.product)
+
   const editor = writable(
-    JSON.parse(($page.stuff.product as Product)?.templateDraft || 'null') || {
+    (($page.stuff.product as Product)?.templateDraft as TemplateSource) || {
       name: 'Template test',
       html: '',
       css: '',
@@ -80,7 +83,7 @@
       saving = true
       await post(`/api/stores/${store.slug}/products`, {
         ...product,
-        templateDraft: JSON.stringify($editor),
+        templateDraft: $editor,
       })
       saved = true
     } catch (err) {
@@ -95,8 +98,8 @@
       saving = true
       await post(`/api/stores/${store.slug}/products`, {
         ...product,
-        template: JSON.stringify($editor),
-        templateDraft: JSON.stringify($editor),
+        template: $editor,
+        templateDraft: $editor,
       })
       notifications.send('Template published', 'default', 3000)
     } catch (err) {
@@ -109,7 +112,12 @@
   let timeout: NodeJS.Timeout
 
   $: if ($editor) {
-    if (!(!browser || product?.templateDraft === JSON.stringify($editor))) {
+    if (
+      !(
+        !browser ||
+        JSON.stringify(product?.templateDraft) === JSON.stringify($editor)
+      )
+    ) {
       saved = false
       if (timeout) {
         clearTimeout(timeout)

@@ -1,23 +1,22 @@
 /// <reference types="@sveltejs/kit" />
 
-import type { Product, Store, StripedProduct } from '$lib/db'
-import type { LayoutType } from '$lib/utils/layout'
-
 declare namespace App {
   interface Locals {
+    layout: import('$lib/utils/layout').LayoutType
     session: import('svelte-kit-cookie-session').Session<SessionData>
     cookies: Record<string, string>
   }
   interface Platform {}
   interface Session extends SessionData {
+    layout: import('$lib/utils/layout').LayoutType
     host?: string
     userAgent?: string
   }
   interface Stuff extends Record<string, unknown> {
-    layout: LayoutType
-    store?: Store
-    product?: Product
-    products?: StripedProduct[]
+    layout: import('$lib/utils/layout').LayoutType
+    store?: import('$lib/db').Store
+    product?: import('$lib/db').Product
+    products?: import('$lib/db').StripedProduct[]
     subtitle?: string
   }
 }

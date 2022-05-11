@@ -99,7 +99,7 @@ export const upsertProduct = async (
     if (!c && !product.id) {
       throw new Error('not allowed')
     }
-    const updated = await prisma.product.update({
+    await prisma.product.update({
       where: {
         id: c?.id,
       },
@@ -205,12 +205,12 @@ export const upsertProduct = async (
 
   const defaultTemplate: TemplateSource = {
     html: `<div class="flex h-full w-full items-center justify-center">
-    <h1
-      class="font-black border-4 border-red-500 rounded-2xl text-center leading-none p-2 pb-2.5 text-red-500 text-4xl uppercase"
-    >
-      Change me!
-    </h1>
-  </div>
+  <h1
+    class="font-black border-4 border-red-500 rounded-2xl text-center leading-none p-2 pb-2.5 text-red-500 text-4xl uppercase"
+  >
+    Change me!
+  </h1>
+</div>
   `,
     css: '',
     fields: '',
@@ -238,8 +238,8 @@ export const upsertProduct = async (
           id: product.storeCategoryId,
         },
       },
-      template: JSON.stringify(defaultTemplate),
-      templateDraft: JSON.stringify(defaultTemplate),
+      template: defaultTemplate,
+      templateDraft: defaultTemplate,
       isTemplate: product.isTemplate,
       modifiers: {
         create: product.modifiers

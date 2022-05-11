@@ -4,7 +4,9 @@
   import { toPng } from 'html-to-image'
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
+  import type { Prisma } from '@prisma/client'
 
+  let parent: HTMLDivElement
   let element: HTMLDivElement
   let shadow: ShadowRoot
 
@@ -12,12 +14,13 @@
   let containerEl: HTMLDivElement
   let innerEl: HTMLDivElement
 
-  export let template: TemplateSource = {
+  export let template: TemplateSource | Prisma.JsonValue = {
     html: '',
     css: '',
     fields: '',
     windi: true,
   }
+  $: source = template as TemplateSource
 
   export let error = ''
 
@@ -48,7 +51,7 @@
 
     compiler.onerror = (event) => {
       error = event.message
-      compiled.html = template.html
+      compiled.html = source.html
     }
   })
 
@@ -56,7 +59,7 @@
     compiler?.terminate()
   })
 
-  $: compiler?.postMessage(template)
+  $: compiler?.postMessage(source)
 
   $: if (compiled.css && shadow) {
     if (styleEl) shadow.removeChild(styleEl)
@@ -87,10 +90,12 @@
 
   const refreshLayout = () => {
     if (!containerEl || !innerEl) return
+    element.style.width = `${compiled.width}`
+    element.style.height = `${compiled.height}`
     containerEl.style.overflow = 'visible'
     containerEl = document.createElement('div')
-    containerEl.style.width = fitParent ? '100%' : `${compiled.width}`
-    containerEl.style.height = fitParent ? '100%' : `${compiled.height}`
+    containerEl.style.width = `${compiled.width}`
+    containerEl.style.height = `${compiled.height}`
     innerEl.style.width = `${compiled.width}`
     innerEl.style.height = `${compiled.height}`
   }
@@ -147,19 +152,17 @@
     innerEl.style.position = 'relative'
   }
 
+  let scale = 1
+
   const scaleLayout = () => {
     if (fitParent && innerEl) {
-      const parent = element.parentElement
+      // const parent = element.parentElement
       if (parent) {
-        const scale = Math.min(
-          parent.clientWidth / innerEl.offsetWidth,
-          parent.clientHeight / innerEl.offsetHeight
-        )
-        containerEl.style.display = 'flex'
-        containerEl.style.alignItems = 'center'
-        containerEl.style.justifyContent = 'center'
-        innerEl.style.transformOrigin = 'center'
-        innerEl.style.transform = `scale(${scale})`
+        const { width: pw, height: ph } = parent.getBoundingClientRect()
+        const cw = innerEl.offsetWidth
+        const ch = innerEl.offsetHeight
+        scale = Math.min(pw / cw, ph / ch)
+        element.style.transform = `scale(${scale})`
       }
     }
   }
@@ -180,4 +183,26 @@
 
 <svelte:window on:resize|passive={scaleLayout} />
 
-<div bind:this={element} class="relative cleanslate" />
+<div bind:this={parent} class:fitParent>
+  <div bind:this={element} />
+</div>
+
+<style>
+  * > div {
+    position: relative;
+    color: initial;
+    font-family: initial;
+  }
+  div > div {
+    position: relative;
+    position: absolute;
+    transform-origin: center;
+  }
+  .fitParent {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
