@@ -42,7 +42,7 @@ export const getLayoutData = async ({
     case 'store':
       try {
         let slug = url.searchParams.get('store')
-        if (!slug && isCanonical(session.host)) {
+        if (!slug) {
           slug = session.host.split('.')[0]
         }
         console.log(slug)
