@@ -21,6 +21,7 @@ const appRoutes = ['/app', '/login']
 
 export const validateLayoutRoute = (event: LoadInput | RequestEvent) => {
   const layout = getLayoutType(event)
+  console.log('validation', event.url)
   switch (layout) {
     case 'store':
       return !Boolean(
