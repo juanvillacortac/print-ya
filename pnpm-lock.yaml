@@ -1585,7 +1585,7 @@ packages:
       dset: 3.1.2
       extract-files: 11.0.0
       graphql: 15.4.0
-      graphql-ws: 5.8.1_graphql@15.4.0
+      graphql-ws: 5.8.2_graphql@15.4.0
       isomorphic-ws: 4.0.1_ws@8.6.0
       meros: 1.2.0
       sync-fetch: 0.3.1
@@ -1613,7 +1613,7 @@ packages:
       dset: 3.1.2
       extract-files: 11.0.0
       graphql: 16.5.0
-      graphql-ws: 5.8.1_graphql@16.5.0
+      graphql-ws: 5.8.2_graphql@16.5.0
       isomorphic-ws: 4.0.1_ws@8.6.0
       meros: 1.2.0
       sync-fetch: 0.3.1
@@ -4018,7 +4018,7 @@ packages:
       graphql-language-service-parser: 1.10.4_i7y2fnpq2ibtpza2nbfuewixue
       graphql-language-service-types: 1.8.7_i7y2fnpq2ibtpza2nbfuewixue
       graphql-language-service-utils: 2.7.1_i7y2fnpq2ibtpza2nbfuewixue
-      vscode-languageserver-types: 3.17.0
+      vscode-languageserver-types: 3.17.1
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -4049,7 +4049,7 @@ packages:
     dependencies:
       graphql: 15.4.0
       graphql-config: 4.3.0_i7y2fnpq2ibtpza2nbfuewixue
-      vscode-languageserver-types: 3.17.0
+      vscode-languageserver-types: 3.17.1
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -4114,8 +4114,8 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /graphql-ws/5.8.1_graphql@15.4.0:
-    resolution: {integrity: sha512-UVf/fxlHultC1+12tX9ShTIipqQFNZ96g7N51RFQlk7MFPsDUUMCR3QXVEzHEd5xlTp16rs5vCyfBljvcPN3fA==}
+  /graphql-ws/5.8.2_graphql@15.4.0:
+    resolution: {integrity: sha512-hYo8kTGzxePFJtMGC7Y4cbypwifMphIJJ7n4TDcVUAfviRwQBnmZAbfZlC+XFwWDUaR7raEDQPxWctpccmE0JQ==}
     engines: {node: '>=10'}
     peerDependencies:
       graphql: '>=0.11 <=16'
@@ -4123,8 +4123,8 @@ packages:
       graphql: 15.4.0
     dev: true
 
-  /graphql-ws/5.8.1_graphql@16.5.0:
-    resolution: {integrity: sha512-UVf/fxlHultC1+12tX9ShTIipqQFNZ96g7N51RFQlk7MFPsDUUMCR3QXVEzHEd5xlTp16rs5vCyfBljvcPN3fA==}
+  /graphql-ws/5.8.2_graphql@16.5.0:
+    resolution: {integrity: sha512-hYo8kTGzxePFJtMGC7Y4cbypwifMphIJJ7n4TDcVUAfviRwQBnmZAbfZlC+XFwWDUaR7raEDQPxWctpccmE0JQ==}
     engines: {node: '>=10'}
     peerDependencies:
       graphql: '>=0.11 <=16'
@@ -4270,7 +4270,7 @@ packages:
       depd: 1.1.1
       inherits: 2.0.3
       setprototypeof: 1.0.3
-      statuses: 1.5.0
+      statuses: 1.4.0
     dev: true
 
   /http-errors/1.6.3:
@@ -6059,11 +6059,6 @@ packages:
     engines: {node: '>= 0.6'}
     dev: true
 
-  /statuses/1.5.0:
-    resolution: {integrity: sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=}
-    engines: {node: '>= 0.6'}
-    dev: true
-
   /streamsearch/1.1.0:
     resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
     engines: {node: '>=10.0.0'}
@@ -6687,8 +6682,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vscode-languageserver-types/3.17.0:
-    resolution: {integrity: sha512-ECJg27DKWEfkIUuNyjMydPsl5Lu7XX1xmwEpZ61I4oeK1qFNbfp3tSZUVmeMPPgnNjasd1rrb3on9jbSe5g3nQ==}
+  /vscode-languageserver-types/3.17.1:
+    resolution: {integrity: sha512-K3HqVRPElLZVVPtMeKlsyL9aK0GxGQpvtAUTfX4k7+iJ4mc1M+JM+zQwkgGy2LzY0f0IAafe8MKqIkJrxfGGjQ==}
     dev: true
 
   /w3c-keyname/2.2.4:
@@ -6742,7 +6737,7 @@ packages:
   /wide-align/1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
     dependencies:
-      string-width: 4.2.3
+      string-width: 1.0.2
 
   /widest-line/3.1.0:
     resolution: {integrity: sha512-NsmoXalsWVDMGupxZ5R08ka9flZjjiLvHVAWYOKtiKM8ujtZWr9cRffak+uSE48+Ob8ObalXpwyeUiyDD6QFgg==}
