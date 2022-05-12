@@ -1,28 +1,10 @@
-import pkg, { PrismaClient } from '@prisma/client'
-import { dev } from '$app/env'
+import Prisma, * as PrismaAll from '@prisma/client'
+const PrismaClient = Prisma?.PrismaClient || PrismaAll?.PrismaClient
 
-declare global {
-  var _prisma: PrismaClient // eslint-disable-line
-}
-
-let _prisma
-if (dev) {
-  if (!global._prisma) {
-    global._prisma = new PrismaClient({
-      errorFormat: 'pretty',
-      rejectOnNotFound: false,
-    })
-  }
-  _prisma = global._prisma
-} else {
-  const { PrismaClient: PrismaClientProd } = pkg
-  _prisma = new PrismaClientProd({
-    errorFormat: 'pretty',
-    rejectOnNotFound: false,
-  })
-}
-
-export const prisma: PrismaClient = _prisma
+export const prisma = new PrismaClient({
+  errorFormat: 'pretty',
+  rejectOnNotFound: false,
+})
 
 export function ErrorHandler(e: {
   stdout?
@@ -49,7 +31,9 @@ export function ErrorHandler(e: {
   if (truncatedError?.name === 'NotFoundError') {
     payload.status = 404
   }
-  if (truncatedError instanceof pkg.Prisma.PrismaClientKnownRequestError) {
+  if (
+    truncatedError instanceof PrismaAll.Prisma.PrismaClientKnownRequestError
+  ) {
     if (truncatedError?.code === 'P2002') {
       payload.body.message = 'Already exists. Choose another name.'
     }
