@@ -8,7 +8,11 @@ async function send({
   timeout = 120000,
   fetch: fetcher = fetch,
 }): Promise<Record<string, any>> {
-  const abortController = typeof AbortController !== 'undefined' ? AbortController : window?.AbortController
+  const abortController =
+    typeof AbortController !== 'undefined'
+      ? AbortController
+      : await import('node-abort-controller').then((m) => m.AbortController)
+
   const controller = new abortController()
   const id = setTimeout(() => controller.abort(), timeout)
   const opts = { method, headers: {}, body: null, signal: controller.signal }

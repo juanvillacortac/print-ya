@@ -59,6 +59,7 @@ specifiers:
   html-minifier: ^4.0.0
   html-to-image: ^1.9.0
   jsx-template-engine: ^1.0.0
+  node-abort-controller: ^3.0.1
   nprogress: ^0.2.0
   prettier: ^2.6.2
   prism-theme-vars: ^0.2.2
@@ -132,6 +133,7 @@ dependencies:
   html-minifier: 4.0.0
   html-to-image: 1.9.0
   jsx-template-engine: 1.0.0
+  node-abort-controller: 3.0.1
   nprogress: 0.2.0
   prettier: 2.6.2
   prism-theme-vars: 0.2.2
@@ -5146,6 +5148,10 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       semver: 7.3.7
+
+  /node-abort-controller/3.0.1:
+    resolution: {integrity: sha512-/ujIVxthRs+7q6hsdjHMaj8hRG9NuWmwrz+JdRwZ14jdFoKSkm+vDsCbF9PLpnSqjaWQJuTmVtcWHNLr+vrOFw==}
+    dev: false
 
   /node-addon-api/4.3.0:
     resolution: {integrity: sha512-73sE9+3UaLYYFmDsFZnqCInzPyh3MqIwZO9cw58yIqAZhONrrabrYyYe3TuIqtIiOuTXVhsGau8hcrhhwSsDIQ==}

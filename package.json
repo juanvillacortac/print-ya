@@ -97,6 +97,7 @@
     "html-minifier": "^4.0.0",
     "html-to-image": "^1.9.0",
     "jsx-template-engine": "^1.0.0",
+    "node-abort-controller": "^3.0.1",
     "nprogress": "^0.2.0",
     "prettier": "^2.6.2",
     "prism-theme-vars": "^0.2.2",
