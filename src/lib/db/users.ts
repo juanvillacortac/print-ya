@@ -1,4 +1,4 @@
-import { prisma } from './common'
+import { prisma, slugify } from './common'
 import * as bcrypt from 'bcrypt'
 import type { RequestEvent } from '@sveltejs/kit/types/internal'
 import type { User } from '@prisma/client'
@@ -48,6 +48,30 @@ export async function login({
       data: {
         email,
         password: hashedPassword,
+      },
+    })
+    let slug = slugify('Labelshut')
+    const coincidences = await prisma.store.findMany({
+      where: {
+        slug: {
+          startsWith: slug,
+        },
+      },
+    })
+    if (coincidences.length) {
+      slug = `${slug}-${coincidences.length}`
+    }
+    const store = await prisma.store.create({
+      data: {
+        slug,
+        logo: 'http://labelshut.com/wp-content/uploads/2022/03/145px.png',
+        favicon: 'http://labelshut.com/wp-content/uploads/2022/03/145px.png',
+        name: 'Labelshut',
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
       },
     })
     uid = user.id
