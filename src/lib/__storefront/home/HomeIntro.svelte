@@ -30,7 +30,7 @@
           <Category16 />
           <h3 class="font-bold text-xs">Categories</h3>
           <a
-            href="/app/stores/{store.slug}/preview/products"
+            href="/app/stores/{store?.slug}/preview/products"
             class="flex text-xs hover:underline"
           >
             See all >
@@ -64,7 +64,7 @@
         {#each products.slice(0, 3) as product (product.id)}
           <a
             class="bg-white rounded-xl flex h-full space-x-4 shadow w-full p-4 transform transition-transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-95 "
-            href="/app/stores/{store.slug}/products/{product.slug}"
+            href="/app/stores/{store?.slug}/products/{product.slug}"
           >
             <div
               class="rounded-lg h-full bg-gray-100 w-auto overflow-hidden pointer-events-none select-none dark:bg-gray-700"
@@ -105,7 +105,7 @@
                 </h4>
                 <div class="flex justify-between items-end">
                   <a
-                    href="/app/stores/{store.slug}/products?category={product
+                    href="/app/stores/{store?.slug}/products?category={product
                       .storeCategory.slug}"
                     class="text-xs text-blue-500 hover:underline"
                     >{product.storeCategory.name}</a

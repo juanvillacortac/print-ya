@@ -4,7 +4,7 @@
 
   export const load: Load = async ({ fetch, stuff }) => {
     const data = await get<StripedProduct[]>(
-      `/api/stores/${stuff.store.slug}/products`,
+      `/api/stores/${stuff.store?.slug}/products`,
       { fetch }
     )
     return {
