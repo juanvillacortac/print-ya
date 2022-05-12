@@ -45,6 +45,7 @@ export const getLayoutData = async ({
         if (!slug && isCanonical(session.host)) {
           slug = session.host.split('.')[0]
         }
+        console.log(slug)
         let response = await get(`/api/stores/${slug}`, {
           fetch,
         })
