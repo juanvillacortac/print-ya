@@ -22,7 +22,7 @@
     "package": "svelte-kit package",
     "gql:fetch": "gq https://graphql.datocms.com/ -H \"Authorization: Bearer $DATOCMS_API_KEY\" --introspect > src/lib/schema.graphql",
     "postbuild@comment": "cp node_modules/sharp/build .vercel_build_output/functions/node/render -r;cp node_modules/sharp/vendor/8.11.3/linux-x64/lib/libvips-cpp.so.42 .vercel_build_output/functions/node/render/;ls .vercel_build_output/functions/node/render/",
-    "vercel-build": "prisma generate && cross-env VITE_DATABASE_URL=$MIGRATION_DB prisma migrate deploy && svelte-kit build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/"
+    "vercel-build": "prisma generate && cross-env VITE_DATABASE_URL=$MIGRATION_DB prisma migrate deploy && svelte-kit build && cp prisma/schema.prisma .vercel_build_output/functions/node/render/"
   },
   "devDependencies": {
     "@poppanator/sveltekit-svg": "^0.2.3",
