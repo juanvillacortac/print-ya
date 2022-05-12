@@ -1,7 +1,7 @@
 import { get } from '$lib/api'
 import type { LoadInput } from '@sveltejs/kit'
 import type { RequestEvent } from '@sveltejs/kit/types/private'
-import { isCanonical } from './host'
+import { getDefaultHost, isCanonical } from './host'
 
 export type LayoutType = 'app' | 'store'
 
@@ -21,7 +21,7 @@ const appRoutes = ['/app', '/login']
 
 export const validateLayoutRoute = (event: LoadInput | RequestEvent) => {
   const layout = getLayoutType(event)
-  console.log('validation', event.url, layout)
+  console.log('validation', event.url, layout, getDefaultHost())
   switch (layout) {
     case 'store':
       return !Boolean(
