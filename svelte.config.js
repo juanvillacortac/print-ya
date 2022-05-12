@@ -3,6 +3,7 @@ import { optimizeImports } from 'carbon-preprocess-svelte'
 import { imagetools } from 'vite-imagetools'
 import auto from '@sveltejs/adapter-auto'
 import node from '@sveltejs/adapter-node'
+import vercel from '@sveltejs/adapter-vercel'
 import svg from '@poppanator/sveltekit-svg'
 import WindiCSS from 'vite-plugin-windicss'
 
@@ -10,6 +11,8 @@ const adapter = () => {
   switch (process.env.ADAPTER?.toLowerCase()) {
     case 'node':
       return node()
+    case 'vercel':
+      return vercel()
     default:
       return auto()
   }
@@ -30,6 +33,10 @@ const config = {
   kit: {
     adapter: adapter(),
     // hydrate the <div id="svelte"> element in src/app.html
+    prerender: {
+      default: false,
+      enabled: false,
+    },
     methodOverride: {
       parameter: '_method',
       allowed: ['PUT', 'PATCH', 'DELETE'],
