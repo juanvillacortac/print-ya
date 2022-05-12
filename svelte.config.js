@@ -43,6 +43,13 @@ const config = {
     },
     inlineStyleThreshold: 48 / 0.0009765625,
     vite: {
+      define: {
+        'process.env.LOCALHOST_HOST': JSON.stringify(
+          process.env.GITPOD_WORKSPACE_URL
+            ? process.env.GITPOD_WORKSPACE_URL.replace('https://', '3000-')
+            : 'localhost:3000'
+        ),
+      },
       plugins: [
         WindiCSS({
           config: './windi.config.js',

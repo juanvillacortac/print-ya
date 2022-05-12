@@ -1,6 +1,7 @@
 import { get } from '$lib/api'
 import type { LoadInput } from '@sveltejs/kit'
 import type { RequestEvent } from '@sveltejs/kit/types/private'
+import { isCanonical } from './host'
 
 export type LayoutType = 'app' | 'store'
 
@@ -8,6 +9,9 @@ export const getLayoutType = ({
   url,
 }: LoadInput | RequestEvent): LayoutType => {
   if (url.searchParams.get('store')) return 'store'
+  if (!isCanonical(url.host)) {
+    return 'store'
+  }
   return 'app'
 }
 
@@ -37,12 +41,13 @@ export const getLayoutData = async ({
   switch (session.layout) {
     case 'store':
       try {
-        let response = await get(
-          `/api/stores/${url.searchParams.get('store')}`,
-          {
-            fetch,
-          }
-        )
+        let slug = url.searchParams.get('store')
+        if (!slug && isCanonical(url.host)) {
+          slug = url.host.split('.')[0]
+        }
+        let response = await get(`/api/stores/${slug}`, {
+          fetch,
+        })
         if (!response?.store) {
           return {
             notFound: true,

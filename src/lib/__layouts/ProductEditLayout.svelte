@@ -134,7 +134,8 @@
         <a
           class="rounded font-bold border-2 border-blue-500 text-xs text-center py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
           href="/app/stores/{store.slug}/products/{product.slug}/ide"
-          >Edit template{product.templateDraft !== product.template
+          >Edit template{JSON.stringify(product.templateDraft) !==
+          JSON.stringify(product.template)
             ? ' (Draft)'
             : ''}</a
         >

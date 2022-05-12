@@ -2,6 +2,7 @@
   import type { Load } from '@sveltejs/kit'
   import Page, { load as storeLoad } from '$lib/__storefront/home/Page.svelte'
   import { session } from '$app/stores'
+  import { isLocalhost } from '$lib/utils/host'
 
   export const load: Load = async (event) => {
     if (event.session.layout === 'store') {

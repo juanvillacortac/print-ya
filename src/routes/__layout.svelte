@@ -2,6 +2,7 @@
   import type { Load } from '@sveltejs/kit'
 
   export const load: Load = async (input) => {
+    console.log(input.session.host)
     const { notFound, response: stuff } = await getLayoutData(input)
     if (notFound || !validateLayoutRoute(input)) {
       return {

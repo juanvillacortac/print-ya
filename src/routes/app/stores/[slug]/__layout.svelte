@@ -26,6 +26,7 @@
   import { page } from '$app/stores'
   import { invalidate } from '$app/navigation'
   import { browser } from '$app/env'
+  import { getAbsoluteURL } from '$lib/utils/host'
 
   let store: Store
   $: store = $page.stuff.store
@@ -56,7 +57,7 @@
   </a>
   <a
     class="border-transparent flex hover:border-current"
-    href="/?store={store.slug}"
+    href={getAbsoluteURL({ subdomain: store.slug })}
     target="__blank"
     title="Go to site"
     use:tooltip

@@ -3,10 +3,12 @@
   import { get } from '$lib/api'
 
   export const load: Load = async ({ fetch, stuff }) => {
+    console.log(stuff)
     const data = await get<StripedProduct[]>(
       `/api/stores/${stuff.store?.slug}/products`,
       { fetch }
     )
+    console.log(data)
     return {
       props: {
         data: {
@@ -29,7 +31,7 @@
 
 <HomeIntro {products} />
 
-<!-- <div
+<div
   class="bg-cover bg-center flex flex-col space-y-4 bg-gray-900 text-white w-full py-24 items-center justify-center dark:bg-gray-800"
   style="background-image: url(https://c.tenor.com/CN76hxiOTPsAAAAC/space-warp-expressions.gif)"
 >
@@ -48,4 +50,4 @@
       We can bring your idea to reality, <i>fast</i>!
     </p>
   </Viewport>
-</div> -->
+</div>
