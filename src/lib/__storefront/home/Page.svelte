@@ -10,7 +10,7 @@
     return {
       props: {
         data: {
-          products: data.filter((p) => p.public),
+          products: data?.filter((p) => p.public) || [],
         },
       },
     }
