@@ -42,8 +42,8 @@ export const getLayoutData = async ({
     case 'store':
       try {
         let slug = url.searchParams.get('store')
-        if (!slug && isCanonical(url.host)) {
-          slug = url.host.split('.')[0]
+        if (!slug && isCanonical(session.host)) {
+          slug = session.host.split('.')[0]
         }
         let response = await get(`/api/stores/${slug}`, {
           fetch,

@@ -70,6 +70,6 @@ export const handle = handleSession(
 export const getSession: GetSession = (event) => ({
   layout: event.locals.layout,
   userAgent: event.request.headers.get('user-agent'),
-  host: event.url.protocol + '//' + event.url.host,
+  host: event.url.host,
   ...event.locals.session.data,
 })
