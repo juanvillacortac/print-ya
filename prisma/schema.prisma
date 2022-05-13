@@ -31,7 +31,9 @@ model Store {
   updatedBy       User?    @relation("store_updatedBy", fields: [updatedByUserId], references: [id])
   updatedByUserId String?
 
-  slug       String          @unique
+  slug         String  @unique
+  customDomain String? @unique
+
   logo       String?
   favicon    String?
   categories StoreCategory[]

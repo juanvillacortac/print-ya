@@ -42,12 +42,20 @@ export const getLayoutData = async ({
   switch (session.layout) {
     case 'store':
       try {
+        let response: any
+        response = await get(`/api/stores/${url.host}?customDomain=true`, {
+          fetch,
+        })
+        if (response?.store) {
+          return {
+            response,
+          }
+        }
         let slug = url.searchParams.get('store')
         if (!slug) {
           slug = session.host.split('.')[0]
         }
-        console.log(slug)
-        let response = await get(`/api/stores/${slug}`, {
+        response = await get(`/api/stores/${slug}`, {
           fetch,
         })
         if (!response?.store) {
