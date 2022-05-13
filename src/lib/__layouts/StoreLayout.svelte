@@ -30,13 +30,15 @@
     class="bg-white border-b flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
   >
     <div class="flex mx-auto w-full p-4 justify-between items-center lg:w-7/10">
-      <Image
-        src={store.logo}
-        class="bg-white rounded p-px h-2rem sm:h-2rem"
-        options={{
-          q: 100,
-        }}
-      />
+      <a href="/" class="flex">
+        <Image
+          src={store.logo}
+          class="bg-white rounded p-px h-2rem sm:h-2rem"
+          options={{
+            q: 100,
+          }}
+        />
+      </a>
       <div class="flex <sm:hidden !text-xs">
         <input
           class="bg-white border rounded-l-full border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
