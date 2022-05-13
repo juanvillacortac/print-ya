@@ -4,6 +4,7 @@ ports:
 
 tasks:
   - init: |
+      curl https://raw.githubusercontent.com/jonico/pscale-workflow-helper-scripts/main/.pscale/cli-helper-scripts/use-pscale-docker-image.sh >> ~/.bashrc
       pnpm install
     command: |
       pnpm run dev
