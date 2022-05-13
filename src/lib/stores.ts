@@ -40,3 +40,10 @@ export function persistentWritable<T>(
 export const preferences = persistentWritable('preferences', {
   darkMode: false,
 })
+
+export type BagItem = {
+  productSlug: string
+  quantity: number
+  modifiers: Record<string, string>
+}
+export const bag = persistentWritable<BagItem[]>('cart', [])

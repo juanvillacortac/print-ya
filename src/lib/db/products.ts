@@ -66,9 +66,8 @@ export const getProductsByStore = async ({
       id: true,
       name: true,
       createdAt: true,
-      designImage: true,
-      isTemplate: true,
       price: true,
+      type: true,
       public: true,
       slug: true,
       description: true,
@@ -106,7 +105,8 @@ export const upsertProduct = async (
       data: {
         name: product.name,
         price: product.price,
-        designImage: product.designImage,
+        type: product.type,
+        minQuantity: product.minQuantity || null,
         public: product.public,
         description: product.description,
         storeCategory: {
@@ -225,7 +225,7 @@ export const upsertProduct = async (
     data: {
       name: product.name,
       price: product.price,
-      designImage: product.designImage,
+      type: product.type,
       public: product.public,
       description: product.description,
       store: {
@@ -240,7 +240,6 @@ export const upsertProduct = async (
       },
       template: defaultTemplate,
       templateDraft: defaultTemplate,
-      isTemplate: product.isTemplate,
       modifiers: {
         create: product.modifiers
           .filter((m) => m.active)

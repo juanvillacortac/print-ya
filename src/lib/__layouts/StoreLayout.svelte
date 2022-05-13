@@ -11,7 +11,7 @@
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
-  import { preferences } from '$lib/stores'
+  import { bag, preferences } from '$lib/stores'
 
   export let store: Store
 
@@ -80,19 +80,20 @@
         >
           <Favorite24 />
         </button>
-        <button
+        <a
           on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
           class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
-          title="Bag"
+          title="Shopping Bag"
+          href="/bag"
           use:tooltip
         >
           <ShoppingBag24 />
           <p
             class="font-bold text-black text-xs text-right w-[3ch] dark:text-white"
           >
-            0
+            {$bag.length || 0}
           </p>
-        </button>
+        </a>
       </div>
     </div>
     <div class="border-t w-full <lg:hidden dark:border-gray-600">

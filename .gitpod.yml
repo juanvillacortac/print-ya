@@ -1,13 +1,23 @@
 ports:
   - port: 3000
     onOpen: notify
+  - port: 3306
+    onOpen: ignore
 
 tasks:
-  - init: |
-      brew install planetscale/tap/pscale
+  - name: App
+    init: |
       pnpm install
     command: |
+      echo VITE_DATABASE_URL=mysql://root@127.0.0.1:3306/print-ya > .env
       pnpm run dev
+  - name: Database
+    init: | 
+      brew install planetscale/tap/pscale
+    command:
+      pscale auth login
+      pscale org switch print-ya
+      pscale connect print-ya develop
 
 github:
   prebuilds:

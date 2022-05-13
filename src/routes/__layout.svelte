@@ -20,6 +20,7 @@
 <script lang="ts">
   import 'virtual:windi.css'
   import '$lib/styles/base.css'
+  import '$lib/styles/components.css'
 
   import NProgress from 'nprogress'
   import { navigating, page, session } from '$app/stores'

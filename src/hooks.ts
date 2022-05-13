@@ -34,6 +34,18 @@ export const handle = handleSession(
         }
       }
 
+      if (
+        event.url.pathname.split('/').slice(1)[0] === 'app' &&
+        !event.locals.session?.data?.userId
+      ) {
+        return Response.redirect(
+          `${event.url.origin}/login?callbackUrl=${encodeURIComponent(
+            event.url.pathname
+          )}`,
+          303
+        )
+      }
+
       response = await resolve(event, {
         ssr: !event.url.pathname.startsWith('/webhooks/success'),
       })
@@ -48,18 +60,6 @@ export const handle = handleSession(
           path: '/',
           expires: new Date('Thu, 01 Jan 1970 00:00:01 GMT'),
         })
-      )
-    }
-
-    if (
-      event.url.pathname.split('/').slice(1)[0] === 'app' &&
-      !event.locals.session?.data?.userId
-    ) {
-      return Response.redirect(
-        `${event.url.origin}/login?callbackUrl=${encodeURIComponent(
-          event.url.pathname
-        )}`,
-        303
       )
     }
 

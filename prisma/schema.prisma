@@ -51,6 +51,11 @@ model StoreCategory {
   products Product[]
 }
 
+enum ProductType {
+  template
+  generic
+}
+
 model Product {
   id   String @id @default(cuid())
   name String
@@ -62,22 +67,31 @@ model Product {
   store   Store?  @relation(fields: [storeId], references: [id])
   storeId String?
 
+  type ProductType @default(template)
+
   public Boolean
 
   description String?
-  designImage String?
 
   minQuantity Int?
   modifiers   ProductModifier[]
 
   price Float
 
-  isTemplate    Boolean
+  images        ProductImage[]
   template      Json?
   templateDraft Json?
 
   storeCategory   StoreCategory? @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
   storeCategoryId String?
+}
+
+model ProductImage {
+  id  String  @id @default(cuid())
+  url String?
+
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
 }
 
 model ProductModifier {

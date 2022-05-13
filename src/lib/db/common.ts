@@ -38,6 +38,7 @@ export function ErrorHandler(e: {
       payload.body.message = 'Already exists. Choose another name.'
     }
   }
+  console.log(payload)
   return payload
 }
 

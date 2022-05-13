@@ -7,7 +7,7 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  transition: background .2s ease-in-out;
+  transition: background 0.2s ease-in-out;
   border: 3px solid transparent;
   @apply bg-clip-content rounded-full bg-gray-300 dark:bg-gray-600;
 }
@@ -20,19 +20,45 @@
   @apply bg-transparent;
 }
 
-  .rainbow-bg {
-    background: linear-gradient(
-      90deg,
-      rgba(255, 0, 0, 1) 0%,
-      rgba(255, 154, 0, 1) 10%,
-      rgba(208, 222, 33, 1) 20%,
-      rgba(79, 220, 74, 1) 30%,
-      rgba(63, 218, 216, 1) 40%,
-      rgba(47, 201, 226, 1) 50%,
-      rgba(28, 127, 238, 1) 60%,
-      rgba(95, 21, 242, 1) 70%,
-      rgba(186, 12, 248, 1) 80%,
-      rgba(251, 7, 217, 1) 90%,
-      rgba(255, 0, 0, 1) 100%
+.rainbow-bg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 1) 0%,
+    rgba(255, 154, 0, 1) 10%,
+    rgba(208, 222, 33, 1) 20%,
+    rgba(79, 220, 74, 1) 30%,
+    rgba(63, 218, 216, 1) 40%,
+    rgba(47, 201, 226, 1) 50%,
+    rgba(28, 127, 238, 1) 60%,
+    rgba(95, 21, 242, 1) 70%,
+    rgba(186, 12, 248, 1) 80%,
+    rgba(251, 7, 217, 1) 90%,
+    rgba(255, 0, 0, 1) 100%
+  );
+}
+
+.checkerboard {
+  --black-cell: rgba(55, 65, 81, 0.2);
+  background-image: linear-gradient(
+      45deg,
+      var(--black-cell) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--black-cell) 75%,
+      var(--black-cell)
+    ),
+    linear-gradient(
+      45deg,
+      var(--black-cell) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--black-cell) 75%,
+      var(--black-cell)
     );
-  }
+  background-size: 60px 60px;
+  background-position: 0 0, 30px 30px;
+}
+:global(.dark) .checkerboard {
+  --black-cell: rgba(55, 65, 81, 0.5);
+  background-color: rgba(80, 80, 80, 0.2);
+}

@@ -20,7 +20,7 @@
       }
     }
     try {
-      await post(`/login`, {
+      const data = await post(`/api/login`, {
         email: email?.toLowerCase(),
         password,
         isLogin,
@@ -30,8 +30,8 @@
         $page.url.searchParams.get('callbackUrl') ||
           encodeURIComponent('/app/dashboard')
       )
-      console.log(callbackUrl)
-      window.location.replace(callbackUrl)
+      // console.log(callbackUrl)
+      // window.location.replace(callbackUrl)
     } catch ({ error }) {
       notifications.send(error, 'default', 1000)
     } finally {
@@ -48,7 +48,7 @@
       Print Ya!
     </h1>
     <form
-      on:submit|preventDefault={handleSubmit}
+      on:submit|preventDefault|stopPropagation={handleSubmit}
       class="flex flex-col space-y-4 transition-opacity duration-400"
     >
       <button

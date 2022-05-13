@@ -23,7 +23,7 @@
   export let product: Partial<Product> = {
     price: 0.01,
     public: true,
-    isTemplate: false,
+    type: 'template',
   }
 
   const editor = writable(
@@ -115,22 +115,12 @@
       class="flex justify-end items-end lg:space-x-6 lg:items-center <lg:flex-col <lg:space-y-4"
     >
       <div class="flex space-x-4 items-center">
-        <input
-          type="checkbox"
-          id="isTemplate"
-          bind:checked={product.isTemplate}
-        />
-        <label class="font-bold text-xs block" for="isTemplate">
-          Is a template
-        </label>
-      </div>
-      <div class="flex space-x-4 items-center">
         <input type="checkbox" id="published" bind:checked={product.public} />
         <label class="font-bold text-xs block" for="published">
           Published
         </label>
       </div>
-      {#if product.isTemplate && product.id}
+      {#if product.type === 'template' && product.id}
         <a
           class="rounded font-bold border-2 border-blue-500 text-xs text-center py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
           href="/app/stores/{store.slug}/products/{product.slug}/ide"
@@ -148,18 +138,18 @@
   </div>
   <div
     class="grid gap-4 grid-cols-1 items-start"
-    class:lg:grid-cols-3={product.template && product.isTemplate}
+    class:lg:grid-cols-3={product.template && product.type === 'template'}
   >
     <div
       class="flex flex-col space-y-6 w-full"
-      class:lg:col-span-2={product.template && product.isTemplate}
+      class:lg:col-span-2={product.template && product.type === 'template'}
     >
       <div
         class="bg-white rounded-xl flex flex-col h-full space-y-4 shadow w-full p-4 relative overflow-hidden <lg:pb-12 dark:bg-gray-800"
       >
         <div class="flex items-center lg:space-x-4 <lg:flex-col <lg:space-y-4">
           <div class="flex flex-col w-full">
-            <label class="font-bold text-sm mb-2 block" for="fieldId">
+            <label class="font-bold text-xs mb-2 block" for="fieldId">
               Product name
             </label>
             <input
@@ -171,8 +161,20 @@
             />
           </div>
           <div class="flex flex-col w-full">
-            <label class="font-bold text-sm mb-2 block" for="fieldId">
+            <label class="font-bold text-xs mb-2 block" for="fieldId">
               Product category
+            </label>
+            <select
+              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              bind:value={product.type}
+            >
+              <option value={'template'}>Custom template</option>
+              <option value={'generic'}>Static product</option>
+            </select>
+          </div>
+          <div class="flex flex-col w-full">
+            <label class="font-bold text-xs mb-2 block" for="fieldId">
+              Product type
             </label>
             <select
               class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
@@ -184,7 +186,7 @@
             </select>
           </div>
           <div class="flex flex-col w-full">
-            <label class="font-bold text-sm mb-2 block" for="fieldId">
+            <label class="font-bold text-xs mb-2 block" for="fieldId">
               Price
             </label>
             <input
@@ -196,7 +198,7 @@
             />
           </div>
           <div class="flex flex-col w-full">
-            <label class="font-bold text-sm mb-2 block" for="fieldId">
+            <label class="font-bold text-xs mb-2 block" for="fieldId">
               Minimum order quantity
             </label>
             <input
@@ -208,7 +210,7 @@
           </div>
         </div>
         <div class="flex flex-col w-full">
-          <label class="font-bold text-sm mb-2 block" for="fieldId">
+          <label class="font-bold text-xs mb-2 block" for="fieldId">
             Description
           </label>
           <Editor
@@ -219,7 +221,7 @@
       </div>
       <ProductModifiersEditor bind:modifiers />
     </div>
-    {#if product.template && product.isTemplate}
+    {#if product.template && product.type === 'template'}
       <div class="flex w-full top-0 sticky" style="aspect-ratio: 1/1">
         <div
           class="border rounded h-full border-gray-300 w-full absolute overflow-auto checkerboard dark:border-gray-800"

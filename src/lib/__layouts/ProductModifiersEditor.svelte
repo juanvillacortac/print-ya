@@ -53,6 +53,7 @@
         active: true,
         name: '',
         percentage: false,
+        productModifierId: '',
       },
     ]
     modifiers = modifiers
@@ -108,7 +109,7 @@
   class="bg-white rounded-xl flex flex-col h-full space-y-4 shadow w-full p-4 relative overflow-hidden dark:bg-gray-800"
 >
   <div class="flex w-full justify-between items-center">
-    <h3 class="font-bold text-sm block">Product modifiers</h3>
+    <h3 class="font-bold text-xs block">Product modifiers</h3>
     <div class="flex space-x-1">
       <button
         class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
@@ -154,6 +155,7 @@
             type="text"
             placeholder="Modifier title"
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            required
             bind:value={m.name}
           />
           <select
@@ -238,6 +240,7 @@
                           type="text"
                           placeholder="Item title"
                           class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none <sm:w-24ch dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                          required
                           bind:value={i.name}
                         />
                       </th>
@@ -248,6 +251,7 @@
                           type="number"
                           min={0}
                           step="any"
+                          required
                           bind:value={i.cost}
                         />
                       </td>
