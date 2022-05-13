@@ -1,13 +1,8 @@
-import {
-  ErrorHandler,
-  upsertProduct,
-  getProductBySlug,
-  getStoreBySlug,
-} from '$lib/db'
+import { ErrorHandler, getProductBySlug, getStoreBySlugOrHost } from '$lib/db'
 import type { RequestHandler } from '@sveltejs/kit'
 
 export const get: RequestHandler = async ({ params }) => {
-  const store = await getStoreBySlug({ slug: params.slug })
+  const store = await getStoreBySlugOrHost({ slug: params.slug })
   if (!store) {
     return {
       status: 404,
