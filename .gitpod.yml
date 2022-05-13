@@ -4,10 +4,8 @@ ports:
 
 tasks:
   - init: |
-      npm install -g pnpm
       pnpm install
     command: |
-      npm install -g pnpm
       pnpm run dev
 
 github:
