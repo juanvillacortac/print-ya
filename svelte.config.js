@@ -11,10 +11,8 @@ const adapter = () => {
   switch (process.env.ADAPTER?.toLowerCase()) {
     case 'node':
       return node()
-    case 'vercel':
-      return vercel({ edge: true })
     default:
-      return auto()
+      return vercel({ edge: true })
   }
 }
 
