@@ -47,8 +47,6 @@
 
   let mode: 'editor' | 'settings' | string = 'editor'
 
-  $: console.log('abc', $page.stuff.product)
-
   const editor = writable(
     (($page.stuff.product as Product)?.templateDraft as TemplateSource) || {
       name: 'Template test',

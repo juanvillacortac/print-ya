@@ -9,7 +9,7 @@
       { fetch }
     )
     console.log(product.templateDraft)
-    if (!data.store || !product || !product.isTemplate)
+    if (!data.store || !product || product.type !== 'template')
       return {
         status: 404,
       }

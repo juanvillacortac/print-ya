@@ -1,9 +1,10 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
   import { get } from '$lib/api'
+  import type { Product } from '$lib/db'
 
   export const load: Load = async ({ params, fetch, stuff }) => {
-    const data = await get(
+    const data = await get<Product>(
       `/api/stores/${params.slug}/products/${params.productSlug}`,
       { fetch }
     )
@@ -12,9 +13,6 @@
         status: 404,
       }
     return {
-      props: {
-        ...data,
-      },
       stuff: {
         ...stuff,
         product: data,
