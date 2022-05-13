@@ -12,7 +12,7 @@ const adapter = () => {
     case 'node':
       return node()
     case 'vercel':
-      return vercel()
+      return vercel({ edge: true })
     default:
       return auto()
   }
