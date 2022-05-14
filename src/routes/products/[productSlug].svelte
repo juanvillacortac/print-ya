@@ -106,7 +106,9 @@
         <div class="flex flex-col space-y-4 lg:self-start">
           {#each product.modifiers as m}
             <div
-              class="flex space-x-4 items-center justify-end lg:justify-between"
+              class="flex w-full {m.type === 'color'
+                ? 'space-y-2 flex-col'
+                : 'space-x-4 items-center justify-end'} lg:justify-between"
             >
               <div
                 class="font-bold font-title text-black text-xs dark:text-white"
@@ -130,6 +132,15 @@
                     >
                   {/each}
                 </select>
+              {:else if m.type === 'color'}
+                <div class="w-full grid gap-6 grid-cols-8">
+                  {#each m.items as i}
+                    <div
+                      class="rounded pb-full border-2 w-full dark:border-gray-600"
+                      style="aspect-ratio: 1/1; background-color: {i.name}"
+                    />
+                  {/each}
+                </div>
               {/if}
             </div>
           {/each}

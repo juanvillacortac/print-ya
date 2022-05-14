@@ -12,9 +12,8 @@ tasks:
       echo VITE_DATABASE_URL=mysql://root@127.0.0.1:3306/print-ya > .env
       pnpm run dev
   - name: Database
-    init: | 
+    command: |
       brew install planetscale/tap/pscale
-    command:
       pscale auth login
       pscale org switch print-ya
       pscale connect print-ya develop
@@ -23,17 +22,17 @@ github:
   prebuilds:
     # enable for the master/default branch (defaults to true)
     master: true
-# enable for all branches in this repo (defaults to false)
+    # enable for all branches in this repo (defaults to false)
     branches: true
-# enable for pull requests coming from this repo (defaults to true)
+    # enable for pull requests coming from this repo (defaults to true)
     pullRequests: true
-# enable for pull requests coming from forks (defaults to false)
+    # enable for pull requests coming from forks (defaults to false)
     pullRequestsFromForks: true
-# add a "Review in Gitpod" button as a comment to pull requests (defaults to true)
+    # add a "Review in Gitpod" button as a comment to pull requests (defaults to true)
     addComment: true
-# add a "Review in Gitpod" button to pull requests (defaults to false)
+    # add a "Review in Gitpod" button to pull requests (defaults to false)
     addBadge: true
-# add a label once the prebuild is ready to pull requests (defaults to false)
+    # add a label once the prebuild is ready to pull requests (defaults to false)
     addLabel: prebuilt-in-gitpod
 
 vscode:

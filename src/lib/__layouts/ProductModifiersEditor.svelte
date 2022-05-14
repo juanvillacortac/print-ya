@@ -28,7 +28,9 @@
         active: true,
         name: '',
         type: 'select',
+        templateAccessor: '',
         items: [],
+        defaultValue: '',
       },
     ]
     expanded = newId
@@ -61,11 +63,11 @@
   }
 
   const modifierTypes = [
-    { type: 'select', name: 'Selection' },
-    { type: 'multiple', name: 'Multiple selection' },
-    { type: 'text', name: 'Text' },
-    { type: 'numeric', name: 'Numeric' },
-    { type: 'color', name: 'Color' },
+    { type: 'select', name: 'Selection', tree: true },
+    // { type: 'multiple', name: 'Multiple selection' },
+    { type: 'text', name: 'Text', tree: true, embeddable: true },
+    { type: 'numeric', name: 'Numeric', tree: true, embeddable: true },
+    { type: 'color', name: 'Color', tree: true, embeddable: true },
   ]
 
   const deleteModifier = ({
@@ -133,7 +135,7 @@
         <div
           class="flex w-full p-4 items-center lg:space-x-4 <lg:flex-col <lg:space-y-4"
         >
-          {#if m.type == 'select' || m.type == 'multiple'}
+          {#if modifierTypes.find((t) => t.type == m.type)?.tree}
             <button
               class="rounded flex p-1 duration-200"
               title="Show/hide items"
@@ -161,13 +163,36 @@
           <select
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
             bind:value={m.type}
+            on:change={() => (m.defaultValue = '')}
           >
             {#each modifierTypes as type}
               <option value={type.type}>{type.name}</option>
             {/each}
           </select>
+          {#if m.type === 'text'}
+            <input
+              type="text"
+              placeholder="Default value"
+              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              bind:value={m.defaultValue}
+            />
+          {:else if m.type === 'numeric'}
+            <input
+              type="number"
+              placeholder="Default value"
+              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              bind:value={m.defaultValue}
+            />
+          {/if}
+          {#if modifierTypes.find((t) => t.type === m.type).embeddable}
+            <input
+              type="text"
+              placeholder="Template accessor"
+              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            />
+          {/if}
           <div class="flex space-x-4 items-center">
-            {#if m.type == 'select' || m.type == 'multiple'}
+            {#if modifierTypes.find((t) => t.type == m.type)?.tree}
               <button
                 class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
                 title="Add item"
@@ -186,7 +211,7 @@
           </div>
         </div>
 
-        {#if expanded && (expanded === m.internalId || expanded === m.id) && (m.type == 'select' || m.type == 'multiple')}
+        {#if expanded && (expanded === m.internalId || expanded === m.id) && modifierTypes.find((t) => t.type == m.type)?.tree}
           <div class="flex-grow w-full px-4 pb-4 overflow-x-auto">
             <div
               class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
@@ -203,7 +228,7 @@
                       scope="col"
                       class="py-3 px-6"
                       class:sr-only={!m.items?.filter((m) => m.active).length}
-                      >Title</th
+                      >{m.type === 'color' ? 'Color' : 'Title'}</th
                     >
                     <th
                       scope="col"
@@ -234,15 +259,24 @@
                     >
                       <th
                         scope="row"
-                        class="font-bold py-4 px-6 text-gray-900 whitespace-nowrap dark:text-white"
+                        class="flex font-bold h-full min-h-64px py-4 px-6 text-gray-900 whitespace-nowrap items-center dark:text-white"
                       >
-                        <input
-                          type="text"
-                          placeholder="Item title"
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none <sm:w-24ch dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-                          required
-                          bind:value={i.name}
-                        />
+                        {#if m.type === 'color'}
+                          <input
+                            type="color"
+                            required
+                            bind:value={i.name}
+                            class="m-auto"
+                          />
+                        {:else}
+                          <input
+                            type="text"
+                            placeholder="Item title"
+                            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none <sm:w-24ch dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                            required
+                            bind:value={i.name}
+                          />
+                        {/if}
                       </th>
 
                       <td class="py-4 px-6">
