@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
   import { get } from '$lib/api'
-  import type { Product, Store } from '$lib/db'
+  import type { Product, ProductModifier, Store } from '$lib/db'
   import Preview from '$lib/components/Preview.svelte'
   import Markdown from 'svelte-markdown'
   import { Add16, Subtract16 } from 'carbon-icons-svelte'
@@ -27,16 +27,63 @@
 <script lang="ts">
   export let product: Product
   import { bag } from '$lib'
+  import { tooltip } from '$lib/components/tooltip'
+  import { onMount } from 'svelte'
+  import type { ProductModifierItem } from '@prisma/client'
 
   let quantity = product.minQuantity || 1
 
-  let modifiers: Record<string, string> = {}
+  let modifiers: Record<string, { value?: string; itemId?: string }> =
+    product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
+
+  let fields = ''
+
+  onMount(() => {
+    const colorItems = product.modifiers
+      .filter((m) => m.type === 'color')
+      .map((m) => [m.id, m.items[0]] as [string, ProductModifierItem])
+    for (let [m, i] of colorItems) {
+      modifiers[m] = {
+        itemId: i.id,
+        value: i.name,
+      }
+    }
+  })
+
+  $: if (product.type === 'template') {
+    const mappedModifiers = Object.entries(modifiers).map(
+      ([mId, mValue]) =>
+        [product.modifiers.find((m) => m.id === mId), mValue] as [
+          ProductModifier,
+          { value?: string; itemId?: string }
+        ]
+    )
+    const items = mappedModifiers
+      .filter(
+        ([m]) =>
+          (m.type === 'color' || m.type === 'text' || m.type === 'numeric') &&
+          m.templateAccessor
+      )
+      .map(([m, item]) => ({
+        value: item.value,
+        key: m.templateAccessor,
+      }))
+    const f = items.reduce((a, b) => ({ ...a, [b.key]: b.value }), {})
+    if (Object.keys(f).length) {
+      fields = JSON.stringify(f)
+    } else {
+      fields = ''
+    }
+  }
+
+  $: template = { ...(product.template as any), fields }
 
   $: total =
     (Object.entries(modifiers)
+      .filter(([_, mValue]) => mValue?.itemId)
       .map(([mId, mValue]) => {
         const modifier = product.modifiers.find((m) => m.id === mId)
-        const item = modifier.items.find((i) => i.id === mValue)
+        const item = modifier.items.find((i) => i.id === mValue.itemId)
         const value = item.percentage
           ? (item.cost / 100) * product.price
           : item.cost
@@ -61,7 +108,7 @@
       ...$bag,
       {
         productSlug: product.slug,
-        modifiers,
+        modifiers: {},
         quantity,
       },
     ]
@@ -82,7 +129,7 @@
           <div
             class="flex h-full w-full items-center justify-center checkerboard"
           >
-            <Preview template={product?.template} fitParent />
+            <Preview {template} fitParent />
           </div>
         </div>
       </div>
@@ -98,12 +145,12 @@
           >{product.storeCategory.name}</a
         >
       </div>
-      <div class="flex flex-col space-y-4">
-        <p class="font-bold text-black text-4xl <lg:hidden dark:text-white">
+      <div class="flex flex-col space-y-4 lg:items-start">
+        <p class="font-bold text-black text-4xl dark:text-white">
           ${product.price.toLocaleString()}
           <span class="text-lg">/ unit</span>
         </p>
-        <div class="flex flex-col space-y-4 lg:self-start">
+        <div class="flex flex-col space-y-4">
           {#each product.modifiers as m}
             <div
               class="flex w-full {m.type === 'color'
@@ -118,7 +165,11 @@
               {#if m.type === 'select'}
                 <select
                   class="bg-white border rounded border-gray-300 text-xs leading-tight py-2 px-3 w-1/2 appearance-none !pr-8 lg:w-60 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-                  bind:value={modifiers[m.id]}
+                  bind:value={modifiers[m.id].itemId}
+                  on:change={() =>
+                    (modifiers[m.id].value = m.items.find(
+                      (i) => i.id == modifiers[m.id].itemId
+                    )?.name)}
                 >
                   {#each m.items as i}
                     <option value={i.id}
@@ -132,12 +183,32 @@
                     >
                   {/each}
                 </select>
+              {:else if m.type === 'text'}
+                <input
+                  type="text"
+                  placeholder="Write something..."
+                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none <sm:w-24ch dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                  bind:value={modifiers[m.id].value}
+                  on:input={() =>
+                    (modifiers[m.id].itemId = modifiers[m.id].itemId)}
+                />
               {:else if m.type === 'color'}
-                <div class="w-full grid gap-6 grid-cols-8">
+                <div class="w-full grid gap-2 grid-cols-8 lg:w-full">
                   {#each m.items as i}
-                    <div
-                      class="rounded pb-full border-2 w-full dark:border-gray-600"
-                      style="aspect-ratio: 1/1; background-color: {i.name}"
+                    <button
+                      class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
+                      title={`${i.cost < 0 ? '-' : ''}${
+                        !i.percentage ? '$' : ''
+                      }${Math.abs(i.cost)}${i.percentage ? '%' : ''}`}
+                      on:click={() => {
+                        modifiers[m.id].value = i.name
+                        modifiers[m.id].itemId = i.id
+                      }}
+                      class:scale-120={modifiers[m.id].itemId == i.id}
+                      class:!border-blue-800={modifiers[m.id].itemId == i.id}
+                      use:tooltip
+                      style="will-change: transform; aspect-ratio: 1/1; background-color: {i.name ||
+                        'black'}"
                     />
                   {/each}
                 </div>

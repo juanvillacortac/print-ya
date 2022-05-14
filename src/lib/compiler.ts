@@ -23,22 +23,22 @@ export type TemplateSource = {
 export const compile = (source: TemplateSource): CompiledTemplate => {
   try {
     let { html = '', css = '', fields = '' } = source
-    if (fields?.trim()) {
-      const payload = JSON.parse(fields || '{}')
-      // const script = `<script>\n${Object.entries(payload).map(([k, v]) => `  let ${k} = ${JSON.stringify(v)}`).join('\n')}\n</script>`
-      // const component = `${script}\n${data.html}`
-      // const { css, js } = compile(component, { generate: 'ssr', hydratable: false })
-      // console.log(js.code)
-      // const html = await jsx.render(`(props) => (${data.html})`, payload)
-      html = ejs.render(
-        replaceAll(replaceAll(html, '{{', '<%'), '}}', ' %>'),
-        payload
-      )
-      css = ejs.render(
-        replaceAll(replaceAll(css, '{{', '<%'), '}}', ' %>'),
-        payload
-      )
-    }
+    // if (fields?.trim()) {
+    const payload = JSON.parse(fields || '{}')
+    // const script = `<script>\n${Object.entries(payload).map(([k, v]) => `  let ${k} = ${JSON.stringify(v)}`).join('\n')}\n</script>`
+    // const component = `${script}\n${data.html}`
+    // const { css, js } = compile(component, { generate: 'ssr', hydratable: false })
+    // console.log(js.code)
+    // const html = await jsx.render(`(props) => (${data.html})`, payload)
+    html = ejs.render(
+      replaceAll(replaceAll(html, '{{', '<%'), '}}', ' %>'),
+      payload
+    )
+    css = ejs.render(
+      replaceAll(replaceAll(css, '{{', '<%'), '}}', ' %>'),
+      payload
+    )
+    // }
     if (source.windi || source.windi === undefined) {
       const { generatedCSS } = useWindiCSS(html, css)
       css = generatedCSS

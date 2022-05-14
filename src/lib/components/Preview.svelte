@@ -133,7 +133,9 @@
       outline: ${
         border
           ? `2px dashed ${
-              $preferences.darkMode ? 'rgba 255, 0.5)' : 'rgba(10, 10, 10, 0.4)'
+              $preferences.darkMode
+                ? 'rgba(255, 255, 255, 0.5)'
+                : 'rgba(10, 10, 10, 0.4)'
             }`
           : 'none'
       };

@@ -136,6 +136,8 @@ export const upsertProduct = async (
             },
           },
           type: m.type,
+          defaultValue: m.defaultValue || undefined,
+          templateAccessor: m.templateAccessor || undefined,
           items: {
             create: m.items?.map((i) => ({
               name: i.name,
@@ -148,6 +150,8 @@ export const upsertProduct = async (
           name: m.name,
           type: m.type,
           active: m.active,
+          defaultValue: m.defaultValue || undefined,
+          templateAccessor: m.templateAccessor || undefined,
           items: {
             create: m.items
               ?.filter((i) => !i.id)
@@ -246,6 +250,8 @@ export const upsertProduct = async (
           .map((m) => ({
             name: m.name,
             type: m.type,
+            defaultValue: m.defaultValue || undefined,
+            templateAccessor: m.templateAccessor || undefined,
             items: {
               create: m.items.map((i) => ({
                 name: i.name,
