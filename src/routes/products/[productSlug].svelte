@@ -33,7 +33,7 @@
 
   let quantity = product.minQuantity || 1
 
-  let modifiers: Record<string, { value?: string; itemId?: string }> =
+  let modifiers: Record<string, { value?: any; itemId?: string }> =
     product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
 
   let fields = ''
@@ -61,7 +61,10 @@
     const items = mappedModifiers
       .filter(
         ([m]) =>
-          (m.type === 'color' || m.type === 'text' || m.type === 'numeric') &&
+          (m.type === 'color' ||
+            m.type === 'text' ||
+            m.type === 'numeric' ||
+            m.type === 'toggle') &&
           m.templateAccessor
       )
       .map(([m, item]) => ({
@@ -74,6 +77,7 @@
     } else {
       fields = ''
     }
+    console.log(f)
   }
 
   $: template = { ...(product.template as any), fields }
@@ -183,6 +187,14 @@
                     >
                   {/each}
                 </select>
+              {:else if m.type === 'toggle'}
+                <input
+                  type="checkbox"
+                  bind:checked={modifiers[m.id].value}
+                  class="justify-start"
+                  on:change={() =>
+                    (modifiers[m.id].itemId = modifiers[m.id].itemId)}
+                />
               {:else if m.type === 'text'}
                 <input
                   type="text"
@@ -201,7 +213,7 @@
                         !i.percentage ? '$' : ''
                       }${Math.abs(i.cost)}${i.percentage ? '%' : ''}`}
                       on:click={() => {
-                        modifiers[m.id].value = i.name
+                        modifiers[m.id].value = i.name || '#000000'
                         modifiers[m.id].itemId = i.id
                       }}
                       class:scale-120={modifiers[m.id].itemId == i.id}

@@ -1,4 +1,9 @@
 import ejs from 'ejs'
+import { urlBuilder } from './components/caravaggio/urlBuilder'
+import {
+  useCaravaggio,
+  useCaravaggioBuilder,
+} from './components/caravaggio/useCaravaggio'
 // import hb from 'handlebars-esm'
 import { useWindiCSS } from './windicss'
 
@@ -30,10 +35,17 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
     // const { css, js } = compile(component, { generate: 'ssr', hydratable: false })
     // console.log(js.code)
     // const html = await jsx.render(`(props) => (${data.html})`, payload)
-    html = ejs.render(
-      replaceAll(replaceAll(html, '{{', '<%'), '}}', ' %>'),
-      payload
-    )
+    html = ejs.render(replaceAll(replaceAll(html, '{{', '<%'), '}}', ' %>'), {
+      ...payload,
+      fillImage: (href: string, color: string = '000000.0') =>
+        urlBuilder({ url: 'https://caravaggio-cdn.vercel.app' }, href, {
+          duotone: {
+            h: '000000.0',
+            s: color.replace('#', ''),
+            o: 1,
+          },
+        }),
+    })
     css = ejs.render(
       replaceAll(replaceAll(css, '{{', '<%'), '}}', ' %>'),
       payload

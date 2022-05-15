@@ -67,6 +67,7 @@
     // { type: 'multiple', name: 'Multiple selection' },
     { type: 'text', name: 'Text', tree: true, embeddable: true },
     { type: 'numeric', name: 'Numeric', tree: true, embeddable: true },
+    { type: 'toggle', name: 'Toggle', tree: false, embeddable: true },
     { type: 'color', name: 'Color', tree: true, embeddable: true },
   ]
 
@@ -169,7 +170,7 @@
               <option value={type.type}>{type.name}</option>
             {/each}
           </select>
-          {#if m.type === 'text'}
+          <!-- {#if m.type === 'text'}
             <input
               type="text"
               placeholder="Default value"
@@ -183,7 +184,7 @@
               class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
               bind:value={m.defaultValue}
             />
-          {/if}
+          {/if} -->
           {#if modifierTypes.find((t) => t.type === m.type).embeddable}
             <input
               type="text"
