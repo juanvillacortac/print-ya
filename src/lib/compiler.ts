@@ -39,6 +39,9 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
       ...payload,
       fillImage: (href: string, color: string = '000000.0') =>
         urlBuilder({ url: 'https://caravaggio-cdn.vercel.app' }, href, {
+          progressive: true,
+          q: 90,
+          o: 'webp',
           duotone: {
             h: '000000.0',
             s: color.replace('#', ''),

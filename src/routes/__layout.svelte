@@ -57,7 +57,7 @@
     validateLayoutRoute,
     type LayoutType,
   } from '$lib/utils/layout'
-  import StoreLayout from '$lib/__layouts/StoreLayout.svelte'
+  import StoreLayout from '$lib/__layouts/DecalshutLayout.svelte'
   import AppLayout from '$lib/__layouts/AppLayout.svelte'
   import type { InstantiableSvelteComponentTyped } from 'svelte-markdown'
 

@@ -2,9 +2,7 @@ export const getDefaultHost = () =>
   import.meta.env.VITE_CANONICAL_HOST || process.env.LOCALHOST_HOST
 
 export const isCanonical = (host?: string) =>
-  (host || window.location.host) === getDefaultHost() ||
-  ((host || window.location.host).includes('localhost:3000') &&
-    (host || window.location.host) !== getDefaultHost())
+  (host || window.location.host) === getDefaultHost()
 
 export const getAbsoluteURL = ({
   path = '',

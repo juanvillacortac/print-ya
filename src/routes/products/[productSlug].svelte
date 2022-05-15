@@ -4,7 +4,13 @@
   import type { Product, ProductModifier, Store } from '$lib/db'
   import Preview from '$lib/components/Preview.svelte'
   import Markdown from 'svelte-markdown'
-  import { Add16, Subtract16 } from 'carbon-icons-svelte'
+  import {
+    Add16,
+    Add24,
+    Favorite24,
+    Favorite32,
+    Subtract16,
+  } from 'carbon-icons-svelte'
 
   export const load: Load = async ({ params, fetch, stuff }) => {
     const store = stuff.store
@@ -30,6 +36,7 @@
   import { tooltip } from '$lib/components/tooltip'
   import { onMount } from 'svelte'
   import type { ProductModifierItem } from '@prisma/client'
+  import Image from '$lib/components/caravaggio/Image.svelte'
 
   let quantity = product.minQuantity || 1
 
@@ -120,8 +127,15 @@
 </script>
 
 <div
-  class="flex flex-col mx-auto space-y-4 w-full py-12 px-4 lg:max-w-7/10 lg:px-6"
+  class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10 lg:px-6"
 >
+  <div class="flex font-bold space-x-2 text-xs text-gray-400 uppercase">
+    <a href="/" class="hover:underline">Home</a>
+    <span>/</span>
+    <a href=".?category={product.storeCategory.slug}" class="hover:underline"
+      >{product.storeCategory.name}</a
+    >
+  </div>
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
   <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-2">
     {#if product.template && product.type === 'template'}
@@ -143,21 +157,15 @@
         <h3 class="font-bold font-title text-black text-3xl dark:text-white">
           {product.name}
         </h3>
-        <a
-          href=".?category={product.storeCategory.slug}"
-          class="text-xs text-blue-500 hover:underline"
-          >{product.storeCategory.name}</a
-        >
       </div>
       <div class="flex flex-col space-y-4 lg:items-start">
-        <p class="font-bold text-black text-4xl dark:text-white">
+        <p class="font-bold text-black text-2xl dark:text-white">
           ${product.price.toLocaleString()}
-          <span class="text-lg">/ unit</span>
         </p>
         <div class="flex flex-col space-y-4">
           {#each product.modifiers as m}
             <div
-              class="flex w-full {m.type === 'color'
+              class="flex w-full {m.type
                 ? 'space-y-2 flex-col'
                 : 'space-x-4 items-center justify-end'} lg:justify-between"
             >
@@ -256,17 +264,87 @@
             </button>
           </div>
         </div>
-        <div class="flex space-x-4 items-center">
-          <button
-            class="rounded-lg font-bold mr-auto bg-blue-500 shadow text-white text-xs py-2 px-3 transform duration-200 hover:scale-105"
-            on:click={addToBag}>Add to basket</button
-          >
+        <div class="flex space-x-4 items-center justify-between !w-full">
+          <div class="flex space-x-4 items-center">
+            <button
+              class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center hover:scale-105"
+              on:click={addToBag}
+              style="will-change: transform"
+            >
+              <Add24 class="m-auto" />
+              <span>Add to cart</span></button
+            >
+            <button
+              class="flex text-gray-400 relative hover:text-pink-500"
+              title="Add to favorites"
+              use:tooltip
+              style="width: 32px; height: 32px"
+            >
+              <Favorite32 />
+            </button>
+          </div>
           <div class="font-bold text-lg text-black dark:text-white">
             Total ${total.toLocaleString()}
           </div>
         </div>
-        <div class="border-t pt-2 prose-sm !w-full dark:border-gray-600">
+        <Image
+          src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/checkout_icon.png?v=172537687083778273411570901059"
+          class="ml-auto w-full sm:w-3/4"
+          options={{
+            q: 100,
+          }}
+        />
+        <div class="border-t pt-4 pb-2 prose-sm !w-full dark:border-gray-600">
           <Markdown source={product.description || 'No description'} />
+        </div>
+        <div
+          class="border-t flex flex-col space-y-4 pt-4 items-center !w-full dark:border-gray-600"
+        >
+          <p class="text-center">4 Great reasons to buy from us:</p>
+          <div
+            class="text-sm text-center w-full grid gap-4 grid-cols-4 self-start lg:w-3/4"
+          >
+            <div class="flex flex-col space-y-2">
+              <Image
+                src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/topreasons_1_image_150x.png?v=96138826798940876551601679670"
+                class="w-full"
+                options={{
+                  q: 100,
+                }}
+              />
+              <p>Free shipping with Canada Post (when you spend over $35)</p>
+            </div>
+            <div class="flex flex-col space-y-2">
+              <Image
+                src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/topreasons_2_image_150x.png?v=56700843281458722951601679057"
+                class="w-full"
+                options={{
+                  q: 100,
+                }}
+              />
+              <p>Made in Canada</p>
+            </div>
+            <div class="flex flex-col space-y-2">
+              <Image
+                src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/topreasons_4_image_150x.png?v=136892144237653317881601679058"
+                class="w-full"
+                options={{
+                  q: 100,
+                }}
+              />
+              <p>Canadian Company</p>
+            </div>
+            <div class="flex flex-col space-y-2">
+              <Image
+                src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/topreasons_5_image_150x.png?v=75465245928373080681601679672"
+                class="w-full"
+                options={{
+                  q: 100,
+                }}
+              />
+              <p>Secure Ordering</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
