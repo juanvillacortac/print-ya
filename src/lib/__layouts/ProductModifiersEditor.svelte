@@ -63,10 +63,10 @@
   }
 
   const modifierTypes = [
-    { type: 'select', name: 'Selection', tree: true },
+    { type: 'select', name: 'Selection', tree: true, embeddable: true },
     // { type: 'multiple', name: 'Multiple selection' },
-    { type: 'text', name: 'Text', tree: true, embeddable: true },
-    { type: 'numeric', name: 'Numeric', tree: true, embeddable: true },
+    { type: 'text', name: 'Text', embeddable: true },
+    { type: 'numeric', name: 'Numeric', embeddable: true },
     { type: 'toggle', name: 'Toggle', tree: false, embeddable: true },
     { type: 'color', name: 'Color', tree: true, embeddable: true },
   ]

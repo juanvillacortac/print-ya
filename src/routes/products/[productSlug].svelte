@@ -68,7 +68,8 @@
     const items = mappedModifiers
       .filter(
         ([m]) =>
-          (m.type === 'color' ||
+          (m.type === 'select' ||
+            m.type === 'color' ||
             m.type === 'text' ||
             m.type === 'numeric' ||
             m.type === 'toggle') &&
