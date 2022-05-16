@@ -46,10 +46,10 @@
   let fields = ''
 
   onMount(() => {
-    const colorItems = product.modifiers
-      .filter((m) => m.type === 'color')
+    const defaultItems = product.modifiers
+      .filter((m) => m.type === 'color' || m.type === 'select')
       .map((m) => [m.id, m.items[0]] as [string, ProductModifierItem])
-    for (let [m, i] of colorItems) {
+    for (let [m, i] of defaultItems) {
       modifiers[m] = {
         itemId: i.id,
         value: i.name,
