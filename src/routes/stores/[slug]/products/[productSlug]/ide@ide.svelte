@@ -206,16 +206,39 @@
         class="bg-white border-r flex flex-col h-full space-y-6 border-light-900 p-4 text-gray-400 z-20 justify-between dark:bg-gray-900 dark:border-gray-800"
       >
         <div class="flex flex-col h-full space-y-6">
-          <a class="relative" href="/" title="Home" use:tooltip>
+          <a
+            class="flex h-24px w-24px relative items-center justify-center"
+            href="/"
+            title="Home"
+            use:tooltip
+          >
             <div
               class="rounded-lg h-auto bg-gray-100 -left-4px w-[calc(100%+8px)] absolute dark:bg-gray-800"
               style="aspect-ratio: 1/1"
             />
-            <h1
+
+            <svg
+              viewBox="0 0 50 39"
+              class="h-full m-auto w-full relative"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16.4992 2H37.5808L22.0816 24.9729H1L16.4992 2Z"
+                class="ccompli1  !dark:fill-white"
+                fill="#007AFF"
+              />
+              <path
+                d="M17.4224 27.102L11.4192 36H33.5008L49 13.0271H32.7024L23.2064 27.102H17.4224Z"
+                class="ccustom  !dark:fill-white"
+                fill="#312ECB"
+              />
+            </svg>
+            <!-- <h1
               class="font-logo font-black text-transparent text-center text-2xl select-none pointer-events-none rainbow-bg relative !bg-clip-text"
             >
               PY!
-            </h1>
+            </h1> -->
           </a>
           {#each modes as m}
             <button
