@@ -130,9 +130,7 @@
   }
 </script>
 
-<div
-  class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10 lg:px-6"
->
+<div class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10">
   <div class="flex font-bold space-x-2 text-xs text-gray-400 uppercase">
     <a href="/" class="hover:underline">Home</a>
     <span>/</span>
