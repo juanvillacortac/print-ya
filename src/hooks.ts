@@ -81,5 +81,6 @@ export const getSession: GetSession = (event) => ({
   layout: event.locals.layout,
   userAgent: event.request.headers.get('user-agent'),
   host: event.url.host,
+  url: event.url,
   ...event.locals.session.data,
 })
