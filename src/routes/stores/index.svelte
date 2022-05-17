@@ -1,8 +1,12 @@
 <script lang="ts">
+  import { pageSubtitle } from '$lib'
+
   import Image from '$lib/components/caravaggio/Image.svelte'
   import type { Store } from '$lib/db'
 
   export let stores: Store[]
+
+  $pageSubtitle = 'Stores'
 </script>
 
 <h2 class="font-bold font-title text-black mb-6 text-3xl dark:text-white">

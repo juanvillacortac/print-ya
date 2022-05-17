@@ -1,13 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import Image from '$lib/components/caravaggio/Image.svelte'
-  import { tooltip } from '$lib/components/tooltip'
+  import { pageSubtitle } from '$lib'
   import type { Store } from '$lib/db'
   import {
     Category32,
-    Code32,
     ColorPalette32,
-    Launch16,
     OrderDetails32,
     Product32,
   } from 'carbon-icons-svelte'
@@ -36,6 +33,8 @@
       href: `/stores/${store.slug}/customization`,
     },
   ]
+
+  $pageSubtitle = $page.stuff.store.name
 </script>
 
 <div class="flex flex-col mx-auto max-w-prose space-y-4">

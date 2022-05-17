@@ -2,6 +2,7 @@
   import { invalidate } from '$app/navigation'
 
   import { page } from '$app/stores'
+  import { pageSubtitle } from '$lib'
   import { post } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
   import type { Store } from '$lib/db'
@@ -43,6 +44,8 @@
       storeId: store.id,
     }
   }
+
+  $pageSubtitle = 'Categories'
 </script>
 
 <div class="flex flex-col mx-auto max-w-prose space-y-4">

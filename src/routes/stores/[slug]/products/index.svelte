@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation'
 
   import { page } from '$app/stores'
+  import { pageSubtitle } from '$lib'
   import Preview from '$lib/components/Preview.svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store, StripedProduct } from '$lib/db'
@@ -22,6 +23,8 @@
     .filter((p) =>
       typeof visibility != 'string' ? p.public == visibility : true
     )
+
+  $pageSubtitle = 'Products'
 </script>
 
 <a

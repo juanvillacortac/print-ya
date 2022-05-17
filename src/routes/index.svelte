@@ -2,6 +2,7 @@
   import type { Load } from '@sveltejs/kit'
   import Page, { load as storeLoad } from '$lib/__storefront/home/Page.svelte'
   import { session } from '$app/stores'
+  import { pageSubtitle } from '$lib'
 
   export const load: Load = async (event) => {
     if (event.session.layout === 'store') {
@@ -13,6 +14,10 @@
 
 <script>
   export let data
+
+  $: if ($session.layout === 'app') {
+    $pageSubtitle = 'Dashboard'
+  }
 </script>
 
 {#if $session.layout === 'store'}
