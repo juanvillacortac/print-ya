@@ -2,7 +2,9 @@ import { getUserDetails } from '$lib/db/users'
 import type { GetSession } from '@sveltejs/kit'
 import { handleSession } from 'svelte-kit-cookie-session'
 import cookie from 'cookie'
-import { getLayoutType } from '$lib/utils/layout'
+import { appRoutes, getLayoutType, storeRoutes } from '$lib/utils/layout'
+import { getDefaultHost } from '$lib/utils/host'
+import { browser } from '$app/env'
 
 export const handle = handleSession(
   {
@@ -14,6 +16,7 @@ export const handle = handleSession(
     let response: Response
 
     event.locals.layout = getLayoutType(event)
+    console.log(event.url.searchParams.get('store'), 'tiendita')
 
     // Set default locale if user preferred locale does not match
     try {
@@ -34,12 +37,20 @@ export const handle = handleSession(
         }
       }
 
+      const isAppPage =
+        event.locals.layout === 'app' &&
+        (Boolean(appRoutes.find((url) => event.url.pathname.startsWith(url))) ||
+          event.url.pathname === '/')
+
       if (
-        event.url.pathname.split('/').slice(1)[0] === 'app' &&
-        !event.locals.session?.data?.userId
+        isAppPage &&
+        !event.locals.session?.data?.userId &&
+        event.url.pathname !== '/login'
       ) {
         return Response.redirect(
-          `${event.url.origin}/login?callbackUrl=${encodeURIComponent(
+          `${
+            getDefaultHost() === 'localhost:3000' ? 'http://' : 'https://'
+          }${getDefaultHost()}/login?callbackUrl=${encodeURIComponent(
             event.url.pathname
           )}`,
           303
@@ -47,12 +58,11 @@ export const handle = handleSession(
       }
 
       response = await resolve(event, {
-        ssr: !event.url.pathname.startsWith('/webhooks/success'),
+        // ssr: event.locals.layout !== 'app',
       })
     } catch (error) {
-      console.log(error)
       response = await resolve(event, {
-        ssr: !event.url.pathname.startsWith('/webhooks/success'),
+        ssr: event.locals.layout !== 'app',
       })
       response.headers.append(
         'Set-Cookie',

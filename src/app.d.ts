@@ -11,13 +11,14 @@ declare namespace App {
     layout: import('$lib/utils/layout').LayoutType
     host?: string
     userAgent?: string
+
+    subtitle?: string
   }
   interface Stuff extends Record<string, unknown> {
     layout: import('$lib/utils/layout').LayoutType
     store?: import('$lib/db').Store
     product?: import('$lib/db').Product
     products?: import('$lib/db').StripedProduct[]
-    subtitle?: string
   }
 }
 

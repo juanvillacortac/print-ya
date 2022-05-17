@@ -2,6 +2,8 @@ import type { Writable } from 'svelte/store'
 import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
 
+export const pageSubtitle = writable('')
+
 export function persistentWritable<T>(
   key: string,
   initialValue: T

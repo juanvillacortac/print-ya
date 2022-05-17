@@ -1,5 +1,4 @@
 <script lang="ts">
-  import 'cleanslate'
   import { onMount, onDestroy } from 'svelte'
   import { toPng } from 'html-to-image'
   import { preferences } from '$lib'

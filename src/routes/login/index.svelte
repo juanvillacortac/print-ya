@@ -1,13 +1,16 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
-
+  import { pageSubtitle } from '$lib'
   import { post } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
   import { onMount } from 'svelte'
+
   let loading = false
   let isLogin = true
   let emailEl: HTMLInputElement
   let email: string, password: string, rePassword: string
+
   onMount(() => {
     emailEl.focus()
   })
@@ -31,13 +34,15 @@
           encodeURIComponent('/app/dashboard')
       )
       // console.log(callbackUrl)
-      // window.location.replace(callbackUrl)
+      goto(callbackUrl)
     } catch ({ error }) {
       notifications.send(error, 'default', 1000)
     } finally {
       loading = false
     }
   }
+
+  $: $pageSubtitle = isLogin ? 'Log in' : 'Register'
 </script>
 
 <div class="flex h-screen text-center w-full p-4 items-center justify-center">

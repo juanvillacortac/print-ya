@@ -30,7 +30,7 @@
           <Category16 />
           <h3 class="font-bold text-xs">Categories</h3>
           <a
-            href="/app/stores/{store?.slug}/preview/products"
+            href="/stores/{store?.slug}/preview/products"
             class="flex text-xs hover:underline"
           >
             See all >
@@ -39,7 +39,7 @@
         <div class="flex flex-col h-full space-y-2 p-2">
           {#each store.categories as category}
             <a
-              href="/app/stores/{store.slug}/preview/products"
+              href="/stores/{store.slug}/preview/products"
               class="flex space-x-2 text-xs hover:underline"
             >
               <Categories16 />

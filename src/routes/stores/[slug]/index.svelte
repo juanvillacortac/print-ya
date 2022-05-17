@@ -18,22 +18,22 @@
     {
       icon: Category32,
       title: 'Categories',
-      href: `/app/stores/${store.slug}/categories`,
+      href: `/stores/${store.slug}/categories`,
     },
     {
       icon: Product32,
       title: 'Products',
-      href: `/app/stores/${store.slug}/products`,
+      href: `/stores/${store.slug}/products`,
     },
     {
       icon: OrderDetails32,
       title: 'Orders',
-      href: `/app/stores/${store.slug}/orders`,
+      href: `/stores/${store.slug}/orders`,
     },
     {
       icon: ColorPalette32,
       title: 'Customize storefront',
-      href: `/app/stores/${store.slug}/customization`,
+      href: `/stores/${store.slug}/customization`,
     },
   ]
 </script>

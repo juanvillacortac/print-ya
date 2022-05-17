@@ -15,13 +15,11 @@ export const getLayoutType = ({
   return 'app'
 }
 
-const storeRoutes = ['/products']
-
-const appRoutes = ['/app', '/login']
+export const storeRoutes = ['/products', '/bag', '/cart']
+export const appRoutes = ['/stores', '/login', '/settings', '/app']
 
 export const validateLayoutRoute = (event: LoadInput | RequestEvent) => {
   const layout = getLayoutType(event)
-  console.log('validation', event.url, layout, getDefaultHost())
   switch (layout) {
     case 'store':
       return !Boolean(

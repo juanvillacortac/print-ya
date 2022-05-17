@@ -61,7 +61,7 @@
 </div>
 <div class="mx-auto grid gap-6 grid-cols-1 lg:w-9/10 lg:grid-cols-4">
   {#each filteredProducts as product (product.id)}
-    {@const href = `/app/stores/${store.slug}/products/${product.slug}`}
+    {@const href = `/stores/${store.slug}/products/${product.slug}`}
     <div
       role="link"
       in:fly={{ y: 20 }}
@@ -73,6 +73,7 @@
       <a
         class="rounded-lg bg-gray-100 w-full overflow-hidden select-none dark:bg-gray-700"
         style="aspect-ratio: 1/1"
+        sveltekit:prefetch
         {href}
       >
         <div
@@ -88,13 +89,18 @@
           ? ' - Unpublished'
           : ''}
       </p>
-      <a class="font-title font-bold text-black dark:text-white" {href}>
+      <a
+        class="font-title font-bold text-black dark:text-white"
+        sveltekit:prefetch
+        {href}
+      >
         {product.name}
       </a>
       <div class="flex justify-between items-end">
         <a
-          href="/app/stores/{store.slug}/products?category={product
-            .storeCategory.slug}"
+          sveltekit:prefetch
+          href="/stores/{store.slug}/products?category={product.storeCategory
+            .slug}"
           class="text-xs text-blue-500 hover:underline"
           >{product.storeCategory.name}</a
         >

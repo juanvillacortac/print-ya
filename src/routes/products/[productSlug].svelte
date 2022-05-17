@@ -37,6 +37,7 @@
   import { onMount } from 'svelte'
   import type { ProductModifierItem } from '@prisma/client'
   import Image from '$lib/components/caravaggio/Image.svelte'
+  import RgbWheel from '$lib/components/__RGBWheel.svelte'
 
   let quantity = product.minQuantity || 1
 
@@ -90,6 +91,8 @@
 
   $: template = { ...(product.template as any), fields }
 
+  let bgColor = ''
+
   $: total =
     (Object.entries(modifiers)
       .filter(([_, mValue]) => mValue?.itemId)
@@ -142,11 +145,33 @@
     {#if product.template && product.type === 'template'}
       <div class="flex h-full relative items-start">
         <div
-          class="border rounded-lg h-auto border-gray-300 w-full top-0 col-span-1 sticky overflow-hidden pointer-events-none  select-none  dark:border-gray-800"
+          class="border rounded-lg h-auto border-gray-300 w-full top-0 col-span-1 sticky overflow-hidden relative select-none  dark:border-gray-800"
           style="aspect-ratio: 1/1"
         >
+          <div class="flex space-x-2 top-2 right-2 z-20 absolute">
+            <div class="transform z-20 duration-200 relative hover:scale-90">
+              <input
+                type="color"
+                class="cursor-pointer opacity-0 z-20 absolute !h-8 !w-8"
+                title="Change preview background"
+                use:tooltip
+                bind:value={bgColor}
+              />
+              <RgbWheel
+                class="border rounded-full flex border-gray-500 h-8 transform w-8 dark:border-gray-700"
+              />
+            </div>
+            <button
+              class="border rounded-full flex border-gray-500 h-8 transform transition-transform w-8 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
+              title="Set transparent background"
+              use:tooltip
+              on:click={() => (bgColor = '')}
+            />
+          </div>
           <div
-            class="flex h-full w-full items-center justify-center checkerboard"
+            class="flex h-full w-full transition-colors duration-200 items-center justify-center relative pointer-events-none"
+            class:checkerboard={!bgColor}
+            style:background-color={bgColor}
           >
             <Preview {template} fitParent />
           </div>
@@ -353,7 +378,8 @@
 </div>
 
 <style>
-  .checkerboard {
+  .checkerboard,
+  .checkerboard-sm {
     --black-cell: rgba(55, 65, 81, 0.2);
     background-image: linear-gradient(
         45deg,
@@ -374,9 +400,14 @@
     background-size: 60px 60px;
     background-position: 0 0, 30px 30px;
   }
-  :global(.dark) .checkerboard {
+  :global(.dark) .checkerboard,
+  :global(.dark) .checkerboard-sm {
     --black-cell: rgba(55, 65, 81, 0.5);
     background-color: rgba(80, 80, 80, 0.2);
+  }
+  .checkerboard-sm {
+    background-size: 10px 10px;
+    background-position: 0 0, 5px 5px;
   }
   .quantity::-webkit-outer-spin-button,
   .quantity::-webkit-inner-spin-button {

@@ -41,7 +41,7 @@
   My Stores
 </h2>
 <div class="flex space-x-4 mb-6 items-center">
-  <a class="flex space-x-4 items-center" href="/app/stores/{store.slug}">
+  <a class="flex space-x-4 items-center" href="/stores/{store.slug}">
     <div class="rounded bg-light-100 shadow p-1 dark:bg-gray-800">
       <Image
         src={store.logo}

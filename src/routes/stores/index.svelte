@@ -17,7 +17,8 @@
   {#each stores as store}
     <a
       class="bg-white rounded-xl flex flex-col h-full space-y-2 shadow w-full p-4 transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-95"
-      href="/app/stores/{store.slug}"
+      href="/stores/{store.slug}"
+      sveltekit:prefetch
     >
       <Image
         src={store.logo}
