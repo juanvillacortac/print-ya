@@ -29,8 +29,7 @@
       })
       notifications.send('Log in successfull', 'default', 1000)
       const callbackUrl = decodeURIComponent(
-        $page.url.searchParams.get('callbackUrl') ||
-          encodeURIComponent('/app/dashboard')
+        $page.url.searchParams.get('callbackUrl') || encodeURIComponent('/')
       )
       window.location.replace(callbackUrl)
     } catch ({ error }) {
