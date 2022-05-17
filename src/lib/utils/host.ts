@@ -3,7 +3,6 @@ export const getDefaultHost = () =>
 
 export const isCanonical = (host?: string) =>
   (host || window.location.host) === getDefaultHost() ||
-  (host || window.location.host) === `app.${getDefaultHost()}` ||
   (host || window.location.host) === 'localhost:3000'
 
 export const getAbsoluteURL = ({
