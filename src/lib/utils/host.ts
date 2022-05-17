@@ -1,4 +1,4 @@
-export const getDefaultHost = () =>
+export const getDefaultHost: any = () =>
   import.meta.env.VITE_CANONICAL_HOST || process.env.LOCALHOST_HOST
 
 export const isCanonical = (host?: string) =>
@@ -7,7 +7,12 @@ export const isCanonical = (host?: string) =>
 
 export const getAbsoluteURL = ({
   path = '',
-  host = getDefaultHost(),
+  host = getDefaultHost().replace(
+    import.meta.env.VITE_APP_HOST_SUBDOMAIN
+      ? `${import.meta.env.VITE_APP_HOST_SUBDOMAIN}.`
+      : '',
+    ''
+  ),
   subdomain = '',
 } = {}) => {
   const hostWithSubdomain = subdomain ? `${subdomain}.${host}` : host
