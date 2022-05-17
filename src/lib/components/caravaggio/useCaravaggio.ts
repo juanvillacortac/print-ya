@@ -62,8 +62,7 @@ type CaravaggioBuilder = (imageUrl: string, opt?: CaravaggioOptions) => string
  */
 export const useCaravaggioBuilder = (baseUrl?: string): CaravaggioBuilder => {
   const context = useCaravaggioContext()
-  context.baseUrl =
-    baseUrl || get(session)?.url.protocol + '//' + get(session)?.host
+  context.baseUrl = baseUrl || get(session)?.fullHost
   const builder: CaravaggioBuilder = (imageUrl, opt) => {
     return urlBuilder(context, imageUrl, opt)
   }

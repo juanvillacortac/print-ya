@@ -10,7 +10,7 @@ declare namespace App {
   interface Session extends SessionData {
     layout: import('$lib/utils/layout').LayoutType
     host?: string
-    url?: URL
+    fullHost?: string
     userAgent?: string
 
     subtitle?: string
