@@ -1,5 +1,4 @@
 <script>
-  import { goto } from '$app/navigation'
   import { page, session, navigating } from '$app/stores'
   import { preferences } from '$lib'
   import { del } from '$lib/api'
@@ -105,7 +104,7 @@
             on:click={() => {
               del(`/login`, {}).then(() => {
                 notifications.send('Log out successfully', 'default', 1000)
-                goto('/login')
+                window.location.replace('/login')
               })
             }}
             class="flex relative justify-self-end self-end hover:text-black dark:hover:text-white"

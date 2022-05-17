@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
   import { post } from '$lib/api'
@@ -33,8 +32,7 @@
         $page.url.searchParams.get('callbackUrl') ||
           encodeURIComponent('/app/dashboard')
       )
-      // console.log(callbackUrl)
-      goto(callbackUrl)
+      window.location.replace(callbackUrl)
     } catch ({ error }) {
       notifications.send(error, 'default', 1000)
     } finally {
