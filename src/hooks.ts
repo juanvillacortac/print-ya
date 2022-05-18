@@ -56,16 +56,16 @@ export const handle = handleSession(
         )
       }
 
+      response = await resolve(event, {
+        ssr: event.locals.layout !== 'app',
+      })
+
       if (event.locals.layout === 'store') {
         response.headers.set(
           'Cache-Control',
           's-maxage=1, stale-while-revalidate=59'
         )
       }
-
-      response = await resolve(event, {
-        ssr: event.locals.layout !== 'app',
-      })
     } catch (error) {
       console.error(error)
       response = await resolve(event, {
