@@ -60,7 +60,7 @@ export const handle = handleSession(
       if (event.locals.layout === 'store') {
         response.headers.set(
           'Cache-Control',
-          's-maxage=1, stale-while-revalidate'
+          's-maxage=1, stale-while-revalidate=59'
         )
       }
 
