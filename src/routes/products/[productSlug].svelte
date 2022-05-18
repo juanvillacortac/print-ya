@@ -1,122 +1,122 @@
 <script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit'
-  import { get } from '$lib/api'
-  import type { Product, ProductModifier, Store } from '$lib/db'
-  import Preview from '$lib/components/Preview.svelte'
-  import Markdown from 'svelte-markdown'
+  import type { Load } from "@sveltejs/kit";
+  import { get } from "$lib/api";
+  import type { Product, ProductModifier, Store } from "$lib/db";
+  import Preview from "$lib/components/Preview.svelte";
+  import Markdown from "svelte-markdown";
   import {
     Add16,
     Add24,
     Favorite24,
     Favorite32,
     Subtract16,
-  } from 'carbon-icons-svelte'
+  } from "carbon-icons-svelte";
 
   export const load: Load = async ({ params, fetch, stuff }) => {
-    const store = stuff.store
+    const store = stuff.store;
     const data = await get(
       `/api/stores/${store?.slug}/products/${params.productSlug}`,
       { fetch }
-    )
+    );
     if (!data)
       return {
         status: 404,
-      }
+      };
     return {
       props: {
         product: data,
       },
-    }
-  }
+    };
+  };
 </script>
 
 <script lang="ts">
-  export let product: Product
-  import { bag } from '$lib'
-  import { tooltip } from '$lib/components/tooltip'
-  import { onMount } from 'svelte'
-  import type { ProductModifierItem } from '@prisma/client'
-  import Image from '$lib/components/caravaggio/Image.svelte'
-  import RgbWheel from '$lib/components/__RGBWheel.svelte'
-  import { session } from '$app/stores'
+  export let product: Product;
+  import { bag } from "$lib";
+  import { tooltip } from "$lib/components/tooltip";
+  import { onMount } from "svelte";
+  import type { ProductModifierItem } from "@prisma/client";
+  import Image from "$lib/components/caravaggio/Image.svelte";
+  import RgbWheel from "$lib/components/__RGBWheel.svelte";
+  import { session } from "$app/stores";
 
-  let quantity = product.minQuantity || 1
+  let quantity = product.minQuantity || 1;
 
   let modifiers: Record<string, { value?: any; itemId?: string }> =
-    product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
+    product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {});
 
-  let fields = ''
+  let fields = "";
 
   onMount(() => {
     const defaultItems = product.modifiers
-      .filter((m) => m.type === 'color' || m.type === 'select')
-      .map((m) => [m.id, m.items[0]] as [string, ProductModifierItem])
+      .filter((m) => m.type === "color" || m.type === "select")
+      .map((m) => [m.id, m.items[0]] as [string, ProductModifierItem]);
     for (let [m, i] of defaultItems) {
       modifiers[m] = {
         itemId: i.id,
         value: i.name,
-      }
+      };
     }
-  })
+  });
 
-  $: if (product.type === 'template') {
+  $: if (product.type === "template") {
     const mappedModifiers = Object.entries(modifiers).map(
       ([mId, mValue]) =>
         [product.modifiers.find((m) => m.id === mId), mValue] as [
           ProductModifier,
           { value?: string; itemId?: string }
         ]
-    )
+    );
     const items = mappedModifiers
       .filter(
         ([m]) =>
-          (m.type === 'select' ||
-            m.type === 'color' ||
-            m.type === 'text' ||
-            m.type === 'numeric' ||
-            m.type === 'toggle') &&
+          (m.type === "select" ||
+            m.type === "color" ||
+            m.type === "text" ||
+            m.type === "numeric" ||
+            m.type === "toggle") &&
           m.templateAccessor
       )
       .map(([m, item]) => ({
         value: item.value,
         key: m.templateAccessor,
-      }))
-    const f = items.reduce((a, b) => ({ ...a, [b.key]: b.value }), {})
+      }));
+    const f = items.reduce((a, b) => ({ ...a, [b.key]: b.value }), {});
     if (Object.keys(f).length) {
-      fields = JSON.stringify(f)
+      fields = JSON.stringify(f);
     } else {
-      fields = ''
+      fields = "";
     }
   }
 
-  $: template = { ...(product.template as any), fields }
+  $: template = { ...(product.template as any), fields };
 
-  let bgColor = ''
+  let bgColor = "";
 
   $: total =
     (Object.entries(modifiers)
       .filter(([_, mValue]) => mValue?.itemId)
       .map(([mId, mValue]) => {
-        const modifier = product.modifiers.find((m) => m.id === mId)
-        const item = modifier.items.find((i) => i.id === mValue.itemId)
+        const modifier = product.modifiers.find((m) => m.id === mId);
+        const item = modifier.items.find((i) => i.id === mValue.itemId);
         const value = item.percentage
           ? (item.cost / 100) * product.price
-          : item.cost
-        return value
+          : item.cost;
+        return value;
       })
       .reduce((a, b) => a + b, 0) +
       product.price) *
-    quantity
+    quantity;
 
   const addToBag = () => {
     const elementIdx = $bag.findIndex(
       (p) =>
         p.productSlug == product.slug &&
         JSON.stringify(modifiers) === JSON.stringify(p.modifiers)
-    )
+    );
     if (elementIdx >= 0) {
-      $bag[elementIdx].quantity += quantity
-      return
+      $bag[elementIdx].quantity += quantity;
+      return;
     }
     $bag = [
       ...$bag,
@@ -125,8 +125,8 @@
         modifiers: {},
         quantity,
       },
-    ]
-  }
+    ];
+  };
 </script>
 
 <div class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10">
@@ -139,7 +139,7 @@
   </div>
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
   <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-2">
-    {#if product.template && product.type === 'template'}
+    {#if product.template && product.type === "template"}
       <div class="flex h-full relative items-start">
         <div
           class="border rounded-lg h-auto border-gray-300 w-full top-0 col-span-1 sticky overflow-hidden relative select-none  dark:border-gray-800"
@@ -162,7 +162,7 @@
               class="border rounded-full flex border-gray-500 h-8 transform transition-transform w-8 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
               title="Set transparent background"
               use:tooltip
-              on:click={() => (bgColor = '')}
+              on:click={() => (bgColor = "")}
             />
           </div>
           <div
@@ -197,7 +197,7 @@
               >
                 {m.name}
               </div>
-              {#if m.type === 'select'}
+              {#if m.type === "select"}
                 <select
                   class="bg-white border rounded border-gray-300 text-xs leading-tight py-2 px-3 w-1/2 appearance-none !pr-8 lg:w-60 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                   bind:value={modifiers[m.id].itemId}
@@ -209,16 +209,16 @@
                   {#each m.items as i}
                     <option value={i.id}
                       >{i.name}&nbsp;&nbsp;&ndash;&nbsp;&nbsp;<strong
-                        >{i.cost < 0 ? '-' : ''}{!i.percentage
-                          ? '$'
-                          : ''}{Math.abs(i.cost)}{i.percentage
-                          ? '%'
-                          : ''}</strong
+                        >{i.cost < 0 ? "-" : ""}{!i.percentage
+                          ? "$"
+                          : ""}{Math.abs(i.cost)}{i.percentage
+                          ? "%"
+                          : ""}</strong
                       ></option
                     >
                   {/each}
                 </select>
-              {:else if m.type === 'toggle'}
+              {:else if m.type === "toggle"}
                 <input
                   type="checkbox"
                   bind:checked={modifiers[m.id].value}
@@ -226,7 +226,7 @@
                   on:change={() =>
                     (modifiers[m.id].itemId = modifiers[m.id].itemId)}
                 />
-              {:else if m.type === 'text'}
+              {:else if m.type === "text"}
                 <input
                   type="text"
                   placeholder="Write something..."
@@ -235,17 +235,17 @@
                   on:input={() =>
                     (modifiers[m.id].itemId = modifiers[m.id].itemId)}
                 />
-              {:else if m.type === 'color'}
+              {:else if m.type === "color"}
                 <div class="w-full grid gap-2 grid-cols-8 lg:w-full">
                   {#each m.items as i}
                     <button
                       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
-                      title={`${i.cost < 0 ? '-' : ''}${
-                        !i.percentage ? '$' : ''
-                      }${Math.abs(i.cost)}${i.percentage ? '%' : ''}`}
+                      title={`${i.cost < 0 ? "-" : ""}${
+                        !i.percentage ? "$" : ""
+                      }${Math.abs(i.cost)}${i.percentage ? "%" : ""}`}
                       on:click={() => {
-                        modifiers[m.id].value = i.name || '#000000'
-                        modifiers[m.id].itemId = i.id
+                        modifiers[m.id].value = i.name || "#000000";
+                        modifiers[m.id].itemId = i.id;
                       }}
                       class:scale-120={modifiers[m.id].itemId == i.id}
                       class:!border-blue-800={modifiers[m.id].itemId == i.id}
@@ -263,7 +263,7 @@
           <div class="font-bold font-title text-black text-xs dark:text-white">
             Quantity{product.minQuantity
               ? ` (min ${product.minQuantity} per order)`
-              : ''}
+              : ""}
           </div>
           <div class="flex !text-xs">
             <button
@@ -318,7 +318,7 @@
           }}
         />
         <div class="border-t pt-4 pb-2 prose-sm !w-full dark:border-gray-600">
-          <Markdown source={product.description || 'No description'} />
+          <Markdown source={product.description || "No description"} />
         </div>
         <div
           class="border-t flex flex-col space-y-4 pt-4 items-center !w-full dark:border-gray-600"
