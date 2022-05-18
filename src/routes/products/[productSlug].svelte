@@ -38,6 +38,7 @@
   import type { ProductModifierItem } from '@prisma/client'
   import Image from '$lib/components/caravaggio/Image.svelte'
   import RgbWheel from '$lib/components/__RGBWheel.svelte'
+  import { session } from '$app/stores'
 
   let quantity = product.minQuantity || 1
 
@@ -177,7 +178,7 @@
     <div class="flex flex-col space-y-4">
       <div class="flex flex-col space-y-2 items-start">
         <h3 class="font-bold font-title text-black text-3xl dark:text-white">
-          {product.name}
+          {$session?.userAgent}
         </h3>
       </div>
       <div class="flex flex-col space-y-4 lg:items-start">
