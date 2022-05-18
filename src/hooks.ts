@@ -57,8 +57,15 @@ export const handle = handleSession(
         )
       }
 
+      if (event.locals.layout === 'store') {
+        response.headers.set(
+          'Cache-Control',
+          's-maxage=1, stale-while-revalidate'
+        )
+      }
+
       response = await resolve(event, {
-        // ssr: event.locals.layout !== 'app',
+        ssr: event.locals.layout !== 'app',
       })
     } catch (error) {
       response = await resolve(event, {
