@@ -1,22 +1,25 @@
-import preprocess from 'svelte-preprocess'
-import { optimizeImports } from 'carbon-preprocess-svelte'
-import { imagetools } from 'vite-imagetools'
-import auto from '@sveltejs/adapter-auto'
-import node from '@sveltejs/adapter-node'
-import vercel from '@sveltejs/adapter-vercel'
-import svg from '@poppanator/sveltekit-svg'
-import WindiCSS from 'vite-plugin-windicss'
+import preprocess from "svelte-preprocess";
+import { optimizeImports } from "carbon-preprocess-svelte";
+import { imagetools } from "vite-imagetools";
+import auto from "@sveltejs/adapter-auto";
+import node from "@sveltejs/adapter-node";
+import vercel from "@sveltejs/adapter-vercel";
+import svg from "@poppanator/sveltekit-svg";
+import WindiCSS from "vite-plugin-windicss";
 
 const adapter = () => {
-  switch (process.env.ADAPTER?.toLowerCase() || 'vercel') {
-    case 'node':
-      return node()
-    case 'vercel':
-      return vercel({ edge: true })
+  switch (process.env.ADAPTER?.toLowerCase() || "vercel") {
+    case "node":
+      return node();
+    case "vercel":
+      return vercel({
+        edge: true,
+        external: ["_http_common", "crypto", "fsevents"],
+      });
     default:
-      return auto()
+      return auto();
   }
-}
+};
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -38,22 +41,22 @@ const config = {
       enabled: false,
     },
     methodOverride: {
-      parameter: '_method',
-      allowed: ['PUT', 'PATCH', 'DELETE'],
+      parameter: "_method",
+      allowed: ["PUT", "PATCH", "DELETE"],
     },
     inlineStyleThreshold: 48 / 0.0009765625,
     vite: {
       define: {
-        'process.env.LOCALHOST_HOST': JSON.stringify(
+        "process.env.LOCALHOST_HOST": JSON.stringify(
           process.env.GITPOD_WORKSPACE_URL
-            ? process.env.GITPOD_WORKSPACE_URL.replace('https://', '3000-')
-            : 'localhost:3000'
+            ? process.env.GITPOD_WORKSPACE_URL.replace("https://", "3000-")
+            : "localhost:3000"
         ),
-        'process.env.VERCEL_URL': JSON.stringify(process.env.VERCEL_URL),
+        "process.env.VERCEL_URL": JSON.stringify(process.env.VERCEL_URL),
       },
       plugins: [
         WindiCSS({
-          config: './windi.config.js',
+          config: "./windi.config.js",
         }),
         svg(),
         imagetools(),
@@ -68,12 +71,12 @@ const config = {
         hmr: {
           clientPort: process.env.GITPOD_WORKSPACE_URL ? 443 : 3000,
           host: process.env.GITPOD_WORKSPACE_URL
-            ? process.env.GITPOD_WORKSPACE_URL.replace('https://', '3000-')
-            : 'localhost',
+            ? process.env.GITPOD_WORKSPACE_URL.replace("https://", "3000-")
+            : "localhost",
         },
       },
     },
   },
-}
+};
 
-export default config
+export default config;
