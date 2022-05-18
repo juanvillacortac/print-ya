@@ -66,7 +66,6 @@
     styleEl.innerHTML = compiled.css
       .replace('html {', ':host > * {')
       .replace('body {', ':host > * {')
-    console.log(styleEl.innerHTML)
     shadow.appendChild(styleEl)
 
     const imports = compiled.css.match(/@import\ url\((.*?)\);/gim)

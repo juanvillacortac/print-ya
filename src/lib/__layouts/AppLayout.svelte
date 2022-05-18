@@ -44,8 +44,6 @@
   }
 
   $: pageTitle = (subtitle ? subtitle + ' | ' : '') + 'Print Ya!'
-
-  $: console.log($$restProps)
 </script>
 
 <svelte:head>

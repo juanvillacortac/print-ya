@@ -86,7 +86,6 @@
     } else {
       fields = ''
     }
-    console.log(f)
   }
 
   $: template = { ...(product.template as any), fields }
@@ -109,7 +108,6 @@
     quantity
 
   const addToBag = () => {
-    console.log(modifiers, $bag)
     const elementIdx = $bag.findIndex(
       (p) =>
         p.productSlug == product.slug &&

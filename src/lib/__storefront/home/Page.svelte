@@ -3,12 +3,10 @@
   import { get } from '$lib/api'
 
   export const load: Load = async ({ fetch, stuff }) => {
-    console.log(stuff)
     const data = await get<StripedProduct[]>(
       `/api/stores/${stuff.store?.slug}/products`,
       { fetch }
     )
-    console.log(data)
     return {
       props: {
         data: {

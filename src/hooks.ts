@@ -16,7 +16,6 @@ export const handle = handleSession(
     let response: Response
 
     event.locals.layout = getLayoutType(event)
-    console.log(event.url.searchParams.get('store'), 'tiendita')
 
     // Set default locale if user preferred locale does not match
     try {

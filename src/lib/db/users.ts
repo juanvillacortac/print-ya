@@ -34,7 +34,6 @@ export async function login({
   let uid: string
 
   if (userFound) {
-    console.log(password, userFound.password)
     const passwordMatch = await bcrypt.compare(password, userFound.password)
     if (!passwordMatch) {
       throw {

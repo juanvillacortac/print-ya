@@ -87,12 +87,7 @@ export const getProductsByStore = async ({
 export const upsertProduct = async (
   product: Partial<Product>
 ): Promise<Product> => {
-  console.log(product)
   let c: Product
-  console.log(
-    product.modifiers.map((m) => m.items).reduce((a, b) => [...a, ...b], []),
-    []
-  )
   if (product.id) {
     c = await getProductBySlug({ slug: product.slug, storeId: product.storeId })
     if (!c && !product.id) {

@@ -97,8 +97,6 @@
     ...(product?.modifiers || []),
   ]
 
-  $: browser ? console.log(modifiers) : null
-
   const zoomIn = () => (scale = Math.max(10, Math.min(scale + 10, 200)))
   const zoomOut = () => (scale = Math.max(10, Math.min(scale - 10, 200)))
 </script>

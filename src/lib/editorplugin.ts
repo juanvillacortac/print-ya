@@ -75,7 +75,6 @@ export const hoverPreview = (processor: Processor) => {
             result.styleSheet.build()
           )
           // const highlightedCSS = result.styleSheet.build()
-          console.log(result)
           dom.className = 'text-sm p-2'
           dom.innerHTML = `<pre><code>${highlightedCSS}</code></pre>`
           return { dom }

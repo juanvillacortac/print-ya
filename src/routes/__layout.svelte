@@ -4,7 +4,6 @@
   export const load: Load = async (input) => {
     const isRouteValid = validateLayoutRoute(input)
     const { notFound, response: stuff } = await getLayoutData(input)
-    console.log('valid', isRouteValid)
     if (notFound || !isRouteValid) {
       return {
         status: 404,
