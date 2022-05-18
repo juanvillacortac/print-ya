@@ -61,7 +61,7 @@
   <a
     class="border-transparent flex hover:border-current"
     href={getAbsoluteURL({
-      subdomain: store.customDomain ? store.slug : undefined,
+      subdomain: !store.customDomain ? store.slug : undefined,
       host: store.customDomain,
     })}
     target="__blank"
