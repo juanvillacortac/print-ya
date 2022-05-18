@@ -152,7 +152,7 @@
                 class="cursor-pointer opacity-0 z-20 absolute !h-8 !w-8"
                 title="Change preview background"
                 use:tooltip
-                bind:value={bgColor}
+                on:input={(e) => bgColor = e.value}
               />
               <RgbWheel
                 class="border rounded-full flex border-gray-500 h-8 transform w-8 dark:border-gray-700"
