@@ -8,11 +8,11 @@ import svg from '@poppanator/sveltekit-svg'
 import WindiCSS from 'vite-plugin-windicss'
 
 const adapter = () => {
-  switch (process.env.ADAPTER?.toLowerCase()) {
+  switch (process.env.ADAPTER?.toLowerCase() || 'vercel') {
     case 'node':
       return node()
     case 'vercel':
-      return vercel()
+      return vercel({ split: true })
     default:
       return auto()
   }
