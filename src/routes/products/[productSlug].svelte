@@ -93,10 +93,6 @@
 
   let bgColor = ''
 
-  $: bot = !!$session?.userAgent?.match(
-    'Lighthouse|Google Page Speed Insights|Googlebot'
-  )
-
   $: total =
     (Object.entries(modifiers)
       .filter(([_, mValue]) => mValue?.itemId)
@@ -182,7 +178,7 @@
     <div class="flex flex-col space-y-4">
       <div class="flex flex-col space-y-2 items-start">
         <h3 class="font-bold font-title text-black text-3xl dark:text-white">
-          {bot}
+          {product.name}
         </h3>
       </div>
       <div class="flex flex-col space-y-4 lg:items-start">

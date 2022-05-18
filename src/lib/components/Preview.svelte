@@ -4,7 +4,6 @@
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
   import type { Prisma } from '@prisma/client'
-  import { session } from '$app/stores'
 
   let parent: HTMLDivElement
   let element: HTMLDivElement
@@ -33,7 +32,7 @@
   let debug = false
 
   onMount(async () => {
-    const bot = !!$session?.userAgent?.match(
+    const bot = !!navigator.userAgent.match(
       'Lighthouse|Google Page Speed Insights|Googlebot'
     )
     if (bot) {
