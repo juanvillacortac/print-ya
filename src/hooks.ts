@@ -49,21 +49,21 @@ export const handle = handleSession(
         return Response.redirect(
           `${
             getDefaultHost() === 'localhost:3000' ? 'http://' : 'https://'
-          }${getDefaultHost()}/login?callbackUrl=${encodeURIComponent(
+          }${event.url.host === process.env.VERCEL_URL ? process.env.VERCEL_URL : getDefaultHost()}/login?callbackUrl=${encodeURIComponent(
             event.url.pathname
           )}`,
           303
         )
       }
 
-      response = await resolve(event, {
+    response = await resolve(event, {
         ssr: event.locals.layout !== 'app',
       })
 
       if (event.locals.layout === 'store') {
         response.headers.set(
           'Cache-Control',
-          's-maxage=1, stale-while-revalidate=59'
+          's-maxage=1, stale-while-revalidate'
         )
       }
     } catch (error) {
