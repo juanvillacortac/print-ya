@@ -12,10 +12,7 @@ const adapter = () => {
     case "node":
       return node();
     case "vercel":
-      return vercel({
-        edge: true,
-        external: ["_http_common", "crypto", "fsevents"],
-      });
+      return vercel();
     default:
       return auto();
   }
