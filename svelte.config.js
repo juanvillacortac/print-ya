@@ -49,6 +49,7 @@ const config = {
             ? process.env.GITPOD_WORKSPACE_URL.replace('https://', '3000-')
             : 'localhost:3000'
         ),
+        'process.env.VERCEL_URL': JSON.stringify(process.env.VERCEL_URL),
       },
       plugins: [
         WindiCSS({

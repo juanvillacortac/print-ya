@@ -3,6 +3,7 @@ export const getDefaultHost: any = () =>
 
 export const isCanonical = (host?: string) =>
   (host || window.location.host) === getDefaultHost() ||
+  (host || window.location.host) === process.env.VERCEL_URL ||
   (host || window.location.host) === 'localhost:3000'
 
 export const getAbsoluteURL = ({
