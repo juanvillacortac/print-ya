@@ -68,6 +68,7 @@ export const handle = handleSession(
         ssr: event.locals.layout !== 'app',
       })
     } catch (error) {
+      console.error(error)
       response = await resolve(event, {
         ssr: event.locals.layout !== 'app',
       })
