@@ -33,7 +33,7 @@
     <div
       class="flex mx-auto w-full p-4 py-2 justify-between items-center lg:w-9/10"
     >
-      <div class="flex space-x-4">
+      <div class="flex space-x-4 items-center">
         <a href="/" class="flex">
           <Image
             src={store.logo}
