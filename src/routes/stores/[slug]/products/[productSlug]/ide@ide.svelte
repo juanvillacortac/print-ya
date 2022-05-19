@@ -29,6 +29,7 @@
   import { page } from '$app/stores'
   import type { Product, Store } from '$lib/db'
   import type { TemplateSource } from '$lib/compiler'
+  import { squareratio } from '$lib/actions/aspectratio'
 
   export let data: string
 
@@ -214,6 +215,7 @@
           >
             <div
               class="rounded-lg h-auto bg-gray-100 -left-4px w-[calc(100%+8px)] absolute dark:bg-gray-800"
+              use:squareratio
               style="aspect-ratio: 1/1"
             />
 

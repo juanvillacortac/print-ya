@@ -4,6 +4,7 @@
 
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
+  import { squareratio } from '$lib/actions/aspectratio'
   import Preview from '$lib/components/Preview.svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store, StripedProduct } from '$lib/db'
@@ -76,6 +77,7 @@
       <a
         class="rounded-lg bg-gray-100 w-full overflow-hidden select-none dark:bg-gray-700"
         style="aspect-ratio: 1/1"
+        use:squareratio
         sveltekit:prefetch
         {href}
       >

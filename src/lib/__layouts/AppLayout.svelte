@@ -16,6 +16,7 @@
   import { pageSubtitle } from '$lib/stores'
   import { fly } from 'svelte/transition'
   import Transition from './Transition.svelte'
+  import { squareratio } from '$lib/actions/aspectratio'
 
   $: path = $page.url.pathname
 
@@ -68,6 +69,7 @@
             <div
               class="rounded-lg h-auto bg-gray-100 -left-4px w-[calc(100%+8px)] absolute dark:bg-gray-800"
               style="aspect-ratio: 1/1"
+              use:squareratio
             />
 
             <svg
