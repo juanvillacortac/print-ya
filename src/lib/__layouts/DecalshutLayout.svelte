@@ -37,11 +37,12 @@
         <a href="/" class="flex">
           <Image
             src={store.logo}
-            class="bg-white rounded p-px h-2rem sm:h-3rem"
+            class="rounded p-px h-2rem sm:h-3rem"
             options={{
               o: 'png',
               rs: {
                 s: 'x48',
+                m: 'scale',
               },
             }}
           />
@@ -65,7 +66,7 @@
           </button>
         </div>
       </div>
-      <div class="flex space-x-2 text-gray-400 sm:space-x-4">
+      <div class="flex space-x-2 text-gray-400 items-center sm:space-x-4">
         <button
           on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
           class="flex relative hover:text-black dark:hover:text-white"
@@ -73,7 +74,7 @@
           use:tooltip
           style="width: 24px; height: 24px"
         >
-          <div class="absolute pointer-events-none">
+          <div class="top-0 left-0 absolute pointer-events-none">
             <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
           </div>
         </button>

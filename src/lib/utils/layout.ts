@@ -1,4 +1,6 @@
 import { get } from '$lib/api'
+import { defineService } from '$lib/context'
+import type { Store } from '$lib/db'
 import type { LoadInput } from '@sveltejs/kit'
 import type { RequestEvent } from '@sveltejs/kit/types/private'
 import { getDefaultHost, isCanonical } from './host'
@@ -32,11 +34,18 @@ export const validateLayoutRoute = (event: LoadInput | RequestEvent) => {
   }
 }
 
-export const getLayoutData = async ({
+export type LayoutData = Partial<{
+  layout?: import('$lib/utils/layout').LayoutType
+  store?: import('$lib/db').Store
+  product?: import('$lib/db').Product
+  products?: import('$lib/db').StripedProduct[]
+}>
+
+export const fetchLayoutData = async ({
   url,
   fetch,
   session,
-}: LoadInput): Promise<{ response?: any; notFound?: boolean }> => {
+}: LoadInput): Promise<{ response?: LayoutData; notFound?: boolean }> => {
   switch (session.layout) {
     case 'store':
       try {

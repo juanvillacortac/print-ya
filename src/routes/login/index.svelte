@@ -34,7 +34,6 @@
       window.location.replace(callbackUrl)
     } catch ({ error }) {
       notifications.send(error, 'default', 1000)
-    } finally {
       loading = false
     }
   }
@@ -106,9 +105,10 @@
         />
       {/if}
       <button
-        class="rounded-lg font-bold border-2 border-blue-500 text-sm py-2 px-2 transform-gpu text-blue-500 duration-200 hover:shadow hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-70"
+        class="rounded-lg font-bold border-2 border-blue-500 text-sm py-2 px-2 transform-gpu text-blue-500 duration-200 hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px"
         disabled={loading}
-        type="submit">{isLogin ? 'Log in' : 'Register'}</button
+        type="submit"
+        >{loading ? 'Loading...' : isLogin ? 'Log in' : 'Register'}</button
       >
     </form>
   </div>

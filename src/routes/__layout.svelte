@@ -1,9 +1,15 @@
 <script context="module" lang="ts">
+  import {
+    fetchLayoutData,
+    validateLayoutRoute,
+    type LayoutType,
+  } from '$lib/utils/layout'
   import type { Load } from '@sveltejs/kit'
 
   export const load: Load = async (input) => {
     const isRouteValid = validateLayoutRoute(input)
-    const { notFound, response: stuff } = await getLayoutData(input)
+    const { notFound, response: stuff } = await fetchLayoutData(input)
+
     if (notFound || !isRouteValid) {
       return {
         status: 404,
@@ -51,11 +57,6 @@
   import { browser } from '$app/env'
   import Toast from '$lib/components/Toast.svelte'
   import { onDestroy } from 'svelte'
-  import {
-    getLayoutData,
-    validateLayoutRoute,
-    type LayoutType,
-  } from '$lib/utils/layout'
   import StoreLayout from '$lib/__layouts/DecalshutLayout.svelte'
   import AppLayout from '$lib/__layouts/AppLayout.svelte'
   import type { InstantiableSvelteComponentTyped } from 'svelte-markdown'

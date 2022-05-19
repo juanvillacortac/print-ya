@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
   import { get } from '$lib/api'
-  import type { Product, ProductModifier, Store } from '$lib/db'
+  import type { Product, ProductModifier } from '$lib/db'
   import Preview from '$lib/components/Preview.svelte'
   import Markdown from 'svelte-markdown'
   import { Add16, Add24, Favorite32, Subtract16 } from 'carbon-icons-svelte'
@@ -147,7 +147,7 @@
                 class="cursor-pointer opacity-0 z-20 absolute !h-8 !w-8"
                 title="Change preview background"
                 use:tooltip
-                on:input={(e) => (bgColor = e.target.value)}
+                bind:value={bgColor}
               />
               <RgbWheel
                 class="border rounded-full flex border-gray-500 h-8 transform w-8 dark:border-gray-700"

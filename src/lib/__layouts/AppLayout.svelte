@@ -125,7 +125,7 @@
           </button>
           <button
             on:click={() => {
-              del(`/login`, {}).then(() => {
+              del(`/api/login`, {}).then(() => {
                 notifications.send('Log out successfully', 'default', 1000)
                 window.location.replace('/login')
               })
