@@ -37,7 +37,7 @@
         <a href="/" class="flex">
           <Image
             src={store.logo}
-            class="rounded-sm p-px h-2rem sm:h-3rem dark:bg-white dark:bg-opacity-20"
+            class="rounded-sm p-px h-2rem lg:h-3rem dark:bg-white dark:bg-opacity-20"
             options={{
               o: 'png',
               rs: {
