@@ -66,7 +66,7 @@
           </button>
         </div>
       </div>
-      <div class="flex space-x-2 text-gray-400 items-center sm:space-x-4">
+      <div class="flex space-x-2 text-gray-400 items-center lg:space-x-4">
         <button
           on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
           class="flex relative hover:text-black dark:hover:text-white"
@@ -101,7 +101,7 @@
           use:tooltip
         >
           <ShoppingBag24 />
-          <p class="font-bold text-xs text-right w-[3ch] <sm:hidden">
+          <p class="font-bold text-xs text-right w-[3ch] <lg:hidden">
             {$bag.length || 0}
           </p>
         </a>
