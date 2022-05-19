@@ -39,7 +39,6 @@
             src={store.logo}
             class="bg-white rounded p-px h-2rem sm:h-3rem"
             options={{
-              q: 70,
               o: 'png',
               rs: {
                 s: 'x48',
