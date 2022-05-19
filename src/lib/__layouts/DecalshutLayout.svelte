@@ -62,7 +62,7 @@
           </button>
         </div>
       </div>
-      <div class="flex space-x-4 text-gray-400">
+      <div class="flex space-x-2 text-gray-400 sm:space-x-4">
         <button
           on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
           class="flex relative hover:text-black dark:hover:text-white"
