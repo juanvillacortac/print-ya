@@ -77,7 +77,7 @@
       }))
     const f = items.reduce((a, b) => ({ ...a, [b.key]: b.value }), {})
     if (Object.keys(f).length) {
-      fields = JSON.stringify(f)
+      fields = JSON.stringify(f).replace(/[^\p{L}\p{N}\p{P}\p{Z}{\^\$}]/gu, '')
     } else {
       fields = ''
     }
