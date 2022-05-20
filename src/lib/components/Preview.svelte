@@ -4,6 +4,7 @@
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
   import type { Prisma } from '@prisma/client'
+  import { IbmCloudDedicatedHost16 } from 'carbon-icons-svelte'
 
   let parent: HTMLDivElement
   let element: HTMLDivElement
@@ -124,6 +125,7 @@
         innerEl.addEventListener('mouseleave', (e) => {
           e.preventDefault()
           hovering = false
+          previousTouch = null
         })
         innerEl.addEventListener('mousedown', (e) => {
           e.preventDefault()
@@ -219,24 +221,41 @@
   let moving = false
   export let dragPos = { x: 0, y: 0 }
 
-  let previousTouch: Touch
+  let previousTouch: { x: number; y: number }
 
   const mousemove = (e: MouseEvent) => {
-    if (!moving || !containerEl) return
-    dragPos.x += e.movementX
-    dragPos.y += e.movementY
+    // dragPos.x += e.movementX
+    // dragPos.y += e.movementY
+    const touch = {
+      x: e.offsetX,
+      y: e.offsetY,
+    }
+    const el = e.target as HTMLElement
+    if (el == element) {
+      if (previousTouch && moving) {
+        dragPos.x += touch.x - previousTouch.x
+        dragPos.y += touch.y - previousTouch.y
+      }
+      previousTouch = touch
+    } else {
+      previousTouch = null
+    }
   }
 
   const touchmove = (e: TouchEvent) => {
     const touch = e.changedTouches[0]
     if (previousTouch && moving) {
-      dragPos.x += touch.pageX - previousTouch.pageX
-      dragPos.y += touch.pageY - previousTouch.pageY
+      dragPos.x += touch.clientX - previousTouch.x
+      dragPos.y += touch.clientY - previousTouch.y
     }
-    previousTouch = touch
+    previousTouch = { x: touch.clientX, y: touch.clientY }
   }
 
-  $: if (innerEl) {
+  $: if (innerEl && containerEl) {
+    // containerEl.style.background = `white`
+    // containerEl.style.transform = `translate(${dragPos.x / scaleFactor}px, ${
+    //   dragPos.y / scaleFactor
+    // }px)`
     innerEl.style.transform = `scale3d(${scaleFactor}, ${scaleFactor}, 1) translate(${
       dragPos.x / scaleFactor
     }px, ${dragPos.y / scaleFactor}px) rotate(${rotation}deg)`
@@ -245,9 +264,12 @@
 
 <svelte:window
   on:resize|passive={scaleLayout}
-  on:mousemove|passive={mousemove}
   on:touchmove|passive={touchmove}
-  on:mouseup={() => (moving = false)}
+  on:mousemove|passive={mousemove}
+  on:mouseup={() => {
+    previousTouch = null
+    moving = false
+  }}
   on:touchend={() => {
     previousTouch = null
     moving = false
