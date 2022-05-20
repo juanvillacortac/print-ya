@@ -32,6 +32,7 @@
   let debug = false
 
   export let scaleFactor = 1
+  export let rotation = 0
 
   onMount(async () => {
     const bot = !!navigator.userAgent.match(
@@ -238,7 +239,7 @@
   $: if (innerEl) {
     innerEl.style.transform = `scale3d(${scaleFactor}, ${scaleFactor}, 1) translate(${
       dragPos.x / scaleFactor
-    }px, ${dragPos.y / scaleFactor}px)`
+    }px, ${dragPos.y / scaleFactor}px) rotate(${rotation}deg)`
   }
 </script>
 
