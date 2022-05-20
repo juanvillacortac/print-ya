@@ -39,6 +39,7 @@
   import Image from '$lib/components/caravaggio/Image.svelte'
   import RgbWheel from '$lib/components/__RGBWheel.svelte'
   import { squareratio } from '$lib/actions/aspectratio'
+  import Slider from 'svelte-range-slider-pips'
 
   let quantity = product.minQuantity || 1
 
@@ -138,6 +139,8 @@
     }
     reader.readAsDataURL(image)
   }
+
+  let previewScale = [100]
 </script>
 
 <div class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10">
@@ -157,6 +160,24 @@
           style="aspect-ratio: 1/1"
           use:squareratio
         >
+          <div
+            class="flex h-full w-full top-0 z-20 absolute pointer-events-none items-center justify-end"
+          >
+            <div
+              class="opacity-50 transition-opacity duration-200 pointer-events-auto hover:opacity-100"
+            >
+              <Slider
+                bind:values={previewScale}
+                min={10}
+                max={200}
+                vertical
+                --range-slider="rgb(252, 165, 165)"
+                --range-handle="rgb(239, 68, 68)"
+                --range-handle-inactive="rgb(239, 68, 68)"
+                --range-handle-focus="rgb(239, 68, 68)"
+              />
+            </div>
+          </div>
           <div class="flex space-x-2 top-2 right-2 z-20 absolute items-center">
             <button
               class="flex preview-button"
@@ -200,13 +221,18 @@
             />
           </div>
           <div
-            class="flex h-full w-full items-center justify-center relative pointer-events-none"
+            class="flex h-full w-full items-center justify-center relative"
             class:checkerboard={!previewBg}
             style:background={previewBg}
             class:!bg-cover={previewBg}
             class:!bg-center={previewBg}
           >
-            <Preview {template} fitParent />
+            <Preview
+              {template}
+              fitParent
+              scaleFactor={previewScale[0] / 100}
+              draggable
+            />
           </div>
         </div>
       </div>
@@ -466,5 +492,22 @@
   }
   .quantity {
     -moz-appearance: textfield;
+  }
+
+  .outlined {
+    position: relative;
+  }
+  .outlined:hover:after {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+    outline: 2px dashed rgba(10, 10, 10, 0.4);
+    outline-offset: -2px;
+  }
+  :global(.dark) .outlined:hover:after {
+    outline: 2px dashed rgba(255, 255, 255, 0.5);
   }
 </style>
