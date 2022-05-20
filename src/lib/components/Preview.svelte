@@ -151,6 +151,9 @@
     containerStyles.innerHTML = `.outlined {
       position: relative;  
     }
+    .inner > * {
+      pointer-events: none;
+    }
     .outlined:after {
       width: 100%;
       height: 100%;
@@ -171,6 +174,7 @@
     }`
 
     innerEl.classList.toggle('outlined', true)
+    innerEl.classList.toggle('inner', true)
     // containerEl.style.outline = border
     //   ? `2px dashed ${
     //       $preferences.darkMode
@@ -205,7 +209,7 @@
         var dl = document.createElement('a')
         document.body.appendChild(dl)
         dl.setAttribute('href', dataUrl)
-        dl.setAttribute('download', `template-${+new Date()}.svg`)
+        dl.setAttribute('download', `template-${+new Date()}.png`)
         dl.click()
       }
     )
