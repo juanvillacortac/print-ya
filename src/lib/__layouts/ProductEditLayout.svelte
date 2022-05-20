@@ -17,7 +17,6 @@
   import Preview from '$lib/components/Preview.svelte'
   import { writable } from 'svelte/store'
   import ProductModifiersEditor from './ProductModifiersEditor.svelte'
-  import { browser } from '$app/env'
   import type { TemplateSource } from '$lib/compiler'
 
   export let product: Partial<Product> = {

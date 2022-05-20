@@ -4,7 +4,13 @@
   import type { Product, ProductModifier } from '$lib/db'
   import Preview from '$lib/components/Preview.svelte'
   import Markdown from 'svelte-markdown'
-  import { Add16, Add24, Favorite32, Subtract16 } from 'carbon-icons-svelte'
+  import {
+    Add16,
+    Add24,
+    Camera16,
+    Favorite32,
+    Subtract16,
+  } from 'carbon-icons-svelte'
 
   export const load: Load = async ({ params, fetch, stuff }) => {
     const store = stuff.store
@@ -85,7 +91,7 @@
 
   $: template = { ...(product.template as any), fields }
 
-  let bgColor = ''
+  let previewBg = ''
 
   $: total =
     (Object.entries(modifiers)
@@ -121,6 +127,17 @@
       },
     ]
   }
+
+  let fileInput: HTMLInputElement
+
+  const onFileSelected = (e) => {
+    let image = e.target.files[0]
+    let reader = new FileReader()
+    reader.onloadend = () => {
+      previewBg = `url("${reader.result}")`
+    }
+    reader.readAsDataURL(image)
+  }
 </script>
 
 <div class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10">
@@ -140,14 +157,36 @@
           style="aspect-ratio: 1/1"
           use:squareratio
         >
-          <div class="flex space-x-2 top-2 right-2 z-20 absolute">
+          <div class="flex space-x-2 top-2 right-2 z-20 absolute items-center">
+            <button
+              class="flex preview-button"
+              title="Set background from image"
+              type="button"
+              on:click={() => fileInput?.click()}
+              use:tooltip
+            >
+              <Camera16 class="flex font-bold" />
+            </button>
+            <input
+              type="file"
+              class="hidden"
+              accept=".jpg, .jpeg, .png"
+              on:change={(e) => onFileSelected(e)}
+              bind:this={fileInput}
+            />
             <div class="transform z-20 duration-200 relative hover:scale-90">
               <input
                 type="color"
                 class="cursor-pointer opacity-0 z-20 absolute !h-8 !w-8"
                 title="Change preview background"
                 use:tooltip
-                bind:value={bgColor}
+                value="#ffffff"
+                on:input={(e) => {
+                  previewBg = e.currentTarget.value
+                }}
+                on:change={(e) => {
+                  previewBg = e.currentTarget.value
+                }}
               />
               <RgbWheel
                 class="border rounded-full flex border-gray-500 h-8 transform w-8 dark:border-gray-700"
@@ -157,13 +196,15 @@
               class="border rounded-full flex border-gray-500 h-8 transform transition-transform w-8 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
               title="Set transparent background"
               use:tooltip
-              on:click={() => (bgColor = '')}
+              on:click={() => (previewBg = '')}
             />
           </div>
           <div
             class="flex h-full w-full items-center justify-center relative pointer-events-none"
-            class:checkerboard={!bgColor}
-            style:background-color={bgColor}
+            class:checkerboard={!previewBg}
+            style:background={previewBg}
+            class:!bg-cover={previewBg}
+            class:!bg-center={previewBg}
           >
             <Preview {template} fitParent />
           </div>
@@ -371,6 +412,22 @@
 </div>
 
 <style>
+  .preview-button {
+    @apply bg-white border rounded flex border-gray-400 shadow p-1 transform transition-transform duration-200;
+  }
+
+  .preview-button:hover {
+    @apply -translate-y-px;
+  }
+
+  :global(.dark) .preview-button {
+    @apply border-transparent border bg-gray-700  border-gray-600;
+  }
+
+  :global(.dark) .preview-button:hover {
+    @apply border-gray-300;
+  }
+
   .checkerboard,
   .checkerboard-sm {
     --black-cell: rgba(55, 65, 81, 0.2);
