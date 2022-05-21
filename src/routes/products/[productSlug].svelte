@@ -7,8 +7,13 @@
   import {
     Add16,
     Add24,
+    Attachment32,
     Camera16,
+    Camera24,
+    Close16,
+    Close24,
     Favorite32,
+    Image32,
     Rotate16,
     RotateClockwise16,
     Subtract16,
@@ -44,6 +49,8 @@
   import RgbWheel from '$lib/components/__RGBWheel.svelte'
   import { squareratio } from '$lib/actions/aspectratio'
   import Slider from 'svelte-range-slider-pips'
+  import { uploadFile } from '$lib/supabase'
+  import { page } from '$app/stores'
 
   let quantity = product.minQuantity || 1
 
@@ -77,6 +84,7 @@
         ([m]) =>
           (m.type === 'select' ||
             m.type === 'color' ||
+            m.type === 'image' ||
             m.type === 'text' ||
             m.type === 'numeric' ||
             m.type === 'toggle') &&
@@ -142,6 +150,37 @@
       previewBg = `url("${reader.result}")`
     }
     reader.readAsDataURL(image)
+  }
+
+  let uploadingImage: Record<string, boolean> = {}
+  const onModifierImageSelected = async <
+    T extends Event & {
+      currentTarget: EventTarget & HTMLInputElement
+    }
+  >(
+    event: T,
+    m: ProductModifier
+  ) => {
+    try {
+      if (
+        !event.currentTarget.files ||
+        event.currentTarget.files.length === 0
+      ) {
+        throw new Error('You must select an image to upload.')
+      }
+      uploadingImage[m.id] = true
+      const file = event.currentTarget.files[0]
+      const fileUrl = await uploadFile({
+        file,
+        bucket: 'client-assets',
+        path: `${$page.stuff.store.slug}/products/${product.slug}/template-assets`,
+      })
+      modifiers[m.id] = { value: fileUrl }
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      uploadingImage[m.id] = false
+    }
   }
 
   let previewScale = [100]
@@ -231,23 +270,23 @@
                 }}
               />
               <RgbWheel
-                class="border rounded-full flex border-gray-500 h-8 transform w-8 dark:border-gray-700"
+                class="border rounded-full flex border-gray-500 h-10 transform w-10 dark:border-gray-700"
               />
             </div>
             <button
-              class="border rounded-full flex border-gray-500 h-8 transform transition-transform w-8 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
+              class="border rounded-full flex border-gray-500 h-10 transform transition-transform w-10 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
               title="Set transparent background"
               use:tooltip
               on:click={() => (previewBg = '')}
             />
             <button
-              class="flex preview-button"
+              class="flex text-gray-500 preview-button"
               title="Set background from image"
               type="button"
               on:click={() => fileInput?.click()}
               use:tooltip
             >
-              <Camera16 class="flex font-bold" />
+              <Camera24 class="flex font-bold" />
             </button>
             <input
               type="file"
@@ -326,6 +365,52 @@
                   on:change={() =>
                     (modifiers[m.id].itemId = modifiers[m.id].itemId)}
                 />
+              {:else if m.type === 'image'}
+                <div
+                  class="border-dotted border-dashed rounded-lg flex bg-gray-100 border-gray-300 border-2 p-8 relative justify-center items-center dark:bg-gray-700 dark:border-gray-600"
+                  class:cursor-pointer={!uploadingImage[m.id]}
+                  class:cursor-not-allowed={uploadingImage[m.id]}
+                >
+                  {#if !uploadingImage[m.id] && modifiers[m.id].value}
+                    <button
+                      class="top-2 right-2 text-gray-400 absolute"
+                      title="Delete image"
+                      use:tooltip
+                      on:click={() => (modifiers[m.id].value = '')}
+                    >
+                      <Close24 />
+                    </button>
+                  {/if}
+                  <div class="absolute pointer-events-none">
+                    <div class="flex flex-col text-gray-400 items-center">
+                      {#if modifiers[m.id]?.value && !uploadingImage[m.id]}
+                        <img
+                          src={modifiers[m.id]?.value}
+                          alt=""
+                          class="object-contain h-32px mb-1 w-32px"
+                        />
+                      {:else}
+                        <Image32 class="mb-1" />
+                      {/if}
+                      <span class="font-normal block"
+                        >{uploadingImage[m.id]
+                          ? 'Uploading image...'
+                          : 'Attach a file here'}</span
+                      >
+                    </div>
+                  </div>
+
+                  <input
+                    type="file"
+                    name=""
+                    class="flex h-full w-full opacity-0"
+                    class:!cursor-pointer={!uploadingImage[m.id]}
+                    class:!cursor-not-allowed={uploadingImage[m.id]}
+                    accept="image/*"
+                    disabled={uploadingImage[m.id]}
+                    on:change={(e) => onModifierImageSelected(e, m)}
+                  />
+                </div>
               {:else if m.type === 'text'}
                 <input
                   type="text"

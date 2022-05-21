@@ -245,10 +245,10 @@
   const touchmove = (e: TouchEvent) => {
     const touch = e.changedTouches[0]
     if (previousTouch && moving) {
-      dragPos.x += touch.clientX - previousTouch.x
-      dragPos.y += touch.clientY - previousTouch.y
+      dragPos.x += touch.pageX - previousTouch.x
+      dragPos.y += touch.pageY - previousTouch.y
     }
-    previousTouch = { x: touch.clientX, y: touch.clientY }
+    previousTouch = { x: touch.pageX, y: touch.pageY }
   }
 
   $: if (innerEl && containerEl) {

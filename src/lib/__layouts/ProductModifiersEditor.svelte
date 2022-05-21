@@ -5,6 +5,10 @@
     Information16,
     TrashCan16,
     ChevronRight16,
+    CheckboxChecked16,
+    CharacterWholeNumber16,
+    TextSelection16,
+    Image16,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { ProductModifier } from '$lib/db'
@@ -65,9 +69,21 @@
   const modifierTypes = [
     { type: 'select', name: 'Selection', tree: true, embeddable: true },
     // { type: 'multiple', name: 'Multiple selection' },
-    { type: 'text', name: 'Text', embeddable: true },
-    { type: 'numeric', name: 'Numeric', embeddable: true },
-    { type: 'toggle', name: 'Toggle', tree: false, embeddable: true },
+    { type: 'text', name: 'Text', embeddable: true, icon: TextSelection16 },
+    { type: 'image', name: 'Image', embeddable: true, icon: Image16 },
+    {
+      type: 'numeric',
+      name: 'Numeric',
+      embeddable: true,
+      icon: CharacterWholeNumber16,
+    },
+    {
+      type: 'toggle',
+      name: 'Toggle',
+      tree: false,
+      embeddable: true,
+      icon: CheckboxChecked16,
+    },
     { type: 'color', name: 'Color', tree: true, embeddable: true },
   ]
 
@@ -129,6 +145,7 @@
     class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
   >
     {#each modifiers.filter((m) => m.active) as m, idx}
+      {@const mType = modifierTypes.find((t) => t.type == m.type)}
       <div
         class="flex flex-col flex-grow space-y-2 w-full"
         in:fly|local={{ x: -20 }}
@@ -136,7 +153,7 @@
         <div
           class="flex w-full p-4 items-center lg:space-x-4 <lg:flex-col <lg:space-y-4"
         >
-          {#if modifierTypes.find((t) => t.type == m.type)?.tree}
+          {#if mType?.tree}
             <button
               class="rounded flex p-1 duration-200"
               title="Show/hide items"
@@ -153,6 +170,10 @@
                   : ''}"
               /></button
             >
+          {:else if mType?.icon}
+            <div class="flex p-1">
+              <svelte:component this={mType.icon} />
+            </div>
           {/if}
           <input
             type="text"

@@ -42,8 +42,11 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
           progressive: true,
           q: 90,
           o: 'png',
+          rs: {
+            s: '0.8x',
+          },
           duotone: {
-            h: '000000.0',
+            h: color.replace('#', ''),
             s: color.replace('#', ''),
             o: 1,
           },

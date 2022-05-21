@@ -81,6 +81,7 @@
     "@leveluptuts/g-query": "^0.2.3",
     "@leveluptuts/svelte-toy": "^0.0.18",
     "@prisma/client": "^3.12.0",
+    "@supabase/supabase-js": "^1.35.3",
     "@types/bcryptjs": "^2.4.2",
     "bcryptjs": "^2.4.3",
     "bytemd": "^1.13.1",

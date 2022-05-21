@@ -39,6 +39,7 @@
   )
 
   let title = product.name
+  let saving = false
 
   const submit = async () => {
     for (let m of modifiers?.filter((m) => m.active)) {
@@ -64,6 +65,7 @@
       }
     }
     try {
+      saving = true
       const data = await post<Product, Partial<Product>>(
         `/api/stores/${store.slug}/products`,
         {
@@ -85,6 +87,8 @@
       modifiers = data.modifiers
     } catch (err) {
       console.log(err.message, err.error)
+    } finally {
+      saving = false
     }
   }
 
@@ -129,7 +133,7 @@
       {/if}
       <button
         class="rounded font-bold border-2 border-blue-500 text-xs py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
-        >Save</button
+        disabled={saving}>{saving ? 'Saving...' : 'Save'}</button
       >
     </div>
   </div>
@@ -144,7 +148,7 @@
       <div
         class="bg-white rounded-xl flex flex-col h-full space-y-4 shadow w-full p-4 relative overflow-hidden <lg:pb-12 dark:bg-gray-800"
       >
-        <div class="flex items-center lg:space-x-4 <lg:flex-col <lg:space-y-4">
+        <div class="grid gap-4 grid-cols-3">
           <div class="flex flex-col w-full">
             <label class="font-bold text-xs mb-2 block" for="fieldId">
               Product name
