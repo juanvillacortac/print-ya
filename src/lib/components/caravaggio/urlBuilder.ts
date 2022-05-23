@@ -47,11 +47,11 @@ export enum GRAVITY {
   gauto = 'attention',
 }
 
-export type GRAVITY_KEYS = keyof typeof GRAVITY;
+export type GRAVITY_KEYS = keyof typeof GRAVITY
 
 export interface CaravaggioOptions {
-  o?: 'auto' | 'original' | 'jpg' | 'jpeg' | 'png' | 'tiff' | 'webp';
-  progressive?: boolean;
+  o?: 'auto' | 'original' | 'jpg' | 'jpeg' | 'png' | 'tiff' | 'webp'
+  progressive?: boolean
   /**
    * Resize the image to the given dimension
    * @see https://caravaggio.ramielcreations.com/docs/resize
@@ -66,17 +66,17 @@ export interface CaravaggioOptions {
      *  `0.8x0.6` (percentages)
      * @see https://caravaggio.ramielcreations.com/docs/resize#sizes
      */
-    s: string;
+    s: string
     /**
      * The resize method. For in depth explanation
      * @see https://caravaggio.ramielcreations.com/docs/resize#resize-methods
      */
-    m?: 'scale' | 'fit' | 'downfit' | 'upfit' | 'fill' | 'downfill' | 'embed';
+    m?: 'scale' | 'fit' | 'downfit' | 'upfit' | 'fill' | 'downfill' | 'embed'
     /**
      * Ignore aspect ratio. If true the aspect ratio of the image is not kept and the image
      * is allowed to be distorted. It works with method `scale`
      */
-    iar?: boolean;
+    iar?: boolean
     /**
      * Background color. With some resize methods an empty space can be left and you can use this value
      * to fill it with a color.
@@ -89,14 +89,14 @@ export interface CaravaggioOptions {
      *
      * @see https://caravaggio.ramielcreations.com/docs/resize#colors
      */
-    b?: string;
+    b?: string
     /**
      * Define the gravity of the image. If an empty space is left, this let you decide where to put the image
      *
      * @see https://caravaggio.ramielcreations.com/docs/resize#gravity
      */
-    g?: GRAVITY_KEYS;
-  };
+    g?: GRAVITY_KEYS
+  }
   /**
    * Extracy a portion of the image
    * @see https://caravaggio.ramielcreations.com/docs/extract
@@ -105,20 +105,20 @@ export interface CaravaggioOptions {
     /**
      * Pixel from the left
      */
-    x: number;
+    x: number
     /**
      * Pixel from the top
      */
-    y: number;
+    y: number
     /**
      * Width of the extracted area
      */
-    w: number;
+    w: number
     /**
      * Height of the extracted area
      */
-    h: number;
-  };
+    h: number
+  }
   /**
    * Add an overlay image (watermark)
    * @see https://caravaggio.ramielcreations.com/docs/overlay
@@ -127,14 +127,14 @@ export interface CaravaggioOptions {
     /**
      * The url of the overlay image
      */
-    url: string;
+    url: string
     /**
      * The gravity of the overlay
      *
      * @see https://caravaggio.ramielcreations.com/docs/overlay#position-with-gravity
      * @see https://caravaggio.ramielcreations.com/docs/resize#gravity
      */
-    g?: GRAVITY_KEYS;
+    g?: GRAVITY_KEYS
     /**
      * Position from the left, in pixels or percentage
      * @example
@@ -143,7 +143,7 @@ export interface CaravaggioOptions {
      *
      * @see https://caravaggio.ramielcreations.com/docs/overlay#positioning-with-coordinates
      */
-    x?: number;
+    x?: number
     /**
      * Position from the top, in pixels or percentage
      * @example
@@ -152,18 +152,18 @@ export interface CaravaggioOptions {
      *
      * @see https://caravaggio.ramielcreations.com/docs/overlay#positioning-with-coordinates
      */
-    y?: number;
+    y?: number
     /**
      * If true, the overlay is repeated
      * @see https://caravaggio.ramielcreations.com/docs/overlay#watermark-repeat
      */
-    watermark?: boolean;
-  };
+    watermark?: boolean
+  }
   /**
    * Set the quality of the final image
    * @see https://caravaggio.ramielcreations.com/docs/quality
    */
-  q?: number;
+  q?: number
   /**
    * Rotate the image arbitrarly
    * @see https://caravaggio.ramielcreations.com/docs/rotate
@@ -172,7 +172,7 @@ export interface CaravaggioOptions {
     /**
      * Value, in degree, of the rotation angle
      */
-    v: number | 'auto';
+    v: number | 'auto'
     /**
      * If the rotation is not multiple of 90°, this defines the background color
      * of the resulting area.
@@ -185,18 +185,18 @@ export interface CaravaggioOptions {
      *
      * @see https://caravaggio.ramielcreations.com/docs/resize#colors
      */
-    b?: string;
-  };
+    b?: string
+  }
   /**
    * Flip the image. Set `x` to flip horzontally, or `y` to flip vertically
    * @see https://caravaggio.ramielcreations.com/docs/flip
    */
-  flip?: 'x' | 'y';
+  flip?: 'x' | 'y'
   /**
    * Blur the image
    * @see https://caravaggio.ramielcreations.com/docs/blur
    */
-  blur?: number;
+  blur?: number
   /**
    * Apply a duotone effect to the image
    * @see https://caravaggio.ramielcreations.com/docs/duotone
@@ -205,39 +205,39 @@ export interface CaravaggioOptions {
     /**
      * Highlight color
      */
-    h: string;
+    h: string
     /**
      * Shadow color
      */
-    s: string;
+    s: string
     /**
      * Opacity
      */
-    o?: number;
-  };
+    o?: number
+  }
 }
 
 export const urlBuilder = (
   { url: caravaggioUrl, baseUrl }: CaravaggioContext,
   imageUrl: string,
-  opt: CaravaggioOptions = {},
+  opt: CaravaggioOptions = {}
 ): string => {
   const options = Object.entries(opt)
     .map(([operation, value]) => {
       if (typeof value !== 'object') {
-        return `${operation}:${value}`;
+        return `${operation}:${value}`
       }
       const valueString = Object.entries(value as Record<string, unknown>)
         .map(([k, v]) => `${k}:${v}`)
-        .join(',');
-      return `${operation},${valueString}`;
+        .join(',')
+      return `${operation},${valueString}`
     })
-    .join('/');
+    .join('/')
   const finalImageUrl =
-    /^\.?\//.test(imageUrl) && baseUrl ? `${baseUrl}${imageUrl}` : imageUrl;
+    /^\.?\//.test(imageUrl) && baseUrl ? `${baseUrl}${imageUrl}` : imageUrl
   return options
-    // ? `${caravaggioUrl}?opts=${encodeURIComponent(options)}&image=${encodeURIComponent(finalImageUrl)}`
-    ? `${caravaggioUrl}/${options}?image=${encodeURIComponent(finalImageUrl)}`
-    : finalImageUrl;
+    ? // ? `${caravaggioUrl}?opts=${encodeURIComponent(options)}&image=${encodeURIComponent(finalImageUrl)}`
+      `${caravaggioUrl}/${options}?image=${escape(finalImageUrl)}`
+    : finalImageUrl
   // return ''
-};
+}
