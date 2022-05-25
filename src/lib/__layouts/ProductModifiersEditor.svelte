@@ -249,7 +249,7 @@
         {#if expanded && (expanded === m.internalId || expanded === m.id) && modifierTypes.find((t) => t.type == m.type)?.tree}
           <div
             class="flex-grow w-full px-4 pb-4 overflow-x-auto"
-            transition:slide|local={{ duration: 600 }}
+            transition:slide|local={{ duration: 800, easing: expoOut }}
           >
             <div
               class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
