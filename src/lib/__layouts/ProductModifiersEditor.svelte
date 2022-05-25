@@ -160,7 +160,7 @@
       <div
         class="flex flex-col flex-grow space-y-2 w-full"
         in:fly|local={{ x: -20 }}
-        out:slide|local={{ duration: 500, easing: expoOut }}
+        out:slide|local={{ duration: 400, easing: expoOut }}
       >
         <div
           class="flex w-full p-4 items-center lg:space-x-4 <lg:flex-col <lg:space-y-4"
