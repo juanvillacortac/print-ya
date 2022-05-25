@@ -286,7 +286,7 @@
                   </tr>
                 </thead>
                 <tbody class="z-10 relative">
-                  {#each m.items?.filter((i) => i.active) as i}
+                  {#each m.items?.filter((i) => i.active) as i, idx}
                     <tr
                       in:fly|local={{ x: -20 }}
                       class="bg-white dark:bg-gray-800"
