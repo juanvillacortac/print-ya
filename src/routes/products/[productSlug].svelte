@@ -51,6 +51,7 @@
   import Slider from 'svelte-range-slider-pips'
   import { uploadFile } from '$lib/supabase'
   import { page } from '$app/stores'
+  import { useCaravaggio } from '$lib/components/caravaggio/useCaravaggio'
 
   let quantity = product.minQuantity || 1
 
@@ -303,6 +304,23 @@
             class:!bg-cover={previewBg}
             class:!bg-center={previewBg}
           >
+            <div
+              class="bg-repeat-space flex h-full w-full opacity-12 inset-0 absolute"
+              style="background-image: url({useCaravaggio(
+                $page.stuff.store.logo,
+                {
+                  o: 'png',
+                  rotate: {
+                    v: 45,
+                    b: '000000.00',
+                  },
+                  rs: {
+                    s: 'x28',
+                    m: 'scale',
+                  },
+                }
+              )})"
+            />
             <Preview
               {template}
               fitParent
