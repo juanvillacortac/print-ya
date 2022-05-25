@@ -16,6 +16,7 @@
     Image32,
     Rotate16,
     RotateClockwise16,
+    SprayPaint16,
     Subtract16,
     ZoomIn16,
     ZoomOut16,
@@ -154,6 +155,16 @@
   }
 
   let uploadingImage: Record<string, boolean> = {}
+  const onModifierImagePaste = async (m: ProductModifier) => {
+    try {
+      const fileUrl = await navigator.clipboard.readText()
+      modifiers[m.id] = { value: fileUrl }
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      // uploadingImage[m.id] = false
+    }
+  }
   const onModifierImageSelected = async <
     T extends Event & {
       currentTarget: EventTarget & HTMLInputElement
@@ -185,6 +196,7 @@
   }
 
   let previewScale = [100]
+
   let previewRotate = [0]
 </script>
 
@@ -242,6 +254,7 @@
               </div>
               <Slider
                 bind:values={previewScale}
+                min={10}
                 max={200}
                 step={10}
                 vertical
@@ -255,7 +268,9 @@
               </div>
             </div>
           </div>
-          <div class="flex space-x-2 top-2 left-2 z-20 absolute items-center">
+          <div
+            class="flex space-x-2 opacity-50 transition-opacity top-2 left-2 z-20 duration-200 absolute items-center hover:opacity-100"
+          >
             <div class="transform z-20 duration-200 relative hover:scale-90">
               <input
                 type="color"
@@ -324,7 +339,7 @@
             <Preview
               {template}
               fitParent
-              scaleFactor={previewScale[0] / 100}
+              scaleFactor={Math.max(previewScale[0] / 100, 0)}
               rotation={previewRotate[0]}
               draggable
             />
@@ -388,37 +403,39 @@
                   class="border-dotted border-dashed rounded-lg flex bg-gray-100 border-gray-300 border-2 p-8 relative justify-center items-center dark:bg-gray-700 dark:border-gray-600"
                   class:cursor-pointer={!uploadingImage[m.id]}
                   class:cursor-not-allowed={uploadingImage[m.id]}
+                  on:click={() => onModifierImagePaste(m)}
                 >
                   {#if !uploadingImage[m.id] && modifiers[m.id].value}
                     <button
                       class="top-2 right-2 text-gray-400 absolute"
                       title="Delete image"
                       use:tooltip
-                      on:click={() => (modifiers[m.id].value = '')}
+                      on:click|preventDefault|stopPropagation={() =>
+                        (modifiers[m.id].value = '')}
                     >
                       <Close24 />
                     </button>
                   {/if}
-                  <div class="absolute pointer-events-none">
-                    <div class="flex flex-col text-gray-400 items-center">
-                      {#if modifiers[m.id]?.value && !uploadingImage[m.id]}
-                        <img
-                          src={modifiers[m.id]?.value}
-                          alt=""
-                          class="object-contain h-32px mb-1 w-32px"
-                        />
-                      {:else}
-                        <Image32 class="mb-1" />
-                      {/if}
-                      <span class="font-normal block"
-                        >{uploadingImage[m.id]
-                          ? 'Uploading image...'
-                          : 'Attach a file here'}</span
-                      >
-                    </div>
+                  <div
+                    class="flex flex-col text-center text-gray-400 items-center justify-center"
+                  >
+                    {#if modifiers[m.id]?.value && !uploadingImage[m.id]}
+                      <img
+                        src={modifiers[m.id]?.value}
+                        alt=""
+                        class="object-contain h-32px mb-1 w-32px"
+                      />
+                    {:else}
+                      <Image32 class="mb-1" />
+                    {/if}
+                    <span class="font-normal block"
+                      >{uploadingImage[m.id]
+                        ? 'Uploading image...'
+                        : 'Click/tap to paste image URL'}</span
+                    >
                   </div>
 
-                  <input
+                  <!-- <input
                     type="file"
                     name=""
                     class="flex h-full w-full opacity-0"
@@ -427,7 +444,7 @@
                     accept="image/*"
                     disabled={uploadingImage[m.id]}
                     on:change={(e) => onModifierImageSelected(e, m)}
-                  />
+                  /> -->
                 </div>
               {:else if m.type === 'text'}
                 <input
