@@ -12,14 +12,25 @@
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { ProductModifier } from '$lib/db'
-  import { fly } from 'svelte/transition'
+  import { fly, slide } from 'svelte/transition'
+  import { expoOut } from 'svelte/easing'
 
   type Unarray<T> = T extends Array<infer U> ? U : T
+
+  let mounted = false
 
   export let modifiers: (Omit<ProductModifier, 'items'> & {
     internalId?: string
     items?: (Unarray<ProductModifier['items']> & { internalId?: string })[]
   })[] = []
+
+  $: if (modifiers && !mounted) {
+    modifiers = modifiers.map((m) => ({
+      ...m,
+      internalId: (Math.random() + 1).toString(36).substring(7),
+    }))
+    mounted = true
+  }
 
   const addModifier = () => {
     const newId = (Math.random() + 1).toString(36).substring(7)
@@ -144,11 +155,12 @@
   <div
     class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
   >
-    {#each modifiers.filter((m) => m.active) as m, idx}
+    {#each modifiers.filter((m) => m.active) as m, idx (m.internalId)}
       {@const mType = modifierTypes.find((t) => t.type == m.type)}
       <div
         class="flex flex-col flex-grow space-y-2 w-full"
         in:fly|local={{ x: -20 }}
+        out:slide|local={{ duration: 500, easing: expoOut }}
       >
         <div
           class="flex w-full p-4 items-center lg:space-x-4 <lg:flex-col <lg:space-y-4"
