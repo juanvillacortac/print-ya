@@ -366,6 +366,7 @@
     {:else}
       <div
         class="bg-gray-50 text-xs w-full text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+        in:slide|local={{ duration: 400, easing: expoOut }}
       >
         <div class="text-center w-full py-4 px-6">
           <div class="flex space-x-2 w-full justify-center items-center">

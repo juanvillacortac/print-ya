@@ -14,7 +14,6 @@
   } from 'carbon-icons-svelte'
   import Favicons from '$lib/components/Favicons.svelte'
   import { pageSubtitle } from '$lib/stores'
-  import { fly } from 'svelte/transition'
   import Transition from './Transition.svelte'
   import { squareratio } from '$lib/actions/aspectratio'
 
@@ -96,15 +95,15 @@
             </h1> -->
           </a>
           {#each pages as p}
+            {@const current =
+              p.href === '/' ? path === '/' : path?.startsWith(p.href)}
             <a
               title={p.title}
               use:tooltip
               class="flex hover:text-black dark:hover:text-white"
               sveltekit:prefetch
-              class:text-black={p.href === '/'
-                ? path === '/'
-                : path?.startsWith(p.href)}
-              class:dark:text-white={path?.startsWith(p.href)}
+              class:text-black={current}
+              class:dark:text-white={current}
               href={p.href}
             >
               <svelte:component this={p.icon} />
