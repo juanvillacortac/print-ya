@@ -99,8 +99,6 @@
   {@html fontsTag}
 </svelte:head>
 
-<Favicons favicon={store.favicon} themeColor="#000" titleName={store.name} />
-
 <Toast />
 <div class=" bg-white text-gray-700 relative  dark:bg-gray-800 dark:text-white">
   <slot />

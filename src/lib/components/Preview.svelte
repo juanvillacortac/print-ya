@@ -5,6 +5,7 @@
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
   import type { Prisma } from '@prisma/client'
   import { IbmCloudDedicatedHost16 } from 'carbon-icons-svelte'
+  import Wiggle from './Wiggle.svelte'
 
   let parent: HTMLDivElement
   let element: HTMLDivElement
@@ -200,6 +201,7 @@
         const ch = innerEl.offsetHeight
         scale = Math.min(pw / cw, ph / ch)
         element.style.willChange = `transform`
+        innerEl.style.willChange = `transform`
         element.style.transform = `scale(${scale})`
       }
     }
@@ -256,9 +258,9 @@
     // containerEl.style.transform = `translate(${dragPos.x / scaleFactor}px, ${
     //   dragPos.y / scaleFactor
     // }px)`
-    innerEl.style.transform = `scale3d(${scaleFactor}, ${scaleFactor}, 1) translate(${
+    innerEl.style.transform = `scale3d(${scaleFactor}, ${scaleFactor}, 1) translate3d(${
       dragPos.x / scaleFactor
-    }px, ${dragPos.y / scaleFactor}px) rotate(${rotation}deg)`
+    }px, ${dragPos.y / scaleFactor}px, 0px) rotate3d(0, 0, 1, ${rotation}deg)`
   }
 </script>
 
