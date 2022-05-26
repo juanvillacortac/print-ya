@@ -42,6 +42,7 @@
   let saving = false
 
   const submit = async () => {
+    console.log(modifiers)
     for (let m of modifiers?.filter((m) => m.active)) {
       if (!m.name) {
         alert('Modifiers should have a title')
@@ -84,7 +85,14 @@
         return
       }
       title = data.name
-      modifiers = data.modifiers
+      modifiers = data.modifiers.map((m) => ({
+        ...m,
+        internalId: (Math.random() + 1).toString(36).substring(7),
+        items: m.items.map((i) => ({
+          ...i,
+          internalId: (Math.random() + 1).toString(36).substring(7),
+        })),
+      }))
     } catch (err) {
       console.log(err.message, err.error)
     } finally {

@@ -33,6 +33,7 @@
   let compiler: Worker
   let debug = false
 
+  export let notLoadFonts = false
   export let scaleFactor = 1
   export let rotation = 0
 
@@ -81,7 +82,7 @@
 
     const imports = compiled.css.match(/@import\ url\((.*?)\);/gim)
 
-    if (imports?.length) {
+    if (imports?.length && !notLoadFonts) {
       let shadowDomCssImports = document.getElementById('preview_fonts')
       if (!shadowDomCssImports) {
         shadowDomCssImports = document.createElement('style')

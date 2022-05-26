@@ -2,11 +2,15 @@ import { prisma, slugify } from './common'
 import type {
   Product as _Product,
   ProductModifier as _ProductModifier,
-  ProductModifierItem,
+  ProductModifierItem as _ProductModifierItem,
   Store as _Store,
   StoreCategory,
 } from '@prisma/client'
 import type { TemplateSource } from '$lib/compiler'
+
+export type ProductModifierItem = _ProductModifierItem & {
+  meta: any
+}
 
 export type ProductModifier = _ProductModifier & {
   items?: ProductModifierItem[]
@@ -152,6 +156,7 @@ export const upsertProduct = async (
               ?.filter((i) => !i.id)
               .map((i) => ({
                 name: i.name,
+                meta: i.meta,
                 cost: i.cost,
                 percentage: i.percentage,
               })),
@@ -173,6 +178,7 @@ export const upsertProduct = async (
           data: {
             active: i.active,
             name: i.name,
+            meta: i.meta,
             cost: i.cost,
             percentage: i.percentage,
           },
@@ -251,6 +257,7 @@ export const upsertProduct = async (
               create: m.items.map((i) => ({
                 name: i.name,
                 cost: i.cost,
+                meta: i.meta,
                 percentage: i.percentage,
               })),
             },

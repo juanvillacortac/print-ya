@@ -113,6 +113,8 @@ model ProductModifierItem {
   percentage Boolean @default(false)
   active     Boolean @default(true)
 
+  meta Json?
+
   productModifier   ProductModifier? @relation(fields: [productModifierId], references: [id])
   productModifierId String?
 }

@@ -14,6 +14,9 @@
   import type { ProductModifier } from '$lib/db'
   import { fly, slide } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
+  import SelectionTable from './modifiers/SelectionTable.svelte'
+  import ColorTable from './modifiers/ColorTable.svelte'
+  import FontTable from './modifiers/FontTable.svelte'
 
   type Unarray<T> = T extends Array<infer U> ? U : T
 
@@ -71,6 +74,7 @@
         name: '',
         percentage: false,
         productModifierId: '',
+        meta: {},
       },
     ]
     modifiers = modifiers
@@ -78,7 +82,18 @@
   }
 
   const modifierTypes = [
-    { type: 'select', name: 'Selection', tree: true, embeddable: true },
+    {
+      type: 'select',
+      name: 'Selection',
+      tree: SelectionTable,
+      embeddable: true,
+    },
+    {
+      type: 'font',
+      name: 'Font selection',
+      tree: FontTable,
+      embeddable: true,
+    },
     // { type: 'multiple', name: 'Multiple selection' },
     { type: 'text', name: 'Text', embeddable: true, icon: TextSelection16 },
     { type: 'image', name: 'Image', embeddable: true, icon: Image16 },
@@ -95,7 +110,7 @@
       embeddable: true,
       icon: CheckboxChecked16,
     },
-    { type: 'color', name: 'Color', tree: true, embeddable: true },
+    { type: 'color', name: 'Color', tree: ColorTable, embeddable: true },
   ]
 
   const deleteModifier = ({
@@ -109,26 +124,6 @@
     if (internalId) {
       modifiers.splice(idx, 1)
       modifiers = [...modifiers]
-    }
-  }
-
-  $: deleteItem = (
-    m: Pick<Unarray<typeof modifiers>, 'id' | 'internalId'>,
-    i: Pick<Unarray<Unarray<typeof modifiers>['items']>, 'id' | 'internalId'>
-  ) => {
-    const mIdx = modifiers.findIndex((mm) =>
-      m.id ? mm.id == m.id : m.internalId == mm.internalId
-    )
-    const idx = modifiers[mIdx].items.findIndex((ii) =>
-      i.id ? ii.id == i.id : ii.internalId == i.internalId
-    )
-    console.log(i.id)
-    console.log(modifiers[mIdx])
-    if (i.internalId) {
-      modifiers[mIdx].items.splice(idx, 1)
-      modifiers[mIdx].items = [...modifiers[mIdx].items]
-    } else {
-      modifiers[mIdx].items[idx].active = false
     }
   }
 
@@ -246,123 +241,12 @@
           </div>
         </div>
 
-        {#if expanded && (expanded === m.internalId || expanded === m.id) && modifierTypes.find((t) => t.type == m.type)?.tree}
+        {#if expanded && (expanded === m.internalId || expanded === m.id) && mType?.tree}
           <div
             class="flex-grow w-full px-4 pb-4 overflow-x-auto"
             transition:slide|local={{ duration: 800, easing: expoOut }}
           >
-            <div
-              class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
-            >
-              <table
-                class="text-sm text-left w-full text-gray-500 dark:text-gray-400"
-              >
-                <thead
-                  class="bg-gray-50 text-xs text-gray-700 uppercase !z-30 dark:bg-gray-700 dark:text-gray-400"
-                  class:sr-only={!m.items?.filter((m) => m.active).length}
-                >
-                  <tr>
-                    <th
-                      scope="col"
-                      class="py-3 px-6"
-                      class:sr-only={!m.items?.filter((m) => m.active).length}
-                      >{m.type === 'color' ? 'Color' : 'Title'}</th
-                    >
-                    <th
-                      scope="col"
-                      class="py-3 px-6"
-                      class:sr-only={!m.items?.filter((m) => m.active).length}
-                      >Cost</th
-                    >
-                    <th
-                      scope="col"
-                      class="py-3 px-6"
-                      class:sr-only={!m.items?.filter((m) => m.active).length}
-                      >Cost as percentage</th
-                    >
-                    <th scope="col" class="py-3 px-6">
-                      <span class="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="z-10 relative">
-                  {#each m.items?.filter((i) => i.active) as i, idx}
-                    <tr
-                      in:fly|local={{ x: -20 }}
-                      class="bg-white dark:bg-gray-800"
-                      class:border-b={idx !==
-                        m?.items?.filter((m) => m.active).length - 1}
-                      class:dark:border-gray-700={idx !==
-                        m?.items?.filter((m) => m.active).length - 1}
-                    >
-                      <th
-                        scope="row"
-                        class="flex font-bold h-full min-h-64px py-4 px-6 text-gray-900 whitespace-nowrap items-center dark:text-white"
-                      >
-                        {#if m.type === 'color'}
-                          <input
-                            type="color"
-                            required
-                            bind:value={i.name}
-                            class="m-auto"
-                          />
-                        {:else}
-                          <input
-                            type="text"
-                            placeholder="Item title"
-                            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none <sm:w-24ch dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-                            required
-                            bind:value={i.name}
-                          />
-                        {/if}
-                      </th>
-
-                      <td class="py-4 px-6">
-                        <input
-                          class="bg-white border rounded border-gray-300 text-xs text-right leading-tight py-2 px-3 w-18 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-                          type="number"
-                          min={0}
-                          step="any"
-                          required
-                          bind:value={i.cost}
-                        />
-                      </td>
-                      <td class="py-4 px-6">
-                        <input
-                          type="checkbox"
-                          class="mx-auto"
-                          bind:checked={i.percentage}
-                        />
-                      </td>
-                      <td class="text-right py-4 px-6">
-                        <button
-                          class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                          title="Delete"
-                          use:tooltip
-                          on:click={() => deleteItem(m, i)}
-                          type="button"><TrashCan16 /></button
-                        >
-                      </td>
-                    </tr>
-                  {:else}
-                    <tr
-                      class="bg-gray-50 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400"
-                    >
-                      <td class="text-center py-4 px-6" colspan="5">
-                        <div
-                          class="flex space-x-2 w-full justify-center items-center"
-                        >
-                          <Information16 />
-                          <p class="font-bold text-xs whitespace-nowrap">
-                            No modifier items
-                          </p>
-                        </div>
-                      </td>
-                    </tr>
-                  {/each}
-                </tbody>
-              </table>
-            </div>
+            <svelte:component this={mType?.tree} bind:modifier={m} />
           </div>
         {/if}
       </div>

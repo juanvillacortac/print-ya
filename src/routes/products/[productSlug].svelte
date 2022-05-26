@@ -12,12 +12,14 @@
     Camera24,
     Close16,
     Close24,
+    CloseOutline24,
     Favorite32,
     Image32,
     Rotate16,
     RotateClockwise16,
     SprayPaint16,
     Subtract16,
+    TagNone24,
     ZoomIn16,
     ZoomOut16,
   } from 'carbon-icons-svelte'
@@ -53,6 +55,8 @@
   import { uploadFile } from '$lib/supabase'
   import { page } from '$app/stores'
   import { useCaravaggio } from '$lib/components/caravaggio/useCaravaggio'
+  import type { mapLinear } from 'three/src/math/MathUtils'
+  import { browser } from '$app/env'
 
   let quantity = product.minQuantity || 1
 
@@ -86,23 +90,38 @@
         ([m]) =>
           (m.type === 'select' ||
             m.type === 'color' ||
+            m.type === 'font' ||
             m.type === 'image' ||
             m.type === 'text' ||
             m.type === 'numeric' ||
             m.type === 'toggle') &&
           m.templateAccessor
       )
+      .filter(([_, item]) => item)
       .map(([m, item]) => ({
         value: item.value,
         key: m.templateAccessor,
       }))
     const f = items.reduce((a, b) => ({ ...a, [b.key]: b.value }), {})
     if (Object.keys(f).length) {
-      fields = JSON.stringify(f).replace(/[^\p{L}\p{N}\p{P}\p{Z}{\^\$}]/gu, '')
+      fields = JSON.stringify(f)
     } else {
       fields = ''
     }
   }
+
+  $: fontsItems = product.modifiers
+    .filter((m) => m.type === 'font')
+    .map((m) => m.items)
+    .reduce((a, b) => [...a, ...b], [])
+    .map((i) => ({
+      name: i?.name,
+      url: i?.meta.web
+        ? i.meta.url
+        : `/api/fontface?name=${encodeURIComponent(
+            i.name
+          )}&src=${encodeURIComponent(i.meta.url)}`,
+    }))
 
   $: template = { ...(product.template as any), fields }
 
@@ -199,6 +218,12 @@
 
   let previewRotate = [0]
 </script>
+
+<svelte:head>
+  {#each fontsItems as f}
+    <link href={f.url} rel="stylesheet" />
+  {/each}
+</svelte:head>
 
 <div class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10">
   <div class="flex font-bold space-x-2 text-xs text-gray-400 uppercase">
@@ -342,6 +367,7 @@
               scaleFactor={Math.max(previewScale[0] / 100, 0)}
               rotation={previewRotate[0]}
               draggable
+              notLoadFonts
             />
           </div>
         </div>
@@ -390,6 +416,42 @@
                     >
                   {/each}
                 </select>
+              {:else if m.type === 'font'}
+                <div
+                  class="w-full grid gap-4 grid-cols-4 lg:w-full lg:grid-cols-4"
+                >
+                  <button
+                    class="border-dashed rounded flex border-2 text-lg w-full p-2 transform transition-transform text-gray-200 duration-200 items-center justify-center dark:border-gray-600 dark:text-gray-600"
+                    title="Unset font"
+                    on:click={() =>
+                      (modifiers[m.id] = { itemId: '', value: '' })}
+                    use:tooltip
+                    style="will-change: transform;"><CloseOutline24 /></button
+                  >
+                  {#each m.items as i}
+                    <button
+                      class="rounded border-2 w-full p-2 transform transition-transform text-2xl duration-200 dark:border-gray-600"
+                      title={i.name}
+                      on:click={() =>
+                        (modifiers[m.id] = {
+                          itemId: i.id,
+                          value: {
+                            name: i?.name,
+                            url: i?.meta.web
+                              ? i.meta.url
+                              : `/api/fontface?name=${encodeURIComponent(
+                                  i.name
+                                )}&src=${encodeURIComponent(i.meta.url)}`,
+                          },
+                        })}
+                      class:scale-120={modifiers[m.id].itemId == i.id}
+                      class:!border-blue-800={modifiers[m.id].itemId == i.id}
+                      use:tooltip
+                      style="will-change: transform; font-family: {i.name};"
+                      >Hello</button
+                    >
+                  {/each}
+                </div>
               {:else if m.type === 'toggle'}
                 <input
                   type="checkbox"
@@ -460,13 +522,7 @@
                   {#each m.items as i}
                     <button
                       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
-                      title={`${i.cost < 0 ? '-' : ''}${
-                        !i.percentage ? '$' : ''
-                      }${Math.abs(i.cost)}${i.percentage ? '%' : ''}`}
-                      on:click={() => {
-                        modifiers[m.id].value = i.name || '#000000'
-                        modifiers[m.id].itemId = i.id
-                      }}
+                      title={i.meta.name}
                       class:scale-120={modifiers[m.id].itemId == i.id}
                       class:!border-blue-800={modifiers[m.id].itemId == i.id}
                       use:tooltip
