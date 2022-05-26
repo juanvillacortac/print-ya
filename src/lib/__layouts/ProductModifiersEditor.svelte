@@ -31,6 +31,11 @@
     modifiers = modifiers.map((m) => ({
       ...m,
       internalId: (Math.random() + 1).toString(36).substring(7),
+      items: m.items.map((i) => ({
+        ...i,
+        internalId: (Math.random() + 1).toString(36).substring(7),
+        meta: i.meta || {},
+      })),
     }))
     mounted = true
   }
