@@ -525,6 +525,11 @@
                       title={i.meta.name}
                       class:scale-120={modifiers[m.id].itemId == i.id}
                       class:!border-blue-800={modifiers[m.id].itemId == i.id}
+                      on:click={() =>
+                        (modifiers[m.id] = {
+                          itemId: i.id,
+                          value: i.name,
+                        })}
                       use:tooltip
                       use:squareratio
                       style="will-change: transform; aspect-ratio: 1/1; background-color: {i.name ||
