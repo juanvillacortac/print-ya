@@ -423,7 +423,7 @@
                 </select>
               {:else if m.type === 'font'}
                 <div
-                  class="w-full grid gap-4 grid-cols-4 lg:w-full lg:grid-cols-4"
+                  class="w-full grid gap-4 grid-cols-3 lg:w-full lg:grid-cols-4"
                 >
                   <button
                     class="border-dashed rounded flex border-2 text-lg w-full p-2 transform transition-transform text-gray-200 duration-200 items-center justify-center dark:border-gray-600 dark:text-gray-600"
