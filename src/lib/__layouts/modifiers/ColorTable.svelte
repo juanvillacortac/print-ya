@@ -84,13 +84,13 @@
                   id="color-{i.id}"
                   type="color"
                   bind:value={i.name}
-                  class="h-0 opacity-0 w-0 overflow-hidden"
+                  class="h-0 opacity-0 w-0 overflow-hidden absolute"
                 />
-                <div
-                  class="rounded h-full border-2 h-32px w-full transform w-32px relative pointer-events-none dark:border-gray-600"
+                <button
+                  class="rounded h-full border-2 h-32px w-full transform w-32px relative dark:border-gray-600"
                   title={i.meta.name}
                   on:click={() =>
-                    document.getElementById(`color-${i.id}`).click()}
+                    document.getElementById(`color-${i.id}`)?.click()}
                   style="will-change: transform; background-color: {i.name ||
                     'black'}"
                 />
