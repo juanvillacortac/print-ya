@@ -81,14 +81,16 @@
             <div class="flex space-x-2 items-center">
               <div class="h-32px w-32px relative">
                 <input
+                  id="color-{i.id}"
                   type="color"
-                  required
                   bind:value={i.name}
-                  class="m-auto h-32px absolute !w-32px"
+                  class="hidden"
                 />
                 <div
                   class="rounded h-full border-2 h-32px w-full transform w-32px relative pointer-events-none dark:border-gray-600"
                   title={i.meta.name}
+                  on:click={() =>
+                    document.getElementById(`color-${i.id}`).click()}
                   style="will-change: transform; background-color: {i.name ||
                     'black'}"
                 />
