@@ -84,7 +84,7 @@
                   id="color-{i.id}"
                   type="color"
                   bind:value={i.name}
-                  class="hidden"
+                  class="h-0 opacity-0 w-0 overflow-hidden"
                 />
                 <div
                   class="rounded h-full border-2 h-32px w-full transform w-32px relative pointer-events-none dark:border-gray-600"
