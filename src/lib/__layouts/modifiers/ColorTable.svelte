@@ -89,6 +89,7 @@
                 <button
                   class="rounded h-full border-2 h-32px w-full transform w-32px relative dark:border-gray-600"
                   title={i.meta.name}
+                  type="button"
                   on:click={() =>
                     document.getElementById(`color-${i.id}`)?.click()}
                   style="will-change: transform; background-color: {i.name ||
@@ -99,7 +100,16 @@
                 type="text"
                 placeholder="Color HEX"
                 pattern="#[a-fA-F\d]+"
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                readonly
+                title="Click to paste HEX from clipboard"
+                use:tooltip
+                on:click={() =>
+                  navigator.clipboard.readText().then((text) => {
+                    if (text.match(/#[a-fA-F\d]+/)) {
+                      i.name = text
+                    }
+                  })}
+                class="border rounded cursor-pointer bg-gray-50 border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                 bind:value={i.name}
                 required
               />

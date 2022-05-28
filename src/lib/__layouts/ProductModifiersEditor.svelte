@@ -41,6 +41,7 @@
   }
 
   const addModifier = () => {
+    showing = true
     const newId = (Math.random() + 1).toString(36).substring(7)
     modifiers = [
       ...modifiers,
@@ -133,13 +134,28 @@
   }
 
   let expanded: string = ''
+  let showing = false
 </script>
 
 <div
   class="bg-white rounded-xl flex flex-col h-full space-y-4 shadow w-full p-4 relative overflow-hidden dark:bg-gray-800"
 >
   <div class="flex w-full justify-between items-center">
-    <h3 class="font-bold text-xs block">Product modifiers</h3>
+    <div class="flex space-x-4 items-center">
+      <button
+        class="rounded flex p-1 duration-200"
+        title="Show/hide items"
+        use:tooltip
+        on:click={() => (showing = !showing)}
+        type="button"
+        ><ChevronRight16
+          class="transform duration-200 transition-transform {showing
+            ? 'rotate-90'
+            : ''}"
+        /></button
+      >
+      <h3 class="font-bold text-xs block">Product modifiers</h3>
+    </div>
     <div class="flex space-x-1">
       <button
         class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
@@ -152,58 +168,60 @@
       </button>
     </div>
   </div>
-  <div
-    class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
-  >
-    {#each modifiers.filter((m) => m.active) as m, idx (m.internalId)}
-      {@const mType = modifierTypes.find((t) => t.type == m.type)}
-      <div
-        class="flex flex-col flex-grow space-y-2 w-full"
-        in:fly|local={{ x: -20 }}
-        out:slide|local={{ duration: 400, easing: expoOut }}
-      >
+  {#if showing}
+    <div
+      class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
+      transition:slide|local={{ duration: 400, easing: expoOut }}
+    >
+      {#each modifiers.filter((m) => m.active) as m, idx (m.internalId)}
+        {@const mType = modifierTypes.find((t) => t.type == m.type)}
         <div
-          class="flex w-full p-4 items-center lg:space-x-4 <lg:flex-col <lg:space-y-4"
+          class="flex flex-col flex-grow space-y-2 w-full"
+          in:fly|local={{ x: -20 }}
+          out:slide|local={{ duration: 400, easing: expoOut }}
         >
-          {#if mType?.tree}
-            <button
-              class="rounded flex p-1 duration-200"
-              title="Show/hide items"
-              use:tooltip
-              on:click={() =>
-                expanded && (expanded === m.internalId || expanded === m.id)
-                  ? (expanded = '')
-                  : (expanded = m.id || m.internalId)}
-              type="button"
-              ><ChevronRight16
-                class="transform duration-200 transition-transform {expanded &&
-                (expanded === m.internalId || expanded === m.id)
-                  ? 'rotate-90'
-                  : ''}"
-              /></button
-            >
-          {:else if mType?.icon}
-            <div class="flex p-1">
-              <svelte:component this={mType.icon} />
-            </div>
-          {/if}
-          <input
-            type="text"
-            placeholder="Modifier title"
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            required
-            bind:value={m.name}
-          />
-          <select
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={m.type}
-            on:change={() => (m.defaultValue = '')}
+          <div
+            class="flex w-full p-4 items-center lg:space-x-4 <lg:flex-col <lg:space-y-4"
           >
-            {#each modifierTypes as type}
-              <option value={type.type}>{type.name}</option>
-            {/each}
-          </select>
-          <!-- {#if m.type === 'text'}
+            {#if mType?.tree}
+              <button
+                class="rounded flex p-1 duration-200"
+                title="Show/hide items"
+                use:tooltip
+                on:click={() =>
+                  expanded && (expanded === m.internalId || expanded === m.id)
+                    ? (expanded = '')
+                    : (expanded = m.id || m.internalId)}
+                type="button"
+                ><ChevronRight16
+                  class="transform duration-200 transition-transform {expanded &&
+                  (expanded === m.internalId || expanded === m.id)
+                    ? 'rotate-90'
+                    : ''}"
+                /></button
+              >
+            {:else if mType?.icon}
+              <div class="flex p-1">
+                <svelte:component this={mType.icon} />
+              </div>
+            {/if}
+            <input
+              type="text"
+              placeholder="Modifier title"
+              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              required
+              bind:value={m.name}
+            />
+            <select
+              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              bind:value={m.type}
+              on:change={() => (m.defaultValue = '')}
+            >
+              {#each modifierTypes as type}
+                <option value={type.type}>{type.name}</option>
+              {/each}
+            </select>
+            <!-- {#if m.type === 'text'}
             <input
               type="text"
               placeholder="Default value"
@@ -218,55 +236,56 @@
               bind:value={m.defaultValue}
             />
           {/if} -->
-          {#if modifierTypes.find((t) => t.type === m.type).embeddable}
-            <input
-              type="text"
-              placeholder="Template accessor"
-              bind:value={m.templateAccessor}
-              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            />
-          {/if}
-          <div class="flex space-x-4 items-center">
-            {#if modifierTypes.find((t) => t.type == m.type)?.tree}
+            {#if modifierTypes.find((t) => t.type === m.type).embeddable}
+              <input
+                type="text"
+                placeholder="Template accessor"
+                bind:value={m.templateAccessor}
+                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              />
+            {/if}
+            <div class="flex space-x-4 items-center">
+              {#if modifierTypes.find((t) => t.type == m.type)?.tree}
+                <button
+                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                  title="Add item"
+                  use:tooltip
+                  on:click={() => addItem(m)}
+                  type="button"><AddAlt16 /></button
+                >
+              {/if}
               <button
                 class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                title="Add item"
+                title="Delete modifier"
                 use:tooltip
-                on:click={() => addItem(m)}
-                type="button"><AddAlt16 /></button
+                on:click={() => deleteModifier(m)}
+                type="button"><TrashCan16 /></button
               >
-            {/if}
-            <button
-              class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-              title="Delete modifier"
-              use:tooltip
-              on:click={() => deleteModifier(m)}
-              type="button"><TrashCan16 /></button
-            >
+            </div>
           </div>
-        </div>
 
-        {#if expanded && (expanded === m.internalId || expanded === m.id) && mType?.tree}
-          <div
-            class="flex-grow w-full px-4 pb-4 overflow-x-auto"
-            transition:slide|local={{ duration: 800, easing: expoOut }}
-          >
-            <svelte:component this={mType?.tree} bind:modifier={m} />
-          </div>
-        {/if}
-      </div>
-    {:else}
-      <div
-        class="bg-gray-50 text-xs w-full text-gray-500 dark:bg-gray-700 dark:text-gray-400"
-        in:slide|local={{ duration: 400, easing: expoOut }}
-      >
-        <div class="text-center w-full py-4 px-6">
-          <div class="flex space-x-2 w-full justify-center items-center">
-            <Information16 />
-            <p class="font-bold text-xs whitespace-nowrap">No modifiers</p>
+          {#if expanded && (expanded === m.internalId || expanded === m.id) && mType?.tree}
+            <div
+              class="flex-grow w-full px-4 pb-4 overflow-x-auto"
+              transition:slide|local={{ duration: 800, easing: expoOut }}
+            >
+              <svelte:component this={mType?.tree} bind:modifier={m} />
+            </div>
+          {/if}
+        </div>
+      {:else}
+        <div
+          class="bg-gray-50 text-xs w-full text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+          in:slide|local={{ duration: 400, easing: expoOut }}
+        >
+          <div class="text-center w-full py-4 px-6">
+            <div class="flex space-x-2 w-full justify-center items-center">
+              <Information16 />
+              <p class="font-bold text-xs whitespace-nowrap">No modifiers</p>
+            </div>
           </div>
         </div>
-      </div>
-    {/each}
-  </div>
+      {/each}
+    </div>
+  {/if}
 </div>

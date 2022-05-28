@@ -18,6 +18,8 @@
   import { writable } from 'svelte/store'
   import ProductModifiersEditor from './ProductModifiersEditor.svelte'
   import type { TemplateSource } from '$lib/compiler'
+  import ProductMainFieldsEditor from './ProductMainFieldsEditor.svelte'
+  import ProductMockupImagesEditor from './ProductMockupImagesEditor.svelte'
 
   export let product: Partial<Product> = {
     price: 0.01,
@@ -153,81 +155,8 @@
       class="flex flex-col space-y-6 w-full"
       class:lg:col-span-2={product.template && product.type === 'template'}
     >
-      <div
-        class="bg-white rounded-xl flex flex-col h-full space-y-4 shadow w-full p-4 relative overflow-hidden <lg:pb-12 dark:bg-gray-800"
-      >
-        <div class="grid gap-4 grid-cols-3">
-          <div class="flex flex-col w-full">
-            <label class="font-bold text-xs mb-2 block" for="fieldId">
-              Product name
-            </label>
-            <input
-              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-              type="text"
-              placeholder="Ex. Red camera sign"
-              required
-              bind:value={product.name}
-            />
-          </div>
-          <div class="flex flex-col w-full">
-            <label class="font-bold text-xs mb-2 block" for="fieldId">
-              Product type
-            </label>
-            <select
-              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-              bind:value={product.type}
-            >
-              <option value={'template'}>Custom template</option>
-              <option value={'generic'}>Static product</option>
-            </select>
-          </div>
-          <div class="flex flex-col w-full">
-            <label class="font-bold text-xs mb-2 block" for="fieldId">
-              Product category
-            </label>
-            <select
-              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-              bind:value={product.storeCategoryId}
-            >
-              {#each store.categories as category}
-                <option value={category.id}>{category.name}</option>
-              {/each}
-            </select>
-          </div>
-          <div class="flex flex-col w-full">
-            <label class="font-bold text-xs mb-2 block" for="fieldId">
-              Price
-            </label>
-            <input
-              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-              type="number"
-              min={0.01}
-              step="any"
-              bind:value={product.price}
-            />
-          </div>
-          <div class="flex flex-col w-full">
-            <label class="font-bold text-xs mb-2 block" for="fieldId">
-              Minimum order quantity
-            </label>
-            <input
-              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-              type="number"
-              min={0}
-              bind:value={product.minQuantity}
-            />
-          </div>
-        </div>
-        <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">
-            Description
-          </label>
-          <Editor
-            value={product.description || ''}
-            on:change={(e) => (product.description = e.detail.value)}
-          />
-        </div>
-      </div>
+      <ProductMainFieldsEditor bind:product />
+      <ProductMockupImagesEditor bind:product />
       <ProductModifiersEditor bind:modifiers />
     </div>
     {#if product.template && product.type === 'template'}

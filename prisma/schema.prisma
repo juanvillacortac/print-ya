@@ -78,6 +78,8 @@ model Product {
 
   price Float
 
+  meta Json?
+
   images        ProductImage[]
   template      Json?
   templateDraft Json?
