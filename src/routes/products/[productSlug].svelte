@@ -385,6 +385,9 @@
         </p>
         <div class="flex flex-col space-y-4">
           {#each product.modifiers as m}
+            {@const item = modifiers[m.id]
+              ? m.items.find((i) => i.id === modifiers[m.id]?.itemId)
+              : undefined}
             <div
               class="flex w-full {m.type
                 ? 'space-y-2 flex-col'
@@ -393,7 +396,9 @@
               <div
                 class="font-bold font-title text-black text-xs dark:text-white"
               >
-                {m.name}
+                {m.name}{#if item && item?.meta?.name}: <span
+                    class="font-normal">{item.meta.name}</span
+                  >{/if}
               </div>
               {#if m.type === 'select'}
                 <select

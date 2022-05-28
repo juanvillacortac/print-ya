@@ -76,14 +76,32 @@
         >
           <th
             scope="row"
-            class="font-bold h-full min-h-64px py-4 px-6 text-gray-900 w-42px items-center whitespace-nowrap dark:text-white "
+            class="font-bold h-full py-4 px-6 text-gray-900 w-48 items-center whitespace-nowrap dark:text-white "
           >
-            <input
-              type="color"
-              required
-              bind:value={i.name}
-              class="m-auto h-32px w-32px"
-            />
+            <div class="flex space-x-2 items-center">
+              <div class="h-32px w-32px relative">
+                <input
+                  type="color"
+                  required
+                  bind:value={i.name}
+                  class="m-auto h-32px absolute !w-32px"
+                />
+                <div
+                  class="rounded h-full border-2 h-32px w-full transform w-32px relative pointer-events-none dark:border-gray-600"
+                  title={i.meta.name}
+                  style="will-change: transform; background-color: {i.name ||
+                    'black'}"
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Color HEX"
+                pattern="[a-fA-F\d]+"
+                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                bind:value={i.name}
+                required
+              />
+            </div>
           </th>
 
           <td class="py-4 px-6">
