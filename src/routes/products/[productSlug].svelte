@@ -435,7 +435,7 @@
                   >
                   {#each m.items as i}
                     <button
-                      class="rounded border-2 w-full p-2 transform transition-transform text-2xl duration-200 dark:border-gray-600"
+                      class="rounded border-2 text-xl w-full p-1 transform transition-transform duration-200 dark:border-gray-600"
                       title={i.name}
                       on:click={() =>
                         (modifiers[m.id] = {
