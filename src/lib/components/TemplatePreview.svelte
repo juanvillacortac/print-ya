@@ -96,7 +96,7 @@
                 }}
               >
                 <button
-                  class="border-dashed rounded-lg flex border-2 p-2 transform transition-transform duration-200 overflow-hidden relative dark:border-gray-700 hover:scale-90"
+                  class="border-dashed rounded-lg flex border-2 p-2 transform transition-transform duration-200 overflow-hidden relative dark:border-gray-700 hover:scale-95"
                   title="Set as background"
                   use:tooltip
                   type="button"
