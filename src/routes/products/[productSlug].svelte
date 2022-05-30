@@ -220,11 +220,11 @@
     >
   </div>
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
-  <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-3">
+  <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-2">
     {#if product.template && product.type === 'template'}
       <TemplatePreview watermark {template} mockups={product.meta?.mockups} />
     {/if}
-    <div class="flex flex-col space-y-4 lg:col-span-2">
+    <div class="flex flex-col space-y-4">
       <div class="flex flex-col space-y-2 items-start">
         <h3 class="font-bold font-title text-black text-3xl dark:text-white">
           {product.name}
