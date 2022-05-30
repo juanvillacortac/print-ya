@@ -129,12 +129,11 @@
   let modifiers: (ProductModifier & { internalId?: string })[] = [
     ...(product?.modifiers || []),
   ]
-
-  const zoomIn = () => (scale = Math.max(10, Math.min(scale + 10, 200)))
-  const zoomOut = () => (scale = Math.max(10, Math.min(scale - 10, 200)))
 </script>
 
-<h2 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
+<h2
+  class="font-bold font-title mx-auto text-black w-full text-2xl lg:max-w-9/10 dark:text-white"
+>
   {product.id ? title : 'New product'}
 </h2>
 <form
