@@ -1,15 +1,33 @@
 <script>
   import Slider from 'svelte-range-slider-pips'
   import { squareratio } from '$lib/actions/aspectratio'
-  import { Camera24, Rotate16, ZoomIn16, ZoomOut16 } from 'carbon-icons-svelte'
+  import {
+    Camera24,
+    Close24,
+    ImageSearch24,
+    Rotate16,
+    ZoomIn16,
+    ZoomOut16,
+  } from 'carbon-icons-svelte'
   import { tooltip } from './tooltip'
   import RgbWheel from './__RGBWheel.svelte'
   import Preview from './Preview.svelte'
   import { useCaravaggio } from './caravaggio/useCaravaggio'
   import { page } from '$app/stores'
+  import { scale } from 'svelte/transition'
+  import { expoOut } from 'svelte/easing'
+  import Image from './caravaggio/Image.svelte'
+  import { flip } from 'svelte/animate'
+
+  /** @type {{
+   * path: string
+   * url: string
+   * }[]} */
+  export let mockups = []
 
   /** @type {import('$lib/compiler').TemplateSource} */
   export let template
+  export let watermark = false
 
   let previewRotate = [0]
   let previewScale = [100]
@@ -25,6 +43,21 @@
     }
     reader.readAsDataURL(image)
   }
+
+  /** @type {import('./caravaggio/urlBuilder').CaravaggioOptions} */
+  const options = {
+    progressive: true,
+    rs: {
+      s: '500x500',
+      m: 'scale',
+    },
+  }
+
+  let gallery = false
+
+  $: if (!mockups?.length && gallery) {
+    gallery = false
+  }
 </script>
 
 <div class="flex h-full w-full relative items-start">
@@ -33,6 +66,57 @@
     style="aspect-ratio: 1/1"
     use:squareratio
   >
+    {#if gallery}
+      <div
+        class="bg-white rounded-lg flex flex-col h-full space-y-2 w-full p-2 z-30 absolute dark:bg-gray-800"
+        transition:scale|local={{ easing: expoOut, start: 0.2 }}
+      >
+        <div class="flex w-full justify-end items-start">
+          <button
+            title="Close gallery"
+            type="button"
+            on:click={() => (gallery = false)}
+            use:tooltip><Close24 /></button
+          >
+        </div>
+        <div class="flex-grow h-full w-full overflow-auto">
+          <div class="w-full grid px-10px gap-4 grid-cols-2">
+            {#each mockups as { url, path }, idx (path)}
+              <div
+                class="flex w-full"
+                animate:flip={{ duration: 400, easing: expoOut }}
+                out:scale={{
+                  easing: expoOut,
+                  start: 0.2,
+                }}
+                in:scale={{
+                  easing: expoOut,
+                  start: 0.2,
+                  delay: idx * 100 + 200,
+                }}
+              >
+                <button
+                  class="border-dashed rounded-lg flex border-2 p-2 transform transition-transform duration-200 overflow-hidden relative dark:border-gray-700 hover:scale-90"
+                  title="Set as background"
+                  use:tooltip
+                  type="button"
+                  on:click={() => {
+                    previewBg = `url('${url}')`
+                    gallery = false
+                  }}
+                >
+                  <Image
+                    {options}
+                    src={url}
+                    class="rounded object-cover w-full aspect-square"
+                  />
+                </button>
+              </div>
+            {/each}
+          </div>
+        </div>
+      </div>
+    {/if}
     <div
       class="flex flex-col h-full w-full top-0 z-20 absolute pointer-events-none items-center justify-end"
     >
@@ -108,6 +192,7 @@
       <button
         class="border rounded-full flex border-gray-500 h-10 transform transition-transform w-10 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
         title="Set transparent background"
+        type="button"
         use:tooltip
         on:click={() => (previewBg = '')}
       />
@@ -120,10 +205,21 @@
       >
         <Camera24 class="flex font-bold" />
       </button>
+      {#if mockups?.length}
+        <button
+          class="flex text-gray-500 preview-button"
+          title="Set background from gallery"
+          type="button"
+          on:click={() => (gallery = true)}
+          use:tooltip
+        >
+          <ImageSearch24 class="flex font-bold" />
+        </button>
+      {/if}
       <input
         type="file"
         class="hidden"
-        accept=".jpg, .jpeg, .png"
+        accept="image/*"
         on:change={(e) => onFileSelected(e)}
         bind:this={fileInput}
       />
@@ -135,20 +231,22 @@
       class:!bg-cover={previewBg}
       class:!bg-center={previewBg}
     >
-      <div
-        class="bg-repeat-space flex h-full w-full opacity-12 inset-0 absolute"
-        style="background-image: url({useCaravaggio($page.stuff.store.logo, {
-          o: 'png',
-          rotate: {
-            v: 45,
-            b: '000000.00',
-          },
-          rs: {
-            s: 'x28',
-            m: 'scale',
-          },
-        })})"
-      />
+      {#if watermark}
+        <div
+          class="bg-repeat-space flex h-full w-full opacity-12 inset-0 absolute"
+          style="background-image: url({useCaravaggio($page.stuff.store.logo, {
+            o: 'png',
+            rotate: {
+              v: 45,
+              b: '000000.00',
+            },
+            rs: {
+              s: 'x28',
+              m: 'scale',
+            },
+          })})"
+        />
+      {/if}
       <Preview
         {template}
         fitParent

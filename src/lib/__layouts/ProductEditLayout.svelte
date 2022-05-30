@@ -45,13 +45,16 @@
   let saving = false
 
   const submit = async () => {
-    console.log(modifiers)
+    if (!product.name?.trim()) {
+      alert('Product should have a title')
+      return
+    }
     for (let m of modifiers?.filter((m) => m.active)) {
       if (!m.name) {
         alert('Modifiers should have a title')
         return
       }
-      if (m.type == 'select' || m.type == 'multiple') {
+      if (m.type == 'select' || m.type == 'font') {
         if (!m.items?.filter((i) => i.active).length) {
           alert('Selection and multiple selection modifier should have items')
           return
@@ -61,8 +64,24 @@
             alert('Modifier items should have a title')
             return
           }
-          if (!m.name) {
-            alert('Modifiers should have a title')
+        }
+      }
+      if (m.type == 'font') {
+        for (let i of m.items) {
+          if (!i.meta.url) {
+            alert('Font items should have a valid URL')
+            return
+          }
+        }
+      }
+      if (m.type == 'color') {
+        for (let i of m.items) {
+          if (!i.name) {
+            alert('Color items should have a value')
+            return
+          }
+          if (!i.meta.name) {
+            alert('Color items should have a name')
             return
           }
         }
@@ -161,7 +180,7 @@
       <ProductModifiersEditor bind:modifiers />
     </div>
     {#if product.template && product.type === 'template'}
-      <TemplatePreview template={$editor} />
+      <TemplatePreview mockups={product.meta?.mockups} template={$editor} />
     {/if}
     <!-- <div
       class="flex justify-end items-end lg:space-x-6 lg:items-center lg:hidden <lg:flex-col <lg:space-y-4"

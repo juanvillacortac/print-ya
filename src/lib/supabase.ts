@@ -5,6 +5,20 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+export const removeFiles = async ({
+  paths,
+  bucket,
+}: {
+  paths: string[]
+  bucket: string
+}) => {
+  let { error, data } = await supabase.storage.from(bucket).remove(paths)
+  if (error) {
+    throw error
+  }
+  return data
+}
+
 export const uploadFile = async ({
   file,
   path,
@@ -32,5 +46,5 @@ export const uploadFile = async ({
   if (urlError) {
     throw urlError
   }
-  return publicURL
+  return { url: publicURL, path: filePath }
 }

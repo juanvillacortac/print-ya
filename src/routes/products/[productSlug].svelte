@@ -191,12 +191,12 @@
       }
       uploadingImage[m.id] = true
       const file = event.currentTarget.files[0]
-      const fileUrl = await uploadFile({
+      const { url } = await uploadFile({
         file,
         bucket: 'client-assets',
         path: `${$page.stuff.store.slug}/products/${product.slug}/template-assets`,
       })
-      modifiers[m.id] = { value: fileUrl }
+      modifiers[m.id] = { value: url }
     } catch (error) {
       alert(error.message)
     } finally {
@@ -226,7 +226,7 @@
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
   <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-2">
     {#if product.template && product.type === 'template'}
-      <TemplatePreview {template} />
+      <TemplatePreview watermark {template} />
     {/if}
     <div class="flex flex-col space-y-4">
       <div class="flex flex-col space-y-2 items-start">

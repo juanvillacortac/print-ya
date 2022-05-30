@@ -18,6 +18,7 @@ export type ProductModifier = _ProductModifier & {
 }
 
 export type Product = _Product & {
+  meta?: any
   storeCategory?: StoreCategory
   modifiers?: ProductModifier[]
 }
@@ -110,6 +111,7 @@ export const upsertProduct = async (
         minQuantity: product.minQuantity || null,
         public: product.public,
         description: product.description,
+        meta: product.meta,
         storeCategory: {
           connect: {
             id: product.storeCategoryId,
@@ -235,6 +237,7 @@ export const upsertProduct = async (
       type: product.type,
       public: product.public,
       description: product.description,
+      meta: product.meta,
       store: {
         connect: {
           id: product.storeId,
