@@ -9,6 +9,7 @@
   import { goto, invalidate } from '$app/navigation'
   import {
     Checkbox16,
+    Launch16,
     ZoomFit16,
     ZoomIn16,
     ZoomOut16,
@@ -21,6 +22,7 @@
   import ProductMainFieldsEditor from './ProductMainFieldsEditor.svelte'
   import ProductMockupImagesEditor from './ProductMockupImagesEditor.svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
+  import { getAbsoluteURL } from '$lib/utils/host'
 
   export let product: Partial<Product> = {
     price: 0.01,
@@ -132,9 +134,26 @@
 </script>
 
 <h2
-  class="font-bold font-title mx-auto text-black w-full text-2xl lg:max-w-9/10 dark:text-white"
+  class="font-bold font-title mx-auto my-2 text-black text-xl w-full lg:max-w-9/10 dark:text-white"
 >
-  {product.id ? title : 'New product'}
+  <span>
+    {product.id ? title : 'New product'}&nbsp;
+  </span>
+  {#if product.id}
+    <a
+      class="border-transparent inline hover:border-current"
+      href={getAbsoluteURL({
+        subdomain: !store.customDomain ? store.slug : undefined,
+        host: store.customDomain || undefined,
+        path: `/products/${product.slug}`,
+      })}
+      target="__blank"
+      title="View product on production"
+      use:tooltip
+    >
+      <Launch16 class="!inline-flex" />
+    </a>
+  {/if}
 </h2>
 <form
   on:submit|preventDefault|stopPropagation={submit}
