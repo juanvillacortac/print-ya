@@ -94,7 +94,6 @@
       1
     )
     $images = $images
-    removeFiles({ bucket: 'assets', paths: [path] })
   }
 
   $: {
