@@ -66,7 +66,7 @@
     <!-- <h1
       class="font-logo font-bold text-transparent p-4 text-8xl rainbow-bg !bg-clip-text"
     >
-      Print Ya!
+      ShackCart
     </h1> -->
     <form
       on:submit|preventDefault|stopPropagation={handleSubmit}

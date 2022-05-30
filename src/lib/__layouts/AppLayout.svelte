@@ -43,14 +43,14 @@
     $pageSubtitle = ''
   }
 
-  $: pageTitle = (subtitle ? subtitle + ' | ' : '') + 'Print Ya!'
+  $: pageTitle = (subtitle ? subtitle + ' | ' : '') + 'ShackCart'
 </script>
 
 <svelte:head>
   <title>{pageTitle}</title>
 </svelte:head>
 
-<Favicons favicon="/images/logo.svg" themeColor="#000" titleName="Print Ya!" />
+<Favicons favicon="/images/logo.svg" themeColor="#000" titleName="ShackCart" />
 
 {#if $session.userId}
   <div class="flex flex-col h-screen w-full overflow-hidden">

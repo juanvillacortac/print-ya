@@ -42,7 +42,7 @@ if (browser) {
   customElements.define(
     // I recommend prefixing your custom elements, but for this example
     // I'm keeping it simple.
-    'print-ya-shared',
+    'shackcart-shared',
     class extends HTMLElement {
       _element: SvelteComponent
 
@@ -63,7 +63,7 @@ if (browser) {
   customElements.define(
     // I recommend prefixing your custom elements, but for this example
     // I'm keeping it simple.
-    'print-ya-preview',
+    'shackcart-preview',
     class extends HTMLElement {
       _element: SvelteComponent
 

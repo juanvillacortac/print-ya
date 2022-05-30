@@ -90,7 +90,7 @@
   let store = $page.stuff.store as Store
   let product = $page.stuff.product as Product
 
-  $: pageTitle = product.name + ' | ' + 'Print Ya!'
+  $: pageTitle = product.name + ' | ' + 'ShackCart'
 </script>
 
 <svelte:head>

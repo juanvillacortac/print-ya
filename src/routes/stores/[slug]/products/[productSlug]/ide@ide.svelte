@@ -144,7 +144,7 @@
     <!-- <div
       class="bg-white flex shadow w-full p-4 z-50 justify-between items-center dark:bg-gray-800"
     >
-      <h2 class="font-bold text-xl">Print Ya!</h2>
+      <h2 class="font-bold text-xl">ShackCart</h2>
       <div class="flex space-x-4 items-center">
         <button
           class="rounded-lg font-bold border-2 border-blue-500 text-sm py-2 px-2 transform-gpu text-blue-500 duration-200 hover:shadow hover:-translate-y-px"

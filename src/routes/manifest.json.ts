@@ -21,9 +21,9 @@ export const get: RequestHandler = (event) => {
       'content-type': 'application/json; charset=utf-8',
     },
     body: {
-      name: 'Print Ya!',
-      short_name: 'Print Ya!',
-      description: 'Print Ya!',
+      name: 'ShackCart',
+      short_name: 'ShackCart',
+      description: 'ShackCart',
       dir: 'auto',
       lang: 'en-US',
       display: 'standalone',
