@@ -62,7 +62,7 @@
 
 <div class="flex h-full w-full relative items-start">
   <div
-    class="border rounded-lg h-auto border-gray-300 w-full top-0 col-span-1 sticky overflow-hidden relative select-none  dark:border-gray-800"
+    class="border rounded-lg h-auto border-gray-300 w-full top-0 col-span-1 sticky overflow-hidden relative select-none  dark:border-gray-700"
     style="aspect-ratio: 1/1"
     use:squareratio
   >
