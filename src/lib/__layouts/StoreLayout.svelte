@@ -1,6 +1,6 @@
 <script lang="ts">
   import Favicons from '$lib/components/Favicons.svelte'
-  import { page } from '$app/stores'
+  import { navigating, page } from '$app/stores'
   import Image from '$lib/components/caravaggio/Image.svelte'
   import {
     Moon24,
@@ -11,12 +11,17 @@
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
-  import { bag, preferences } from '$lib/stores'
+  import { bag, pageSubtitle, preferences } from '$lib/stores'
 
   export let store: Store
 
-  $: pageTitle =
-    ($page.stuff.subtitle ? $page.stuff.subtitle + ' | ' : '') + store.name
+  let subtitle = ''
+  $: subtitle = $pageSubtitle ? $pageSubtitle : subtitle
+  $: if (!$navigating) {
+    $pageSubtitle = ''
+  }
+
+  $: pageTitle = (subtitle ? subtitle + ' | ' : '') + store.name
 </script>
 
 <svelte:head>

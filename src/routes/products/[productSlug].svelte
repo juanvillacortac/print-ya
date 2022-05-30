@@ -44,22 +44,19 @@
 
 <script lang="ts">
   export let product: Product
-  import { bag } from '$lib'
+  import { bag, pageSubtitle } from '$lib'
   import { tooltip } from '$lib/components/tooltip'
   import { onMount } from 'svelte'
   import type { ProductModifierItem } from '@prisma/client'
   import Image from '$lib/components/caravaggio/Image.svelte'
-  import RgbWheel from '$lib/components/__RGBWheel.svelte'
   import { squareratio } from '$lib/actions/aspectratio'
-  import Slider from 'svelte-range-slider-pips'
   import { uploadFile } from '$lib/supabase'
   import { page } from '$app/stores'
-  import { useCaravaggio } from '$lib/components/caravaggio/useCaravaggio'
-  import type { mapLinear } from 'three/src/math/MathUtils'
-  import { browser } from '$app/env'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
 
   let quantity = product.minQuantity || 1
+
+  $pageSubtitle = product?.name
 
   let modifiers: Record<string, { value?: any; itemId?: string }> =
     product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
