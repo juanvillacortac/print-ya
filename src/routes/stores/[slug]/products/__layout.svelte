@@ -17,8 +17,4 @@
   }
 </script>
 
-<h2 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
-  Products
-</h2>
-<div class="flex space-x-4 mb-6 items-center" />
 <slot />

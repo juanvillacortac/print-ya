@@ -20,6 +20,7 @@
   import type { TemplateSource } from '$lib/compiler'
   import ProductMainFieldsEditor from './ProductMainFieldsEditor.svelte'
   import ProductMockupImagesEditor from './ProductMockupImagesEditor.svelte'
+  import TemplatePreview from '$lib/components/TemplatePreview.svelte'
 
   export let product: Partial<Product> = {
     price: 0.01,
@@ -114,14 +115,14 @@
   const zoomOut = () => (scale = Math.max(10, Math.min(scale - 10, 200)))
 </script>
 
+<h2 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
+  {product.id ? title : 'New product'}
+</h2>
 <form
   on:submit|preventDefault|stopPropagation={submit}
   class="flex flex-col mx-auto space-y-4 w-full lg:max-w-9/10"
 >
-  <div class="flex lg:items-center lg:justify-between <lg:flex-col">
-    <h3 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
-      {product.id ? title : 'New product'}
-    </h3>
+  <div class="flex lg:items-center lg:justify-end <lg:flex-col">
     <div
       class="flex justify-end items-end lg:space-x-6 lg:items-center <lg:flex-col <lg:space-y-4"
     >
@@ -148,7 +149,7 @@
     </div>
   </div>
   <div
-    class="grid gap-4 grid-cols-1 items-start"
+    class="w-full grid gap-4 grid-cols-1 items-start"
     class:lg:grid-cols-3={product.template && product.type === 'template'}
   >
     <div
@@ -160,59 +161,7 @@
       <ProductModifiersEditor bind:modifiers />
     </div>
     {#if product.template && product.type === 'template'}
-      <div class="flex w-full top-0 sticky" style="aspect-ratio: 1/1">
-        <div
-          class="border rounded h-full border-gray-300 w-full absolute overflow-auto checkerboard dark:border-gray-800"
-        >
-          <div
-            class="origin-top-left transition-transform duration-200"
-            style="transform: scale({scale / 100})"
-          >
-            <Preview template={$editor} bind:border />
-          </div>
-        </div>
-        <div
-          class="flex space-x-1 right-1rem bottom-1rem absolute items-center"
-        >
-          <p class="font-bold text-xs pr-4">{scale}%</p>
-          <button
-            class="preview-button"
-            title="Zoom Out"
-            type="button"
-            use:tooltip
-            on:click={zoomOut}
-          >
-            <ZoomOut16 class="font-bold" />
-          </button>
-          <button
-            class="preview-button"
-            title="Reset zoom"
-            type="button"
-            use:tooltip
-            on:click={() => (scale = 100)}
-          >
-            <ZoomFit16 class="font-bold" />
-          </button>
-          <button
-            class="preview-button"
-            title="Zoom In"
-            type="button"
-            use:tooltip
-            on:click={zoomIn}
-          >
-            <ZoomIn16 class="font-bold" />
-          </button>
-          <button
-            class="preview-button"
-            type="button"
-            title="Toggle border"
-            use:tooltip
-            on:click={() => (border = !border)}
-          >
-            <Checkbox16 class="font-bold" />
-          </button>
-        </div>
-      </div>
+      <TemplatePreview template={$editor} />
     {/if}
     <!-- <div
       class="flex justify-end items-end lg:space-x-6 lg:items-center lg:hidden <lg:flex-col <lg:space-y-4"

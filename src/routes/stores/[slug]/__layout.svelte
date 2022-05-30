@@ -37,9 +37,6 @@
   }
 </script>
 
-<h2 class="font-bold font-title text-black mb-4 text-3xl dark:text-white">
-  My Stores
-</h2>
 <div
   class="flex mb-6 items-start sm:space-x-4 sm:items-center <sm:flex-col <sm:space-y-4"
 >

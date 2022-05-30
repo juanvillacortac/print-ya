@@ -13,6 +13,7 @@ export type ProductModifierItem = _ProductModifierItem & {
 }
 
 export type ProductModifier = _ProductModifier & {
+  meta?: any
   items?: ProductModifierItem[]
 }
 
@@ -82,6 +83,7 @@ export const getProductsByStore = async ({
       updatedAt: true,
       template: true,
       minQuantity: true,
+      meta: true,
     },
     orderBy: {
       name: 'asc',

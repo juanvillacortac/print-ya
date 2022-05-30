@@ -28,6 +28,9 @@
   $pageSubtitle = 'Products'
 </script>
 
+<h2 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
+  Products
+</h2>
 <a
   class="rounded-full flex bg-blue-500 shadow-lg text-white p-3 transform right-6 bottom-6 z-20 duration-200 fixed hover:scale-95"
   title="Add new product"

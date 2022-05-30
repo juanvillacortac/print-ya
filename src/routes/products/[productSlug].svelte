@@ -57,6 +57,7 @@
   import { useCaravaggio } from '$lib/components/caravaggio/useCaravaggio'
   import type { mapLinear } from 'three/src/math/MathUtils'
   import { browser } from '$app/env'
+  import TemplatePreview from '$lib/components/TemplatePreview.svelte'
 
   let quantity = product.minQuantity || 1
 
@@ -162,17 +163,6 @@
     ]
   }
 
-  let fileInput: HTMLInputElement
-
-  const onFileSelected = (e) => {
-    let image = e.target.files[0]
-    let reader = new FileReader()
-    reader.onloadend = () => {
-      previewBg = `url("${reader.result}")`
-    }
-    reader.readAsDataURL(image)
-  }
-
   let uploadingImage: Record<string, boolean> = {}
   const onModifierImagePaste = async (m: ProductModifier) => {
     try {
@@ -236,142 +226,7 @@
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
   <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-2">
     {#if product.template && product.type === 'template'}
-      <div class="flex h-full relative items-start">
-        <div
-          class="border rounded-lg h-auto border-gray-300 w-full top-0 col-span-1 sticky overflow-hidden relative select-none  dark:border-gray-800"
-          style="aspect-ratio: 1/1"
-          use:squareratio
-        >
-          <div
-            class="flex flex-col h-full w-full top-0 z-20 absolute pointer-events-none items-center justify-end"
-          >
-            <div
-              class="flex opacity-50 transition-opacity duration-200 pointer-events-auto items-center hover:opacity-100"
-            >
-              <div class="rounded-lg flex bg-red-500 p-6px">
-                <Rotate16 class="text-white" />
-              </div>
-              <div class="w-200px">
-                <Slider
-                  bind:values={previewRotate}
-                  min={-180}
-                  max={180}
-                  step={10}
-                  --range-slider="rgb(252, 165, 165)"
-                  --range-handle="rgb(239, 68, 68)"
-                  --range-handle-inactive="rgb(239, 68, 68)"
-                  --range-handle-focus="rgb(239, 68, 68)"
-                />
-              </div>
-              <div class="rounded-lg flex bg-red-500 p-6px">
-                <Rotate16 class="text-white" style="transform: scale(-1, 1);" />
-              </div>
-            </div>
-          </div>
-          <div
-            class="flex h-full w-full top-0 z-20 absolute pointer-events-none items-center justify-end"
-          >
-            <div
-              class="flex flex-col opacity-50 transition-opacity duration-200 pointer-events-auto items-center hover:opacity-100"
-            >
-              <div class="rounded-lg flex bg-red-500 p-6px">
-                <ZoomIn16 class="text-white" />
-              </div>
-              <Slider
-                bind:values={previewScale}
-                min={10}
-                max={200}
-                step={10}
-                vertical
-                --range-slider="rgb(252, 165, 165)"
-                --range-handle="rgb(239, 68, 68)"
-                --range-handle-inactive="rgb(239, 68, 68)"
-                --range-handle-focus="rgb(239, 68, 68)"
-              />
-              <div class="rounded-lg flex bg-red-500 p-6px">
-                <ZoomOut16 class="text-white" />
-              </div>
-            </div>
-          </div>
-          <div
-            class="flex space-x-2 opacity-50 transition-opacity top-2 left-2 z-20 duration-200 absolute items-center hover:opacity-100"
-          >
-            <div class="transform z-20 duration-200 relative hover:scale-90">
-              <input
-                type="color"
-                class="cursor-pointer opacity-0 z-20 absolute !h-8 !w-8"
-                title="Change preview background"
-                use:tooltip
-                value="#ffffff"
-                on:input={(e) => {
-                  previewBg = e.currentTarget.value
-                }}
-                on:change={(e) => {
-                  previewBg = e.currentTarget.value
-                }}
-              />
-              <RgbWheel
-                class="border rounded-full flex border-gray-500 h-10 transform w-10 dark:border-gray-700"
-              />
-            </div>
-            <button
-              class="border rounded-full flex border-gray-500 h-10 transform transition-transform w-10 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
-              title="Set transparent background"
-              use:tooltip
-              on:click={() => (previewBg = '')}
-            />
-            <button
-              class="flex text-gray-500 preview-button"
-              title="Set background from image"
-              type="button"
-              on:click={() => fileInput?.click()}
-              use:tooltip
-            >
-              <Camera24 class="flex font-bold" />
-            </button>
-            <input
-              type="file"
-              class="hidden"
-              accept=".jpg, .jpeg, .png"
-              on:change={(e) => onFileSelected(e)}
-              bind:this={fileInput}
-            />
-          </div>
-          <div
-            class="flex h-full w-full items-center justify-center relative"
-            class:checkerboard={!previewBg}
-            style:background={previewBg}
-            class:!bg-cover={previewBg}
-            class:!bg-center={previewBg}
-          >
-            <div
-              class="bg-repeat-space flex h-full w-full opacity-12 inset-0 absolute"
-              style="background-image: url({useCaravaggio(
-                $page.stuff.store.logo,
-                {
-                  o: 'png',
-                  rotate: {
-                    v: 45,
-                    b: '000000.00',
-                  },
-                  rs: {
-                    s: 'x28',
-                    m: 'scale',
-                  },
-                }
-              )})"
-            />
-            <Preview
-              {template}
-              fitParent
-              scaleFactor={Math.max(previewScale[0] / 100, 0)}
-              rotation={previewRotate[0]}
-              draggable
-              notLoadFonts
-            />
-          </div>
-        </div>
-      </div>
+      <TemplatePreview {template} />
     {/if}
     <div class="flex flex-col space-y-4">
       <div class="flex flex-col space-y-2 items-start">
@@ -527,7 +382,7 @@
                   {#each m.items as i}
                     <button
                       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
-                      title={i.meta.name}
+                      title={i?.meta?.name}
                       class:scale-120={modifiers[m.id].itemId == i.id}
                       class:!border-blue-800={modifiers[m.id].itemId == i.id}
                       on:click={() =>
