@@ -11,6 +11,7 @@
   import { html } from '@codemirror/lang-html'
   import { json } from '@codemirror/lang-json'
   import { css } from '@codemirror/legacy-modes/mode/css'
+  import { javascript } from '@codemirror/legacy-modes/mode/javascript'
   import { abbreviationTracker } from '@emmetio/codemirror6-plugin'
 
   import { basicSetup, hoverPreview } from '$lib/editorplugin'
@@ -92,6 +93,7 @@
     switch (language) {
       case 'html':
         extensions.push(html())
+        extensions.push(StreamLanguage.define(javascript))
         extensions.push(abbreviationTracker())
         break
       case 'css':
