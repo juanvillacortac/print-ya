@@ -59,7 +59,7 @@
   <div class="flex flex-col h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
       <div
-        class="bg-white border-r flex flex-col h-full space-y-6 border-light-900 p-4 text-gray-400 z-10 justify-between sidebar dark:bg-gray-900 dark:border-gray-800"
+        class="bg-white border-r flex flex-col h-full  border-light-900 p-4 text-gray-400 z-10 justify-between sidebar dark:bg-gray-900 dark:border-gray-800"
         class:open={sidebar}
       >
         <div
