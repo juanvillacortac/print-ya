@@ -43,7 +43,7 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
     )
     replacedHtml = replaceAll(html, '<script=>', '<%=')
     replacedHtml = replaceAll(html, '<script =>', '<%=')
-    html = ejs.render(replacedHtml, ' %>'), {
+    html = ejs.render(replacedHtml, {
       ...payload,
       fillImage: (href: string, color: string = '000000.0') =>
         urlBuilder({ url: 'https://caravaggio-cdn.vercel.app' }, href, {
