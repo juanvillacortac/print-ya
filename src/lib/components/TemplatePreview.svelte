@@ -12,7 +12,10 @@
   import { tooltip } from './tooltip'
   import RgbWheel from './__RGBWheel.svelte'
   import Preview from './Preview.svelte'
-  import { useCaravaggio } from './caravaggio/useCaravaggio'
+  import {
+    useCaravaggio,
+    useCaravaggioBuilder,
+  } from './caravaggio/useCaravaggio'
   import { page } from '$app/stores'
   import { scale } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
@@ -53,6 +56,8 @@
       m: 'scale',
     },
   }
+
+  const urlBuilder = useCaravaggioBuilder()
 
   let gallery = false
 
@@ -97,14 +102,15 @@
                 }}
               >
                 <button
-                  class="border-dashed rounded-lg flex border-2 p-2 transform transition-transform duration-200 overflow-hidden relative dark:border-gray-700 hover:scale-95"
+                  class="border-dashed rounded-lg flex border-2 w-full p-2 transform transition-transform duration-200 overflow-hidden relative dark:border-gray-700 hover:scale-95"
                   title="Set as background"
                   use:tooltip
                   type="button"
                   on:click={() => {
-                    previewBg = `url('${url}')`
+                    previewBg = `url('${urlBuilder(url, options)}')`
                     gallery = false
                   }}
+                  use:squareratio
                 >
                   <Image
                     {options}
