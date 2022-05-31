@@ -56,7 +56,7 @@ export const handle = handleSession(
       }
 
       response = await resolve(event, {
-        ssr: event.locals.layout !== 'app',
+        // ssr: event.locals.layout !== 'app',
       })
 
       if (event.locals.layout === 'store') {
