@@ -60,6 +60,7 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
           },
         }),
     })
+    console.log(html)
     css = ejs.render(
       replaceAll(replaceAll(css, '{{', '<%'), '}}', ' %>'),
       payload
