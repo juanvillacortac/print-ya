@@ -45,6 +45,9 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
     replacedHtml = replaceAll(replacedHtml, '<script =>', '<%=')
     replacedHtml = replaceAll(replacedHtml, '<script~>', '<%-')
     replacedHtml = replaceAll(replacedHtml, '<script ~>', '<%-')
+    replacedHtml = replaceAll(replacedHtml, '<script _>', '<%_')
+    replacedHtml = replaceAll(replacedHtml, '</_script>', '_%>')
+    replacedHtml = replaceAll(replacedHtml, '</-script>', '-%>')
     html = ejs.render(replacedHtml, {
       ...payload,
       fillImage: (href: string, color: string = '000000.0') =>
