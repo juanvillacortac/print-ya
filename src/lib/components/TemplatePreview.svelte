@@ -18,6 +18,7 @@
   import { expoOut } from 'svelte/easing'
   import Image from './caravaggio/Image.svelte'
   import { flip } from 'svelte/animate'
+  import { clamp } from '$lib/utils/math'
 
   /** @type {{
    * path: string
@@ -121,12 +122,20 @@
       class="flex flex-col h-full w-full top-0 z-20 absolute pointer-events-none items-center justify-end"
     >
       <div
-        class="flex opacity-50 transition-opacity duration-200 pointer-events-auto items-center hover:opacity-100"
+        class="flex opacity-50 transition-opacity duration-200 pointer-events-auto items-center <sm:space-x-4 <sm:p-2 hover:opacity-100 "
       >
-        <div class="rounded-lg flex bg-red-500 p-6px">
+        <div
+          class="rounded-lg cursor-pointer flex bg-red-500 p-6px transform duration-200 hover:scale-95"
+          on:click={() =>
+            (previewRotate[0] = clamp({
+              min: -180,
+              max: 180,
+              val: previewRotate[0] - 10,
+            }))}
+        >
           <Rotate16 class="text-white" />
         </div>
-        <div class="w-200px">
+        <div class="w-200px <sm:hidden">
           <Slider
             bind:values={previewRotate}
             min={-180}
@@ -138,7 +147,15 @@
             --range-handle-focus="rgb(239, 68, 68)"
           />
         </div>
-        <div class="rounded-lg flex bg-red-500 p-6px">
+        <div
+          class="rounded-lg cursor-pointer flex bg-red-500 p-6px transform duration-200 hover:scale-95"
+          on:click={() =>
+            (previewRotate[0] = clamp({
+              min: -180,
+              max: 180,
+              val: previewRotate[0] + 10,
+            }))}
+        >
           <Rotate16 class="text-white" style="transform: scale(-1, 1);" />
         </div>
       </div>
@@ -147,23 +164,41 @@
       class="flex h-full w-full top-0 z-20 absolute pointer-events-none items-center justify-end"
     >
       <div
-        class="flex flex-col opacity-50 transition-opacity duration-200 pointer-events-auto items-center hover:opacity-100"
+        class="flex flex-col opacity-50 transition-opacity duration-200 pointer-events-auto items-center <sm:space-y-4 <sm:p-2 hover:opacity-100"
       >
-        <div class="rounded-lg flex bg-red-500 p-6px">
+        <div
+          class="rounded-lg cursor-pointer flex bg-red-500 p-6px transform duration-200 hover:scale-95"
+          on:click={() =>
+            (previewScale[0] = clamp({
+              min: 10,
+              max: 200,
+              val: previewScale[0] + 10,
+            }))}
+        >
           <ZoomIn16 class="text-white" />
         </div>
-        <Slider
-          bind:values={previewScale}
-          min={10}
-          max={200}
-          step={10}
-          vertical
-          --range-slider="rgb(252, 165, 165)"
-          --range-handle="rgb(239, 68, 68)"
-          --range-handle-inactive="rgb(239, 68, 68)"
-          --range-handle-focus="rgb(239, 68, 68)"
-        />
-        <div class="rounded-lg flex bg-red-500 p-6px">
+        <div class="content <sm:hidden">
+          <Slider
+            bind:values={previewScale}
+            min={10}
+            max={200}
+            step={10}
+            vertical
+            --range-slider="rgb(252, 165, 165)"
+            --range-handle="rgb(239, 68, 68)"
+            --range-handle-inactive="rgb(239, 68, 68)"
+            --range-handle-focus="rgb(239, 68, 68)"
+          />
+        </div>
+        <div
+          class="rounded-lg cursor-pointer flex bg-red-500 p-6px transform duration-200 hover:scale-95"
+          on:click={() =>
+            (previewScale[0] = clamp({
+              min: 10,
+              max: 200,
+              val: previewScale[0] - 10,
+            }))}
+        >
           <ZoomOut16 class="text-white" />
         </div>
       </div>

@@ -29,6 +29,7 @@ specifiers:
   '@leveluptuts/svelte-toy': ^0.0.18
   '@poppanator/sveltekit-svg': ^0.2.3
   '@prisma/client': ^3.12.0
+  '@rgossiaux/svelte-headlessui': ^1.0.2
   '@supabase/supabase-js': ^1.35.3
   '@sveltejs/adapter-auto': 1.0.0-next.40
   '@sveltejs/adapter-cloudflare': ^1.0.0-next.18
@@ -116,6 +117,7 @@ dependencies:
   '@leveluptuts/g-query': 0.2.3_typescript@4.6.4
   '@leveluptuts/svelte-toy': 0.0.18
   '@prisma/client': 3.14.0_prisma@3.14.0
+  '@rgossiaux/svelte-headlessui': 1.0.2_svelte@3.48.0
   '@supabase/supabase-js': 1.35.3
   '@types/bcryptjs': 2.4.2
   bcryptjs: 2.4.3
@@ -1708,6 +1710,14 @@ packages:
     resolution: {integrity: sha512-LwZvI3FY6f43xFjQNRuE10JM5R8vJzFTSmbV9X0Wuhv9kscLkjRlZt0BEoiHmO+2HA3B3xxbMfB5du7ZoSFXGg==}
     requiresBuild: true
     dev: true
+
+  /@rgossiaux/svelte-headlessui/1.0.2_svelte@3.48.0:
+    resolution: {integrity: sha512-sauopYTSivhzXe1kAvgawkhyYJcQlK8Li3p0d2OtcCIVprOzdbard5lbqWB4xHDv83zAobt2mR08oizO2poHLQ==}
+    peerDependencies:
+      svelte: ^3.44.0
+    dependencies:
+      svelte: 3.48.0
+    dev: false
 
   /@rollup/pluginutils/4.2.1:
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}

@@ -236,6 +236,12 @@
             {@const item = modifiers[m.id]
               ? m.items.find((i) => i.id === modifiers[m.id]?.itemId)
               : undefined}
+            {@const itemName =
+              m.type === 'font'
+                ? item?.name
+                : m.type === 'color'
+                ? item?.meta?.name
+                : ''}
             <div
               class="flex w-full {m.type
                 ? 'space-y-2 flex-col'
@@ -244,8 +250,8 @@
               <div
                 class="font-bold font-title text-black text-xs dark:text-white"
               >
-                {m.name}{#if item && item?.meta?.name}: <span
-                    class="font-normal">{item.meta.name}</span
+                {m.name}{#if itemName}: <span class="font-normal"
+                    >{itemName}</span
                   >{/if}
               </div>
               {#if m.type === 'select'}

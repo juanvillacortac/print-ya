@@ -3,19 +3,11 @@
   import { page } from '$app/stores'
   import type { Product, ProductModifier, Store } from '$lib/db'
   const store = $page.stuff.store as Store
-  import { Editor } from 'bytemd'
   import { post } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
-  import { goto, invalidate } from '$app/navigation'
-  import {
-    Checkbox16,
-    Launch16,
-    ZoomFit16,
-    ZoomIn16,
-    ZoomOut16,
-  } from 'carbon-icons-svelte'
+  import { goto } from '$app/navigation'
+  import { Launch16 } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
-  import Preview from '$lib/components/Preview.svelte'
   import { writable } from 'svelte/store'
   import ProductModifiersEditor from './ProductModifiersEditor.svelte'
   import type { TemplateSource } from '$lib/compiler'
@@ -123,10 +115,6 @@
       saving = false
     }
   }
-
-  let border = true
-
-  let scale = 100
 
   let modifiers: (ProductModifier & { internalId?: string })[] = [
     ...(product?.modifiers || []),

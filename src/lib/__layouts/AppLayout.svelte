@@ -11,6 +11,7 @@
     Sun24,
     Settings24,
     Logout24,
+    ChevronLeft20,
   } from 'carbon-icons-svelte'
   import Favicons from '$lib/components/Favicons.svelte'
   import { pageSubtitle } from '$lib/stores'
@@ -44,6 +45,8 @@
   }
 
   $: pageTitle = (subtitle ? subtitle + ' | ' : '') + 'ShackCart'
+
+  let sidebar = false
 </script>
 
 <svelte:head>
@@ -56,8 +59,21 @@
   <div class="flex flex-col h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
       <div
-        class="bg-white border-r flex flex-col h-full space-y-6 border-light-900 p-4 text-gray-400 z-20 justify-between dark:bg-gray-900 dark:border-gray-800"
+        class="bg-white border-r flex flex-col h-full space-y-6 border-light-900 p-4 text-gray-400 z-10 justify-between sidebar dark:bg-gray-900 dark:border-gray-800"
+        class:open={sidebar}
       >
+        <div
+          class="opacity-50 right-[calc(-52px-16px)] bottom-4 absolute sm:hidden"
+        >
+          <button
+            class="rounded-full outline-none bg-blue-500 shadow text-white p-4"
+            on:click={() => (sidebar = !sidebar)}
+          >
+            <ChevronLeft20
+              class="transform duration-400 {!sidebar ? 'rotate-180' : ''}"
+            />
+          </button>
+        </div>
         <div class="flex flex-col h-full space-y-6">
           <a
             class="flex h-24px w-24px relative items-center justify-center"
@@ -105,12 +121,18 @@
               class:text-black={current}
               class:dark:text-white={current}
               href={p.href}
+              on:click={() => (sidebar = false)}
             >
-              <svelte:component this={p.icon} />
+              <div class="flex space-x-2">
+                <svelte:component this={p.icon} />
+                <span class="sm:hidden">{p.title}</span>
+              </div>
             </a>
           {/each}
         </div>
-        <div class="flex flex-col space-y-6">
+        <div
+          class="flex sm:flex-col sm:space-y-6 <sm:space-x-6 <sm:items-center <sm:justify-between"
+        >
           <button
             on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
             class="flex relative hover:text-black dark:hover:text-white"
@@ -129,7 +151,7 @@
                 window.location.replace('/login')
               })
             }}
-            class="flex relative justify-self-end self-end hover:text-black dark:hover:text-white"
+            class="flex relative items-end justify-end hover:text-black dark:hover:text-white"
             title="Log out"
             use:tooltip
             style="width: 24px; height: 24px"
@@ -150,3 +172,14 @@
 {:else}
   <slot />
 {/if}
+
+<style>
+  @media (max-width: 639.9px) {
+    .sidebar:not(.open) {
+      transform: translateX(-100%);
+    }
+    .sidebar {
+      @apply transition-transform top-0 left-0 duration-400 fixed;
+    }
+  }
+</style>

@@ -2,10 +2,10 @@
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
 
-  import ProductEditLayout from '$lib/__layouts/ProductEditLayout.svelte'
+  import ProductEditor from '$lib/__app/product-editor/ProductEditor.svelte'
 
   let product = $page.stuff.product
   $pageSubtitle = product.name
 </script>
 
-<ProductEditLayout {product} />
+<ProductEditor {product} />

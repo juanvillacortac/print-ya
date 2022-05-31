@@ -1,9 +1,9 @@
 <script lang="ts">
   import { pageSubtitle } from '$lib/stores'
 
-  import ProductEditLayout from '$lib/__layouts/ProductEditLayout.svelte'
+  import ProductEditor from '$lib/__app/product-editor/ProductEditor.svelte'
 
   $pageSubtitle = 'New product'
 </script>
 
-<ProductEditLayout />
+<ProductEditor />
