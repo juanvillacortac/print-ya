@@ -35,7 +35,15 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
     // const { css, js } = compile(component, { generate: 'ssr', hydratable: false })
     // console.log(js.code)
     // const html = await jsx.render(`(props) => (${data.html})`, payload)
-    html = ejs.render(replaceAll(replaceAll(html, '{{', '<%'), '}}', ' %>'), {
+    let replacedHtml = replaceAll(replaceAll(html, '{{', '<%'), '}}', ' %>')
+    replacedHtml = replaceAll(
+      replaceAll(html, '<script>', '<%'),
+      '</script>',
+      ' %>'
+    )
+    replacedHtml = replaceAll(html, '<script=>', '<%=')
+    replacedHtml = replaceAll(html, '<script =>', '<%=')
+    html = ejs.render(replacedHtml, ' %>'), {
       ...payload,
       fillImage: (href: string, color: string = '000000.0') =>
         urlBuilder({ url: 'https://caravaggio-cdn.vercel.app' }, href, {
