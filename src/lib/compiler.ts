@@ -37,12 +37,12 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
     // const html = await jsx.render(`(props) => (${data.html})`, payload)
     let replacedHtml = replaceAll(replaceAll(html, '{{', '<%'), '}}', ' %>')
     replacedHtml = replaceAll(
-      replaceAll(html, '<script>', '<%'),
+      replaceAll(replacedHtml, '<script>', '<%'),
       '</script>',
       ' %>'
     )
-    replacedHtml = replaceAll(html, '<script=>', '<%=')
-    replacedHtml = replaceAll(html, '<script =>', '<%=')
+    replacedHtml = replaceAll(replacedHtml, '<script=>', '<%=')
+    replacedHtml = replaceAll(replacedHtml, '<script =>', '<%=')
     html = ejs.render(replacedHtml, {
       ...payload,
       fillImage: (href: string, color: string = '000000.0') =>
