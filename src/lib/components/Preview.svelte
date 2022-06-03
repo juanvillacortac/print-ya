@@ -259,9 +259,9 @@
     // containerEl.style.transform = `translate(${dragPos.x / scaleFactor}px, ${
     //   dragPos.y / scaleFactor
     // }px)`
-    innerEl.style.transform = `scale3d(${scaleFactor}, ${scaleFactor}, 1) translate3d(${
+    innerEl.style.transform = `scale(${scaleFactor}) translate(${
       dragPos.x / scaleFactor
-    }px, ${dragPos.y / scaleFactor}px, 0px) rotate3d(0, 0, 1, ${rotation}deg)`
+    }px, ${dragPos.y / scaleFactor}px) rotate(${rotation}deg)`
   }
 </script>
 
