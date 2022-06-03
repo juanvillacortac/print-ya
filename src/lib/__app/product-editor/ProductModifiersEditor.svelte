@@ -118,6 +118,11 @@
       icon: CheckboxChecked16,
     },
     { type: 'color', name: 'Color', tree: ColorTable, embeddable: true },
+    {
+      type: 'upsell',
+      name: 'Upselling',
+      tree: SelectionTable,
+    },
   ]
 
   const deleteModifier = ({
@@ -128,7 +133,7 @@
       internalId ? m.internalId == internalId : m.id == id
     )
     modifiers[idx].active = false
-    if (internalId) {
+    if (!modifiers[idx].id) {
       modifiers.splice(idx, 1)
       modifiers = [...modifiers]
     }
@@ -174,7 +179,7 @@
       class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
       transition:slide|local={{ duration: 400, easing: expoOut }}
     >
-      {#each modifiers.filter((m) => m.active) as m, idx (m.internalId)}
+      {#each modifiers.filter((m) => m.active) as m (m.internalId)}
         {@const mType = modifierTypes.find((t) => t.type == m.type)}
         <div
           class="flex flex-col flex-grow space-y-2 w-full"

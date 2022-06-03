@@ -32,8 +32,9 @@
 
   const options: CaravaggioOptions = {
     progressive: true,
+    o: 'png',
     rs: {
-      s: '500x500',
+      s: '480x480',
       m: 'scale',
     },
   }

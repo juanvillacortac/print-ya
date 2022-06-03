@@ -4,6 +4,7 @@
   import {
     Camera24,
     Close24,
+    ColorPalette24,
     ImageSearch24,
     Rotate16,
     ZoomIn16,
@@ -51,8 +52,9 @@
   /** @type {import('./caravaggio/urlBuilder').CaravaggioOptions} */
   const options = {
     progressive: true,
+    o: 'png',
     rs: {
-      s: '500x500',
+      s: '480x480',
       m: 'scale',
     },
   }
@@ -128,7 +130,7 @@
       class="flex flex-col h-full w-full top-0 z-20 absolute pointer-events-none items-center justify-end"
     >
       <div
-        class="flex opacity-50 transition-opacity duration-200 pointer-events-auto items-center <sm:space-x-4 <sm:p-2 hover:opacity-100 "
+        class="flex opacity-50 transition-opacity duration-200 pointer-events-auto items-center <sm:space-x-4 <sm:p-2 hover:opacity-100"
       >
         <div
           class="rounded-lg cursor-pointer flex bg-red-500 p-6px transform duration-200 hover:scale-95"
@@ -210,60 +212,66 @@
       </div>
     </div>
     <div
-      class="flex space-x-2 opacity-50 transition-opacity top-2 left-2 z-20 duration-200 absolute items-center hover:opacity-100"
+      class="bg-white border rounded-br-lg flex flex-col space-y-2 opacity-80 p-2 transition-opacity top-[-2px] z-20 duration-200 absolute dark:bg-gray-800 dark:border-gray-700 hover:opacity-100"
     >
-      <div class="transform z-20 duration-200 relative hover:scale-90">
-        <input
-          type="color"
-          class="cursor-pointer opacity-0 z-20 absolute !h-8 !w-8"
-          title="Change preview background"
+      <!-- <div class="font-bold text-xl text-xs">Preview options</div> -->
+      <div class="flex flex-col space-y-2 items-center">
+        <button
+          class="border rounded-full flex border-gray-500 h-8 transform transition-transform w-8 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
+          title="Set transparent background"
+          type="button"
           use:tooltip
-          value="#ffffff"
-          on:input={(e) => {
-            previewBg = e.currentTarget.value
-          }}
-          on:change={(e) => {
-            previewBg = e.currentTarget.value
-          }}
+          on:click={() => (previewBg = '')}
         />
-        <RgbWheel
-          class="border rounded-full flex border-gray-500 h-10 transform w-10 dark:border-gray-700"
-        />
-      </div>
-      <button
-        class="border rounded-full flex border-gray-500 h-10 transform transition-transform w-10 duration-200 checkerboard-sm !bg-white dark:border-gray-700 hover:scale-90"
-        title="Set transparent background"
-        type="button"
-        use:tooltip
-        on:click={() => (previewBg = '')}
-      />
-      <button
-        class="flex text-gray-500 preview-button"
-        title="Set background from image"
-        type="button"
-        on:click={() => fileInput?.click()}
-        use:tooltip
-      >
-        <Camera24 class="flex font-bold" />
-      </button>
-      {#if mockups?.length}
+        <div class="transform z-20 duration-200 relative hover:scale-90">
+          <input
+            type="color"
+            class="cursor-pointer opacity-0 z-20 absolute !h-8 !w-8"
+            title="Pick preview background color"
+            use:tooltip
+            value="#ffffff"
+            on:input={(e) => {
+              previewBg = e.currentTarget.value
+            }}
+            on:change={(e) => {
+              previewBg = e.currentTarget.value
+            }}
+          />
+          <div
+            class="flex text-gray-500 preview-button items-center justify-center"
+            type="button"
+          >
+            <ColorPalette24 class="flex font-bold" />
+          </div>
+        </div>
         <button
           class="flex text-gray-500 preview-button"
-          title="Set background from gallery"
+          title="Set background from image"
           type="button"
-          on:click={() => (gallery = true)}
+          on:click={() => fileInput?.click()}
           use:tooltip
         >
-          <ImageSearch24 class="flex font-bold" />
+          <Camera24 class="flex font-bold" />
         </button>
-      {/if}
-      <input
-        type="file"
-        class="hidden"
-        accept="image/*"
-        on:change={(e) => onFileSelected(e)}
-        bind:this={fileInput}
-      />
+        {#if mockups?.length}
+          <button
+            class="flex text-gray-500 preview-button"
+            title="Set background from gallery"
+            type="button"
+            on:click={() => (gallery = true)}
+            use:tooltip
+          >
+            <ImageSearch24 class="flex font-bold" />
+          </button>
+        {/if}
+        <input
+          type="file"
+          class="hidden"
+          accept="image/*"
+          on:change={(e) => onFileSelected(e)}
+          bind:this={fileInput}
+        />
+      </div>
     </div>
     <div
       class="flex h-full w-full items-center justify-center relative"
@@ -303,10 +311,11 @@
 <style>
   .preview-button {
     @apply bg-white border rounded flex border-gray-400 shadow p-1 transform transition-transform duration-200;
+    will-change: transform;
   }
 
   .preview-button:hover {
-    @apply -translate-y-px;
+    @apply scale-90;
   }
 
   :global(.dark) .preview-button {
