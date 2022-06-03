@@ -17,6 +17,7 @@
   import SelectionTable from './modifiers/SelectionTable.svelte'
   import ColorTable from './modifiers/ColorTable.svelte'
   import FontTable from './modifiers/FontTable.svelte'
+  import UpsellEditor from './modifiers/UpsellEditor.svelte'
 
   type Unarray<T> = T extends Array<infer U> ? U : T
 
@@ -121,7 +122,7 @@
     {
       type: 'upsell',
       name: 'Upselling',
-      tree: SelectionTable,
+      tree: UpsellEditor,
     },
   ]
 

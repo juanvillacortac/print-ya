@@ -26,11 +26,10 @@
     const idx = modifier.items.findIndex((ii) =>
       i.id ? ii.id == i.id : ii.internalId == i.internalId
     )
-    if (i.internalId) {
+    modifier.items[idx].active = false
+    if (!modifier.items[idx].id) {
       modifier.items.splice(idx, 1)
       modifier.items = [...modifier.items]
-    } else {
-      modifier.items[idx].active = false
     }
   }
 </script>

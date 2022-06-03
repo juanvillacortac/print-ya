@@ -11,14 +11,13 @@
     ZoomOut16,
   } from 'carbon-icons-svelte'
   import { tooltip } from './tooltip'
-  import RgbWheel from './__RGBWheel.svelte'
   import Preview from './Preview.svelte'
   import {
     useCaravaggio,
     useCaravaggioBuilder,
   } from './caravaggio/useCaravaggio'
   import { page } from '$app/stores'
-  import { scale } from 'svelte/transition'
+  import { scale, slide } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import Image from './caravaggio/Image.svelte'
   import { flip } from 'svelte/animate'
@@ -94,8 +93,8 @@
   >
     {#if gallery}
       <div
-        class="bg-white rounded-lg flex flex-col h-full space-y-2 w-full p-2 z-30 absolute dark:bg-gray-800"
-        transition:scale|local={{ easing: expoOut, start: 0.2 }}
+        class="bg-white flex flex-col h-full space-y-2 w-full p-2 z-30 absolute dark:bg-gray-800"
+        transition:slide|local={{ easing: expoOut }}
       >
         <div class="flex w-full justify-end items-start">
           <button
