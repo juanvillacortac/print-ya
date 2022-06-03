@@ -73,6 +73,24 @@
     class="border rounded-lg h-auto border-gray-300 w-full top-0 col-span-1 sticky overflow-hidden relative select-none  dark:border-gray-700"
     style="aspect-ratio: 1/1"
     use:squareratio
+    on:wheel={(e) => {
+      if (e.ctrlKey) {
+        e.preventDefault()
+        if (e.deltaY > 0) {
+          previewScale[0] = clamp({
+            min: 10,
+            max: 200,
+            val: previewScale[0] - 10,
+          })
+        } else {
+          previewScale[0] = clamp({
+            min: 10,
+            max: 200,
+            val: previewScale[0] + 10,
+          })
+        }
+      }
+    }}
   >
     {#if gallery}
       <div
