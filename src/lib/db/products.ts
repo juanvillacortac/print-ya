@@ -248,8 +248,8 @@ export const upsertProduct = async (
           id: product.storeCategoryId,
         },
       },
-      template: defaultTemplate,
-      templateDraft: defaultTemplate,
+      template: product.template || defaultTemplate,
+      templateDraft: product.template || defaultTemplate,
       modifiers: {
         create: product.modifiers
           .filter((m) => m.active)

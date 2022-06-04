@@ -38,48 +38,84 @@
   let title = product.name
   let saving = false
 
-  const submit = async () => {
+  const validate = () => {
     if (!product.name?.trim()) {
       alert('Product should have a title')
-      return
+      return false
     }
     for (let m of modifiers?.filter((m) => m.active)) {
+      const items = m.items?.filter((i) => i.active)
       if (!m.name) {
         alert('Modifiers should have a title')
-        return
+        return false
       }
       if (m.type == 'select' || m.type == 'font') {
-        if (!m.items?.filter((i) => i.active).length) {
+        if (!items.length) {
           alert('Selection and multiple selection modifier should have items')
-          return
+          return false
         }
-        for (let i of m.items) {
+        for (let i of items) {
           if (!i.name) {
             alert('Modifier items should have a title')
-            return
+            return false
+          }
+        }
+      }
+      if (m.type == 'upsell') {
+        for (let i of items) {
+          if (!i.name) {
+            alert('Upsell product should have a name')
+            return false
+          }
+          if (!i.meta.image) {
+            alert('Upsell product should have an image')
+            return false
           }
         }
       }
       if (m.type == 'font') {
-        for (let i of m.items) {
+        for (let i of items) {
           if (!i.meta.url) {
             alert('Font items should have a valid URL')
-            return
+            return false
           }
         }
       }
       if (m.type == 'color') {
-        for (let i of m.items) {
+        for (let i of items) {
           if (!i.name) {
             alert('Color items should have a value')
-            return
+            return false
           }
           if (!i.meta.name) {
             alert('Color items should have a name')
-            return
+            return false
           }
         }
       }
+    }
+    return true
+  }
+
+  const duplicate = async () => {
+    if (validate()) {
+      const data = await post<Product, Partial<Product>>(
+        `/api/stores/${store.slug}/products`,
+        {
+          ...product,
+          id: '',
+          public: false,
+          modifiers,
+          storeId: store.id,
+        }
+      )
+      goto(`/stores/${store.slug}/products/${data.slug}`)
+    }
+  }
+
+  const submit = async () => {
+    if (!validate()) {
+      return
     }
     try {
       saving = true
@@ -147,9 +183,9 @@
   on:submit|preventDefault|stopPropagation={submit}
   class="flex flex-col mx-auto space-y-4 w-full lg:max-w-9/10"
 >
-  <div class="flex lg:items-center lg:justify-end <lg:flex-col">
+  <div class="flex flex-col space-y-4 lg:items-end">
     <div
-      class="flex justify-end items-end lg:space-x-6 lg:items-center <lg:flex-col <lg:space-y-4"
+      class="flex justify-end items-end lg:space-x-2 lg:items-center <lg:flex-col <lg:space-y-4"
     >
       <div class="flex space-x-4 items-center">
         <input type="checkbox" id="published" bind:checked={product.public} />
@@ -167,6 +203,14 @@
             : ''}</a
         >
       {/if}
+      {#if product.id}
+        <button
+          class="rounded font-bold border-2 border-blue-500 text-xs py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+          type="button"
+          on:click={duplicate}
+          disabled={saving}>Duplicate</button
+        >
+      {/if}
       <button
         class="rounded font-bold border-2 border-blue-500 text-xs py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
         disabled={saving}>{saving ? 'Saving...' : 'Save'}</button
@@ -174,7 +218,7 @@
     </div>
   </div>
   <div
-    class="w-full grid gap-4 grid-cols-1 items-start"
+    class="w-full grid gap-6 grid-cols-1 items-start"
     class:lg:grid-cols-3={product.template && product.type === 'template'}
   >
     <div

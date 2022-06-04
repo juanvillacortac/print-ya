@@ -1,4 +1,4 @@
-lockfileVersion: 5.4
+lockfileVersion: 5.3
 
 specifiers:
   '@bytemd/plugin-gfm': ^1.13.1
@@ -112,7 +112,7 @@ dependencies:
   '@codemirror/tooltip': 0.19.16
   '@codemirror/view': 0.19.48
   '@emmetio/codemirror-plugin': 1.2.4
-  '@emmetio/codemirror6-plugin': 0.0.7_vkeeahccmhej5k7soksck2g6u4
+  '@emmetio/codemirror6-plugin': 0.0.7_aa88401c4261c89eabf272a42568dea7
   '@juanvillacortac/g-query': 0.2.2_typescript@4.6.4
   '@leveluptuts/g-query': 0.2.3_typescript@4.6.4
   '@leveluptuts/svelte-toy': 0.0.18
@@ -172,9 +172,9 @@ devDependencies:
   rollup-plugin-polyfill: 3.0.0
   svelte: 3.48.0
   svelte-check: 2.7.0_svelte@3.48.0
-  svelte-preprocess: 4.10.6_wwvk7nlptlrqo2czohjtk6eiqm
+  svelte-preprocess: 4.10.6_svelte@3.48.0+typescript@4.6.4
   svelte-windicss-preprocess: 4.2.6
-  svelte2tsx: 0.4.14_wwvk7nlptlrqo2czohjtk6eiqm
+  svelte2tsx: 0.4.14_svelte@3.48.0+typescript@4.6.4
   tslib: 2.4.0
   typescript: 4.6.4
   vite-imagetools: 4.0.3
@@ -994,7 +994,7 @@ packages:
     resolution: {integrity: sha512-wVw2gqI6X+uVWYVRtTVymzTgbo4hEZIcPCNj4xrXw4l/+L3Qa+tAC/yf+Xy9nenRPCqRq0RLqGiQL+Qf/wYE9Q==}
     dev: false
 
-  /@emmetio/codemirror6-plugin/0.0.7_vkeeahccmhej5k7soksck2g6u4:
+  /@emmetio/codemirror6-plugin/0.0.7_aa88401c4261c89eabf272a42568dea7:
     resolution: {integrity: sha512-AMW//bJd377WJF4Dm27favyszfJwjpdKaEFVS81fzJ5AnDH+m1tWLCkZLvpS0ySgRHj9yoTjZ+KOHsjrl5PvAQ==}
     peerDependencies:
       '@codemirror/autocomplete': ^0.19.9
@@ -1034,7 +1034,7 @@ packages:
     resolution: {integrity: sha512-8HqW8EVqjnCmWXVpqAOZf+EGESdkR27odcMMMGefgKXtar00SoYNSryGv//TELI4T3QFsECo78p+0lmalk/CFA==}
     dev: false
 
-  /@endemolshinegroup/cosmiconfig-typescript-loader/3.0.2_eqevhppa7sa2qvpxws2sflyfju:
+  /@endemolshinegroup/cosmiconfig-typescript-loader/3.0.2_240953bde0fc81a855f7b4b522af054d:
     resolution: {integrity: sha512-QRVtqJuS1mcT56oHpVegkKBlgtWjXw/gHNWO3eL9oyB5Sc7HBoc2OLG/nYpVfT/Jejvo3NUrD0Udk7XgoyDKkA==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
@@ -1059,7 +1059,7 @@ packages:
       tslib: 2.3.1
     dev: false
 
-  /@graphql-codegen/cli/2.6.2_46emjsxzfxj3xgw6p37zzdssd4:
+  /@graphql-codegen/cli/2.6.2_graphql@16.5.0+typescript@4.6.4:
     resolution: {integrity: sha512-UO75msoVgvLEvfjCezM09cQQqp32+mR8Ma1ACsBpr7nroFvHbgcu2ulx1cMovg4sxDBCsvd9Eq/xOOMpARUxtw==}
     hasBin: true
     peerDependencies:
@@ -1089,7 +1089,7 @@ packages:
       glob: 7.2.0
       globby: 11.1.0
       graphql: 16.5.0
-      graphql-config: 4.3.0_46emjsxzfxj3xgw6p37zzdssd4
+      graphql-config: 4.3.0_graphql@16.5.0+typescript@4.6.4
       inquirer: 8.2.4
       is-glob: 4.0.3
       json-to-pretty-yaml: 1.2.2
@@ -1114,7 +1114,6 @@ packages:
       - typescript
       - utf-8-validate
       - zen-observable
-      - zenObservable
     dev: false
 
   /@graphql-codegen/core/2.5.1_graphql@16.5.0:
@@ -1560,7 +1559,7 @@ packages:
     peerDependencies:
       vite: ^2.8.0
     dependencies:
-      '@graphql-codegen/cli': 2.6.2_46emjsxzfxj3xgw6p37zzdssd4
+      '@graphql-codegen/cli': 2.6.2_graphql@16.5.0+typescript@4.6.4
       '@graphql-codegen/import-types-preset': 2.1.18_graphql@16.5.0
       '@graphql-codegen/near-operation-file-preset': 2.2.12_graphql@16.5.0
       '@graphql-codegen/plugin-helpers': 2.4.2_graphql@16.5.0
@@ -1580,13 +1579,12 @@ packages:
       - typescript
       - utf-8-validate
       - zen-observable
-      - zenObservable
     dev: false
 
   /@leveluptuts/g-query/0.2.3_typescript@4.6.4:
     resolution: {integrity: sha512-x+ybEFlhYSM+lgj5S8qMS5T9JRPARbKPdff49kztauplOAV3v9ByF1dOp6ViOsEG+3y65hdRMZYZvhnDuvgXsA==}
     dependencies:
-      '@graphql-codegen/cli': 2.6.2_46emjsxzfxj3xgw6p37zzdssd4
+      '@graphql-codegen/cli': 2.6.2_graphql@16.5.0+typescript@4.6.4
       '@graphql-codegen/import-types-preset': 2.1.18_graphql@16.5.0
       '@graphql-codegen/near-operation-file-preset': 2.2.12_graphql@16.5.0
       '@graphql-codegen/plugin-helpers': 2.4.2_graphql@16.5.0
@@ -1606,7 +1604,6 @@ packages:
       - typescript
       - utf-8-validate
       - zen-observable
-      - zenObservable
     dev: false
 
   /@leveluptuts/svelte-toy/0.0.18:
@@ -1739,10 +1736,8 @@ packages:
       zen-observable:
         optional: true
     dependencies:
-      any-observable: 0.3.0_rxjs@6.6.7
+      any-observable: 0.3.0
       rxjs: 6.6.7
-    transitivePeerDependencies:
-      - zenObservable
     dev: false
 
   /@sindresorhus/is/0.14.0:
@@ -1779,8 +1774,6 @@ packages:
     dependencies:
       '@types/phoenix': 1.5.4
       websocket: 1.0.34
-    transitivePeerDependencies:
-      - supports-color
     dev: false
 
   /@supabase/storage-js/1.7.0:
@@ -1801,7 +1794,6 @@ packages:
       '@supabase/storage-js': 1.7.0
     transitivePeerDependencies:
       - encoding
-      - supports-color
     dev: false
 
   /@sveltejs/adapter-auto/1.0.0-next.40:
@@ -2105,19 +2097,9 @@ packages:
       color-convert: 2.0.1
     dev: false
 
-  /any-observable/0.3.0_rxjs@6.6.7:
+  /any-observable/0.3.0:
     resolution: {integrity: sha512-/FQM1EDkTsf63Ub2C6O7GuYFDsSXUwsaZDurV0np41ocwq0jthUAYCmhBX9f+KwlaCgIuWyr/4WlUQUBfKfZog==}
     engines: {node: '>=6'}
-    peerDependencies:
-      rxjs: '*'
-      zenObservable: '*'
-    peerDependenciesMeta:
-      rxjs:
-        optional: true
-      zenObservable:
-        optional: true
-    dependencies:
-      rxjs: 6.6.7
     dev: false
 
   /anymatch/3.1.2:
@@ -2392,7 +2374,7 @@ packages:
     resolution: {integrity: sha512-z/SOcB1jqrodshM87YPWdTcLdQzCKKLiWueM4RPfTIz9EIo7DgJSn0gbnVtEOk8Vy/xOZ0EnnAu5fY8ualzngQ==}
     dependencies:
       purgecss: 4.1.3
-      svelte-preprocess: 4.10.6_wwvk7nlptlrqo2czohjtk6eiqm
+      svelte-preprocess: 4.10.6_svelte@3.48.0+typescript@4.6.4
       typescript: 4.6.4
     transitivePeerDependencies:
       - '@babel/core'
@@ -2801,11 +2783,6 @@ packages:
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
     dependencies:
       ms: 2.0.0
     dev: false
@@ -3558,13 +3535,13 @@ packages:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
     dev: true
 
-  /graphql-config/4.3.0_46emjsxzfxj3xgw6p37zzdssd4:
+  /graphql-config/4.3.0_graphql@16.5.0+typescript@4.6.4:
     resolution: {integrity: sha512-Uiu3X7+s5c056WyrvdZVz2vG1fhAipMlYmtiCU/4Z2mX79OXDr1SqIon2MprC/pExIWJfAQZCcjYDY76fPBUQg==}
     engines: {node: '>= 10.0.0'}
     peerDependencies:
       graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2_eqevhppa7sa2qvpxws2sflyfju
+      '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2_240953bde0fc81a855f7b4b522af054d
       '@graphql-tools/graphql-file-loader': 7.3.12_graphql@16.5.0
       '@graphql-tools/json-file-loader': 7.3.12_graphql@16.5.0
       '@graphql-tools/load': 7.5.11_graphql@16.5.0
@@ -4160,7 +4137,6 @@ packages:
       rxjs: 6.6.7
     transitivePeerDependencies:
       - zen-observable
-      - zenObservable
     dev: false
 
   /locate-path/5.0.0:
@@ -5370,7 +5346,7 @@ packages:
       sade: 1.8.1
       source-map: 0.7.3
       svelte: 3.48.0
-      svelte-preprocess: 4.10.6_wwvk7nlptlrqo2czohjtk6eiqm
+      svelte-preprocess: 4.10.6_svelte@3.48.0+typescript@4.6.4
       typescript: 4.6.4
     transitivePeerDependencies:
       - '@babel/core'
@@ -5427,7 +5403,7 @@ packages:
     resolution: {integrity: sha512-mBO3fBA++Xwn7P1VdgeH4OI+MrulxxNrGwdX7NVA1GU1ZCyrQUcb7AD8V3s6s2ZWW3cRXVhbBmgXW+aABYV9kA==}
     dev: false
 
-  /svelte-preprocess/4.10.6_wwvk7nlptlrqo2czohjtk6eiqm:
+  /svelte-preprocess/4.10.6_svelte@3.48.0+typescript@4.6.4:
     resolution: {integrity: sha512-I2SV1w/AveMvgIQlUF/ZOO3PYVnhxfcpNyGt8pxpUVhPfyfL/CZBkkw/KPfuFix5FJ9TnnNYMhACK3DtSaYVVQ==}
     engines: {node: '>= 9.11.2'}
     requiresBuild: true
@@ -5504,7 +5480,7 @@ packages:
     resolution: {integrity: sha512-fN2YRm/bGumvjUpu6yI3BpvZnpIm9I6A7HR4oUNYd7ggYyIwSA/BX7DJ+UXXffLp6XNcUijyLvttbPVCYa/3xQ==}
     engines: {node: '>= 8'}
 
-  /svelte2tsx/0.4.14_wwvk7nlptlrqo2czohjtk6eiqm:
+  /svelte2tsx/0.4.14_svelte@3.48.0+typescript@4.6.4:
     resolution: {integrity: sha512-udF0Z/DA98OfjPFBU1GBJRpYHEvsxA8ozwYVN08AOWMnQyxoSyWWlYspiq2m9xAjLo/pWnhec9z1d6jc9umqjA==}
     peerDependencies:
       svelte: ^3.24
@@ -5856,8 +5832,6 @@ packages:
       typedarray-to-buffer: 3.1.5
       utf-8-validate: 5.0.9
       yaeti: 0.0.6
-    transitivePeerDependencies:
-      - supports-color
     dev: false
 
   /whatwg-fetch/3.6.2:

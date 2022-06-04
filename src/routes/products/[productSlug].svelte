@@ -53,13 +53,16 @@
   import { uploadFile } from '$lib/supabase'
   import { page } from '$app/stores'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
+  import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
 
   let quantity = product.minQuantity || 1
 
   $pageSubtitle = product?.name
 
-  let modifiers: Record<string, { value?: any; itemId?: string }> =
-    product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
+  let modifiers: Record<
+    string,
+    { value?: any; itemId?: string; itemIds?: string[] }
+  > = product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
 
   let fields = ''
 
@@ -123,13 +126,31 @@
 
   $: template = { ...(product.template as any), fields }
 
-  let previewBg = ''
+  const options: CaravaggioOptions = {
+    progressive: true,
+    o: 'png',
+    rs: {
+      s: '480x480',
+      m: 'scale',
+    },
+  }
 
   $: total =
     (Object.entries(modifiers)
-      .filter(([_, mValue]) => mValue?.itemId)
+      .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
       .map(([mId, mValue]) => {
-        const modifier = product.modifiers.find((m) => m.id === mId)
+        const modifier: ProductModifier = product.modifiers.find(
+          (m) => m.id === mId
+        )
+        if (mValue.itemIds) {
+          const items = mValue.itemIds.map((id) =>
+            modifier.items.find((i) => i.id === id)
+          )
+          const costs = items.map((item) =>
+            item.percentage ? (item.cost / 100) * product.price : item.cost
+          )
+          return costs.reduce((a, b) => a + b, 0)
+        }
         const item = modifier.items.find((i) => i.id === mValue.itemId)
         const value = item.percentage
           ? (item.cost / 100) * product.price
@@ -200,6 +221,15 @@
       uploadingImage[m.id] = false
     }
   }
+
+  let upsellingValues = Object.fromEntries(
+    product.modifiers.filter((m) => m.type === 'upsell').map((m) => [m.id, []])
+  )
+
+  $: for (let mId in upsellingValues) {
+    modifiers[mId].itemIds = upsellingValues[mId]
+  }
+  $: console.log(modifiers)
 </script>
 
 <svelte:head>
@@ -221,17 +251,17 @@
     {#if product.template && product.type === 'template'}
       <TemplatePreview watermark {template} mockups={product.meta?.mockups} />
     {/if}
-    <div class="flex flex-col space-y-4">
+    <div class="flex flex-col space-y-4 w-full">
       <div class="flex flex-col space-y-2 items-start">
         <h3 class="font-bold font-title text-black text-3xl dark:text-white">
           {product.name}
         </h3>
       </div>
-      <div class="flex flex-col space-y-4 lg:items-start">
+      <div class="flex flex-col space-y-4 w-full lg:items-start">
         <p class="font-bold text-black text-2xl dark:text-white">
           ${product.price.toLocaleString()}
         </p>
-        <div class="flex flex-col space-y-4">
+        <div class="flex flex-col space-y-4 w-full">
           {#each product.modifiers as m}
             {@const item = modifiers[m.id]
               ? m.items.find((i) => i.id === modifiers[m.id]?.itemId)
@@ -256,7 +286,7 @@
               </div>
               {#if m.type === 'select'}
                 <select
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight py-2 px-3 w-1/2 appearance-none !pr-8 lg:w-60 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                  class="bg-white border rounded border-gray-300 text-xs leading-tight py-2 px-3 w-1/2 appearance-none !pr-8 lg:w-60 lg:w-6/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                   bind:value={modifiers[m.id].itemId}
                   on:change={() =>
                     (modifiers[m.id].value = m.items.find(
@@ -275,9 +305,61 @@
                     >
                   {/each}
                 </select>
+              {:else if m.type === 'upsell'}
+                <div class="w-full grid gap-4 grid-cols-2 lg:w-6/10">
+                  {#each m.items as i}
+                    <div
+                      class="border rounded-lg shadow w-full transform transition-transform duration-200 relative dark:border-gray-700 hover:scale-102"
+                      style="will-change: transform"
+                      class:!scale-102={upsellingValues[m.id]?.includes(i.id)}
+                      class:!border-blue-500={upsellingValues[m.id]?.includes(
+                        i.id
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        class="cursor-pointer h-full w-full opacity-0 z-20 absolute"
+                        bind:group={upsellingValues[m.id]}
+                        value={i.id}
+                      />
+                      <div
+                        class="flex flex-col h-full space-y-2 p-2 justify-between"
+                      >
+                        <div class="flex flex-col space-y-2">
+                          <div
+                            class="rounded-lg bg-gray-100 w-auto overflow-hidden pointer-events-none select-none dark:bg-gray-700"
+                          >
+                            <div
+                              class="flex w-full p-2 items-center justify-center aspect-square"
+                            >
+                              <Image
+                                {options}
+                                src={i.meta?.image}
+                                class="rounded object-cover w-full aspect-square"
+                              />
+                            </div>
+                          </div>
+                          <div class="">
+                            <h3 class="font-bold text-sm">{i.name}</h3>
+                            <p
+                              class="text-sm leading-none overflow-hidden overflow-ellipsis whitespace-nowrap"
+                            >
+                              {i.meta.description}
+                            </p>
+                          </div>
+                        </div>
+                        <p class="font-bold text-right text-lg">
+                          {i.cost < 0 ? '-' : ''}{!i.percentage
+                            ? '$'
+                            : ''}{Math.abs(i.cost)}{i.percentage ? '%' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  {/each}
+                </div>
               {:else if m.type === 'font'}
                 <div
-                  class="w-full grid gap-4 grid-cols-3 lg:w-full lg:grid-cols-4"
+                  class="w-full grid gap-4 grid-cols-3 lg:w-full lg:w-6/10 lg:grid-cols-4"
                 >
                   <button
                     class="border-dashed rounded flex border-2 text-lg w-full p-2 transform transition-transform text-gray-200 duration-200 items-center justify-center dark:border-gray-600 dark:text-gray-600"
@@ -321,7 +403,7 @@
                 />
               {:else if m.type === 'image'}
                 <div
-                  class="border-dotted border-dashed rounded-lg flex bg-gray-100 border-gray-300 border-2 p-8 relative justify-center items-center dark:bg-gray-700 dark:border-gray-600"
+                  class="border-dotted border-dashed rounded-lg flex bg-gray-100 border-gray-300 border-2 p-8 relative justify-center items-center lg:w-6/10 dark:bg-gray-700 dark:border-gray-600"
                   class:cursor-pointer={!uploadingImage[m.id]}
                   class:cursor-not-allowed={uploadingImage[m.id]}
                   on:click={() => onModifierImagePaste(m)}
@@ -371,13 +453,13 @@
                 <input
                   type="text"
                   placeholder="Write something..."
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none <sm:w-24ch dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-6/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
                   bind:value={modifiers[m.id].value}
                   on:input={() =>
                     (modifiers[m.id].itemId = modifiers[m.id].itemId)}
                 />
               {:else if m.type === 'color'}
-                <div class="w-full grid gap-2 grid-cols-8 lg:w-full">
+                <div class="w-full grid gap-2 grid-cols-8 lg:w-6/10">
                   {#each m.items as i}
                     <button
                       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"

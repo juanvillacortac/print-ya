@@ -56,7 +56,7 @@
       i.id ? ii.id == i.id : ii.internalId == i.internalId
     )
     modifier.items[idx].active = false
-    if (modifier.items[idx]) {
+    if (!modifier.items[idx].id) {
       modifier.items.splice(idx, 1)
       modifier.items = [...modifier.items]
     }
@@ -73,6 +73,8 @@
 
   const urlBuilder = useCaravaggioBuilder()
 
+  let uploading = {}
+
   $: uploadImage = async (event, i) => {
     try {
       if (
@@ -81,6 +83,7 @@
       ) {
         throw new Error('You must select an image to upload.')
       }
+      uploading[i.internalId] = true
       const file = event.currentTarget.files[0]
       const { url, path } = await uploadFile({
         file,
@@ -92,10 +95,11 @@
 
       const _ = await loadImage(optimizedUrl)
 
-      i.meta.url = url
+      i.meta.image = url
     } catch (error) {
       alert(error.message)
     } finally {
+      uploading[i.internalId] = false
     }
   }
 </script>
@@ -142,12 +146,12 @@
       </div>
       {#if open[i.internalId]}
         <div
-          class="grid gap-4 grid-cols-1 lg:grid-cols-3"
+          class="grid gap-4 grid-cols-1 items-center lg:grid-cols-4"
           transition:slide|local={{ duration: 400, easing: expoOut }}
         >
           <div class="flex flex-col w-full">
             <label class="font-bold text-xs mb-2 block" for="fieldId">
-              Upsell product name
+              Upsell product name *
             </label>
             <input
               class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
@@ -173,28 +177,49 @@
             <input
               class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
               type="number"
-              min={0.01}
               step="any"
               bind:value={i.cost}
             />
           </div>
+          <div class="flex flex-col w-full">
+            <label class="font-bold text-xs mb-2 block" for="fieldId">
+              Cost type
+            </label>
+            <select
+              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              bind:value={i.percentage}
+            >
+              <option value={false}>Fixed</option>
+              <option value={true}>Percentage</option>
+            </select>
+          </div>
           <div class="relative">
-            <button
-              type="button"
-              class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
-              title="Delete image"
-              on:click={() => (i.meta.image = '')}
-              use:tooltip
-            >
-              <Close24 />
-            </button>
+            {#if i.meta?.image}
+              <button
+                type="button"
+                class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
+                title="Delete image"
+                on:click={() => (i.meta.image = '')}
+                use:tooltip
+              >
+                <Close24 />
+              </button>
+            {:else if !uploading[i.internalId]}
+              <input
+                type="file"
+                name=""
+                class="cursor-pointer flex h-full w-full opacity-0 absolute"
+                accept="image/*"
+                on:change={(e) => uploadImage(e, i)}
+              />
+            {/if}
             <div
-              class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative dark:border-gray-700"
+              class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative pointer-events-none darkborder-gray-700 dark:border-gray-700"
             >
-              {#if i.meta.url}
+              {#if i.meta?.image}
                 <Image
                   {options}
-                  src={i.meta.url}
+                  src={i.meta?.image}
                   class="rounded object-cover w-full aspect-square"
                 />
               {:else}
@@ -203,7 +228,11 @@
                   use:squareratio
                 >
                   <Image32 class="mb-1" />
-                  <span class="font-normal block">Upload an image</span>
+                  <span class="font-normal block"
+                    >{uploading[i.internalId]
+                      ? 'Uploading image...'
+                      : 'Upload an image'}</span
+                  >
                 </div>
               {/if}
             </div>
