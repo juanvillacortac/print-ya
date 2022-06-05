@@ -20,7 +20,6 @@
   } from 'carbon-icons-svelte'
   import { expoOut } from 'svelte/easing'
   import { slide } from 'svelte/transition'
-  import ProductModifiersEditor from '../ProductModifiersEditor.svelte'
 
   let open: Record<string, boolean> = {}
 
@@ -34,7 +33,8 @@
     o: 'png',
     rs: {
       s: '480x480',
-      m: 'scale',
+      m: 'embed',
+      b: '000000.0',
     },
   }
 

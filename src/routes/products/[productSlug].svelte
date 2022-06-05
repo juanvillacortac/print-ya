@@ -131,7 +131,8 @@
     o: 'png',
     rs: {
       s: '480x480',
-      m: 'scale',
+      m: 'embed',
+      b: '000000.0',
     },
   }
 
@@ -339,13 +340,15 @@
                               />
                             </div>
                           </div>
-                          <div class="">
+                          <div class="flex flex-col">
                             <h3 class="font-bold text-sm">{i.name}</h3>
-                            <p
-                              class="text-sm leading-none overflow-hidden overflow-ellipsis whitespace-nowrap"
-                            >
-                              {i.meta?.description}
-                            </p>
+                            {#if i.meta.description}
+                              <p
+                                class="text-sm leading-none overflow-hidden overflow-ellipsis whitespace-nowrap"
+                              >
+                                {i.meta?.description}
+                              </p>
+                            {/if}
                           </div>
                         </div>
                         <p class="font-bold text-right text-lg">
@@ -371,7 +374,7 @@
                   >
                   {#each m.items as i}
                     <button
-                      class="rounded border-2 text-xl w-full p-1 transform transition-transform duration-200 dark:border-gray-600"
+                      class="rounded border-2 text-lg w-full p-1 transform transition-transform duration-200 dark:border-gray-600"
                       title={i.name}
                       on:click={() =>
                         (modifiers[m.id] = {

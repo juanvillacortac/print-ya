@@ -62,6 +62,10 @@
         }
       }
       if (m.type == 'upsell') {
+        if (!items.length) {
+          alert('Selection and multiple selection modifier should have items')
+          return false
+        }
         for (let i of items) {
           if (!i.name) {
             alert('Upsell product should have a name')
