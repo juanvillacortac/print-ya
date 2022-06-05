@@ -344,7 +344,7 @@
                             <p
                               class="text-sm leading-none overflow-hidden overflow-ellipsis whitespace-nowrap"
                             >
-                              {i.meta.description}
+                              {i.meta?.description}
                             </p>
                           </div>
                         </div>
