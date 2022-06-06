@@ -7,21 +7,12 @@
   import {
     Add16,
     Add24,
-    Attachment32,
-    Camera16,
-    Camera24,
-    Close16,
     Close24,
     CloseOutline24,
     Favorite32,
     Image32,
-    Rotate16,
-    RotateClockwise16,
-    SprayPaint16,
+    ShoppingBag24,
     Subtract16,
-    TagNone24,
-    ZoomIn16,
-    ZoomOut16,
   } from 'carbon-icons-svelte'
 
   export const load: Load = async ({ params, fetch, stuff }) => {
@@ -54,24 +45,28 @@
   import { page } from '$app/stores'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
-
+  import {
+    compareModifiers,
+    createModifiersMapStore,
+    getTemplateFieldsFromModifiers,
+    getTotalFromProductModifiers,
+  } from '$lib/utils/modifiers'
+  import { derived, writable } from 'svelte/store'
+  import { browser } from '$app/env'
   let quantity = product.minQuantity || 1
 
   $pageSubtitle = product?.name
 
-  let modifiers: Record<
-    string,
-    { value?: any; itemId?: string; itemIds?: string[] }
-  > = product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
+  let modifiers = createModifiersMapStore(product)
 
   let fields = ''
 
   onMount(() => {
-    const defaultItems = product.modifiers
+    let defaultItems = product.modifiers
       .filter((m) => m.type === 'color' || m.type === 'select')
       .map((m) => [m.id, m.items[0]] as [string, ProductModifierItem])
     for (let [m, i] of defaultItems) {
-      modifiers[m] = {
+      $modifiers[m] = {
         itemId: i.id,
         value: i.name,
       }
@@ -79,36 +74,7 @@
   })
 
   $: if (product.type === 'template') {
-    const mappedModifiers = Object.entries(modifiers).map(
-      ([mId, mValue]) =>
-        [product.modifiers.find((m) => m.id === mId), mValue] as [
-          ProductModifier,
-          { value?: string; itemId?: string }
-        ]
-    )
-    const items = mappedModifiers
-      .filter(
-        ([m]) =>
-          (m.type === 'select' ||
-            m.type === 'color' ||
-            m.type === 'font' ||
-            m.type === 'image' ||
-            m.type === 'text' ||
-            m.type === 'numeric' ||
-            m.type === 'toggle') &&
-          m.templateAccessor
-      )
-      .filter(([_, item]) => item)
-      .map(([m, item]) => ({
-        value: item.value,
-        key: m.templateAccessor,
-      }))
-    const f = items.reduce((a, b) => ({ ...a, [b.key]: b.value }), {})
-    if (Object.keys(f).length) {
-      fields = JSON.stringify(f)
-    } else {
-      fields = ''
-    }
+    fields = getTemplateFieldsFromModifiers(product, $modifiers)
   }
 
   $: fontsItems = product.modifiers
@@ -136,37 +102,24 @@
     },
   }
 
-  $: total =
-    (Object.entries(modifiers)
-      .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
-      .map(([mId, mValue]) => {
-        const modifier: ProductModifier = product.modifiers.find(
-          (m) => m.id === mId
-        )
-        if (mValue.itemIds) {
-          const items = mValue.itemIds.map((id) =>
-            modifier.items.find((i) => i.id === id)
-          )
-          const costs = items.map((item) =>
-            item.percentage ? (item.cost / 100) * product.price : item.cost
-          )
-          return costs.reduce((a, b) => a + b, 0)
-        }
-        const item = modifier.items.find((i) => i.id === mValue.itemId)
-        const value = item.percentage
-          ? (item.cost / 100) * product.price
-          : item.cost
-        return value
-      })
-      .reduce((a, b) => a + b, 0) +
-      product.price) *
-    quantity
+  $: total = getTotalFromProductModifiers(product, $modifiers) * quantity
+
+  let upsellingValues = Object.fromEntries(
+    product.modifiers.filter((m) => m.type === 'upsell').map((m) => [m.id, []])
+  )
+
+  $: if (browser) {
+    let u = { ...upsellingValues }
+    for (let mId in u) {
+      $modifiers[mId] = { ...$modifiers[mId], itemIds: u[mId] }
+    }
+  }
 
   const addToBag = () => {
     const elementIdx = $bag.findIndex(
       (p) =>
         p.productSlug == product.slug &&
-        JSON.stringify(modifiers) === JSON.stringify(p.modifiers)
+        compareModifiers($modifiers, p.modifiers)
     )
     if (elementIdx >= 0) {
       $bag[elementIdx].quantity += quantity
@@ -176,17 +129,19 @@
       ...$bag,
       {
         productSlug: product.slug,
-        modifiers: {},
+        modifiers: $modifiers,
         quantity,
       },
     ]
   }
 
+  // $: if ($modifiers && browser) alert(inBag)
+
   let uploadingImage: Record<string, boolean> = {}
   const onModifierImagePaste = async (m: ProductModifier) => {
     try {
       const fileUrl = await navigator.clipboard.readText()
-      modifiers[m.id] = { value: fileUrl }
+      $modifiers[m.id] = { ...$modifiers[m.id], value: fileUrl }
     } catch (error) {
       alert(error.message)
     } finally {
@@ -215,22 +170,13 @@
         bucket: 'client-assets',
         path: `${$page.stuff.store.slug}/products/${product.slug}/template-assets`,
       })
-      modifiers[m.id] = { value: url }
+      $modifiers[m.id] = { ...$modifiers[m.id], value: url }
     } catch (error) {
       alert(error.message)
     } finally {
       uploadingImage[m.id] = false
     }
   }
-
-  let upsellingValues = Object.fromEntries(
-    product.modifiers.filter((m) => m.type === 'upsell').map((m) => [m.id, []])
-  )
-
-  $: for (let mId in upsellingValues) {
-    modifiers[mId].itemIds = upsellingValues[mId]
-  }
-  $: console.log(modifiers)
 </script>
 
 <svelte:head>
@@ -264,8 +210,8 @@
         </p>
         <div class="flex flex-col space-y-4 w-full">
           {#each product.modifiers as m}
-            {@const item = modifiers[m.id]
-              ? m.items.find((i) => i.id === modifiers[m.id]?.itemId)
+            {@const item = $modifiers[m.id]
+              ? m.items.find((i) => i.id === $modifiers[m.id]?.itemId)
               : undefined}
             {@const itemName =
               m.type === 'font'
@@ -288,10 +234,10 @@
               {#if m.type === 'select'}
                 <select
                   class="bg-white border rounded border-gray-300 text-xs leading-tight py-2 px-3 w-1/2 appearance-none !pr-8 lg:w-60 lg:w-6/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-                  bind:value={modifiers[m.id].itemId}
+                  bind:value={$modifiers[m.id].itemId}
                   on:change={() =>
-                    (modifiers[m.id].value = m.items.find(
-                      (i) => i.id == modifiers[m.id].itemId
+                    ($modifiers[m.id].value = m.items.find(
+                      (i) => i.id == $modifiers[m.id].itemId
                     )?.name)}
                 >
                   {#each m.items as i}
@@ -321,6 +267,7 @@
                         type="checkbox"
                         class="cursor-pointer h-full w-full opacity-0 z-20 absolute"
                         bind:group={upsellingValues[m.id]}
+                        on:change={() => (upsellingValues = upsellingValues)}
                         value={i.id}
                       />
                       <div
@@ -368,7 +315,7 @@
                     class="border-dashed rounded flex border-2 text-lg w-full p-2 transform transition-transform text-gray-200 duration-200 items-center justify-center dark:border-gray-600 dark:text-gray-600"
                     title="Unset font"
                     on:click={() =>
-                      (modifiers[m.id] = { itemId: '', value: '' })}
+                      ($modifiers[m.id] = { itemId: '', value: '' })}
                     use:tooltip
                     style="will-change: transform;"><CloseOutline24 /></button
                   >
@@ -377,7 +324,7 @@
                       class="rounded border-2 text-lg w-full p-1 transform transition-transform duration-200 dark:border-gray-600"
                       title={i.name}
                       on:click={() =>
-                        (modifiers[m.id] = {
+                        ($modifiers[m.id] = {
                           itemId: i.id,
                           value: {
                             name: i?.name,
@@ -388,10 +335,10 @@
                                 )}&src=${encodeURIComponent(i.meta.url)}`,
                           },
                         })}
-                      class:scale-120={modifiers[m.id].itemId == i.id}
-                      class:!border-blue-800={modifiers[m.id].itemId == i.id}
+                      class:scale-120={$modifiers[m.id].itemId == i.id}
+                      class:!border-blue-800={$modifiers[m.id].itemId == i.id}
                       use:tooltip
-                      style="will-change: transform; font-family: {i.name};"
+                      style={`will-change: transform; font-family: "${i.name}";`}
                       >Hello</button
                     >
                   {/each}
@@ -399,10 +346,10 @@
               {:else if m.type === 'toggle'}
                 <input
                   type="checkbox"
-                  bind:checked={modifiers[m.id].value}
+                  bind:checked={$modifiers[m.id].value}
                   class="justify-start"
                   on:change={() =>
-                    (modifiers[m.id].itemId = modifiers[m.id].itemId)}
+                    ($modifiers[m.id].itemId = $modifiers[m.id].itemId)}
                 />
               {:else if m.type === 'image'}
                 <div
@@ -411,13 +358,13 @@
                   class:cursor-not-allowed={uploadingImage[m.id]}
                   on:click={() => onModifierImagePaste(m)}
                 >
-                  {#if !uploadingImage[m.id] && modifiers[m.id].value}
+                  {#if !uploadingImage[m.id] && $modifiers[m.id].value}
                     <button
                       class="top-2 right-2 text-gray-400 absolute"
                       title="Delete image"
                       use:tooltip
                       on:click|preventDefault|stopPropagation={() =>
-                        (modifiers[m.id].value = '')}
+                        ($modifiers[m.id].value = '')}
                     >
                       <Close24 />
                     </button>
@@ -425,9 +372,9 @@
                   <div
                     class="flex flex-col text-center text-gray-400 items-center justify-center"
                   >
-                    {#if modifiers[m.id]?.value && !uploadingImage[m.id]}
+                    {#if $modifiers[m.id]?.value && !uploadingImage[m.id]}
                       <img
-                        src={modifiers[m.id]?.value}
+                        src={$modifiers[m.id]?.value}
                         alt=""
                         class="object-contain h-32px mb-1 w-32px"
                       />
@@ -457,9 +404,9 @@
                   type="text"
                   placeholder="Write something..."
                   class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-6/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                  bind:value={modifiers[m.id].value}
+                  bind:value={$modifiers[m.id].value}
                   on:input={() =>
-                    (modifiers[m.id].itemId = modifiers[m.id].itemId)}
+                    ($modifiers[m.id].itemId = $modifiers[m.id].itemId)}
                 />
               {:else if m.type === 'color'}
                 <div class="w-full grid gap-2 grid-cols-8 lg:w-6/10">
@@ -467,10 +414,10 @@
                     <button
                       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
                       title={i?.meta?.name}
-                      class:scale-120={modifiers[m.id].itemId == i.id}
-                      class:!border-blue-800={modifiers[m.id].itemId == i.id}
+                      class:scale-120={$modifiers[m.id].itemId == i.id}
+                      class:!border-blue-800={$modifiers[m.id].itemId == i.id}
                       on:click={() =>
-                        (modifiers[m.id] = {
+                        ($modifiers[m.id] = {
                           itemId: i.id,
                           value: i.name,
                         })}
@@ -516,12 +463,12 @@
         <div class="flex space-x-4 items-center justify-between !w-full">
           <div class="flex space-x-4 items-center">
             <button
-              class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center hover:scale-105"
+              class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
               on:click={addToBag}
               style="will-change: transform"
             >
               <Add24 class="m-auto" />
-              <span>Add to cart</span></button
+              <span>Add to bag</span></button
             >
             <button
               class="flex text-gray-400 relative hover:text-pink-500"

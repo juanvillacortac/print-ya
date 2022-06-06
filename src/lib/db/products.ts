@@ -7,6 +7,7 @@ import type {
   StoreCategory,
 } from '@prisma/client'
 import type { TemplateSource } from '$lib/compiler'
+import type { JSONValue } from '@sveltejs/kit/types/private'
 
 export type ProductModifierItem = _ProductModifierItem & {
   meta: any
@@ -17,7 +18,8 @@ export type ProductModifier = _ProductModifier & {
   items?: ProductModifierItem[]
 }
 
-export type Product = _Product & {
+export type Product<T extends TemplateSource = any> = _Product & {
+  template: T
   meta?: any
   storeCategory?: StoreCategory
   modifiers?: ProductModifier[]

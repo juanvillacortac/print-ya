@@ -1,6 +1,8 @@
 import type { Writable } from 'svelte/store'
 import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
+import type { ModifiersMap } from './utils/modifiers'
+import type { Product } from './db'
 
 export const pageSubtitle = writable('')
 
@@ -46,6 +48,25 @@ export const preferences = persistentWritable('preferences', {
 export type BagItem = {
   productSlug: string
   quantity: number
-  modifiers: Record<string, string>
+  modifiers: ModifiersMap
 }
-export const bag = persistentWritable<BagItem[]>('cart', [])
+
+export type BagStore = Writable<BagItem[]> & {
+  existInBag(product: Product, modifiers: ModifiersMap): boolean
+}
+
+const createBag = (): BagStore => {
+  const store = persistentWritable<BagItem[]>('bag', [])
+  return {
+    ...store,
+    existInBag: (product, modifiers) =>
+      Boolean(
+        get(store).find(
+          (p) =>
+            p.productSlug == product.slug &&
+            JSON.stringify(modifiers) === JSON.stringify(p.modifiers)
+        )
+      ),
+  }
+}
+export const bag = createBag()

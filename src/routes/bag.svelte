@@ -7,6 +7,12 @@
 
   import type { Product } from '$lib/db'
   import {
+    getCostFromProductModifiers,
+    getTemplateFieldsFromModifiers,
+    getTotalFromProductModifiers,
+    type ModifiersMap,
+  } from '$lib/utils/modifiers'
+  import {
     Add16,
     Information16,
     Subtract16,
@@ -33,19 +39,6 @@
       const item = modifier.items.find((i) => i.id === mValue)
       return item.name
     })
-  $: getAdditionalCost = (element: BagItem) =>
-    Object.entries(element.modifiers)
-      .map(([mId, mValue]) => {
-        const product = products ? products[element.productSlug] : null
-        if (!product) return 0
-        const modifier = product.modifiers.find((m) => m.id === mId)
-        const item = modifier.items.find((i) => i.id === mValue)
-        const value = item.percentage
-          ? (item.cost / 100) * product.price
-          : item.cost
-        return value
-      })
-      .reduce((a, b) => a + b, 0)
 
   const loadProducts = () => {
     if (!$bag.length) {
@@ -66,147 +59,123 @@
         ))
     )
   }
-  $: console.log(products)
 </script>
 
 <div
-  class="flex flex-col mx-auto space-y-4 w-full py-12 px-4 lg:max-w-7/10 lg:px-6"
+  class="flex flex-col mx-auto space-y-4 w-full py-12 px-4 lg:max-w-9/10 lg:px-6"
 >
   <h3 class="font-bold font-title text-black text-3xl dark:text-white">
     Shopping bag
   </h3>
   <div class="flex-grow w-full overflow-x-auto">
     <div
-      class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
+      class="divide-y flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
     >
-      <table class="text-sm text-left w-full text-gray-500 dark:text-gray-400">
-        <thead
-          class="bg-gray-50 text-xs text-gray-700 uppercase !z-30 dark:bg-gray-700 dark:text-gray-400"
-          class:sr-only={!$bag.length}
+      {#each $bag as i, idx (idx)}
+        {@const p = products ? products[i.productSlug] : null}
+        <div
+          class="flex py-6 text-gray-500  justify-between sm:items-center <sm:flex-col <sm:space-y-4 dark:text-gray-400"
         >
-          <tr>
-            <th scope="col" class="py-3 px-6" class:sr-only={!$bag.length}
-              >Item</th
+          <div
+            class="flex items-center sm:space-x-4 <sm:flex-col <sm:space-y-4"
+          >
+            <div
+              class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-42 dark:bg-gray-700"
+              style="aspect-ratio: 1/1"
             >
-            <th scope="col" class="py-3 px-6" class:sr-only={!$bag.length}
-              >Cost</th
-            >
-            <th scope="col" class="py-3 px-6" class:sr-only={!$bag.length}
-              >Additional cost</th
-            >
-            <th scope="col" class="py-3 px-6" class:sr-only={!$bag.length}
-              >Quantity</th
-            >
-            <th scope="col" class="py-3 px-6" class:sr-only={!$bag.length}
-              >Total</th
-            >
-            <th scope="col" class="py-3 px-6">
-              <span class="sr-only">Actions</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody class="z-10 relative">
-          {#each $bag as i, idx (idx)}
-            {@const p = products ? products[i.productSlug] : null}
-            <tr
-              in:fly|local={{ x: -20 }}
-              class="bg-white dark:bg-gray-800"
-              class:border-b={idx !== $bag?.length - 1}
-              class:dark:border-gray-700={idx !== $bag.length - 1}
-            >
-              <th
-                scope="row"
-                class="flex font-bold space-x-4 p-4 text-gray-900 whitespace-nowrap items-center dark:text-white"
-              >
-                <div
-                  class="rounded-lg bg-gray-100 w-auto w-32 overflow-hidden pointer-events-none select-none dark:bg-gray-700"
-                  style="aspect-ratio: 1/1"
-                >
-                  <div class="flex h-full w-full items-center justify-center">
-                    <Preview template={p?.template || {}} fitParent />
-                  </div>
-                </div>
-                <div class="flex flex-col space-y-1">
-                  <p class="font-bold text-sm">{p?.name}</p>
-                  <p class="font-bold text-xs text-gray-400">
-                    {getModifiers(i).join(' / ')}
-                  </p>
-                </div>
-              </th>
-
-              <td class="py-4 px-6">
-                <p class="font-bold text-sm">
-                  ${p?.price.toLocaleString()} / unit
-                </p>
-              </td>
-              <td class="py-4 px-6">
-                <p class="font-bold text-sm">
-                  ${getAdditionalCost(i)} / unit
-                </p>
-              </td>
-              <td class="py-4 px-6">
-                <div class="flex !text-xs">
-                  <button
-                    class="border rounded-l-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
-                    on:click={() =>
-                      (i.quantity = Math.max(
-                        p?.minQuantity || 1,
-                        i.quantity - 1
-                      ))}
-                  >
-                    <Subtract16 class="m-auto" />
-                  </button>
-                  <input
-                    class="bg-white border-t border-b border-gray-300 border-l-0 border-r-0 text-xs text-center leading-tight py-1 px-2 w-8ch quantity dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
-                    type="number"
-                    min={Math.max(p?.minQuantity || 1)}
-                    bind:value={i.quantity}
+              <div class="flex h-full w-full items-center justify-center">
+                {#if p}
+                  <Preview
+                    template={{
+                      ...(p?.template || {}),
+                      fields: getTemplateFieldsFromModifiers(p, i.modifiers),
+                    }}
+                    fitParent
                   />
-                  <button
-                    class="border rounded-r-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
-                    on:click={() => i.quantity++}
-                  >
-                    <Add16 class="m-auto" />
-                  </button>
-                </div>
-              </td>
-              <td class="py-4 px-6">
-                <p class="font-bold text-sm">
-                  ${(
-                    (p?.price + getAdditionalCost(i)) *
-                    i.quantity
-                  ).toLocaleString()}
-                </p>
-              </td>
-              <td class="text-right py-4 px-6">
-                <button
-                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                  title="Delete"
-                  on:click={() => {
-                    $bag.splice(idx, 1)
-                    $bag = $bag
-                  }}
-                  use:tooltip
-                  type="button"><TrashCan16 /></button
-                >
-              </td>
-            </tr>
-          {:else}
-            <tr
-              class="bg-gray-50 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+                {/if}
+              </div>
+            </div>
+            <div
+              class="flex flex-col space-y-1 w-full whitespace-normal sm:w-48"
             >
-              <td class="text-center py-4 px-6" colspan="5">
-                <div class="flex space-x-2 w-full justify-center items-center">
-                  <Information16 />
-                  <p class="font-bold text-xs whitespace-nowrap">
-                    No products added
-                  </p>
-                </div>
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+              <p
+                class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white"
+              >
+                {p?.name}
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col space-y-1">
+            <p class="font-bold text-xs text-black dark:text-white">Cost</p>
+            <p class="font-bold text-sm">
+              ${p?.price.toLocaleString('en', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })} / unit
+            </p>
+          </div>
+          <div class="flex flex-col space-y-1">
+            <p class="font-bold text-xs text-black dark:text-white">
+              Aditional cost
+            </p>
+            <p class="font-bold text-sm">
+              ${(p
+                ? getCostFromProductModifiers(p, i.modifiers)
+                : 0
+              ).toLocaleString('en', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })} / unit
+            </p>
+          </div>
+          <div class="flex flex-col space-y-1">
+            <p class="font-bold text-xs text-black dark:text-white">Quantity</p>
+            <div class="flex !text-xs">
+              <button
+                class="border rounded-l-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
+                on:click={() =>
+                  (i.quantity = Math.max(p?.minQuantity || 1, i.quantity - 1))}
+              >
+                <Subtract16 class="m-auto" />
+              </button>
+              <input
+                class="bg-white border-t border-b border-gray-300 border-l-0 border-r-0 text-xs text-center leading-tight py-1 px-2 w-8ch quantity dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+                type="number"
+                min={Math.max(p?.minQuantity || 1)}
+                bind:value={i.quantity}
+              />
+              <button
+                class="border rounded-r-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
+                on:click={() => i.quantity++}
+              >
+                <Add16 class="m-auto" />
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-col space-y-1">
+            <p class="font-bold text-xs text-black dark:text-white">Total</p>
+            <p class="font-bold text-sm">
+              ${(p
+                ? getTotalFromProductModifiers(p, i.modifiers) * i.quantity
+                : 0
+              ).toLocaleString('en', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })} / unit
+            </p>
+          </div>
+          <button
+            class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+            title="Delete"
+            on:click={() => {
+              $bag.splice(idx, 1)
+              $bag = $bag
+            }}
+            use:tooltip
+            type="button"><TrashCan16 /></button
+          >
+        </div>
+      {/each}
     </div>
   </div>
 </div>

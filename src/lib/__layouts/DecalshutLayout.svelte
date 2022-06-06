@@ -101,8 +101,8 @@
         </button>
         <a
           class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
-          title="Shopping Cart"
-          href="/cart"
+          title="Shopping Bag"
+          href="/bag"
           use:tooltip
         >
           <ShoppingBag24 />
