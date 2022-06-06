@@ -4,8 +4,6 @@
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
   import type { Prisma } from '@prisma/client'
-  import { IbmCloudDedicatedHost16 } from 'carbon-icons-svelte'
-  import Wiggle from './Wiggle.svelte'
 
   let parent: HTMLDivElement
   let element: HTMLDivElement
@@ -14,6 +12,15 @@
   let styleEl: HTMLStyleElement
   let containerEl: HTMLDivElement
   let innerEl: HTMLDivElement
+
+  function generateUID() {
+    const firstPart = (Math.random() * 46656) | 0
+    const secondPart = (Math.random() * 46656) | 0
+    return (
+      ('000' + firstPart.toString(36)).slice(-3) +
+      ('000' + secondPart.toString(36)).slice(-3)
+    )
+  }
 
   export let template: TemplateSource | Prisma.JsonValue = {
     html: '',
@@ -37,7 +44,10 @@
   export let scaleFactor = 1
   export let rotation = 0
 
+  let uid: string
+
   onMount(async () => {
+    uid = generateUID()
     const bot = !!navigator.userAgent.match(
       'Lighthouse|Google Page Speed Insights|Googlebot'
     )
@@ -72,7 +82,7 @@
 
   $: compiler?.postMessage(source)
 
-  $: if (compiled.css && shadow) {
+  $: if (compiled.css && shadow && uid) {
     if (styleEl) shadow.removeChild(styleEl)
     styleEl = document.createElement('style')
     styleEl.innerHTML = compiled.css
@@ -83,15 +93,15 @@
     const imports = compiled.css.match(/@import\ url\((.*?)\);/gim)
 
     if (imports?.length && !notLoadFonts) {
-      let shadowDomCssImports = document.getElementById('preview_fonts')
+      let shadowDomCssImports = document.getElementById(`preview_fonts-${uid}`)
       if (!shadowDomCssImports) {
         shadowDomCssImports = document.createElement('style')
-        shadowDomCssImports.id = 'preview_fonts'
+        shadowDomCssImports.id = `preview_fonts-${uid}`
         document.head.append(shadowDomCssImports)
       }
       shadowDomCssImports.innerHTML = imports.join('\n')
     } else {
-      document.getElementById('preview_fonts')?.remove()
+      document.getElementById(`preview_fonts-${uid}`)?.remove()
     }
   }
 
