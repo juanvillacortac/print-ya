@@ -4,6 +4,7 @@
   import { get } from '$lib/api'
   import Preview from '$lib/components/Preview.svelte'
   import { tooltip } from '$lib/components/tooltip'
+  import VirtualList from '@sveltejs/svelte-virtual-list'
 
   import type { Product } from '$lib/db'
   import {
@@ -21,6 +22,8 @@
 
   import { onMount } from 'svelte'
   import { fly } from 'svelte/transition'
+  import { browser } from '$app/env'
+  import TemplatePreview from '$lib/components/TemplatePreview.svelte'
 
   let mounted = false
   onMount(() => {
@@ -59,6 +62,8 @@
         ))
     )
   }
+
+  $: items = $bag.map((v, idx) => ({ ...v, idx }))
 </script>
 
 <div
@@ -69,12 +74,12 @@
   </h3>
   <div class="flex-grow w-full overflow-x-auto">
     <div
-      class="divide-y flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
+      class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
     >
-      {#each $bag as i, idx (idx)}
-        {@const p = products ? products[i.productSlug] : null}
+      {#each items as item (item.idx)}
+        {@const p = products ? products[item.productSlug] : null}
         <div
-          class="flex py-6 text-gray-500  justify-between sm:items-center <sm:flex-col <sm:space-y-4 dark:text-gray-400"
+          class="flex p-4  text-gray-500 justify-between sm:items-center <sm:flex-col <sm:space-y-4 dark:text-gray-400"
         >
           <div
             class="flex items-center sm:space-x-4 <sm:flex-col <sm:space-y-4"
@@ -85,12 +90,17 @@
             >
               <div class="flex h-full w-full items-center justify-center">
                 {#if p}
-                  <Preview
+                  <TemplatePreview
+                    lazy
                     template={{
                       ...(p?.template || {}),
-                      fields: getTemplateFieldsFromModifiers(p, i.modifiers),
+                      fields: getTemplateFieldsFromModifiers(
+                        p,
+                        $bag[item.idx].modifiers
+                      ),
                     }}
-                    fitParent
+                    watermark
+                    controls={false}
                   />
                 {/if}
               </div>
@@ -120,7 +130,7 @@
             </p>
             <p class="font-bold text-sm">
               ${(p
-                ? getCostFromProductModifiers(p, i.modifiers)
+                ? getCostFromProductModifiers(p, item.modifiers)
                 : 0
               ).toLocaleString('en', {
                 minimumFractionDigits: 2,
@@ -134,7 +144,10 @@
               <button
                 class="border rounded-l-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
                 on:click={() =>
-                  (i.quantity = Math.max(p?.minQuantity || 1, i.quantity - 1))}
+                  ($bag[item.idx].quantity = Math.max(
+                    p?.minQuantity || 1,
+                    $bag[item.idx].quantity - 1
+                  ))}
               >
                 <Subtract16 class="m-auto" />
               </button>
@@ -142,11 +155,11 @@
                 class="bg-white border-t border-b border-gray-300 border-l-0 border-r-0 text-xs text-center leading-tight py-1 px-2 w-8ch quantity dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
                 type="number"
                 min={Math.max(p?.minQuantity || 1)}
-                bind:value={i.quantity}
+                bind:value={$bag[item.idx].quantity}
               />
               <button
                 class="border rounded-r-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
-                on:click={() => i.quantity++}
+                on:click={() => $bag[item.idx].quantity++}
               >
                 <Add16 class="m-auto" />
               </button>
@@ -156,7 +169,8 @@
             <p class="font-bold text-xs text-black dark:text-white">Total</p>
             <p class="font-bold text-sm">
               ${(p
-                ? getTotalFromProductModifiers(p, i.modifiers) * i.quantity
+                ? getTotalFromProductModifiers(p, item.modifiers) *
+                  item.quantity
                 : 0
               ).toLocaleString('en', {
                 minimumFractionDigits: 2,
@@ -168,8 +182,7 @@
             class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
             title="Delete"
             on:click={() => {
-              $bag.splice(idx, 1)
-              $bag = $bag
+              bag.delete(p, item.modifiers)
             }}
             use:tooltip
             type="button"><TrashCan16 /></button

@@ -116,24 +116,6 @@
     }
   }
 
-  const addToBag = (modifiers: ModifiersMap) => {
-    const elementIdx = $bag.findIndex(
-      (p) => p.productSlug == product.slug && isEqual(modifiers, p.modifiers)
-    )
-    if (elementIdx >= 0) {
-      $bag[elementIdx].quantity += quantity
-      return
-    }
-    $bag = [
-      ...$bag,
-      {
-        productSlug: product.slug,
-        modifiers,
-        quantity,
-      },
-    ]
-  }
-
   // $: if ($modifiers && browser) alert(inBag)
 
   let uploadingImage: Record<string, boolean> = {}

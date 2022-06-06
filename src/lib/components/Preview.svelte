@@ -78,7 +78,9 @@
 
   onDestroy(() => {
     compiler?.terminate()
-    document.getElementById(`preview_fonts-${uid}`)?.remove()
+    if (typeof document !== 'undefined') {
+      document?.getElementById(`preview_fonts-${uid}`)?.remove()
+    }
   })
 
   $: compiler?.postMessage(source)

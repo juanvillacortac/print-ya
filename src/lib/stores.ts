@@ -1,9 +1,8 @@
-import type { Writable } from 'svelte/store'
+import { derived, type Readable, type Writable } from 'svelte/store'
 import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
-import { compareModifiers, type ModifiersMap } from './utils/modifiers'
+import type { ModifiersMap } from './utils/modifiers'
 import type { Product } from './db'
-import { isEqual } from 'lodash-es'
 
 export const pageSubtitle = writable('')
 
@@ -11,6 +10,26 @@ export function persistentWritable<T>(
   key: string,
   initialValue: T
 ): Writable<T> {
+  function replacer(key, value) {
+    if (value instanceof Map) {
+      return {
+        es6: true,
+        dataType: 'Map',
+        value: Array.from(value.entries()), // or with spread: value: [...value]
+      }
+    } else {
+      return value
+    }
+  }
+  function reviver(key, value) {
+    if (typeof value === 'object' && value !== null && value.es6) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value)
+      }
+    }
+    return value
+  }
+
   // create an underlying store
   const store = writable(initialValue)
   const { subscribe } = store
@@ -19,7 +38,7 @@ export function persistentWritable<T>(
 
   // use the value from localStorage if it exists
   if (json) {
-    store.set(JSON.parse(json))
+    store.set(JSON.parse(json, reviver))
   }
 
   if (typeof window !== 'undefined') {
@@ -28,7 +47,7 @@ export function persistentWritable<T>(
 
       // use the value from localStorage if it exists
       if (json) {
-        store.set(JSON.parse(json))
+        store.set(JSON.parse(json, reviver))
       }
     })
   }
@@ -36,7 +55,7 @@ export function persistentWritable<T>(
   const set = (value: T) => {
     store.set(value)
     if (!browser) return
-    localStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(key, JSON.stringify(value, replacer))
   }
 
   // return an object with the same interface as svelte's writable()
@@ -59,54 +78,47 @@ export const preferences = persistentWritable('preferences', {
 
 export type BagItem = {
   productSlug: string
-  quantity: number
   modifiers: ModifiersMap
+  quantity: number
 }
 
-export type BagStore = Writable<BagItem[]> & {
+export type BagStore = Readable<BagItem[]> & {
   addToBag(product: Product, modifiers: ModifiersMap, quantity: number): void
+  delete(product: Product, modifiers: ModifiersMap): void
   existInBag(product: Product, modifiers: ModifiersMap): boolean
 }
 
 const createBag = (): BagStore => {
-  const store = persistentWritable<BagItem[]>('bag', [])
+  const store = persistentWritable<Map<string, number>>('bag', new Map())
+  const items = derived([store], ([s]) =>
+    [...s.entries()].map<BagItem>(([k, q]) => ({
+      ...JSON.parse(k),
+      quantity: q,
+    }))
+  )
+
+  store.subscribe(console.log)
+
   return {
-    ...store,
+    ...items,
     addToBag: (product, modifiers, quantity) =>
       store.update((store) => {
         if (!quantity || quantity < 1) {
           return store
         }
-        console.log(modifiers)
-        if (store.length) {
-          console.log(
-            compareModifiers(modifiers, store[0].modifiers),
-            modifiers,
-            store
-          )
-        }
-        const elementIdx = store.findIndex((p) =>
-          compareModifiers(modifiers, p.modifiers)
-        )
-        console.log(elementIdx)
-        if (elementIdx >= 0) {
-          store[elementIdx].quantity += quantity
-        } else {
-          store.push({
-            productSlug: product.slug,
-            modifiers,
-            quantity,
-          })
-        }
+        const key = JSON.stringify({ productSlug: product.slug, modifiers })
+        store.set(key, store.get(key) ?? 0)
+        return store
+      }),
+    delete: (product, modifiers) =>
+      store.update((store) => {
+        const key = JSON.stringify({ productSlug: product.slug, modifiers })
+        store.delete(key)
         return store
       }),
     existInBag: (product, modifiers) =>
       Boolean(
-        get(store).find(
-          (p) =>
-            p.productSlug == product.slug &&
-            JSON.stringify(modifiers) === JSON.stringify(p.modifiers)
-        )
+        get(store).get(JSON.stringify({ productSlug: product.slug, modifiers }))
       ),
   }
 }

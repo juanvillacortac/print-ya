@@ -25,8 +25,7 @@ export const compareModifiers = (a: ModifiersMap, b: ModifiersMap) => {
     if (!isEqual(aObj.itemIds, bObj.itemIds)) {
       return false
     }
-    if (!isEqual(aObj.itemId, bObj.itemId) || !isEqual(aObj.value, bObj.value))
-      return false
+    if (aObj.itemId !== bObj.itemId || aObj.value !== bObj.value) return false
   }
   return true
 }
