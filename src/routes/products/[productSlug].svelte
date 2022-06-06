@@ -50,8 +50,9 @@
     createModifiersMapStore,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
+    type ModifiersMap,
   } from '$lib/utils/modifiers'
-  import { derived, writable } from 'svelte/store'
+  import { isEqual } from 'lodash-es'
   import { browser } from '$app/env'
   let quantity = product.minQuantity || 1
 
@@ -115,11 +116,9 @@
     }
   }
 
-  const addToBag = () => {
+  const addToBag = (modifiers: ModifiersMap) => {
     const elementIdx = $bag.findIndex(
-      (p) =>
-        p.productSlug == product.slug &&
-        compareModifiers($modifiers, p.modifiers)
+      (p) => p.productSlug == product.slug && isEqual(modifiers, p.modifiers)
     )
     if (elementIdx >= 0) {
       $bag[elementIdx].quantity += quantity
@@ -129,7 +128,7 @@
       ...$bag,
       {
         productSlug: product.slug,
-        modifiers: $modifiers,
+        modifiers,
         quantity,
       },
     ]
@@ -464,7 +463,7 @@
           <div class="flex space-x-4 items-center">
             <button
               class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
-              on:click={addToBag}
+              on:click={() => bag.addToBag(product, $modifiers, quantity)}
               style="will-change: transform"
             >
               <Add24 class="m-auto" />

@@ -1,8 +1,9 @@
 import type { Writable } from 'svelte/store'
 import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
-import type { ModifiersMap } from './utils/modifiers'
+import { compareModifiers, type ModifiersMap } from './utils/modifiers'
 import type { Product } from './db'
+import { isEqual } from 'lodash-es'
 
 export const pageSubtitle = writable('')
 
@@ -19,6 +20,17 @@ export function persistentWritable<T>(
   // use the value from localStorage if it exists
   if (json) {
     store.set(JSON.parse(json))
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('focus', () => {
+      const json = browser ? localStorage.getItem(key) : null
+
+      // use the value from localStorage if it exists
+      if (json) {
+        store.set(JSON.parse(json))
+      }
+    })
   }
 
   const set = (value: T) => {
@@ -52,6 +64,7 @@ export type BagItem = {
 }
 
 export type BagStore = Writable<BagItem[]> & {
+  addToBag(product: Product, modifiers: ModifiersMap, quantity: number): void
   existInBag(product: Product, modifiers: ModifiersMap): boolean
 }
 
@@ -59,6 +72,34 @@ const createBag = (): BagStore => {
   const store = persistentWritable<BagItem[]>('bag', [])
   return {
     ...store,
+    addToBag: (product, modifiers, quantity) =>
+      store.update((store) => {
+        if (!quantity || quantity < 1) {
+          return store
+        }
+        console.log(modifiers)
+        if (store.length) {
+          console.log(
+            compareModifiers(modifiers, store[0].modifiers),
+            modifiers,
+            store
+          )
+        }
+        const elementIdx = store.findIndex((p) =>
+          compareModifiers(modifiers, p.modifiers)
+        )
+        console.log(elementIdx)
+        if (elementIdx >= 0) {
+          store[elementIdx].quantity += quantity
+        } else {
+          store.push({
+            productSlug: product.slug,
+            modifiers,
+            quantity,
+          })
+        }
+        return store
+      }),
     existInBag: (product, modifiers) =>
       Boolean(
         get(store).find(

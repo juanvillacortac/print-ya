@@ -1,5 +1,6 @@
 import type { Product, ProductModifier } from '$lib/db'
 import { writable } from 'svelte/store'
+import { isEqual } from 'lodash-es'
 
 export type ModifiersMap = Record<
   string,
@@ -18,15 +19,14 @@ export const compareModifiers = (a: ModifiersMap, b: ModifiersMap) => {
   const getKeys = (m: ModifiersMap) =>
     Object.keys(m).filter((k) => Object.values(m[k]).length)
   const [aKeys, bKeys] = [getKeys(a), getKeys(b)]
-  if (aKeys.filter((k) => !bKeys.includes(k)).length) return false
+  if (!isEqual(aKeys, bKeys)) return false
   for (let k of aKeys) {
     const [aObj, bObj] = [a[k], b[k]]
-    if (aObj.itemIds?.length && bObj.itemIds?.length) {
-      if (aObj.itemIds.filter((id) => !bObj.itemIds.includes(id)).length) {
-        return false
-      }
+    if (!isEqual(aObj.itemIds, bObj.itemIds)) {
+      return false
     }
-    if (aObj.itemId != bObj.itemId || aObj.value !== bObj.value) return false
+    if (!isEqual(aObj.itemId, bObj.itemId) || !isEqual(aObj.value, bObj.value))
+      return false
   }
   return true
 }
