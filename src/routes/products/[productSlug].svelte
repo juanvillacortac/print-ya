@@ -240,8 +240,9 @@
                 <div class="w-full grid gap-4 grid-cols-2 lg:w-6/10">
                   {#each m.items as i}
                     <div
-                      class="border rounded-lg shadow w-full transform transition-transform duration-200 relative dark:border-gray-700 hover:scale-102"
+                      class="border rounded-lg w-full transform transition-transform duration-200 relative dark:border-gray-700 hover:scale-102"
                       style="will-change: transform"
+                      class:!shadow={upsellingValues[m.id]?.includes(i.id)}
                       class:!scale-102={upsellingValues[m.id]?.includes(i.id)}
                       class:!border-blue-500={upsellingValues[m.id]?.includes(
                         i.id
