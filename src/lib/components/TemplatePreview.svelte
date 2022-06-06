@@ -90,7 +90,7 @@
   }
 
   let gallery = false
-  let showFonts = false
+  export let showFonts = false
 
   $: if (!mockups?.length && gallery) {
     gallery = false
