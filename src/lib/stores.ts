@@ -83,9 +83,10 @@ export type BagItem = {
 }
 
 export type BagStore = Readable<BagItem[]> & {
-  addToBag(product: Product, modifiers: ModifiersMap, quantity: number): void
   delete(product: Product, modifiers: ModifiersMap): void
   existInBag(product: Product, modifiers: ModifiersMap): boolean
+  setItem(product: Product, modifiers: ModifiersMap, quantity: number): void
+  addToBag(product: Product, modifiers: ModifiersMap, quantity: number): void
 }
 
 const createBag = (): BagStore => {
@@ -97,27 +98,34 @@ const createBag = (): BagStore => {
     }))
   )
 
+  const getKey = (product: Product, modifiers: ModifiersMap) =>
+    JSON.stringify({ productSlug: product.slug, modifiers })
+  const setItem: BagStore['setItem'] = (product, modifiers, quantity) =>
+    store.update((store) => {
+      if (!quantity || quantity < 0) {
+        return store
+      }
+      const key = getKey(product, modifiers)
+      store.set(key, quantity)
+      return store
+    })
+
   return {
     ...items,
+    setItem,
     addToBag: (product, modifiers, quantity) =>
-      store.update((store) => {
-        if (!quantity || quantity < 1) {
-          return store
-        }
-        const key = JSON.stringify({ productSlug: product.slug, modifiers })
-        store.set(key, (store.get(key) ?? 0) + quantity)
-        return store
-      }),
+      setItem(
+        product,
+        modifiers,
+        (get(store).get(getKey(product, modifiers)) ?? 0) + quantity
+      ),
     delete: (product, modifiers) =>
       store.update((store) => {
-        const key = JSON.stringify({ productSlug: product.slug, modifiers })
-        store.delete(key)
+        store.delete(getKey(product, modifiers))
         return store
       }),
     existInBag: (product, modifiers) =>
-      get(store).get(
-        JSON.stringify({ productSlug: product.slug, modifiers })
-      ) !== undefined,
+      get(store).get(getKey(product, modifiers)) !== undefined,
   }
 }
 export const bag = createBag()
