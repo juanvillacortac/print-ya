@@ -340,11 +340,10 @@
                   class="border-dotted border-dashed rounded-lg flex bg-gray-100 border-gray-300 border-2 p-8 relative justify-center items-center lg:w-6/10 dark:bg-gray-700 dark:border-gray-600"
                   class:cursor-pointer={!uploadingImage[m.id]}
                   class:cursor-not-allowed={uploadingImage[m.id]}
-                  on:click={() => onModifierImagePaste(m)}
                 >
                   {#if !uploadingImage[m.id] && $modifiers[m.id].value}
                     <button
-                      class="top-2 right-2 text-gray-400 absolute"
+                      class="top-2 right-2 text-gray-400 z-30 absolute"
                       title="Delete image"
                       use:tooltip
                       on:click|preventDefault|stopPropagation={() =>
@@ -372,16 +371,16 @@
                     >
                   </div>
 
-                  <!-- <input
+                  <input
                     type="file"
                     name=""
-                    class="flex h-full w-full opacity-0"
+                    class="flex h-full w-full opacity-0 absolute"
                     class:!cursor-pointer={!uploadingImage[m.id]}
                     class:!cursor-not-allowed={uploadingImage[m.id]}
                     accept="image/*"
                     disabled={uploadingImage[m.id]}
                     on:change={(e) => onModifierImageSelected(e, m)}
-                  /> -->
+                  />
                 </div>
               {:else if m.type === 'text'}
                 <input
