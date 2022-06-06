@@ -97,8 +97,6 @@ const createBag = (): BagStore => {
     }))
   )
 
-  store.subscribe(console.log)
-
   return {
     ...items,
     addToBag: (product, modifiers, quantity) =>
@@ -107,7 +105,7 @@ const createBag = (): BagStore => {
           return store
         }
         const key = JSON.stringify({ productSlug: product.slug, modifiers })
-        store.set(key, store.get(key) ?? 0)
+        store.set(key, (store.get(key) ?? 0) + quantity)
         return store
       }),
     delete: (product, modifiers) =>
@@ -117,9 +115,9 @@ const createBag = (): BagStore => {
         return store
       }),
     existInBag: (product, modifiers) =>
-      Boolean(
-        get(store).get(JSON.stringify({ productSlug: product.slug, modifiers }))
-      ),
+      get(store).get(
+        JSON.stringify({ productSlug: product.slug, modifiers })
+      ) !== undefined,
   }
 }
 export const bag = createBag()

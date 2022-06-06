@@ -52,8 +52,8 @@
     getTotalFromProductModifiers,
     type ModifiersMap,
   } from '$lib/utils/modifiers'
-  import { isEqual } from 'lodash-es'
   import { browser } from '$app/env'
+  import { ShoppingBag16 } from 'carbon-icons-svelte'
   let quantity = product.minQuantity || 1
 
   $pageSubtitle = product?.name
@@ -109,14 +109,17 @@
     product.modifiers.filter((m) => m.type === 'upsell').map((m) => [m.id, []])
   )
 
+  let inBag = false
+  $: if (browser && $bag && $modifiers) {
+    inBag = bag.existInBag(product, $modifiers)
+  }
+
   $: if (browser) {
     let u = { ...upsellingValues }
     for (let mId in u) {
       $modifiers[mId] = { ...$modifiers[mId], itemIds: u[mId] }
     }
   }
-
-  // $: if ($modifiers && browser) alert(inBag)
 
   let uploadingImage: Record<string, boolean> = {}
   const onModifierImagePaste = async (m: ProductModifier) => {
@@ -290,13 +293,12 @@
                 </div>
               {:else if m.type === 'font'}
                 <div
-                  class="w-full grid gap-4 grid-cols-3 lg:w-full lg:w-6/10 lg:grid-cols-4"
+                  class="w-full grid gap-4 grid-cols-3 lg:w-full lg:w-6/10 lg:grid-cols-3"
                 >
                   <button
                     class="border-dashed rounded flex border-2 text-lg w-full p-2 transform transition-transform text-gray-200 duration-200 items-center justify-center dark:border-gray-600 dark:text-gray-600"
                     title="Unset font"
-                    on:click={() =>
-                      ($modifiers[m.id] = { itemId: '', value: '' })}
+                    on:click={() => ($modifiers[m.id] = {})}
                     use:tooltip
                     style="will-change: transform;"><CloseOutline24 /></button
                   >
@@ -345,7 +347,7 @@
                       title="Delete image"
                       use:tooltip
                       on:click|preventDefault|stopPropagation={() =>
-                        ($modifiers[m.id].value = '')}
+                        ($modifiers[m.id] = {})}
                     >
                       <Close24 />
                     </button>
@@ -388,6 +390,10 @@
                   bind:value={$modifiers[m.id].value}
                   on:input={() =>
                     ($modifiers[m.id].itemId = $modifiers[m.id].itemId)}
+                  on:change={() =>
+                    !$modifiers[m.id].value?.trim()
+                      ? ($modifiers[m.id] = {})
+                      : null}
                 />
               {:else if m.type === 'color'}
                 <div class="w-full grid gap-2 grid-cols-8 lg:w-6/10">
@@ -441,15 +447,17 @@
             </button>
           </div>
         </div>
-        <div class="flex space-x-4 items-center justify-between !w-full">
-          <div class="flex space-x-4 items-center">
+        <div
+          class="flex justify-between sm:space-x-4 sm:items-center <sm:flex-col <sm:space-y-4 !w-full"
+        >
+          <div class="flex space-x-4 w-full items-center">
             <button
               class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
               on:click={() => bag.addToBag(product, $modifiers, quantity)}
               style="will-change: transform"
             >
               <Add24 class="m-auto" />
-              <span>Add to bag</span></button
+              <span>Add to bag{inBag ? ' (in bag)' : ''}</span></button
             >
             <button
               class="flex text-gray-400 relative hover:text-pink-500"

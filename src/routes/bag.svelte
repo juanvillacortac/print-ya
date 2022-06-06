@@ -2,27 +2,17 @@
   import { page } from '$app/stores'
   import { bag, type BagItem } from '$lib'
   import { get } from '$lib/api'
-  import Preview from '$lib/components/Preview.svelte'
   import { tooltip } from '$lib/components/tooltip'
-  import VirtualList from '@sveltejs/svelte-virtual-list'
 
   import type { Product } from '$lib/db'
   import {
     getCostFromProductModifiers,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
-    type ModifiersMap,
   } from '$lib/utils/modifiers'
-  import {
-    Add16,
-    Information16,
-    Subtract16,
-    TrashCan16,
-  } from 'carbon-icons-svelte'
+  import { Add16, Subtract16, TrashCan16 } from 'carbon-icons-svelte'
 
   import { onMount } from 'svelte'
-  import { fly } from 'svelte/transition'
-  import { browser } from '$app/env'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
 
   let mounted = false
