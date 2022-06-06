@@ -217,7 +217,7 @@
               </div>
               {#if m.type === 'select'}
                 <select
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight py-2 px-3 w-1/2 appearance-none !pr-8 lg:w-60 lg:w-6/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                  class="bg-white border rounded border-gray-300 text-xs leading-tight py-2 px-3 w-1/2 appearance-none !pr-8 lg:w-60 lg:w-7/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                   bind:value={$modifiers[m.id].itemId}
                   on:change={() =>
                     ($modifiers[m.id].value = m.items.find(
@@ -237,7 +237,7 @@
                   {/each}
                 </select>
               {:else if m.type === 'upsell'}
-                <div class="w-full grid gap-4 grid-cols-2 lg:w-6/10">
+                <div class="w-full grid gap-4 grid-cols-2 lg:w-7/10">
                   {#each m.items as i}
                     <div
                       class="border rounded-lg w-full transform transition-transform duration-200 relative dark:border-gray-700 hover:scale-102"
@@ -294,7 +294,7 @@
                 </div>
               {:else if m.type === 'font'}
                 <div
-                  class="w-full grid gap-4 grid-cols-3 lg:w-full lg:w-6/10 lg:grid-cols-3"
+                  class="w-full grid gap-4 grid-cols-3 lg:w-full lg:w-7/10 lg:grid-cols-3"
                 >
                   <button
                     class="border-dashed rounded flex border-2 text-lg w-full p-2 transform transition-transform text-gray-200 duration-200 items-center justify-center dark:border-gray-600 dark:text-gray-600"
@@ -337,7 +337,7 @@
                 />
               {:else if m.type === 'image'}
                 <div
-                  class="border-dotted border-dashed rounded-lg flex bg-gray-100 border-gray-300 border-2 p-8 relative justify-center items-center lg:w-6/10 dark:bg-gray-700 dark:border-gray-600"
+                  class="border-dotted border-dashed rounded-lg flex bg-gray-100 border-gray-300 border-2 p-8 relative justify-center items-center lg:w-7/10 dark:bg-gray-700 dark:border-gray-600"
                   class:cursor-pointer={!uploadingImage[m.id]}
                   class:cursor-not-allowed={uploadingImage[m.id]}
                 >
@@ -386,7 +386,7 @@
                 <input
                   type="text"
                   placeholder="Write something..."
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-6/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-7/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
                   bind:value={$modifiers[m.id].value}
                   on:input={() =>
                     ($modifiers[m.id].itemId = $modifiers[m.id].itemId)}
@@ -396,7 +396,7 @@
                       : null}
                 />
               {:else if m.type === 'color'}
-                <div class="w-full grid gap-2 grid-cols-8 lg:w-6/10">
+                <div class="w-full grid gap-2 grid-cols-8 lg:w-7/10">
                   {#each m.items as i}
                     <button
                       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
