@@ -94,6 +94,7 @@
                   {#if p}
                     <TemplatePreview
                       lazy
+                      showFonts
                       template={{
                         ...(p?.template || {}),
                         fields: getTemplateFieldsFromModifiers(

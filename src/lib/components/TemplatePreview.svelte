@@ -90,6 +90,7 @@
   }
 
   let gallery = false
+  let showFonts = false
 
   $: if (!mockups?.length && gallery) {
     gallery = false
@@ -354,7 +355,7 @@
           scaleFactor={Math.max(previewScale[0] / 100, 0)}
           rotation={previewRotate[0]}
           draggable
-          notLoadFonts
+          notLoadFonts={!showFonts}
         />
       </div>
     </div>
