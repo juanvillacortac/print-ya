@@ -11,10 +11,18 @@
     getTotalFromProductModifiers,
     type ModifiersMap,
   } from '$lib/utils/modifiers'
-  import { Add16, Subtract16, TrashCan16 } from 'carbon-icons-svelte'
+  import {
+    Add16,
+    ArrowRight24,
+    ChevronLeft24,
+    Subtract16,
+    TrashCan16,
+  } from 'carbon-icons-svelte'
 
   import { onMount } from 'svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
+  import { fly } from 'svelte/transition'
+  import { expoOut } from 'svelte/easing'
 
   let mounted = false
   onMount(() => {
@@ -64,11 +72,165 @@
     bag.setItem(p, m, Math.max(p?.minQuantity || 1, +e.currentTarget.value))
   }
 
+  let checkout = false
+
   $: items = $bag.map((v, idx) => ({ ...v, idx }))
+
+  $: total = $bag
+    .map((v) => ({
+      product: products ? products[v.productSlug] : null,
+      modifiers: v.modifiers,
+      quantity: v.quantity,
+    }))
+    .map(({ product, modifiers, quantity }) =>
+      product ? getTotalFromProductModifiers(product, modifiers) * quantity : 0
+    )
+    .reduce((a, b) => a + b, 0)
 </script>
 
 <div
+  class="bg-white border-l flex-grow h-full shadow-xl transform top-0 ease-out right-0 z-100 duration-600 fixed sm:w-1/2 <sm:w-full lg:w-1/3 dark:bg-gray-800 dark:border-gray-700"
+  class:translate-x-120={!checkout}
+  class:opacity-0={!checkout}
+  style="will-change: transform"
+>
+  <div class="flex flex-col space-y-6 p-4 overflow-auto">
+    <div class="flex space-x-4 items-center">
+      <button
+        class="transform transition-transform duration-200 hover:scale-90"
+        on:click={() => (checkout = false)}
+      >
+        <ChevronLeft24 />
+      </button>
+      <div class="font-title font-bold text-2xl">Checkout</div>
+    </div>
+    <div class="flex flex-col space-y-2">
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Email
+        </label>
+        <input
+          type="text"
+          placeholder="Ex. juan@gmail.com"
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+        />
+      </div>
+      <div class="flex space-x-2">
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId"
+            >First name</label
+          >
+          <input
+            type="text"
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+          />
+        </div>
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId"
+            >Last name</label
+          >
+          <input
+            type="text"
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+          />
+        </div>
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Region
+        </label>
+        <select
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+        >
+          <option value="Canada">Canada</option>
+          <option value="EU">EU</option>
+          <option value="USA">USA</option>
+        </select>
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Address
+        </label>
+        <input
+          type="text"
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+        />
+      </div>
+      <div class="flex space-x-3">
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId">City</label>
+          <input
+            type="text"
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+          />
+        </div>
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId"
+            >Postal code</label
+          >
+          <input
+            type="text"
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      class="divide-y border rounded rounded-lg flex flex-col w-full dark:divide-gray-600 dark:border-gray-600"
+    >
+      <div class="flex space-x-2 w-full p-2 items-center justify-between">
+        <input
+          type="text"
+          placeholder="Apply coupon code"
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+        />
+        <button
+          class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xs py-2 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+          style="will-change: transform"
+          on:click={() => (checkout = true)}
+        >
+          Apply
+        </button>
+      </div>
+      <div class="flex flex-col font-bold space-y-4 text-xs p-2">
+        <div class="flex justify-between">
+          <div>Subtotal:</div>
+          <p>
+            ${total.toLocaleString('en', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </p>
+        </div>
+      </div>
+      <div class="flex flex-col font-bold space-y-4 text-xs p-2">
+        <div class="flex justify-between">
+          <div>Shipping:</div>
+          <p>
+            ${total.toLocaleString('en', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </p>
+        </div>
+      </div>
+      <div class="flex flex-col font-bold space-y-4 text-xs p-2">
+        <div class="flex justify-between">
+          <div>Total:</div>
+          <p>
+            ${total.toLocaleString('en', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div
   class="flex flex-col mx-auto space-y-4 w-full py-12 px-4 lg:max-w-9/10 lg:px-6"
+  class:pointer-events-none={checkout}
 >
   <h3 class="font-bold font-title text-black text-3xl dark:text-white">
     Shopping bag
@@ -203,6 +365,22 @@
           </div>
         {/each}
       </div>
+    </div>
+    <div class="flex space-x-4 w-full justify-end items-center">
+      <p class="font-bold text-lg">
+        Total: ${total.toLocaleString('en', {
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+        })}
+      </p>
+      <button
+        class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+        style="will-change: transform"
+        on:click={() => (checkout = true)}
+      >
+        <span>Checkout</span>
+        <ArrowRight24 class="m-auto" />
+      </button>
     </div>
   {:else}
     <div
