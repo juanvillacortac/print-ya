@@ -157,15 +157,27 @@
           {/each}
         </select>
       </div>
-      <div class="flex flex-col w-full">
-        <label class="font-bold text-xs mb-2 block" for="fieldId">
-          Address *
-        </label>
-        <input
-          type="text"
-          required
-          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-        />
+      <div class="flex space-x-3">
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId">
+            Province/State *
+          </label>
+          <input
+            type="text"
+            required
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+          />
+        </div>
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId">
+            Address *
+          </label>
+          <input
+            type="text"
+            required
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+          />
+        </div>
       </div>
       <div class="flex space-x-3">
         <div class="flex flex-col w-full">
