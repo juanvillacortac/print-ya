@@ -21,8 +21,7 @@
 
   import { onMount } from 'svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
-  import { fly } from 'svelte/transition'
-  import { expoOut } from 'svelte/easing'
+  import { getCountries } from '$lib/utils/countries'
 
   let mounted = false
   onMount(() => {
@@ -32,15 +31,6 @@
   $: if (mounted && $page.stuff.store && $bag.length) {
     loadProducts()
   }
-
-  $: getModifiers = (element: BagItem) =>
-    Object.entries(element.modifiers).map(([mId, mValue]) => {
-      const product = products ? products[element.productSlug] : null
-      if (!product) return ''
-      const modifier = product.modifiers.find((m) => m.id === mId)
-      const item = modifier.items.find((i) => i.id === mValue)
-      return item.name
-    })
 
   const loadProducts = () => {
     if (!$bag.length) {
@@ -72,6 +62,8 @@
     bag.setItem(p, m, Math.max(p?.minQuantity || 1, +e.currentTarget.value))
   }
 
+  const countries = getCountries()
+
   let checkout = false
 
   $: items = $bag.map((v, idx) => ({ ...v, idx }))
@@ -88,7 +80,8 @@
     .reduce((a, b) => a + b, 0)
 </script>
 
-<div
+<form
+  on:submit|preventDefault={() => {}}
   class="bg-white border-l flex-grow h-full shadow-xl transform top-0 ease-out right-0 z-100 duration-600 fixed sm:w-1/2 <sm:w-full lg:w-1/3 dark:bg-gray-800 dark:border-gray-700"
   class:translate-x-120={!checkout}
   class:opacity-0={!checkout}
@@ -97,6 +90,7 @@
   <div class="flex flex-col space-y-6 p-4 overflow-auto">
     <div class="flex space-x-4 items-center">
       <button
+        type="reset"
         class="transform transition-transform duration-200 hover:scale-90"
         on:click={() => (checkout = false)}
       >
@@ -105,23 +99,37 @@
       <div class="font-title font-bold text-2xl">Checkout</div>
     </div>
     <div class="flex flex-col space-y-2">
-      <div class="flex flex-col w-full">
-        <label class="font-bold text-xs mb-2 block" for="fieldId">
-          Email
-        </label>
-        <input
-          type="text"
-          placeholder="Ex. juan@gmail.com"
-          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-        />
+      <div class="flex space-x-2">
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId">
+            Email *
+          </label>
+          <input
+            type="email"
+            placeholder="Ex. juan@gmail.com"
+            required
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+          />
+        </div>
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId">
+            Phone number
+          </label>
+          <input
+            type="tel"
+            placeholder="Ex. +1 XXXXXX"
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+          />
+        </div>
       </div>
       <div class="flex space-x-2">
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId"
-            >First name</label
+            >First name *</label
           >
           <input
             type="text"
+            required
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
           />
         </div>
@@ -137,39 +145,46 @@
       </div>
       <div class="flex flex-col w-full">
         <label class="font-bold text-xs mb-2 block" for="fieldId">
-          Region
+          Country/Region *
         </label>
         <select
           class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          required
         >
-          <option value="Canada">Canada</option>
-          <option value="EU">EU</option>
-          <option value="USA">USA</option>
+          <option value="" hidden />
+          {#each countries as country}
+            <option value={country.code}>{country.name}</option>
+          {/each}
         </select>
       </div>
       <div class="flex flex-col w-full">
         <label class="font-bold text-xs mb-2 block" for="fieldId">
-          Address
+          Address *
         </label>
         <input
           type="text"
+          required
           class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
         />
       </div>
       <div class="flex space-x-3">
         <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">City</label>
+          <label class="font-bold text-xs mb-2 block" for="fieldId"
+            >City *</label
+          >
           <input
+            required
             type="text"
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
           />
         </div>
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId"
-            >Postal code</label
+            >Postal code *</label
           >
           <input
             type="text"
+            required
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
           />
         </div>
@@ -227,7 +242,7 @@
       </div>
     </div>
   </div>
-</div>
+</form>
 <div
   class="flex flex-col mx-auto space-y-4 w-full py-12 px-4 lg:max-w-9/10 lg:px-6"
   class:pointer-events-none={checkout}
