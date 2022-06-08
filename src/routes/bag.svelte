@@ -99,7 +99,7 @@
       <div class="font-title font-bold text-2xl">Checkout</div>
     </div>
     <div class="flex flex-col space-y-2">
-      <div class="flex space-x-2">
+      <div class="flex space-x-3">
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId">
             Email *
@@ -122,7 +122,7 @@
           />
         </div>
       </div>
-      <div class="flex space-x-2">
+      <div class="flex space-x-3">
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId"
             >First name *</label
