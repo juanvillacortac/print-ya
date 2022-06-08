@@ -192,7 +192,7 @@
         </div>
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId"
-            >Postal code *</label
+            >ZIP/Postal code *</label
           >
           <input
             type="text"
