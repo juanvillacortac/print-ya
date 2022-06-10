@@ -35,14 +35,14 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
     // const { css, js } = compile(component, { generate: 'ssr', hydratable: false })
     // console.log(js.code)
     // const html = await jsx.render(`(props) => (${data.html})`, payload)
-    let replacedHtml = replaceAll(replaceAll(html, '{{', '<%'), '}}', ' %>')
+    let replacedHtml = replaceAll(replaceAll(html, '{{', '<%'), '}}', '%>')
     replacedHtml = replaceAll(
       replaceAll(replacedHtml, '<script>', '<%'),
       '</script>',
       '%>'
     )
-    html = ejs.render(replacedHtml, {
-      ...payload,
+
+    const helpers = {
       fillImage: (href: string, color: string = '000000.0') =>
         urlBuilder({ url: 'https://caravaggio-cdn.vercel.app' }, href, {
           progressive: true,
@@ -57,12 +57,17 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
             o: 1,
           },
         }),
+    }
+
+    html = ejs.render(replacedHtml, {
+      ...payload,
+      ...helpers,
     })
     console.log(html)
-    css = ejs.render(
-      replaceAll(replaceAll(css, '{{', '<%'), '}}', ' %>'),
-      payload
-    )
+    css = ejs.render(replaceAll(replaceAll(css, '{{', '<%'), '}}', ' %>'), {
+      ...payload,
+      ...helpers,
+    })
     // }
     if (source.windi || source.windi === undefined) {
       const { generatedCSS } = useWindiCSS(html, css)

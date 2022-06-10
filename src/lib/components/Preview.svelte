@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
-  import { toPng } from 'html-to-image'
+  import { toPng, toSvg } from 'html-to-image'
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
   import type { Prisma } from '@prisma/client'
@@ -130,6 +130,7 @@
     if (!containerEl) {
       containerEl = document.createElement('div')
       innerEl = document.createElement('div')
+      innerEl.id = 'inner'
       containerEl.appendChild(innerEl)
       shadow.appendChild(containerEl)
       if (draggable) {
@@ -223,15 +224,19 @@
 
   export const saveImage = () => {
     if (!containerEl) return
-    toPng(containerEl.getElementsByTagName('div')[0], { skipFonts: true }).then(
-      (dataUrl) => {
+    console.log(shadow.getElementById('inner'))
+    innerEl?.classList.toggle('outlined', false)
+    toPng(containerEl, { skipFonts: true })
+      .then((dataUrl) => {
         var dl = document.createElement('a')
         document.body.appendChild(dl)
         dl.setAttribute('href', dataUrl)
         dl.setAttribute('download', `template-${+new Date()}.png`)
         dl.click()
-      }
-    )
+      })
+      .finally(() => {
+        innerEl?.classList.toggle('outlined', true)
+      })
   }
 
   let moving = false
