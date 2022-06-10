@@ -30,6 +30,7 @@ specifiers:
   '@poppanator/sveltekit-svg': ^0.2.3
   '@prisma/client': ^3.12.0
   '@rgossiaux/svelte-headlessui': ^1.0.2
+  '@stripe/stripe-js': ^1.31.0
   '@supabase/supabase-js': ^1.35.3
   '@sveltejs/adapter-auto': 1.0.0-next.40
   '@sveltejs/adapter-cloudflare': ^1.0.0-next.18
@@ -70,6 +71,7 @@ specifiers:
   rollup-plugin-polyfill: ^3.0.0
   screenfull: ^6.0.1
   sharp: ^0.29.3
+  stripe: ^9.8.0
   svelte: ^3.48.0
   svelte-check: ^2.7.0
   svelte-datocms: ^0.6.3
@@ -81,6 +83,7 @@ specifiers:
   svelte-range-slider-pips: ^2.0.3
   svelte-split-pane: ^0.1.2
   svelte-splitpanes: ^0.6.3
+  svelte-stripe: ^0.0.17
   svelte-windicss-preprocess: ~4.2.6
   svelte2tsx: ^0.4.14
   three: ^0.135.0
@@ -121,6 +124,7 @@ dependencies:
   '@leveluptuts/svelte-toy': 0.0.18
   '@prisma/client': 3.14.0_prisma@3.14.0
   '@rgossiaux/svelte-headlessui': 1.0.2_svelte@3.48.0
+  '@stripe/stripe-js': 1.31.0
   '@supabase/supabase-js': 1.35.3
   '@sveltejs/svelte-virtual-list': 3.0.1
   '@types/bcryptjs': 2.4.2
@@ -147,6 +151,7 @@ dependencies:
   prismjs: 1.28.0
   screenfull: 6.0.1
   sharp: 0.29.3
+  stripe: 9.8.0
   svelte-datocms: 0.6.3
   svelte-fullscreen: 2.0.0
   svelte-kit-cookie-session: 2.1.4
@@ -155,6 +160,7 @@ dependencies:
   svelte-range-slider-pips: 2.0.3
   svelte-split-pane: 0.1.2
   svelte-splitpanes: 0.6.5
+  svelte-stripe: 0.0.17
   three: 0.135.0
   typewriter-document: 0.6.50
   typewriter-editor: 0.7.9_svelte@3.48.0
@@ -1754,6 +1760,10 @@ packages:
   /@sindresorhus/is/0.14.0:
     resolution: {integrity: sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ==}
     engines: {node: '>=6'}
+    dev: false
+
+  /@stripe/stripe-js/1.31.0:
+    resolution: {integrity: sha512-drlXsNvd/s9S1+Ghja0aDB81N3Wr/6iRAZ7MOzKv7AtKxVdvGpOwESw3z1lHl/Wx/rvPpA7whKdB3W2CnVSArw==}
     dev: false
 
   /@supabase/functions-js/1.3.3:
@@ -4582,6 +4592,10 @@ packages:
     resolution: {integrity: sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=}
     engines: {node: '>=0.10.0'}
 
+  /object-inspect/1.12.2:
+    resolution: {integrity: sha512-z+cPxW0QGUp0mcqcsgQyLVRDoXFQbXOwBaqyF7VIgI4TWNQsDHrBpUQslRmIfAoYWdYzs6UlKJtB2XJpTaNSpQ==}
+    dev: false
+
   /object-keys/1.1.1:
     resolution: {integrity: sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==}
     engines: {node: '>= 0.4'}
@@ -4875,6 +4889,13 @@ packages:
       postcss: 8.4.13
       postcss-selector-parser: 6.0.10
     dev: true
+
+  /qs/6.10.5:
+    resolution: {integrity: sha512-O5RlPh0VFtR78y79rgcgKK4wbAI0C5zGVLztOIdpWX6ep368q5Hv6XRxDvXuZ9q3C6v+e3n8UfZZJw7IIG27eQ==}
+    engines: {node: '>=0.6'}
+    dependencies:
+      side-channel: 1.0.4
+    dev: false
 
   /queue-microtask/1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -5189,6 +5210,14 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
+  /side-channel/1.0.4:
+    resolution: {integrity: sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw==}
+    dependencies:
+      call-bind: 1.0.2
+      get-intrinsic: 1.1.1
+      object-inspect: 1.12.2
+    dev: false
+
   /signal-exit/3.0.7:
     resolution: {integrity: sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==}
 
@@ -5353,6 +5382,14 @@ packages:
     resolution: {integrity: sha1-PFMZQukIwml8DsNEhYwobHygpgo=}
     engines: {node: '>=0.10.0'}
 
+  /stripe/9.8.0:
+    resolution: {integrity: sha512-6trh3w4U2wRAvXdh2ilHxky/nWP7aFMGvQX0Ga2eCMAqQwYGOBkBT0ZxT3V+wWruOB1svpuOO6ixpMQif0bnIw==}
+    engines: {node: ^8.1 || >=10.*}
+    dependencies:
+      '@types/node': 17.0.32
+      qs: 6.10.5
+    dev: false
+
   /style-mod/4.0.0:
     resolution: {integrity: sha512-OPhtyEjyyN9x3nhPsu76f52yUGXiZcgvsrFVtvTkyGRQJ0XK+GPc6ov1z+lRpbeabka+MYEQxOYRnt5nF30aMw==}
     dev: false
@@ -5512,6 +5549,10 @@ packages:
 
   /svelte-splitpanes/0.6.5:
     resolution: {integrity: sha512-kf8OAkhQm7/zeaGEM5FTs3l9MCyVti1U7v7ZPtBWJu1WQenw8cSKYViKWE5ZU3h0ISyPcYHM0RnwI/FbD/6VRg==}
+    dev: false
+
+  /svelte-stripe/0.0.17:
+    resolution: {integrity: sha512-9Ddt3HOiMGGBvC4uYmpc9eQxpj1/dEbee8B+1f+Lo3FKwdfjk8LeRpaD1D8LU7RdnNad25UWwi0WTlpH47CMWQ==}
     dev: false
 
   /svelte-windicss-preprocess/4.2.6:

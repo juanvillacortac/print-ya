@@ -84,6 +84,7 @@ export type BagItem = {
 
 export type BagStore = Readable<BagItem[]> & {
   delete(product: Product, modifiers: ModifiersMap): void
+  clear(): void
   existInBag(product: Product, modifiers: ModifiersMap): boolean
   setItem(product: Product, modifiers: ModifiersMap, quantity: number): void
   addToBag(product: Product, modifiers: ModifiersMap, quantity: number): void
@@ -123,6 +124,10 @@ const createBag = (): BagStore => {
       store.update((store) => {
         store.delete(getKey(product, modifiers))
         return store
+      }),
+    clear: () =>
+      store.update(() => {
+        return new Map()
       }),
     existInBag: (product, modifiers) =>
       get(store).get(getKey(product, modifiers)) !== undefined,
