@@ -80,6 +80,7 @@ export type BagItem = {
   productSlug: string
   modifiers: ModifiersMap
   quantity: number
+  key: string
 }
 
 export type BagStore = Readable<BagItem[]> & {
@@ -96,6 +97,7 @@ const createBag = (): BagStore => {
     [...s.entries()].map<BagItem>(([k, q]) => ({
       ...JSON.parse(k),
       quantity: q,
+      key: k,
     }))
   )
 

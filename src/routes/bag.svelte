@@ -23,8 +23,11 @@
     ArrowRight24,
     CheckmarkFilled32,
     ChevronLeft24,
+    Close16,
+    Close24,
     Subtract16,
     TrashCan16,
+    View16,
   } from 'carbon-icons-svelte'
 
   import { loadStripe, type Stripe, type StripeError } from '@stripe/stripe-js'
@@ -32,8 +35,10 @@
   import { onMount } from 'svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import { getCountries } from '$lib/utils/countries'
-  import { expoOut } from 'svelte/easing'
-  import { scale, slide } from 'svelte/transition'
+  import { elasticOut, expoOut } from 'svelte/easing'
+  import { fade, scale, slide } from 'svelte/transition'
+  import { squareratio } from '$lib/actions/aspectratio'
+  import Image from '$lib/components/caravaggio/Image.svelte'
 
   let mounted = false
   let stripe: Stripe
@@ -85,6 +90,9 @@
 
   const submit = async () => {
     if (!payment) {
+      // done = total
+      // payment = false
+      // bag.clear()
       payment = true
       return
     }
@@ -103,14 +111,14 @@
       error = result.error
       return
     }
-    checkout = false
+    done = total
     payment = false
     bag.clear()
   }
 
   let error: StripeError
 
-  let done: number | undefined = 1
+  let done: number | undefined
 
   $: items = $bag.map((v, idx) => ({ ...v, idx }))
 
@@ -178,12 +186,205 @@
 				opacity: ${target_opacity - od * u}`,
     }
   }
+
+  let details: BagItem | undefined
 </script>
+
+{#if details}
+  {@const p = products ? products[details.productSlug] : null}
+  <div
+    class="flex h-full w-full top-0 z-9999 fixed items-center justify-center"
+  >
+    <div
+      class="bg-black h-full w-full opacity-70 absolute"
+      on:click={() => (details = undefined)}
+      transition:fade={{ duration: 300, easing: expoOut }}
+    />
+    <div
+      class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 max-w-8/10 p-4 relative dark:bg-gray-900"
+      in:scale|local={{
+        start: 0.6,
+        duration: 1000,
+        opacity: 1,
+        easing: elasticOut,
+      }}
+      out:scale|local={{
+        start: 0.2,
+        duration: 300,
+        easing: expoOut,
+      }}
+    >
+      <div class="flex items-center justify-between">
+        <h4 class="font-bold text-xl text-black leading-thight dark:text-white">
+          Details
+        </h4>
+        <button on:click={() => (details = undefined)}><Close24 /></button>
+      </div>
+      <div
+        class="h-full grid gap-4 grid-cols-1 items-start overflow-auto lg:grid-cols-2"
+      >
+        {#if p.template && p.type === 'template'}
+          <TemplatePreview
+            watermark
+            template={{
+              ...(p?.template || {}),
+              fields: getTemplateFieldsFromModifiers(p, details.modifiers),
+            }}
+            mockups={p.meta?.mockups}
+          />
+        {/if}
+        <div class="flex flex-col space-y-4 w-full">
+          <div class="flex flex-col space-y-2 items-start">
+            <h3 class="font-bold font-title text-black text-xl dark:text-white">
+              {p.name}
+            </h3>
+            <p class="font-bold text-black text-2xl dark:text-white">
+              ${p.price.toLocaleString()} <span class="text-base">/ unit</span>
+            </p>
+            <p class="font-bold text-black text-base dark:text-white">
+              Total: ${getTotalFromProductModifiers(
+                p,
+                details.modifiers
+              ).toLocaleString()}
+            </p>
+          </div>
+          <div class="flex flex-col space-y-2">
+            {#each Object.entries(details.modifiers) as [mId, m]}
+              {@const modifier = p.modifiers.find((m) => m.id == mId)}
+              {@const itemName = modifier.name}
+              {@const item = modifier.items.find((i) => i.id === m.itemId)}
+              <div class="flex flex-col space-y-1 w-full lg:w-1/3">
+                <div
+                  class="font-bold font-title text-black text-xs dark:text-white"
+                >
+                  {itemName}:
+                </div>
+                {#if modifier.type === 'select'}
+                  <p class="text-xs">
+                    {m.value}
+                    {item?.cost
+                      ? ` - ${
+                          !item?.percentage ? '$' : ''
+                        }${item?.cost?.toLocaleString('en', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}${item?.percentage ? '%' : ''}`
+                      : ''}
+                  </p>
+                {:else if modifier.type === 'color'}
+                  <div class="flex space-x-2 items-center">
+                    <div
+                      class="rounded pb-full border-2 h-8 w-full transform w-8 duration-200 dark:border-gray-600"
+                      use:squareratio
+                      style="background-color: {m.value || 'black'}"
+                    />
+                    <div class="text-xs">
+                      {item?.meta.name}
+                    </div>
+                  </div>
+                {:else if modifier.type === 'toggle'}
+                  <p class="text-xs">
+                    {m.value ? 'Yes' : 'No'}
+                  </p>
+                {:else if modifier.type === 'text'}
+                  <p class="text-xs">
+                    {m.value || 'N/A'}
+                  </p>
+                {:else if modifier.type === 'upsell'}
+                  <div class="flex flex-col space-y-2 w-full">
+                    {#each m.itemIds as id}
+                      {@const i = modifier.items.find((i) => i.id === id)}
+                      <div
+                        class="border rounded-lg w-full relative dark:border-gray-700"
+                      >
+                        <div
+                          class="flex flex-col h-full space-y-2 p-2 justify-between"
+                        >
+                          <div class="flex flex-col space-y-2">
+                            <div
+                              class="rounded-lg bg-gray-100 w-auto overflow-hidden pointer-events-none select-none dark:bg-gray-700"
+                            >
+                              <div
+                                class="flex w-full p-2 items-center justify-center aspect-square"
+                              >
+                                <Image
+                                  options={{
+                                    progressive: true,
+                                    o: 'png',
+                                    rs: {
+                                      s: '480x480',
+                                      m: 'embed',
+                                      b: '000000.0',
+                                    },
+                                  }}
+                                  src={i.meta?.image}
+                                  class="rounded object-cover w-full aspect-square"
+                                />
+                              </div>
+                            </div>
+                            <div class="flex flex-col">
+                              <h3 class="font-bold text-sm">{i.name}</h3>
+                              {#if i.meta.description}
+                                <p
+                                  class="text-sm leading-none overflow-hidden overflow-ellipsis whitespace-nowrap"
+                                >
+                                  {i.meta?.description}
+                                </p>
+                              {/if}
+                            </div>
+                          </div>
+                          <p class="font-bold text-right text-lg">
+                            {i.cost < 0 ? '-' : ''}{!i.percentage
+                              ? '$'
+                              : ''}{Math.abs(i.cost)}{i.percentage ? '%' : ''}
+                          </p>
+                        </div>
+                      </div>
+                    {:else}
+                      <p class="text-xs">N/A</p>
+                    {/each}
+                  </div>
+                {:else if modifier.type === 'image'}
+                  {#if item}
+                    <div
+                      class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none dark:bg-gray-700"
+                    >
+                      <div
+                        class="flex w-full p-2 items-center justify-center aspect-square"
+                        use:squareratio
+                      >
+                        <Image
+                          options={{
+                            progressive: true,
+                            o: 'png',
+                            rs: {
+                              s: '480x480',
+                              m: 'embed',
+                              b: '000000.0',
+                            },
+                          }}
+                          src={item?.meta?.image}
+                          class="rounded object-cover w-full aspect-square"
+                        />
+                      </div>
+                    </div>
+                  {:else}
+                    <p class="text-xs">N/A</p>
+                  {/if}
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
 
 {#if checkout}
   <form
     on:submit|preventDefault={submit}
-    class="bg-white border-l flex-grow h-full shadow-xl transform top-0 ease-out right-0 z-100 duration-600 fixed sm:w-1/2 <sm:w-full lg:w-1/3 dark:bg-gray-800 dark:border-gray-700"
+    class="bg-white border-l flex-grow h-full shadow-xl top-0 ease-out right-0 z-100 fixed sm:w-1/2 <sm:w-full lg:w-1/3 dark:bg-gray-800 dark:border-gray-700"
     style="will-change: transform"
     transition:fly|local={{ x: '100%', opacity: 1, duration: 400 }}
   >
@@ -194,14 +395,54 @@
           class="transform transition-transform duration-200 hover:scale-90"
           on:click={() => {
             checkout = false
+            payment = false
+            done = undefined
           }}
         >
           <ChevronLeft24 />
         </button>
         <div class="font-title font-bold text-2xl">Checkout</div>
       </div>
-      {#if done === undefined}
-        <CheckmarkFilled32 class="text-green-500" />
+      {#if done !== undefined}
+        <div
+          class="flex flex-col h-full space-y-4 w-full items-center justify-center"
+        >
+          <div
+            class="w-4/10 aspect-square"
+            use:squareratio
+            in:scale={{
+              easing: elasticOut,
+              start: 0,
+              duration: 800,
+              opacity: 1,
+            }}
+          >
+            <CheckmarkFilled32 class="h-full w-full text-green-500" />
+          </div>
+          <p
+            class="font-bold text-center text-2xl"
+            in:fly={{
+              delay: 200,
+              duration: 400,
+              y: '1.5rem',
+            }}
+          >
+            Thank you!
+          </p>
+          <p
+            class="font-bold text-center"
+            in:fly={{
+              delay: 300,
+              duration: 400,
+              y: '1.5rem',
+            }}
+          >
+            Your checkout for ${done.toLocaleString('en', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })} was sucesfully payed
+          </p>
+        </div>
       {:else}
         {#if !payment}
           <div
@@ -368,42 +609,47 @@
             </div>
           </div>
         </div>
-        <StripeContainer {stripe}>
-          {#if payment}
-            <div
-              class="border rounded rounded-lg flex flex-col space-y-2 w-full p-2 dark:border-gray-600"
-              transition:scale|local={{
-                duration: 600,
-                start: 0.2,
-                easing: expoOut,
-                delay: 200,
-              }}
-              style="will-change: transform"
-            >
-              <div class="flex flex-col w-full">
-                <div class="font-bold text-xs mb-2 block">
-                  Pay with a credit card
-                </div>
-                {#if error}
-                  <div
-                    class="text-xs mb-2 text-red-500 block"
-                    transition:slide|local={{ duration: 400, easing: expoOut }}
-                  >
-                    {error.message}
+        {#if stripe}
+          <StripeContainer {stripe}>
+            {#if payment}
+              <div
+                class="border rounded rounded-lg flex flex-col space-y-2 w-full p-2 dark:border-gray-600"
+                transition:scale|local={{
+                  duration: 600,
+                  start: 0.2,
+                  easing: expoOut,
+                  delay: 200,
+                }}
+                style="will-change: transform"
+              >
+                <div class="flex flex-col w-full">
+                  <div class="font-bold text-xs mb-2 block">
+                    Pay with a credit card
                   </div>
-                {/if}
-                <CardNumber
-                  bind:element={cardElement}
-                  classes={{ base: 'stripe-input' }}
-                />
+                  {#if error}
+                    <div
+                      class="text-xs mb-2 text-red-500 block"
+                      transition:slide|local={{
+                        duration: 400,
+                        easing: expoOut,
+                      }}
+                    >
+                      {error.message}
+                    </div>
+                  {/if}
+                  <CardNumber
+                    bind:element={cardElement}
+                    classes={{ base: 'stripe-input' }}
+                  />
+                </div>
+                <div class="flex space-x-2">
+                  <CardExpiry classes={{ base: 'stripe-input' }} />
+                  <CardCvc classes={{ base: 'stripe-input' }} />
+                </div>
               </div>
-              <div class="flex space-x-2">
-                <CardExpiry classes={{ base: 'stripe-input' }} />
-                <CardCvc classes={{ base: 'stripe-input' }} />
-              </div>
-            </div>
-          {/if}
-        </StripeContainer>
+            {/if}
+          </StripeContainer>
+        {/if}
         <button
           class="rounded flex font-bold ml-auto space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
           style="will-change: transform"
@@ -423,17 +669,21 @@
     Shopping bag
   </h3>
   {#if items?.length}
-    <div class="flex-grow w-full overflow-x-auto">
+    <div
+      class="flex-grow w-full overflow-x-auto"
+      transition:slide|local={{ duration: 400, easing: expoOut }}
+    >
       <div
         class="divide-y border rounded-lg flex flex-col w-full max-h-60vh relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
       >
-        {#each items as item (item.idx)}
+        {#each items as item (item.key)}
           {@const p = products ? products[item.productSlug] : null}
           <div
             class="flex p-4  text-gray-500 justify-between sm:items-center <sm:flex-col <sm:space-y-4 dark:text-gray-400"
+            transition:slide|local={{ duration: 400, easing: expoOut }}
           >
             <div
-              class="flex items-center sm:space-x-4 <sm:flex-col <sm:space-y-4"
+              class="flex items-center sm:space-x-4 <lg:flex-col <lg:space-y-4"
             >
               <div
                 class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-42 dark:bg-gray-700"
@@ -467,28 +717,30 @@
                 </p>
               </div>
             </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold text-xs text-black dark:text-white">Cost</p>
-              <p class="font-bold text-sm">
-                ${p?.price.toLocaleString('en', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })} / unit
-              </p>
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold text-xs text-black dark:text-white">
-                Aditional cost
-              </p>
-              <p class="font-bold text-sm">
-                ${(p
-                  ? getCostFromProductModifiers(p, item.modifiers)
-                  : 0
-                ).toLocaleString('en', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })} / unit
-              </p>
+            <div class="flex flex-col space-y-3">
+              <div class="flex flex-col">
+                <p class="font-bold text-xs text-black dark:text-white">Cost</p>
+                <p class="font-bold text-sm">
+                  ${p?.price.toLocaleString('en', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })} / unit
+                </p>
+              </div>
+              <div class="flex flex-col">
+                <p class="font-bold text-xs text-black dark:text-white">
+                  Aditional cost
+                </p>
+                <p class="font-bold text-sm">
+                  ${(p
+                    ? getCostFromProductModifiers(p, item.modifiers)
+                    : 0
+                  ).toLocaleString('en', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })} / unit
+                </p>
+              </div>
             </div>
             <div class="flex flex-col space-y-1">
               <p class="font-bold text-xs text-black dark:text-white">
@@ -537,18 +789,29 @@
                 ).toLocaleString('en', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                })} / unit
+                })}
               </p>
             </div>
-            <button
-              class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-              title="Delete"
-              on:click={() => {
-                bag.delete(p, item.modifiers)
-              }}
-              use:tooltip
-              type="button"><TrashCan16 /></button
-            >
+            <div class="flex space-x-2 items-center">
+              <button
+                class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                title="View details"
+                on:click={() => {
+                  details = { ...item }
+                }}
+                use:tooltip
+                type="button"><View16 /></button
+              >
+              <button
+                class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                title="Delete"
+                on:click={() => {
+                  bag.delete(p, item.modifiers)
+                }}
+                use:tooltip
+                type="button"><TrashCan16 /></button
+              >
+            </div>
           </div>
         {/each}
       </div>
