@@ -39,7 +39,7 @@
       if (data.slug !== $page.stuff.store.slug) {
         goto(`/stores/${data.slug}/settings`)
       } else {
-        invalidate(`/api/stores/${data.slug}`)
+        await invalidate(`/api/stores/${data.slug}`)
       }
     } catch (err) {
       console.log(err.message, err.error)
