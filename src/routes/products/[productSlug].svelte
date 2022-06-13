@@ -226,13 +226,13 @@
                 >
                   {#each m.items as i}
                     <option value={i.id}
-                      >{i.name}&nbsp;&nbsp;&ndash;&nbsp;&nbsp;<strong
-                        >{i.cost < 0 ? '-' : ''}{!i.percentage
-                          ? '$'
-                          : ''}{Math.abs(i.cost)}{i.percentage
-                          ? '%'
-                          : ''}</strong
-                      ></option
+                      >{i.name}{#if i.cost}&nbsp;&nbsp;&ndash;&nbsp;&nbsp;<strong
+                          >{i.cost < 0 ? '-' : ''}{!i.percentage
+                            ? '$'
+                            : ''}{Math.abs(i.cost)}{i.percentage
+                            ? '%'
+                            : ''}</strong
+                        >{/if}</option
                     >
                   {/each}
                 </select>
