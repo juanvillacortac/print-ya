@@ -22,11 +22,15 @@ export const getAbsoluteURL = ({
   let baseURL = isLocalhost(host)
     ? `http://${hostWithSubdomain}`
     : `https://${hostWithSubdomain}`
-  const url = new URL(baseURL + path)
-  if (isGitpod) {
-    url.searchParams.set('store', subdomain)
+  try {
+    const url = new URL(baseURL + path)
+    if (isGitpod) {
+      url.searchParams.set('store', subdomain)
+    }
+    return url.toString()
+  } catch {
+    return ''
   }
-  return url.toString()
 }
 
 export const isLocalhost = (host = getDefaultHost()) => {

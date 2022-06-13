@@ -7,6 +7,7 @@
     ColorPalette32,
     OrderDetails32,
     Product32,
+    Settings32,
   } from 'carbon-icons-svelte'
 
   $: store = $page.stuff.store as Store
@@ -21,6 +22,11 @@
       icon: Product32,
       title: 'Products',
       href: `/stores/${store.slug}/products`,
+    },
+    {
+      icon: Settings32,
+      title: 'Store settings',
+      href: `/stores/${store.slug}/settings`,
     },
     {
       icon: OrderDetails32,
@@ -45,8 +51,9 @@
   <div class="grid gap-4 grid-cols-1 sm:grid-cols-2">
     {#each actions as a}
       <a
-        class="bg-white rounded-xl flex flex-col h-full space-y-2 shadow w-full p-4 transform duration-400 relative overflow-hidden items-center dark:bg-gray-800 hover:scale-95"
+        class="bg-white rounded-xl flex flex-col h-full space-y-2 shadow w-full p-4 transform transition-color duration-400 relative overflow-hidden items-center dark:bg-gray-800 hover:scale-95"
         href={a.href}
+        style="will-change: transform"
       >
         <svelte:component this={a.icon} />
         <h4 class="font-title font-bold text-black dark:text-white">

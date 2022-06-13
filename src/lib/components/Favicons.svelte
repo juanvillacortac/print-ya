@@ -14,6 +14,8 @@
       rs: {
         s: `${res}x${res}`,
         g: 'center',
+        m: 'embed',
+        b: '000000.0',
       },
     })
 </script>

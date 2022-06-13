@@ -15,3 +15,16 @@ export const get: RequestHandler = async (event) => {
     return ErrorHandler(error)
   }
 }
+
+export const post: RequestHandler = async (event) => {
+  const { userId } = await db.getUserDetails(event)
+  const data = await event.request.json()
+  try {
+    const store = await db.upsertStore(data, userId)
+    return {
+      body: store,
+    }
+  } catch (error) {
+    return ErrorHandler(error)
+  }
+}

@@ -36,10 +36,20 @@ model Store {
   slug         String  @unique
   customDomain String? @unique
 
-  logo       String?
-  favicon    String?
-  categories StoreCategory[]
-  products   Product[]
+  logo            String?
+  favicon         String?
+  categories      StoreCategory[]
+  products        Product[]
+  paymentGateways PaymentGateway[]
+}
+
+model PaymentGateway {
+  id       String  @id @default(cuid())
+  provider String
+  meta     Json?
+  active   Boolean @default(true)
+  store    Store?  @relation(fields: [storeId], references: [id])
+  storeId  String?
 }
 
 model StoreCategory {

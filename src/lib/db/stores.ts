@@ -120,3 +120,42 @@ export const upsertStoreCategory = async (
     },
   })
 }
+
+export const upsertStore = async (
+  store: Partial<Store>,
+  userId: string
+): Promise<Store> => {
+  let s: Store
+  if (store.id) {
+    s = await prisma.store.findUnique({ where: { id: store.id } })
+    if (!s || s.userId !== userId) {
+      throw new Error('not allowed')
+    }
+    return await prisma.store.update({
+      where: {
+        id: s?.id,
+      },
+      data: {
+        favicon: store.favicon,
+        logo: store.logo,
+        name: store.name,
+        slug: slugify(store.slug),
+        customDomain: store.customDomain,
+      },
+    })
+  }
+  return await prisma.store.create({
+    data: {
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+      favicon: store.favicon,
+      logo: store.logo,
+      name: store.name,
+      slug: store.slug,
+      customDomain: store.customDomain,
+    },
+  })
+}

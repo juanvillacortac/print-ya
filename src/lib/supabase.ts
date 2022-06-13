@@ -23,13 +23,15 @@ export const uploadFile = async ({
   file,
   path,
   bucket,
+  fileName,
 }: {
   file: File
   path: string
   bucket: string
+  fileName?: string
 }) => {
   const fileExt = file.name.split('.').pop()
-  const fileName = `${Math.random()}.${fileExt}`
+  fileName = `${fileName || Math.random()}.${fileExt}`
   const filePath = `${path}/${fileName}`
 
   let { error: uploadError } = await supabase.storage
