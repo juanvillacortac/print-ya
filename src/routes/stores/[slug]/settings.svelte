@@ -59,18 +59,11 @@
 
   const urlBuilder = useCaravaggioBuilder()
 
-  const uploadImage = async ({
-    filename,
-    file,
-  }: {
-    file: File
-    filename: string
-  }) => {
+  const uploadImage = async ({ file }: { file: File }) => {
     const { url } = await uploadFile({
       file,
       bucket: 'assets',
       path: `${$page.stuff.store.slug}`,
-      fileName: filename,
     })
     const optimizedUrl = urlBuilder(url, options)
 
@@ -89,7 +82,7 @@
       }
       const file = event.currentTarget.files[0]
       uploadingLogo = true
-      const url = await uploadImage({ file, filename: 'logo' })
+      const url = await uploadImage({ file })
 
       store.logo = url
     } catch (error) {
@@ -109,7 +102,7 @@
       }
       const file = event.currentTarget.files[0]
       uploadingFavicon = true
-      const url = await uploadImage({ file, filename: 'favicon' })
+      const url = await uploadImage({ file })
 
       store.favicon = url
     } catch (error) {
