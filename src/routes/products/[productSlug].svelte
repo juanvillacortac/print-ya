@@ -189,9 +189,14 @@
         </h3>
       </div>
       <div class="flex flex-col space-y-4 w-full lg:items-start">
-        <p class="font-bold text-black text-2xl dark:text-white">
-          ${product.price.toLocaleString()}
-        </p>
+        <div class="flex flex-col space-y-2">
+          <p class="font-bold text-black text-2xl dark:text-white">
+            ${product.price.toLocaleString()}
+          </p>
+          <div class="font-bold text-lg text-black dark:text-white">
+            Total: ${total.toLocaleString()}
+          </div>
+        </div>
         <div class="flex flex-col space-y-4 w-full">
           {#each product.modifiers as m}
             {@const item = $modifiers[m.id]
