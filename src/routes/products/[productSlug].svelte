@@ -372,7 +372,7 @@
                     <span class="font-normal block"
                       >{uploadingImage[m.id]
                         ? 'Uploading image...'
-                        : 'Click/tap to paste image URL'}</span
+                        : 'Upload an image (png and svg only)'}</span
                     >
                   </div>
 
@@ -382,7 +382,7 @@
                     class="flex h-full w-full opacity-0 absolute"
                     class:!cursor-pointer={!uploadingImage[m.id]}
                     class:!cursor-not-allowed={uploadingImage[m.id]}
-                    accept="image/*"
+                    accept="image/png, image/svg+xml"
                     disabled={uploadingImage[m.id]}
                     on:change={(e) => onModifierImageSelected(e, m)}
                   />
