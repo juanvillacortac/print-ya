@@ -843,7 +843,7 @@
                     })}
                   </p>
                 </div>
-                <div class="flex ml-auto space-x-2 items-center">
+                <div class="flex space-x-2 items-center <sm:ml-auto">
                   <div class="flex space-x-1 items-center">
                     <div class="text-xs">View order details</div>
                     <button
