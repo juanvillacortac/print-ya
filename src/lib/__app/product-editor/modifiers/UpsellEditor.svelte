@@ -19,6 +19,7 @@
     TrashCan16,
   } from 'carbon-icons-svelte'
   import { expoOut } from 'svelte/easing'
+  import { writable } from 'svelte/store'
   import { slide } from 'svelte/transition'
 
   let open: Record<string, boolean> = {}
@@ -40,26 +41,61 @@
 
   type Unarray<T> = T extends Array<infer U> ? U : T
 
-  let mounted
-  $: if (modifier && !mounted) {
-    modifier.items = modifier.items.map((i) => ({
+  const items = writable(
+    modifier.items.map((i) => ({
       ...i,
       internalId: (Math.random() + 1).toString(36).substring(7),
     }))
-    mounted = true
+  )
+
+  $: if ($items) {
+    if (modifier.items.length > $items.length) {
+      $items.push({
+        ...modifier.items[modifier.items?.length - 1],
+        internalId: (Math.random() + 1).toString(36).substring(7),
+      })
+      $items = $items
+    }
+    modifier.items = $items
   }
 
-  $: deleteItem = (
+  const deleteItem = (
     i: Pick<Unarray<typeof modifier['items']>, 'id' | 'internalId'>
   ) => {
     const idx = modifier.items.findIndex((ii) =>
       i.id ? ii.id == i.id : ii.internalId == i.internalId
     )
-    modifier.items[idx].active = false
-    if (!modifier.items[idx].id) {
-      modifier.items.splice(idx, 1)
-      modifier.items = [...modifier.items]
+    $items[idx].active = false
+    if (!$items[idx].id) {
+      const newList = $items
+      newList.splice(idx, 1)
+      items.set(newList)
     }
+  }
+
+  let hovering: number
+
+  $: drop = (event, target) => {
+    event.dataTransfer.dropEffect = 'move'
+    const start = parseInt(event.dataTransfer.getData('text/plain'))
+    const newTracklist = $items
+
+    if (start < target) {
+      newTracklist.splice(target + 1, 0, newTracklist[start])
+      newTracklist.splice(start, 1)
+    } else {
+      newTracklist.splice(target, 0, newTracklist[start])
+      newTracklist.splice(start + 1, 1)
+    }
+    items.set(newTracklist)
+    hovering = null
+  }
+
+  const dragstart = (event, i) => {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.dropEffect = 'move'
+    const start = i
+    event.dataTransfer.setData('text/plain', start)
   }
 
   const loadImage = (url: string) =>
@@ -107,10 +143,18 @@
 <div
   class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
 >
-  {#each modifier.items.filter((i) => i.active) as i, idx (i.internalId)}
+  {#each $items.filter((i) => i.active) as i, idx (i.internalId)}
     <div
       class="flex flex-col space-y-4 w-full p-4"
       transition:slide|local={{ duration: 400, easing: expoOut }}
+      draggable={true}
+      on:dragstart|stopPropagation={(event) => dragstart(event, idx)}
+      on:drop|preventDefault|stopPropagation={(event) => drop(event, idx)}
+      on:dragover|preventDefault={() => {}}
+      on:dragenter|stopPropagation={() => (hovering = idx)}
+      on:dragend={() => (hovering = null)}
+      class:bg-blue-100={hovering == idx}
+      class:dark:bg-gray-900={hovering == idx}
     >
       <div class="flex w-full justify-between items-center">
         <div class="flex space-x-4 items-center">

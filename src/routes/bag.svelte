@@ -188,7 +188,35 @@
   }
 
   let details: BagItem | undefined
+
+  let fonts: { name: string; url: string }[] = []
+
+  $: if (details && products[details?.productSlug]) {
+    const p = products[details.productSlug]
+    fonts = Object.entries(details.modifiers)
+      .map(([mId, m]) => ({
+        modifier: p.modifiers.find((m) => m.id == mId),
+        item: p.modifiers
+          .find((m) => m.id == mId)
+          .items.find((i) => i.id === m.itemId),
+      }))
+      .filter(({ modifier }) => modifier.type === 'font')
+      .map(({ item }) => ({
+        name: item?.name,
+        url: item?.meta?.web
+          ? (item?.meta?.url as string)
+          : `/api/fontface?name=${encodeURIComponent(
+              item?.name
+            )}&src=${encodeURIComponent(item?.meta?.url)}`,
+      }))
+  }
 </script>
+
+<svelte:head>
+  {#each fonts as f}
+    <link href={f.url} rel="stylesheet" />
+  {/each}
+</svelte:head>
 
 {#if details}
   {@const p = products ? products[details.productSlug] : null}
@@ -279,13 +307,21 @@
                       style="background-color: {m.value || 'black'}"
                     />
                     <div class="text-xs">
-                      {item?.meta.name}
+                      {item?.meta?.name}
                     </div>
                   </div>
                 {:else if modifier.type === 'toggle'}
                   <p class="text-xs">
                     {m.value ? 'Yes' : 'No'}
                   </p>
+                {:else if modifier.type === 'font'}
+                  {#if item}
+                    <div class="text-xl" style={`font-family: "${item?.name}"`}>
+                      {item?.name}
+                    </div>
+                  {:else}
+                    <p class="text-xs">N/A</p>
+                  {/if}
                 {:else if modifier.type === 'text'}
                   <p class="text-xs">
                     {m.value || 'N/A'}
@@ -326,7 +362,7 @@
                               <h3 class="font-bold text-sm">{i.name}</h3>
                               {#if i.meta.description}
                                 <p
-                                  class="text-sm leading-none overflow-hidden overflow-ellipsis whitespace-nowrap"
+                                  class="text-sm leading-none pb-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
                                 >
                                   {i.meta?.description}
                                 </p>
@@ -668,195 +704,197 @@
   <h3 class="font-bold font-title text-black text-3xl dark:text-white">
     Shopping bag
   </h3>
-  {#if items?.length}
-    <div
-      class="flex-grow w-full overflow-x-auto"
-      transition:slide|local={{ duration: 400, easing: expoOut }}
-    >
+  <div class="flex flex-grow flex-col h-full space-y-4 w-full">
+    {#if items?.length}
       <div
-        class="divide-y border rounded-lg flex flex-col w-full max-h-60vh relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
+        class="flex-grow w-full overflow-x-auto"
+        transition:slide|local={{ duration: 400, easing: expoOut }}
       >
-        {#each items as item (item.key)}
-          {@const p = products ? products[item.productSlug] : null}
-          <div class="relative">
-            <div
-              class="flex p-4 text-gray-500 justify-between relative sm:items-center <sm:flex-col <sm:space-y-4 dark:text-gray-400"
-              class:skeleton={!p}
-              class:pointer-events-none={!p}
-              transition:slide|local={{ duration: 400, easing: expoOut }}
-            >
+        <div
+          class="divide-y border rounded-lg flex flex-col w-full max-h-50vh relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
+        >
+          {#each items as item (item.key)}
+            {@const p = products ? products[item.productSlug] : null}
+            <div class="relative">
               <div
-                class="flex items-center sm:space-x-4 <lg:flex-col <lg:space-y-4"
+                class="flex p-4 text-gray-500 justify-between relative sm:items-center <sm:flex-col <sm:space-y-4 dark:text-gray-400"
+                class:skeleton={!p}
+                class:pointer-events-none={!p}
+                transition:slide|local={{ duration: 400, easing: expoOut }}
               >
                 <div
-                  class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-42 dark:bg-gray-700"
-                  style="aspect-ratio: 1/1"
+                  class="flex items-center sm:space-x-4 <lg:flex-col <lg:space-y-4"
                 >
-                  <div class="flex h-full w-full items-center justify-center">
-                    {#if p}
-                      <TemplatePreview
-                        lazy
-                        showFonts
-                        template={{
-                          ...(p?.template || {}),
-                          fields: getTemplateFieldsFromModifiers(
-                            p,
-                            $bag[item.idx].modifiers
-                          ),
-                        }}
-                        watermark
-                        controls={false}
-                      />
-                    {/if}
+                  <div
+                    class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-42 dark:bg-gray-700"
+                    style="aspect-ratio: 1/1"
+                  >
+                    <div class="flex h-full w-full items-center justify-center">
+                      {#if p}
+                        <TemplatePreview
+                          lazy
+                          showFonts
+                          template={{
+                            ...(p?.template || {}),
+                            fields: getTemplateFieldsFromModifiers(
+                              p,
+                              $bag[item.idx].modifiers
+                            ),
+                          }}
+                          watermark
+                          controls={false}
+                        />
+                      {/if}
+                    </div>
+                  </div>
+                  <div
+                    class="flex flex-col space-y-1 w-full whitespace-normal sm:w-48"
+                  >
+                    <a
+                      href="/products/{p?.slug}"
+                      class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
+                    >
+                      {p?.name}
+                    </a>
                   </div>
                 </div>
-                <div
-                  class="flex flex-col space-y-1 w-full whitespace-normal sm:w-48"
-                >
-                  <a
-                    href="/products/{p?.slug}"
-                    class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
-                  >
-                    {p?.name}
-                  </a>
+                <div class="flex flex-col space-y-3">
+                  <div class="flex flex-col">
+                    <p class="font-bold text-xs text-black dark:text-white">
+                      Cost
+                    </p>
+                    <p class="font-bold text-sm">
+                      ${p?.price.toLocaleString('en', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })} / unit
+                    </p>
+                  </div>
+                  <div class="flex flex-col">
+                    <p class="font-bold text-xs text-black dark:text-white">
+                      Aditional cost
+                    </p>
+                    <p class="font-bold text-sm">
+                      ${(p
+                        ? getCostFromProductModifiers(p, item.modifiers)
+                        : 0
+                      ).toLocaleString('en', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })} / unit
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div class="flex flex-col space-y-3">
-                <div class="flex flex-col">
+                <div class="flex flex-col space-y-1">
                   <p class="font-bold text-xs text-black dark:text-white">
-                    Cost
+                    Quantity
                   </p>
-                  <p class="font-bold text-sm">
-                    ${p?.price.toLocaleString('en', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })} / unit
-                  </p>
+                  <div class="flex !text-xs">
+                    <button
+                      class="border rounded-l-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
+                      on:click={() =>
+                        bag.setItem(
+                          p,
+                          item.modifiers,
+                          Math.max(
+                            p?.minQuantity || 1,
+                            $bag[item.idx].quantity - 1
+                          )
+                        )}
+                    >
+                      <Subtract16 class="m-auto" />
+                    </button>
+                    <input
+                      class="bg-white border-t border-b border-gray-300 border-l-0 border-r-0 text-xs text-center leading-tight py-1 px-2 w-8ch quantity dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+                      type="number"
+                      min={Math.max(p?.minQuantity || 1)}
+                      value={$bag[item.idx].quantity}
+                      on:input={(e) => onChangeQuantity(e, p, item.modifiers)}
+                      on:change={(e) => onChangeQuantity(e, p, item.modifiers)}
+                    />
+                    <button
+                      class="border rounded-r-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
+                      on:click={() =>
+                        bag.setItem(
+                          p,
+                          item.modifiers,
+                          Math.max(
+                            p?.minQuantity || 1,
+                            $bag[item.idx].quantity + 1
+                          )
+                        )}
+                    >
+                      <Add16 class="m-auto" />
+                    </button>
+                  </div>
                 </div>
-                <div class="flex flex-col">
+                <div class="flex flex-col space-y-1">
                   <p class="font-bold text-xs text-black dark:text-white">
-                    Aditional cost
+                    Total
                   </p>
                   <p class="font-bold text-sm">
                     ${(p
-                      ? getCostFromProductModifiers(p, item.modifiers)
+                      ? getTotalFromProductModifiers(p, item.modifiers) *
+                        item.quantity
                       : 0
                     ).toLocaleString('en', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    })} / unit
+                    })}
                   </p>
                 </div>
-              </div>
-              <div class="flex flex-col space-y-1">
-                <p class="font-bold text-xs text-black dark:text-white">
-                  Quantity
-                </p>
-                <div class="flex !text-xs">
+                <div class="flex space-x-2 items-center">
                   <button
-                    class="border rounded-l-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
-                    on:click={() =>
-                      bag.setItem(
-                        p,
-                        item.modifiers,
-                        Math.max(
-                          p?.minQuantity || 1,
-                          $bag[item.idx].quantity - 1
-                        )
-                      )}
+                    class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                    title="View details"
+                    on:click={() => {
+                      details = { ...item }
+                    }}
+                    use:tooltip
+                    type="button"><View16 /></button
                   >
-                    <Subtract16 class="m-auto" />
-                  </button>
-                  <input
-                    class="bg-white border-t border-b border-gray-300 border-l-0 border-r-0 text-xs text-center leading-tight py-1 px-2 w-8ch quantity dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
-                    type="number"
-                    min={Math.max(p?.minQuantity || 1)}
-                    value={$bag[item.idx].quantity}
-                    on:input={(e) => onChangeQuantity(e, p, item.modifiers)}
-                    on:change={(e) => onChangeQuantity(e, p, item.modifiers)}
-                  />
                   <button
-                    class="border rounded-r-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
-                    on:click={() =>
-                      bag.setItem(
-                        p,
-                        item.modifiers,
-                        Math.max(
-                          p?.minQuantity || 1,
-                          $bag[item.idx].quantity + 1
-                        )
-                      )}
+                    class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                    title="Delete"
+                    on:click={() => {
+                      bag.delete(p, item.modifiers)
+                    }}
+                    use:tooltip
+                    type="button"><TrashCan16 /></button
                   >
-                    <Add16 class="m-auto" />
-                  </button>
                 </div>
               </div>
-              <div class="flex flex-col space-y-1">
-                <p class="font-bold text-xs text-black dark:text-white">
-                  Total
-                </p>
-                <p class="font-bold text-sm">
-                  ${(p
-                    ? getTotalFromProductModifiers(p, item.modifiers) *
-                      item.quantity
-                    : 0
-                  ).toLocaleString('en', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-              <div class="flex space-x-2 items-center">
-                <button
-                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                  title="View details"
-                  on:click={() => {
-                    details = { ...item }
-                  }}
-                  use:tooltip
-                  type="button"><View16 /></button
-                >
-                <button
-                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                  title="Delete"
-                  on:click={() => {
-                    bag.delete(p, item.modifiers)
-                  }}
-                  use:tooltip
-                  type="button"><TrashCan16 /></button
-                >
-              </div>
             </div>
-          </div>
-        {/each}
+          {/each}
+        </div>
       </div>
-    </div>
-    <div class="flex space-x-4 w-full justify-end items-center">
-      <p class="font-bold text-lg">
-        Total: ${total.toLocaleString('en', {
-          maximumFractionDigits: 2,
-          minimumFractionDigits: 2,
-        })}
-      </p>
-      <button
-        class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
-        style="will-change: transform"
-        on:click={() => {
-          checkout = true
-          payment = false
-        }}
+      <div class="flex space-x-4 w-full justify-end items-center">
+        <p class="font-bold text-lg">
+          Total: ${total.toLocaleString('en', {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+          })}
+        </p>
+        <button
+          class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+          style="will-change: transform"
+          on:click={() => {
+            checkout = true
+            payment = false
+          }}
+        >
+          <span>Checkout</span>
+          <ArrowRight24 class="m-auto" />
+        </button>
+      </div>
+    {:else}
+      <div
+        class="flex w-full text-gray-500 items-center justify-center dark:text-gray-400"
       >
-        <span>Checkout</span>
-        <ArrowRight24 class="m-auto" />
-      </button>
-    </div>
-  {:else}
-    <div
-      class="flex w-full text-gray-500 items-center justify-center dark:text-gray-400"
-    >
-      <p class="font-bold text-center text-xl">Add items to bag first</p>
-    </div>
-  {/if}
+        <p class="font-bold text-center text-xl">Add items to bag first</p>
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>

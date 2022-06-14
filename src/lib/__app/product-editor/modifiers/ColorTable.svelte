@@ -2,6 +2,7 @@
   import { tooltip } from '$lib/components/tooltip'
   import type { ProductModifier } from '$lib/db'
   import { Information16, TrashCan16 } from 'carbon-icons-svelte'
+  import { writable } from 'svelte/store'
   import { fly } from 'svelte/transition'
 
   export let modifier: Omit<ProductModifier, 'items'> & {
@@ -14,26 +15,61 @@
 
   type Unarray<T> = T extends Array<infer U> ? U : T
 
-  let mounted
-  $: if (modifier && !mounted) {
-    modifier.items = modifier.items.map((i) => ({
+  const items = writable(
+    modifier.items.map((i) => ({
       ...i,
       internalId: (Math.random() + 1).toString(36).substring(7),
     }))
-    mounted = true
+  )
+
+  $: if ($items) {
+    if (modifier.items.length > $items.length) {
+      $items.push({
+        ...modifier.items[modifier.items?.length - 1],
+        internalId: (Math.random() + 1).toString(36).substring(7),
+      })
+      $items = $items
+    }
+    modifier.items = $items
   }
 
-  $: deleteItem = (
+  const deleteItem = (
     i: Pick<Unarray<typeof modifier['items']>, 'id' | 'internalId'>
   ) => {
     const idx = modifier.items.findIndex((ii) =>
       i.id ? ii.id == i.id : ii.internalId == i.internalId
     )
-    modifier.items[idx].active = false
-    if (!modifier.items[idx].id) {
-      modifier.items.splice(idx, 1)
-      modifier.items = [...modifier.items]
+    $items[idx].active = false
+    if (!$items[idx].id) {
+      const newList = $items
+      newList.splice(idx, 1)
+      items.set(newList)
     }
+  }
+
+  let hovering: number
+
+  $: drop = (event, target) => {
+    event.dataTransfer.dropEffect = 'move'
+    const start = parseInt(event.dataTransfer.getData('text/plain'))
+    const newTracklist = $items
+
+    if (start < target) {
+      newTracklist.splice(target + 1, 0, newTracklist[start])
+      newTracklist.splice(start, 1)
+    } else {
+      newTracklist.splice(target, 0, newTracklist[start])
+      newTracklist.splice(start + 1, 1)
+    }
+    items.set(newTracklist)
+    hovering = null
+  }
+
+  const dragstart = (event, i) => {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.dropEffect = 'move'
+    const start = i
+    event.dataTransfer.setData('text/plain', start)
   }
 </script>
 
@@ -64,9 +100,17 @@
       </tr>
     </thead>
     <tbody class="z-10 relative">
-      {#each modifier.items?.filter((i) => i.active) as i, idx (i.internalId)}
+      {#each $items?.filter((i) => i.active) as i, idx (i.internalId)}
         <tr
           in:fly|local={{ x: -20 }}
+          draggable={true}
+          on:dragstart|stopPropagation={(event) => dragstart(event, idx)}
+          on:drop|preventDefault|stopPropagation={(event) => drop(event, idx)}
+          on:dragover|preventDefault={() => {}}
+          on:dragenter|stopPropagation={() => (hovering = idx)}
+          on:dragend={() => (hovering = null)}
+          class:bg-blue-100={hovering == idx}
+          class:dark:bg-gray-900={hovering == idx}
           class="bg-white dark:bg-gray-800"
           class:border-b={idx !==
             modifier?.items?.filter((m) => m.active).length - 1}

@@ -12,12 +12,13 @@
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { ProductModifier } from '$lib/db'
-  import { fly, slide } from 'svelte/transition'
+  import { fly, slide, crossfade } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import SelectionTable from './modifiers/SelectionTable.svelte'
   import ColorTable from './modifiers/ColorTable.svelte'
   import FontTable from './modifiers/FontTable.svelte'
   import UpsellEditor from './modifiers/UpsellEditor.svelte'
+  import { writable } from 'svelte/store'
 
   type Unarray<T> = T extends Array<infer U> ? U : T
 
@@ -28,23 +29,31 @@
     items?: (Unarray<ProductModifier['items']> & { internalId?: string })[]
   })[] = []
 
-  $: if (modifiers && !mounted) {
-    modifiers = modifiers.map((m) => ({
-      ...m,
-      internalId: (Math.random() + 1).toString(36).substring(7),
-      items: m.items.map((i) => ({
-        ...i,
+  const modifiersStore = writable(modifiers)
+
+  $: if ($modifiersStore && !mounted) {
+    modifiersStore.update((modifiers) =>
+      modifiers.map((m) => ({
+        ...m,
         internalId: (Math.random() + 1).toString(36).substring(7),
-        meta: i.meta || {},
-      })),
-    }))
+        items: m.items.map((i) => ({
+          ...i,
+          internalId: (Math.random() + 1).toString(36).substring(7),
+          meta: i.meta || {},
+        })),
+      }))
+    )
     mounted = true
+  }
+
+  $: if ($modifiersStore) {
+    modifiers = $modifiersStore
   }
 
   const addModifier = () => {
     showing = true
     const newId = (Math.random() + 1).toString(36).substring(7)
-    modifiers = [
+    modifiersStore.update((modifiers) => [
       ...modifiers,
       {
         internalId: newId,
@@ -58,7 +67,7 @@
         defaultValue: '',
         meta: {},
       },
-    ]
+    ])
     expanded = newId
   }
 
@@ -69,24 +78,26 @@
     Unarray<Unarray<typeof modifiers>['items']>,
     'id' | 'internalId'
   >) => {
-    const idx = modifiers.findIndex((m) =>
+    const idx = $modifiersStore.findIndex((m) =>
       internalId ? m.internalId == internalId : m.id == id
     )
-    modifiers[idx].items = [
-      ...modifiers[idx].items,
-      {
-        internalId: (Math.random() + 1).toString(36).substring(7),
-        id: '',
-        cost: 0,
-        active: true,
-        name: '',
-        percentage: false,
-        productModifierId: '',
-        meta: {},
-      },
-    ]
-    modifiers = modifiers
-    expanded = modifiers[idx].id || modifiers[idx].internalId
+    modifiersStore.update((modifiers) => {
+      modifiers[idx].items = [
+        ...modifiers[idx].items,
+        {
+          internalId: (Math.random() + 1).toString(36).substring(7),
+          id: '',
+          cost: 0,
+          active: true,
+          name: '',
+          percentage: false,
+          productModifierId: '',
+          meta: {},
+        },
+      ]
+      return modifiers
+    })
+    expanded = $modifiersStore[idx].id || $modifiersStore[idx].internalId
   }
 
   const modifierTypes = [
@@ -130,18 +141,43 @@
     id,
     internalId,
   }: Pick<Unarray<typeof modifiers>, 'id' | 'internalId'>) => {
-    const idx = modifiers.findIndex((m) =>
+    const idx = $modifiersStore.findIndex((m) =>
       internalId ? m.internalId == internalId : m.id == id
     )
-    modifiers[idx].active = false
-    if (!modifiers[idx].id) {
-      modifiers.splice(idx, 1)
-      modifiers = [...modifiers]
+    $modifiersStore[idx].active = false
+    if (!$modifiersStore[idx].id) {
+      const newList = $modifiersStore
+      newList.splice(idx, 1)
+      modifiersStore.set(newList)
     }
   }
 
   let expanded: string = ''
   let showing = false
+  let hovering: number
+
+  $: drop = (event, target) => {
+    event.dataTransfer.dropEffect = 'move'
+    const start = parseInt(event.dataTransfer.getData('text/plain'))
+    const newTracklist = $modifiersStore
+
+    if (start < target) {
+      newTracklist.splice(target + 1, 0, newTracklist[start])
+      newTracklist.splice(start, 1)
+    } else {
+      newTracklist.splice(target, 0, newTracklist[start])
+      newTracklist.splice(start + 1, 1)
+    }
+    modifiersStore.set(newTracklist)
+    hovering = null
+  }
+
+  const dragstart = (event, i) => {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.dropEffect = 'move'
+    const start = i
+    event.dataTransfer.setData('text/plain', start)
+  }
 </script>
 
 <div
@@ -180,12 +216,20 @@
       class="divide-y border rounded-lg flex flex-col w-full relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
       transition:slide|local={{ duration: 400, easing: expoOut }}
     >
-      {#each modifiers.filter((m) => m.active) as m (m.internalId)}
+      {#each $modifiersStore.filter((m) => m.active) as m, idx (m.internalId)}
         {@const mType = modifierTypes.find((t) => t.type == m.type)}
         <div
-          class="flex flex-col flex-grow space-y-2 w-full"
           in:fly|local={{ x: -20 }}
           out:slide|local={{ duration: 400, easing: expoOut }}
+          class="flex flex-col flex-grow space-y-2 w-full"
+          draggable={true}
+          on:dragstart={(event) => dragstart(event, idx)}
+          on:drop|preventDefault={(event) => drop(event, idx)}
+          on:dragover|preventDefault={() => {}}
+          on:dragenter={() => (hovering = idx)}
+          on:dragend={() => (hovering = null)}
+          class:bg-blue-100={hovering == idx}
+          class:dark:bg-gray-900={hovering == idx}
         >
           <div class="flex flex-col w-full">
             <div class="flex w-full p-4 items-center justify-between">

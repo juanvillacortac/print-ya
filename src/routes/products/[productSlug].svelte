@@ -281,7 +281,7 @@
                             <h3 class="font-bold text-sm">{i.name}</h3>
                             {#if i.meta.description}
                               <p
-                                class="text-sm leading-none overflow-hidden overflow-ellipsis whitespace-nowrap"
+                                class="text-sm leading-none pb-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
                               >
                                 {i.meta?.description}
                               </p>
