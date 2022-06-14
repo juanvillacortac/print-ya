@@ -843,16 +843,19 @@
                     })}
                   </p>
                 </div>
-                <div class="flex space-x-2 items-center">
-                  <button
-                    class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                    title="View details"
-                    on:click={() => {
-                      details = { ...item }
-                    }}
-                    use:tooltip
-                    type="button"><View16 /></button
-                  >
+                <div class="flex ml-auto space-x-2 items-center">
+                  <div class="flex space-x-1 items-center">
+                    <div class="text-xs">View order details</div>
+                    <button
+                      class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                      title="View details"
+                      on:click={() => {
+                        details = { ...item }
+                      }}
+                      use:tooltip
+                      type="button"><View16 /></button
+                    >
+                  </div>
                   <button
                     class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
                     title="Delete"
