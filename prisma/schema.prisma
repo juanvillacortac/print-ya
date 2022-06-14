@@ -116,6 +116,7 @@ model ProductModifier {
   templateAccessor String?
   productId        String?
   items            ProductModifierItem[]
+  ordinal          Int                   @default(0)
 }
 
 model ProductModifierItem {
@@ -125,7 +126,8 @@ model ProductModifierItem {
   percentage Boolean @default(false)
   active     Boolean @default(true)
 
-  meta Json?
+  meta    Json?
+  ordinal Int   @default(0)
 
   productModifier   ProductModifier? @relation(fields: [productModifierId], references: [id])
   productModifierId String?

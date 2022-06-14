@@ -7,13 +7,12 @@ import type {
   StoreCategory,
 } from '@prisma/client'
 import type { TemplateSource } from '$lib/compiler'
-import type { JSONValue } from '@sveltejs/kit/types/private'
 
-export type ProductModifierItem = _ProductModifierItem & {
+export type ProductModifierItem = Omit<_ProductModifierItem, 'ordinal'> & {
   meta: any
 }
 
-export type ProductModifier = _ProductModifier & {
+export type ProductModifier = Omit<_ProductModifier, 'ordinal'> & {
   meta?: any
   items?: ProductModifierItem[]
 }
@@ -47,10 +46,16 @@ export const getProductBySlug = ({
         where: {
           active: true,
         },
+        orderBy: {
+          ordinal: 'asc',
+        },
         include: {
           items: {
             where: {
               active: true,
+            },
+            orderBy: {
+              ordinal: 'asc',
             },
           },
         },
@@ -160,7 +165,8 @@ export const upsertProduct = async (
           items: {
             create: m.items
               ?.filter((i) => !i.id)
-              .map((i) => ({
+              .map((i, idx) => ({
+                ordinal: idx,
                 name: i.name,
                 meta: i.meta,
                 cost: i.cost,
@@ -176,12 +182,13 @@ export const upsertProduct = async (
     const itemsTransactions = product.modifiers
       .map((m) => m.items.filter((i) => i.id))
       .reduce((a, b) => [...a, ...b], [])
-      .map((i) =>
+      .map((i, idx) =>
         prisma.productModifierItem.update({
           where: {
             id: i.id,
           },
           data: {
+            ordinal: idx,
             active: i.active,
             name: i.name,
             meta: i.meta,
@@ -255,13 +262,15 @@ export const upsertProduct = async (
       modifiers: {
         create: product.modifiers
           .filter((m) => m.active)
-          .map((m) => ({
+          .map((m, idx) => ({
+            ordinal: idx,
             name: m.name,
             type: m.type,
             defaultValue: m.defaultValue || undefined,
             templateAccessor: m.templateAccessor || undefined,
             items: {
-              create: m.items.map((i) => ({
+              create: m.items.map((i, idx) => ({
+                ordinal: idx,
                 name: i.name,
                 cost: i.cost,
                 meta: i.meta,
