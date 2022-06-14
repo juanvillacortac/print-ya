@@ -844,20 +844,20 @@
                   </p>
                 </div>
                 <div class="flex space-x-2 items-center <sm:ml-auto">
-                  <div class="flex space-x-1 items-center">
-                    <div class="text-xs">View order details</div>
-                    <button
-                      class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                      title="View details"
-                      on:click={() => {
-                        details = { ...item }
-                      }}
-                      use:tooltip
-                      type="button"><View16 /></button
-                    >
-                  </div>
                   <button
-                    class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                    class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 items-center hover:border-gray-300 dark:hover:border-gray-500"
+                    title="View details"
+                    on:click={() => {
+                      details = { ...item }
+                    }}
+                    use:tooltip
+                    type="button"
+                  >
+                    <div class="text-xs">View order details</div>
+                    <View16 /></button
+                  >
+                  <button
+                    class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300 dark:hover:border-gray-500"
                     title="Delete"
                     on:click={() => {
                       bag.delete(p, item.modifiers)
