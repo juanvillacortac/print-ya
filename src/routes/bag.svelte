@@ -229,7 +229,7 @@
       transition:fade={{ duration: 300, easing: expoOut }}
     />
     <div
-      class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 max-w-8/10 p-4 relative dark:bg-gray-900"
+      class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 p-4 w-8/10 relative dark:bg-gray-900"
       in:scale|local={{
         start: 0.6,
         duration: 1000,
