@@ -19,7 +19,7 @@ export const get: RequestHandler = async (event) => {
       store = await getStoreBySlugOrHost({ slug })
     }
   }
-  const icon = store?.favicon || '/logo.svg'
+  const icon = store?.favicon || '/images/logo.svg'
   const iconsRes = [36, 48, 72, 96, 144, 192, 256, 384, 512]
   const getIcon = (res: number) =>
     imageBuilder(icon, {
