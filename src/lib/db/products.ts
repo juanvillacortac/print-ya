@@ -102,6 +102,7 @@ export const upsertProduct = async (
   product: Partial<Product>
 ): Promise<Product> => {
   let c: Product
+  console.log(product.modifiers)
   if (product.id) {
     c = await getProductBySlug({ slug: product.slug, storeId: product.storeId })
     if (!c && !product.id) {
@@ -128,7 +129,7 @@ export const upsertProduct = async (
         templateDraft: product.templateDraft,
       },
     })
-    const transactions = product.modifiers.map((m) =>
+    const transactions = product.modifiers.map((m, idx) =>
       prisma.productModifier.upsert({
         include: {
           items: {
@@ -145,6 +146,7 @@ export const upsertProduct = async (
               id: product.id,
             },
           },
+          ordinal: idx,
           type: m.type,
           defaultValue: m.defaultValue || undefined,
           templateAccessor: m.templateAccessor || undefined,
@@ -162,6 +164,7 @@ export const upsertProduct = async (
           active: m.active,
           defaultValue: m.defaultValue || undefined,
           templateAccessor: m.templateAccessor || undefined,
+          ordinal: idx,
           items: {
             create: m.items
               ?.filter((i) => !i.id)
