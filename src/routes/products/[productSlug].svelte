@@ -222,7 +222,7 @@
               </div>
               {#if m.type === 'select'}
                 <select
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight py-2 px-3 w-1/2 appearance-none !pr-8 lg:w-60 lg:w-7/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none !pr-8 lg:w-60 lg:w-7/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                   bind:value={$modifiers[m.id].itemId}
                   on:change={() =>
                     ($modifiers[m.id].value = m.items.find(
@@ -406,7 +406,7 @@
                     <button
                       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
                       title={i?.meta?.name}
-                      class:scale-120={$modifiers[m.id].itemId == i.id}
+                      class:scale-110={$modifiers[m.id].itemId == i.id}
                       class:!border-blue-800={$modifiers[m.id].itemId == i.id}
                       on:click={() =>
                         ($modifiers[m.id] = {
