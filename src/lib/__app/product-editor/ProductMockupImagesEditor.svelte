@@ -21,6 +21,7 @@
     useCaravaggioBuilder,
   } from '$lib/components/caravaggio/useCaravaggio'
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
+  import { squareratio } from '$lib/actions/aspectratio'
 
   export let product: Partial<Product>
 
@@ -105,6 +106,31 @@
     }
     product.meta.mockups = $images
   }
+
+  let hovering: number
+
+  $: drop = (event, target) => {
+    event.dataTransfer.dropEffect = 'move'
+    const start = parseInt(event.dataTransfer.getData('text/plain'))
+    const newTracklist = $images
+
+    if (start < target) {
+      newTracklist.splice(target + 1, 0, newTracklist[start])
+      newTracklist.splice(start, 1)
+    } else {
+      newTracklist.splice(target, 0, newTracklist[start])
+      newTracklist.splice(start + 1, 1)
+    }
+    images.set(newTracklist)
+    hovering = null
+  }
+
+  const dragstart = (event, i) => {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.dropEffect = 'move'
+    const start = i
+    event.dataTransfer.setData('text/plain', start)
+  }
 </script>
 
 <div
@@ -169,10 +195,16 @@
       transition:slide|local={{ duration: 400, easing: expoOut }}
     >
       <div class="w-full grid pt-2 gap-4 grid-cols-2 lg:grid-cols-4">
-        {#each $images as { path, url } (path)}
+        {#each $images as { path, url }, idx (path)}
           <div
             class="relative"
             animate:flip={{ duration: 400, easing: expoOut }}
+            draggable={true}
+            on:dragstart|stopPropagation={(event) => dragstart(event, idx)}
+            on:drop|preventDefault|stopPropagation={(event) => drop(event, idx)}
+            on:dragover|preventDefault={() => {}}
+            on:dragenter|stopPropagation={() => (hovering = idx)}
+            on:dragend={() => (hovering = null)}
             in:scale|local={{
               duration: 400,
               easing: expoOut,
@@ -190,13 +222,21 @@
               <Close24 />
             </button>
             <div
-              class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative dark:border-gray-700"
+              class="border-dashed rounded-lg flex border-2 overflow-hidden relative aspect-square dark:border-gray-700"
+              use:squareratio
             >
-              <Img
-                {options}
-                src={url}
-                class="rounded object-cover w-full aspect-square"
+              <div
+                class="flex h-full w-full opacity-50 absolute"
+                class:bg-blue-100={hovering == idx}
+                class:dark:bg-blue-500={hovering == idx}
               />
+              <div class="p-2">
+                <Img
+                  {options}
+                  src={url}
+                  class="rounded object-cover w-full aspect-square"
+                />
+              </div>
             </div>
           </div>
         {:else}
