@@ -13,8 +13,6 @@
     Logout24,
     ChevronLeft20,
     Launch16,
-    ArrowLeft32,
-    ArrowLeft24,
     ChevronLeft24,
   } from 'carbon-icons-svelte'
   import Favicons from '$lib/components/Favicons.svelte'
@@ -24,7 +22,7 @@
   import Image from '$lib/components/caravaggio/Image.svelte'
   import { getAbsoluteURL } from '$lib/utils/host'
   import { beforeNavigate } from '$app/navigation'
-  import { fly, scale } from 'svelte/transition'
+  import { fly } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
 
   $: path = $page.url.pathname
