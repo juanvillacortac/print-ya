@@ -14,7 +14,7 @@
 </script>
 
 <div
-  class="bg-white rounded-xl flex flex-col h-full space-y-4 shadow w-full p-4 relative overflow-hidden dark:bg-gray-800"
+  class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
 >
   <div class="flex w-full justify-between items-center">
     <div class="flex space-x-4 items-center">

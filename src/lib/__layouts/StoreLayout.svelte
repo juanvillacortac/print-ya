@@ -32,7 +32,7 @@
 
 <div class="top-0 left-0 text-gray-700 relative dark:text-white">
   <div
-    class="bg-white border-b flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
+    class="bg-white border-b flex flex-col w-full top-0 z-60 items-center sticky filter blur-lg !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
   >
     <div class="flex mx-auto w-full p-4 justify-between items-center lg:w-7/10">
       <a href="/" class="flex">

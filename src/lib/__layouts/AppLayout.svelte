@@ -68,7 +68,7 @@
   <div class="flex flex-col h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
       <div
-        class="bg-white border-r flex flex-col h-full  border-light-900 p-4 text-gray-400 z-10 justify-between sidebar dark:bg-gray-900 dark:border-gray-800"
+        class="bg-white border-r flex flex-col h-full  border-light-900 p-4 text-gray-400 z-10 justify-between sidebar dark:bg-gray-900 dark:border-gray-700"
         class:open={sidebar}
       >
         <div
@@ -176,11 +176,12 @@
           {@const store = $page.stuff.store}
           <div
             class="flex mb-6 items-center sm:space-x-4"
-            in:fly={{ y: 10, duration: 400, easing: expoOut }}
+            in:fly={{ y: -5, duration: 600, easing: expoOut }}
           >
             <a
               class="flex <sm:hidden"
               title="Go back"
+              sveltekit:prefetch
               use:tooltip
               href={$page.url.pathname.substring(
                 0,
