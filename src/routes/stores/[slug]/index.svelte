@@ -51,7 +51,7 @@
   <div class="grid gap-4 grid-cols-1 sm:grid-cols-2">
     {#each actions as a}
       <a
-        class="bg-white rounded-xl flex flex-col h-full space-y-2 shadow w-full p-4 transform transition-color duration-400 relative overflow-hidden items-center dark:bg-gray-800 hover:scale-95"
+        class="bg-white border rounded-lg flex flex-col h-full space-y-2 border-gray-300 w-full p-4 transform transition-transform duration-200 relative overflow-hidden items-center dark:bg-gray-800 dark:border-gray-600 hover:scale-105"
         href={a.href}
         style="will-change: transform"
       >

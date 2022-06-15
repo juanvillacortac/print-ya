@@ -12,11 +12,20 @@
     Settings24,
     Logout24,
     ChevronLeft20,
+    Launch16,
+    ArrowLeft32,
+    ArrowLeft24,
+    ChevronLeft24,
   } from 'carbon-icons-svelte'
   import Favicons from '$lib/components/Favicons.svelte'
   import { pageSubtitle } from '$lib/stores'
   import Transition from './Transition.svelte'
   import { squareratio } from '$lib/actions/aspectratio'
+  import Image from '$lib/components/caravaggio/Image.svelte'
+  import { getAbsoluteURL } from '$lib/utils/host'
+  import { beforeNavigate } from '$app/navigation'
+  import { fly, scale } from 'svelte/transition'
+  import { expoOut } from 'svelte/easing'
 
   $: path = $page.url.pathname
 
@@ -40,9 +49,9 @@
 
   let subtitle = ''
   $: subtitle = $pageSubtitle ? $pageSubtitle : subtitle
-  $: if (!$navigating) {
+  beforeNavigate(() => {
     $pageSubtitle = ''
-  }
+  })
 
   $: pageTitle = (subtitle ? subtitle + ' | ' : '') + 'ShackCart'
 
@@ -163,6 +172,68 @@
       <div
         class="h-full bg-light-500 w-full p-4 overflow-auto lg:p-6 dark:bg-gray-900"
       >
+        {#if $page.stuff.store}
+          {@const store = $page.stuff.store}
+          <div
+            class="flex mb-6 items-center sm:space-x-4"
+            in:fly={{ y: 10, duration: 400, easing: expoOut }}
+          >
+            <a
+              class="flex <sm:hidden"
+              title="Go back"
+              use:tooltip
+              href={$page.url.pathname.substring(
+                0,
+                $page.url.pathname.lastIndexOf('/')
+              )}><ChevronLeft24 class="flex" /></a
+            >
+            <div
+              class="flex mr-auto items-start sm:space-x-4 sm:items-center <sm:flex-col <sm:space-y-4"
+            >
+              <a
+                href="/stores/{store.slug}"
+                class="border rounded bg-light-100 border-blue-500 p-1 dark:bg-gray-100"
+              >
+                <Image
+                  src={store.logo}
+                  options={{
+                    q: 100,
+                  }}
+                  class="h-2rem"
+                />
+              </a>
+              <div class="flex items-center">
+                <a
+                  class="flex mr-4 sm:hidden"
+                  title="Go back"
+                  use:tooltip
+                  href={$page.url.pathname.substring(
+                    0,
+                    $page.url.pathname.lastIndexOf('/')
+                  )}><ChevronLeft24 /></a
+                >
+                <a
+                  class="font-bold font-title text-black text-xl dark:text-white"
+                  href="/stores/{store.slug}"
+                >
+                  {store.name}
+                </a>
+                <a
+                  class="border-transparent flex ml-4 hover:border-current"
+                  href={getAbsoluteURL({
+                    subdomain: !store.customDomain ? store.slug : undefined,
+                    host: store.customDomain || undefined,
+                  })}
+                  target="__blank"
+                  title="Go to site"
+                  use:tooltip
+                >
+                  <Launch16 />
+                </a>
+              </div>
+            </div>
+          </div>
+        {/if}
         <Transition url={$page.url.pathname}>
           <slot />
         </Transition>

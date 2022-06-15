@@ -37,40 +37,4 @@
   }
 </script>
 
-<div
-  class="flex mb-6 items-start sm:space-x-4 sm:items-center <sm:flex-col <sm:space-y-4"
->
-  <a
-    href="/stores/{store.slug}"
-    class="rounded bg-light-100 shadow p-1 dark:bg-gray-800"
-  >
-    <Image
-      src={store.logo}
-      options={{
-        q: 100,
-      }}
-      class="h-2rem"
-    />
-  </a>
-  <div class="flex space-x-4 items-center">
-    <a
-      class="font-bold font-title text-black text-xl dark:text-white"
-      href="/stores/{store.slug}"
-    >
-      {store.name}
-    </a>
-    <a
-      class="border-transparent flex hover:border-current"
-      href={getAbsoluteURL({
-        subdomain: !store.customDomain ? store.slug : undefined,
-        host: store.customDomain || undefined,
-      })}
-      target="__blank"
-      title="Go to site"
-      use:tooltip
-    >
-      <Launch16 />
-    </a>
-  </div>
-</div>
 <slot />
