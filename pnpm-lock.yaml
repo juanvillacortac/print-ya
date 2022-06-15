@@ -44,6 +44,7 @@ specifiers:
   '@types/bcryptjs': ^2.4.2
   '@types/lodash-es': ^4.17.6
   '@types/three': ^0.135.0
+  '@upstash/redis': ^1.6.1
   '@windicss/plugin-icons': ^1.0.2
   bcryptjs: ^2.4.3
   bytemd: ^1.13.1
@@ -129,6 +130,7 @@ dependencies:
   '@sveltejs/svelte-virtual-list': 3.0.1
   '@types/bcryptjs': 2.4.2
   '@types/lodash-es': 4.17.6
+  '@upstash/redis': 1.6.1
   bcryptjs: 2.4.3
   bytemd: 1.14.0
   caravaggio-plugin-nextjs: 0.4.2
@@ -2039,6 +2041,14 @@ packages:
     resolution: {integrity: sha512-98PlbmZOhyY3HazK+nktE9sX9sjKLc0GPGrqLhvSkTieGi4xrcmeRO5dZLr06sJKd8W9no3NvNEvRQaGgGnXNA==}
     dependencies:
       '@typewriter/delta': 1.0.2
+    dev: false
+
+  /@upstash/redis/1.6.1:
+    resolution: {integrity: sha512-2SGkAzBewW8MoRT5YpypWxdxRdsX6ydCLktldDvGocCeSJcx00gj+sXi3WfRvVfXQS9EDR3cJVKoaBhbmn1IyA==}
+    dependencies:
+      isomorphic-fetch: 3.0.0
+    transitivePeerDependencies:
+      - encoding
     dev: false
 
   /@windicss/config/1.8.4:
@@ -5677,7 +5687,7 @@ packages:
       is-number: 7.0.0
 
   /tr46/0.0.3:
-    resolution: {integrity: sha1-gYT9NH2snNwYWZLzpmIuFLnZq2o=}
+    resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: false
 
   /ts-log/2.2.4:
@@ -5905,7 +5915,7 @@ packages:
     dev: false
 
   /webidl-conversions/3.0.1:
-    resolution: {integrity: sha1-JFNCdeKnvGvnvIZhHMFq4KVlSHE=}
+    resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
     dev: false
 
   /websocket/1.0.34:
@@ -5927,7 +5937,7 @@ packages:
     dev: false
 
   /whatwg-url/5.0.0:
-    resolution: {integrity: sha1-lmRU6HZUYuN2RNNib2dCzotwll0=}
+    resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
     dependencies:
       tr46: 0.0.3
       webidl-conversions: 3.0.1

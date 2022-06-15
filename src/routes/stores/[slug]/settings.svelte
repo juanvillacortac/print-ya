@@ -14,6 +14,8 @@
   import { Close24, Image32 } from 'carbon-icons-svelte'
   import { expoOut } from 'svelte/easing'
   import { fade, scale } from 'svelte/transition'
+  import StripeLogo from '$lib/components/__StripeLogo.svelte'
+  import PaypalLogo from '$lib/components/__PaypalLogo.svelte'
 
   let store = $page.stuff.store as Store
 
@@ -121,8 +123,15 @@
   </h3>
   <form
     on:submit|preventDefault={submit}
-    class="bg-white rounded-xl flex flex-col h-full space-y-4 shadow w-full p-4 relative overflow-hidden dark:bg-gray-800"
+    class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
   >
+    <div class="flex w-full justify-between items-">
+      <h5 class="font-bold font-title text-sm">General settings</h5>
+      <button
+        class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+        disabled={saving}>{saving ? 'Saving...' : 'Save'}</button
+      >
+    </div>
     <div
       class="flex w-full items-center sm:space-x-2 <sm:flex-col <sm:space-y-2"
     >
@@ -350,9 +359,65 @@
         </div>
       </div>
     </div>
-    <button
-      class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
-      disabled={saving}>{saving ? 'Saving...' : 'Save'}</button
-    >
   </form>
+
+  <div
+    class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
+  >
+    <h5 class="font-bold font-title text-sm">Payment gateways</h5>
+    <div
+      class="border rounded-lg flex flex-col space-y-2 border-gray-300 w-full p-4 items-start dark:border-gray-600"
+    >
+      <div class="flex w-full justify-between">
+        <StripeLogo class="h-6 w-auto" />
+        <button
+          class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+          disabled={saving}>{saving ? 'Applying...' : 'Apply'}</button
+        >
+      </div>
+      <div class="w-full grid gap-2 grid-cols-2">
+        <div class="flex flex-col w-full">
+          <div class="font-bold text-xs mb-2 block">Public key</div>
+          <input
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            type="text"
+            style="text-security:disc; -webkit-text-security:disc;"
+            required
+            bind:value={store.name}
+          />
+        </div>
+        <div class="flex flex-col w-full">
+          <div class="font-bold text-xs mb-2 block">Secret key</div>
+          <input
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            type="text"
+            style="text-security:disc; -webkit-text-security:disc;"
+            required
+            bind:value={store.name}
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      class="border rounded-lg flex flex-col space-y-2 border-gray-300 w-full p-4 items-start dark:border-gray-600"
+    >
+      <div class="flex w-full justify-between">
+        <PaypalLogo class="h-6 w-auto" />
+        <button
+          class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+          disabled={saving}>{saving ? 'Applying...' : 'Apply'}</button
+        >
+      </div>
+      <div class="flex flex-col w-full">
+        <div class="font-bold text-xs mb-2 block">Client ID</div>
+        <input
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          type="text"
+          style="text-security:disc; -webkit-text-security:disc;"
+          required
+          bind:value={store.name}
+        />
+      </div>
+    </div>
+  </div>
 </div>

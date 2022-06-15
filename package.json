@@ -87,6 +87,7 @@
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/lodash-es": "^4.17.6",
+    "@upstash/redis": "^1.6.1",
     "bcryptjs": "^2.4.3",
     "bytemd": "^1.13.1",
     "caravaggio-plugin-nextjs": "^0.4.2",
