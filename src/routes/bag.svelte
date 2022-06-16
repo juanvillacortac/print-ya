@@ -21,11 +21,9 @@
   } from '$lib/utils/modifiers'
   import {
     Add16,
-    ArrowRight16,
     ArrowRight24,
     CheckmarkFilled32,
     ChevronLeft24,
-    Close16,
     Close24,
     Subtract16,
     TrashCan16,
@@ -116,6 +114,25 @@
     done = total
     payment = false
     bag.clear()
+  }
+
+  async function pay(e) {
+    const paymentMethod = e.detail.paymentMethod
+    // create payment intent server side
+    const clientSecret = await createPaymentIntent()
+    let result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: paymentMethod.id,
+    })
+    if (result.error) {
+      e.detail.complete('fail')
+      // payment failed, notify user
+      error = result.error
+    } else {
+      e.detail.complete('success')
+      done = total
+      payment = false
+      bag.clear()
+    }
   }
 
   let error: StripeError
@@ -671,8 +688,10 @@
                 style="will-change: transform"
               >
                 <div class="flex flex-col w-full">
-                  <div class="font-bold text-xs mb-2 block">
-                    Pay with a credit card
+                  <div class="flex mb-2 w-full items-center justify-between">
+                    <div class="font-bold text-xs block">
+                      Pay with a credit card
+                    </div>
                   </div>
                   {#if error}
                     <div
@@ -696,25 +715,42 @@
                     classes={{ base: 'stripe-input' }}
                     style={{ base: { color: dark ? 'white' : undefined } }}
                   />
-                  <CardCvc classes={{ base: 'stripe-input' }} />
+                  <CardCvc
+                    classes={{ base: 'stripe-input' }}
+                    style={{ base: { color: dark ? 'white' : undefined } }}
+                  />
+                  <button
+                    class="rounded flex font-bold ml-auto space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                    style="will-change: transform"
+                  >
+                    Pay
+                  </button>
                 </div>
               </div>
-              <div class="flex mb-4 w-full">
+              <div class="flex w-full">
                 <PaymentRequestButton
-                  {paymentRequest}
+                  paymentRequest={{
+                    country: 'US',
+                    currency: 'usd',
+                    total: { label: 'Total', amount: Math.trunc(total * 100) },
+                    requestPayerName: true,
+                    requestPayerEmail: true,
+                  }}
                   classes={{ base: 'w-full' }}
+                  on:paymentmethod={pay}
                 />
               </div>
             {/if}
           </StripeContainer>
         {/if}
-        <button
-          class="rounded flex font-bold ml-auto space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
-          class:-mt-4={payment}
-          style="will-change: transform"
-        >
-          {payment ? 'Pay' : 'Go to payment'}
-        </button>
+        {#if !payment}
+          <button
+            class="rounded flex font-bold ml-auto space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+            style="will-change: transform"
+          >
+            Go to payment
+          </button>
+        {/if}
       {/if}
     </div>
   </form>
