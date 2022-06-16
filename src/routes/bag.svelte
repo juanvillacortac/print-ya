@@ -8,6 +8,8 @@
     Container as StripeContainer,
     CardCvc,
     CardExpiry,
+    PaymentElement,
+    PaymentRequestButton,
   } from 'svelte-stripe'
 
   import type { Product } from '$lib/db'
@@ -209,6 +211,14 @@
               item?.name
             )}&src=${encodeURIComponent(item?.meta?.url)}`,
       }))
+  }
+
+  const paymentRequest = {
+    country: 'US',
+    currency: 'usd',
+    total: { label: 'Demo total', amount: 1099 },
+    requestPayerName: true,
+    requestPayerEmail: true,
   }
 </script>
 
@@ -681,6 +691,9 @@
                 <div class="flex space-x-2">
                   <CardExpiry classes={{ base: 'stripe-input' }} />
                   <CardCvc classes={{ base: 'stripe-input' }} />
+                </div>
+                <div class="flex w-full">
+                  <PaymentRequestButton {paymentRequest} />
                 </div>
               </div>
             {/if}
