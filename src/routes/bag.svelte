@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import { bag, type BagItem } from '$lib'
+  import { bag, preferences, type BagItem } from '$lib'
   import { get, post } from '$lib/api'
   import { tooltip } from '$lib/components/tooltip'
   import {
@@ -220,6 +220,8 @@
     requestPayerName: true,
     requestPayerEmail: true,
   }
+
+  $: dark = $preferences.darkMode
 </script>
 
 <svelte:head>
@@ -686,21 +688,29 @@
                   <CardNumber
                     bind:element={cardElement}
                     classes={{ base: 'stripe-input' }}
+                    style={{ base: { color: dark ? 'white' : undefined } }}
                   />
                 </div>
                 <div class="flex space-x-2">
-                  <CardExpiry classes={{ base: 'stripe-input' }} />
+                  <CardExpiry
+                    classes={{ base: 'stripe-input' }}
+                    style={{ base: { color: dark ? 'white' : undefined } }}
+                  />
                   <CardCvc classes={{ base: 'stripe-input' }} />
                 </div>
-                <div class="flex w-full">
-                  <PaymentRequestButton {paymentRequest} />
-                </div>
+              </div>
+              <div class="flex mb-4 w-full">
+                <PaymentRequestButton
+                  {paymentRequest}
+                  classes={{ base: 'w-full' }}
+                />
               </div>
             {/if}
           </StripeContainer>
         {/if}
         <button
           class="rounded flex font-bold ml-auto space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+          class:-mt-4={payment}
           style="will-change: transform"
         >
           {payment ? 'Pay' : 'Go to payment'}
