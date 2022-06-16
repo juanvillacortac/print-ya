@@ -11,6 +11,7 @@
     PaymentElement,
     PaymentRequestButton,
   } from 'svelte-stripe'
+  import { loadScript } from '@paypal/paypal-js'
 
   import type { Product } from '$lib/db'
   import {
@@ -88,12 +89,56 @@
   let checkout = false
   let payment = false
 
+  const createPaypal = (el: string | HTMLElement, amount: number) =>
+    loadScript({
+      'client-id':
+        'AeFkK76hZkhCrPuLpM1yAiCHXSzro1INVTH2S0WFmzuWekXPCIh4tdAGW569cRVRGIoLIUdOwrggqo-T',
+    }).then((paypal) => {
+      paypal
+        .Buttons({
+          style: {
+            color: 'blue',
+            shape: 'rect',
+            height: 40,
+            label: 'pay',
+            tagline: false,
+            layout: 'horizontal',
+          },
+          createOrder: function (data, actions) {
+            // Set up the transaction
+            return actions.order.create({
+              purchase_units: [
+                {
+                  amount: {
+                    value: `${amount}`,
+                    currency_code: 'USD',
+                  },
+                },
+              ],
+            })
+          },
+          onApprove: function (data, actions) {
+            // Capture order after payment approved
+            return actions.order.capture().then(function (details) {
+              confirmPayment()
+            })
+          },
+          onError: function (err) {
+            // Log error if something goes wrong during approval
+            alert('Something went wrong')
+            console.log('Something went wrong', err)
+          },
+        })
+        .render(el)
+    })
+
   const submit = async () => {
     if (!payment) {
       // done = total
       // payment = false
       // bag.clear()
       payment = true
+      createPaypal('#paypal-button', total)
       return
     }
 
@@ -111,6 +156,10 @@
       error = result.error
       return
     }
+    confirmPayment()
+  }
+
+  const confirmPayment = () => {
     done = total
     payment = false
     bag.clear()
@@ -129,9 +178,7 @@
       error = result.error
     } else {
       e.detail.complete('success')
-      done = total
-      payment = false
-      bag.clear()
+      confirmPayment()
     }
   }
 
@@ -740,6 +787,7 @@
                   on:paymentmethod={pay}
                 />
               </div>
+              <div class="flex w-full" id="paypal-button" />
             {/if}
           </StripeContainer>
         {/if}
