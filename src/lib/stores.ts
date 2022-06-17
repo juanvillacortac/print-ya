@@ -3,6 +3,7 @@ import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
 import type { ModifiersMap } from './utils/modifiers'
 import type { Product } from './db'
+import { flatMap, isObject, merge } from 'lodash-es'
 
 export const pageSubtitle = writable('')
 
@@ -101,25 +102,10 @@ const createBag = (): BagStore => {
     }))
   )
 
-  const flattenObject = (obj) => {
-    const flattened = {}
-
-    Object.keys(obj).forEach((key) => {
-      const value = obj[key]
-
-      if (
-        typeof value === 'object' &&
-        value !== null &&
-        !Array.isArray(value)
-      ) {
-        Object.assign(flattened, flattenObject(value))
-      } else {
-        flattened[key] = value
-      }
-    })
-
-    return flattened
-  }
+  const getKeys = (val, keys = []) =>
+    isObject(val)
+      ? flatMap(val, (v, k) => getKeys(v, [...keys, k]))
+      : keys[keys.length - 1]
 
   const getKey = (product: Product, modifiers: ModifiersMap) => {
     const map = Object.fromEntries(
@@ -130,8 +116,8 @@ const createBag = (): BagStore => {
     )
     console.log(map)
     const obj = { productSlug: product.slug, modifiers: map }
-    const keys = Object.keys(flattenObject(obj))
-    console.log(flattenObject(obj))
+    const keys = getKeys(obj)
+    console.log(keys)
     console.log(JSON.stringify(obj, keys.sort()))
     return JSON.stringify(obj, keys.sort())
   }
