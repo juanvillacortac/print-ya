@@ -1,7 +1,10 @@
 import { navigating } from '$app/stores'
 import Tooltip from './Tooltip.svelte'
 
-export function tooltip(element: HTMLElement) {
+export function tooltip(
+  element: HTMLElement,
+  { show = true }: { show?: boolean } = { show: true }
+) {
   let title: string
   let tooltipComponent
   function mouseEnter(event: MouseEvent) {
@@ -13,6 +16,7 @@ export function tooltip(element: HTMLElement) {
     tooltipComponent = new Tooltip({
       props: {
         title: title,
+        show,
       },
       target: document.body,
     })
@@ -58,7 +62,8 @@ export function tooltip(element: HTMLElement) {
   element.addEventListener('mouseleave', mouseLeave)
 
   return {
-    update() {
+    update(newOpts) {
+      show = newOpts.show
       tooltipComponent?.$destroy()
     },
     destroy() {

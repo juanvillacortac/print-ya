@@ -8,7 +8,6 @@
     Container as StripeContainer,
     CardCvc,
     CardExpiry,
-    PaymentElement,
     PaymentRequestButton,
   } from 'svelte-stripe'
   import { loadScript } from '@paypal/paypal-js'
@@ -500,7 +499,7 @@
     style="will-change: transform"
     transition:fly|local={{ x: '100%', opacity: 1, duration: 400 }}
   >
-    <div class="flex flex-col h-full space-y-6 p-4 overflow-y-auto">
+    <div class="flex flex-col h-full space-y-4 p-4 overflow-y-auto">
       <div class="flex space-x-4 items-center">
         <button
           type="reset"
@@ -556,115 +555,6 @@
           </p>
         </div>
       {:else}
-        {#if !payment}
-          <div
-            class="flex flex-col space-y-2"
-            transition:slide|local={{ duration: 400, easing: expoOut }}
-          >
-            <div class="flex space-x-3">
-              <div class="flex flex-col w-full">
-                <label class="font-bold text-xs mb-2 block" for="fieldId">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  placeholder="Ex. juan@gmail.com"
-                  required
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                />
-              </div>
-              <div class="flex flex-col w-full">
-                <label class="font-bold text-xs mb-2 block" for="fieldId">
-                  Phone number
-                </label>
-                <input
-                  type="tel"
-                  placeholder="Ex. +1 XXXXXX"
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                />
-              </div>
-            </div>
-            <div class="flex space-x-3">
-              <div class="flex flex-col w-full">
-                <label class="font-bold text-xs mb-2 block" for="fieldId"
-                  >First name *</label
-                >
-                <input
-                  type="text"
-                  required
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                />
-              </div>
-              <div class="flex flex-col w-full">
-                <label class="font-bold text-xs mb-2 block" for="fieldId"
-                  >Last name</label
-                >
-                <input
-                  type="text"
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                />
-              </div>
-            </div>
-            <div class="flex flex-col w-full">
-              <label class="font-bold text-xs mb-2 block" for="fieldId">
-                Country/Region *
-              </label>
-              <select
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-                required
-              >
-                <option value="" hidden />
-                {#each countries as country}
-                  <option value={country.code}>{country.name}</option>
-                {/each}
-              </select>
-            </div>
-            <div class="flex space-x-3">
-              <div class="flex flex-col w-full">
-                <label class="font-bold text-xs mb-2 block" for="fieldId">
-                  Province/State *
-                </label>
-                <input
-                  type="text"
-                  required
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                />
-              </div>
-              <div class="flex flex-col w-full">
-                <label class="font-bold text-xs mb-2 block" for="fieldId">
-                  Address *
-                </label>
-                <input
-                  type="text"
-                  required
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                />
-              </div>
-            </div>
-            <div class="flex space-x-3">
-              <div class="flex flex-col w-full">
-                <label class="font-bold text-xs mb-2 block" for="fieldId"
-                  >City *</label
-                >
-                <input
-                  required
-                  type="text"
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                />
-              </div>
-              <div class="flex flex-col w-full">
-                <label class="font-bold text-xs mb-2 block" for="fieldId"
-                  >ZIP/Postal code *</label
-                >
-                <input
-                  type="text"
-                  required
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                />
-              </div>
-            </div>
-          </div>
-        {/if}
         <div
           class="divide-y border rounded rounded-lg flex flex-col w-full dark:divide-gray-600 dark:border-gray-600"
         >
@@ -721,16 +611,160 @@
             </div>
           </div>
         </div>
-        {#if stripe}
-          <StripeContainer {stripe}>
-            {#if payment}
+
+        <div
+          class="border rounded rounded-lg flex flex-col space-y-4 w-full p-2 dark:divide-gray-600 dark:border-gray-600"
+        >
+          <div
+            class="flex space-x-2 w-full items-center"
+            on:click={() => (payment = false)}
+            class:cursor-pointer={payment}
+            title="Change billing details"
+            use:tooltip={{ show: payment }}
+          >
+            <div
+              class="rounded-full flex font-bold font-title bg-[rgb(113,3,3)] h-8 shadow text-xs text-white w-8 items-center justify-center"
+            >
+              1
+            </div>
+            <div class="font-bold font-title text-xs">Shipping</div>
+          </div>
+          {#if !payment}
+            <div
+              class="flex flex-col space-y-2"
+              transition:slide|local={{ duration: 400, easing: expoOut }}
+            >
+              <div class="flex space-x-3">
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Ex. juan@gmail.com"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  />
+                </div>
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId">
+                    Phone number
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="Ex. +1 XXXXXX"
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  />
+                </div>
+              </div>
+              <div class="flex space-x-3">
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId"
+                    >First name *</label
+                  >
+                  <input
+                    type="text"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  />
+                </div>
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId"
+                    >Last name</label
+                  >
+                  <input
+                    type="text"
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  />
+                </div>
+              </div>
+              <div class="flex flex-col w-full">
+                <label class="font-bold text-xs mb-2 block" for="fieldId">
+                  Country/Region *
+                </label>
+                <select
+                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                  required
+                >
+                  <option value="" hidden />
+                  {#each countries as country}
+                    <option value={country.code}>{country.name}</option>
+                  {/each}
+                </select>
+              </div>
+              <div class="flex space-x-3">
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId">
+                    Province/State *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  />
+                </div>
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId">
+                    Address *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  />
+                </div>
+              </div>
+              <div class="flex space-x-3">
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId"
+                    >City *</label
+                  >
+                  <input
+                    required
+                    type="text"
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  />
+                </div>
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId"
+                    >ZIP/Postal code *</label
+                  >
+                  <input
+                    type="text"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                  />
+                </div>
+              </div>
+            </div>
+          {/if}
+        </div>
+        <div
+          class="border rounded rounded-lg flex flex-col space-y-4 w-full p-2 dark:divide-gray-600 dark:border-gray-600"
+        >
+          <div class="flex space-x-2 w-full items-center">
+            <div
+              class="border rounded-full flex font-bold font-title h-8 text-xs w-8 items-center justify-center dark:border-gray-600"
+              class:bg-[rgb(113,3,3)]={payment}
+              class:text-white={payment}
+            >
+              2
+            </div>
+            <div class="font-bold font-title text-xs">Billing</div>
+          </div>
+          {#if stripe && payment}
+            <StripeContainer {stripe}>
               <div
                 class="border rounded rounded-lg flex flex-col space-y-2 w-full p-2 dark:border-gray-600"
-                transition:scale|local={{
+                in:scale|local={{
                   duration: 600,
                   start: 0.2,
                   easing: expoOut,
                   delay: 200,
+                }}
+                out:slide|local={{
+                  duration: 400,
+                  easing: expoOut,
                 }}
                 style="will-change: transform"
               >
@@ -779,7 +813,10 @@
                   paymentRequest={{
                     country: 'US',
                     currency: 'usd',
-                    total: { label: 'Total', amount: Math.trunc(total * 100) },
+                    total: {
+                      label: 'Total',
+                      amount: Math.trunc(total * 100),
+                    },
                     requestPayerName: true,
                     requestPayerEmail: true,
                   }}
@@ -788,9 +825,9 @@
                 />
               </div>
               <div class="flex w-full" id="paypal-button" />
-            {/if}
-          </StripeContainer>
-        {/if}
+            </StripeContainer>
+          {/if}
+        </div>
         {#if !payment}
           <button
             class="rounded flex font-bold ml-auto space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"

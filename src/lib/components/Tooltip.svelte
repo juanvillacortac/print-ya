@@ -12,13 +12,14 @@
   export let height = 0
 
   let visible = false
+  export let show = true
 
   onMount(() => {
     visible = true
   })
 </script>
 
-{#if visible}
+{#if visible && show}
   <div
     transition:fly={{ y: 2 }}
     class="bg-white border rounded border-gray-300 text-xs p-1 text-gray-700 z-20 z-999 absolute pointer-events-none <sm:hidden dark:bg-gray-800 dark:border-gray-700 dark:text-white"
