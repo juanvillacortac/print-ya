@@ -136,9 +136,9 @@ const createBag = (): BagStore => {
     }
     const keys = [
       ...new Set(
-        Object.entries(flattenObject(obj || {})).map(
-          ([k]) => k.split('.').slice(-1)[0]
-        )
+        Object.entries(flattenObject(obj || {}))
+          .map(([k]) => k.split('.'))
+          .flat()
       ),
     ]
     console.log(keys)
