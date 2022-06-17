@@ -126,7 +126,7 @@ const createBag = (): BagStore => {
           let flatObject = flattenObject(ob[i])
           for (let x in flatObject) {
             if (!flatObject.hasOwnProperty(x)) continue
-            toReturn[x] = flatObject[x]
+            toReturn[i + '.' + x] = flatObject[x]
           }
         } else {
           toReturn[i] = ob[i]
@@ -134,7 +134,11 @@ const createBag = (): BagStore => {
       }
       return toReturn
     }
-    const keys = [...Object.entries(flattenObject(obj || {})).map(([k]) => k)]
+    const keys = [
+      ...Object.entries(flattenObject(obj || {})).map(
+        ([k]) => k.split('.').slice(-1)[0]
+      ),
+    ]
     console.log(keys)
     console.log(JSON.stringify(obj, keys.sort()))
     return JSON.stringify(obj, keys.sort())
