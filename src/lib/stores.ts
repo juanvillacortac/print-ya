@@ -130,7 +130,7 @@ const createBag = (): BagStore => {
         })
       return out
     }
-    const keys = [...Object.entries(flat(obj, {})).map(([k]) => k)]
+    const keys = [...Object.entries(flat(obj || {}, {})).map(([k]) => k)]
     console.log(keys)
     console.log(JSON.stringify(obj, keys.sort()))
     return JSON.stringify(obj, keys.sort())
