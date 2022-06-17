@@ -108,6 +108,7 @@ const createBag = (): BagStore => {
         { ...v, modifier: product.modifiers.find((m) => m.id === mId) },
       ])
     )
+    console.log(map)
     const obj = { productSlug: product.slug, modifiers: map }
     return JSON.stringify(obj, Object.keys(obj).sort())
   }
