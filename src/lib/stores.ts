@@ -126,7 +126,7 @@ const createBag = (): BagStore => {
           let flatObject = flattenObject(ob[i])
           for (let x in flatObject) {
             if (!flatObject.hasOwnProperty(x)) continue
-            toReturn[i + '.' + x] = flatObject[x]
+            toReturn[x] = flatObject[x]
           }
         } else {
           toReturn[i] = ob[i]
