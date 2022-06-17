@@ -101,6 +101,26 @@ const createBag = (): BagStore => {
     }))
   )
 
+  const flattenObject = (obj) => {
+    const flattened = {}
+
+    Object.keys(obj).forEach((key) => {
+      const value = obj[key]
+
+      if (
+        typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        Object.assign(flattened, flattenObject(value))
+      } else {
+        flattened[key] = value
+      }
+    })
+
+    return flattened
+  }
+
   const getKey = (product: Product, modifiers: ModifiersMap) => {
     const map = Object.fromEntries(
       Object.entries(modifiers).map(([mId, v]) => [
@@ -110,7 +130,8 @@ const createBag = (): BagStore => {
     )
     console.log(map)
     const obj = { productSlug: product.slug, modifiers: map }
-    console.log(JSON.stringify(obj, Object.keys(obj).sort()))
+    const keys = Object.keys(flattenObject(obj))
+    console.log(JSON.stringify(obj, keys.sort()))
     return JSON.stringify(obj, Object.keys(obj).sort())
   }
 
