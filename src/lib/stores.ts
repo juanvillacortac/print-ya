@@ -110,6 +110,7 @@ const createBag = (): BagStore => {
     )
     console.log(map)
     const obj = { productSlug: product.slug, modifiers: map }
+    console.log(JSON.stringify(obj, Object.keys(obj).sort()))
     return JSON.stringify(obj, Object.keys(obj).sort())
   }
 
