@@ -119,6 +119,7 @@ const createBag = (): BagStore => {
     const keys = [
       ...new Set(getKeys(obj)),
       ...Object.entries(modifiers).map(([k]) => k),
+      ...Object.entries(obj).map(([k]) => k),
     ] as string[]
     console.log(keys)
     console.log(JSON.stringify(obj, keys.sort()))
