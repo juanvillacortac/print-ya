@@ -101,8 +101,17 @@ const createBag = (): BagStore => {
     }))
   )
 
-  const getKey = (product: Product, modifiers: ModifiersMap) =>
-    JSON.stringify({ productSlug: product.slug, modifiers })
+  const getKey = (product: Product, modifiers: ModifiersMap) => {
+    const map = Object.fromEntries(
+      Object.entries(modifiers).map(([mId, v]) => [
+        mId,
+        { ...v, modifier: product.modifiers.find((m) => m.id === mId) },
+      ])
+    )
+    const obj = { productSlug: product.slug, modifiers: map }
+    return JSON.stringify(obj, Object.keys(obj).sort())
+  }
+
   const setItem: BagStore['setItem'] = (product, modifiers, quantity) =>
     store.update((store) => {
       if (!quantity || quantity < 0) {

@@ -4,7 +4,12 @@ import { isEqual } from 'lodash-es'
 
 export type ModifiersMap = Record<
   string,
-  { value?: any; itemId?: string; itemIds?: string[] }
+  {
+    value?: any
+    itemId?: string
+    itemIds?: string[]
+    modifier?: ProductModifier
+  }
 >
 
 export const createModifiersMapStore = (product?: Product) =>
@@ -37,10 +42,10 @@ export const getTemplateFieldsFromModifiers = (
   let fields = ''
   const mappedModifiers = Object.entries(modifiers).map(
     ([mId, mValue]) =>
-      [product.modifiers.find((m) => m.id === mId), mValue] as [
-        ProductModifier,
-        { value?: string; itemId?: string }
-      ]
+      [
+        mValue.modifier || product.modifiers.find((m) => m.id === mId),
+        mValue,
+      ] as [ProductModifier, { value?: string; itemId?: string }]
   )
   const items = mappedModifiers
     .filter(

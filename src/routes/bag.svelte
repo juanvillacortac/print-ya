@@ -260,10 +260,10 @@
     const p = products[details.productSlug]
     fonts = Object.entries(details.modifiers)
       .map(([mId, m]) => ({
-        modifier: p.modifiers.find((m) => m.id == mId),
-        item: p.modifiers
-          .find((m) => m.id == mId)
-          .items.find((i) => i.id === m.itemId),
+        modifier: m.modifier || p.modifiers.find((m) => m.id == mId),
+        item: (m.modifier || p.modifiers.find((m) => m.id == mId)).items.find(
+          (i) => i.id === m.itemId
+        ),
       }))
       .filter(({ modifier }) => modifier.type === 'font')
       .map(({ item }) => ({
@@ -353,7 +353,8 @@
           </div>
           <div class="flex flex-col space-y-2">
             {#each Object.entries(details.modifiers) as [mId, m]}
-              {@const modifier = p.modifiers.find((m) => m.id == mId)}
+              {@const modifier =
+                m.modifier || p.modifiers.find((m) => m.id == mId)}
               {@const itemName = modifier.name}
               {@const item = modifier.items.find((i) => i.id === m.itemId)}
               <div class="flex flex-col space-y-1 w-full lg:w-1/3">
