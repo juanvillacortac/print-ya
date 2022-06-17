@@ -119,7 +119,7 @@ const createBag = (): BagStore => {
     console.log(map)
     const obj = { productSlug: product.slug, modifiers: { ...map } }
     const flat = (obj, out) => {
-      Object.entries(obj)
+      Object.entries(obj || {})
         .map(([k]) => k)
         .forEach((key) => {
           if (typeof obj[key] == 'object') {
