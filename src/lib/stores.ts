@@ -118,7 +118,7 @@ const createBag = (): BagStore => {
     const obj = { productSlug: product.slug, modifiers: { ...map } }
     const keys = [
       ...new Set(getKeys(obj)),
-      ...Object.keys(modifiers),
+      ...Object.entries(modifiers).map(([k]) => k),
     ] as string[]
     console.log(keys)
     console.log(JSON.stringify(obj, keys.sort()))
