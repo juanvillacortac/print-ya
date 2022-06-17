@@ -118,19 +118,23 @@ const createBag = (): BagStore => {
     }
     console.log(map)
     const obj = { productSlug: product.slug, modifiers: { ...map } }
-    const flat = (obj, out) => {
-      Object.entries(obj || {})
-        .map(([k]) => k)
-        .forEach((key) => {
-          if (typeof obj[key] == 'object') {
-            out = flat(obj[key], out) //recursively call for nesteds
-          } else {
-            out[key] = obj[key] //direct assign for values
+    const flattenObject = (ob) => {
+      let toReturn = {}
+      for (var i in ob) {
+        if (!ob.hasOwnProperty(i)) continue
+        if (typeof ob[i] == 'object') {
+          let flatObject = flattenObject(ob[i])
+          for (let x in flatObject) {
+            if (!flatObject.hasOwnProperty(x)) continue
+            toReturn[i + '.' + x] = flatObject[x]
           }
-        })
-      return out
+        } else {
+          toReturn[i] = ob[i]
+        }
+      }
+      return toReturn
     }
-    const keys = [...Object.entries(flat(obj || {}, {})).map(([k]) => k)]
+    const keys = [...Object.entries(flattenObject(obj || {})).map(([k]) => k)]
     console.log(keys)
     console.log(JSON.stringify(obj, keys.sort()))
     return JSON.stringify(obj, keys.sort())
