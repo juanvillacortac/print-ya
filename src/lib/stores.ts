@@ -108,7 +108,7 @@ const createBag = (): BagStore => {
       : keys[keys.length - 1]
 
   const getKey = (product: Product, modifiers: ModifiersMap) => {
-    const map = {
+    const map: ModifiersMap = {
       ...Object.fromEntries(
         Object.entries(modifiers).map(([mId, v]) => [
           mId,
@@ -118,11 +118,19 @@ const createBag = (): BagStore => {
     }
     console.log(map)
     const obj = { productSlug: product.slug, modifiers: { ...map } }
-    const keys = [
-      ...new Set(getKeys(obj)),
-      ...Object.entries(modifiers).map(([k]) => k),
-      ...Object.entries(obj).map(([k]) => k),
-    ] as string[]
+    const flat = (obj, out) => {
+      Object.entries(obj)
+        .map(([k]) => k)
+        .forEach((key) => {
+          if (typeof obj[key] == 'object') {
+            out = flat(obj[key], out) //recursively call for nesteds
+          } else {
+            out[key] = obj[key] //direct assign for values
+          }
+        })
+      return out
+    }
+    const keys = [...Object.entries(flat(obj, {})).map(([k]) => k)]
     console.log(keys)
     console.log(JSON.stringify(obj, keys.sort()))
     return JSON.stringify(obj, keys.sort())

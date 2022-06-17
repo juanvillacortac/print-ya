@@ -2,15 +2,14 @@ import type { Product, ProductModifier } from '$lib/db'
 import { writable } from 'svelte/store'
 import { isEqual } from 'lodash-es'
 
-export type ModifiersMap = Record<
-  string,
-  {
-    value?: any
-    itemId?: string
-    itemIds?: string[]
-    modifier?: ProductModifier
-  }
->
+export type ModifierValue = {
+  value?: any
+  itemId?: string
+  itemIds?: string[]
+  modifier?: ProductModifier
+}
+
+export type ModifiersMap = Record<string, ModifierValue>
 
 export const createModifiersMapStore = (product?: Product) =>
   writable<ModifiersMap>(
