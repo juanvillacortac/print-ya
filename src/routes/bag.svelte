@@ -285,6 +285,7 @@
   }
 
   $: dark = $preferences.darkMode
+  $: console.log(Object.entries(details?.modifiers || {}))
 </script>
 
 <svelte:head>
@@ -352,7 +353,7 @@
             </p>
           </div>
           <div class="flex flex-col space-y-2">
-            {#each Object.entries(details.modifiers) as [mId, m]}
+            {#each Object.entries(details?.modifiers || {}) as [mId, m]}
               {@const modifier =
                 m.modifier || p.modifiers.find((m) => m.id == mId)}
               {@const itemName = modifier.name}
@@ -404,7 +405,7 @@
                   </p>
                 {:else if modifier.type === 'upsell'}
                   <div class="flex flex-col space-y-2 w-full">
-                    {#each m.itemIds as id}
+                    {#each m?.itemIds || [] as id}
                       {@const i = modifier.items.find((i) => i.id === id)}
                       <div
                         class="border rounded-lg w-full relative dark:border-gray-700"
