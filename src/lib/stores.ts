@@ -93,7 +93,7 @@ export type BagStore = Readable<BagItem[]> & {
 }
 
 const createBag = (): BagStore => {
-  const store = persistentWritable<Map<string, number>>('bag', new Map())
+  const store = persistentWritable<Map<string, number>>('bag-v2', new Map())
   const items = derived([store], ([s]) =>
     [...s.entries()].map<BagItem>(([k, q]) => ({
       ...JSON.parse(k),
