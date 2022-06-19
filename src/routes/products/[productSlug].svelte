@@ -17,10 +17,14 @@
 
   export const load: Load = async ({ params, fetch, stuff }) => {
     const store = stuff.store
-    const data = await get(
-      `/api/stores/${store?.slug}/products/${params.productSlug}`,
-      { fetch }
-    )
+    const data = await trpc(fetch).query('products:getBySlug', {
+      storeSlug: store.slug,
+      productSlug: params.productSlug,
+    })
+    // const data = await get(
+    //   `/api/stores/${store?.slug}/products/${params.productSlug}`,
+    //   { fetch }
+    // )
     if (!data)
       return {
         status: 404,
@@ -54,6 +58,7 @@
   } from '$lib/utils/modifiers'
   import { browser } from '$app/env'
   import { ShoppingBag16 } from 'carbon-icons-svelte'
+  import trpc from '$lib/trpc'
   let quantity = product.minQuantity || 1
 
   $pageSubtitle = product?.name

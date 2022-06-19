@@ -1,9 +1,7 @@
-import { get } from '$lib/api'
-import { defineService } from '$lib/context'
-import type { Store } from '$lib/db'
+import trpc from '$lib/trpc'
 import type { LoadInput } from '@sveltejs/kit'
 import type { RequestEvent } from '@sveltejs/kit/types/private'
-import { getDefaultHost, isCanonical } from './host'
+import { isCanonical } from './host'
 
 export type LayoutType = 'app' | 'store'
 
@@ -46,32 +44,22 @@ export const fetchLayoutData = async ({
   fetch,
   session,
 }: LoadInput): Promise<{ response?: LayoutData; notFound?: boolean }> => {
+  const client = trpc(fetch)
   switch (session.layout) {
     case 'store':
       try {
-        let response: any
-        response = await get(`/api/stores/${url.host}?customDomain=true`, {
-          fetch,
-        })
-        if (response?.store) {
-          return {
-            response,
-          }
+        let response: LayoutData = {
+          store: await client.query('stores:getByHost', url.host),
         }
-        let slug = url.searchParams.get('store')
-        if (!slug) {
-          slug = session.host.split('.')[0]
-        }
-        response = await get(`/api/stores/${slug}`, {
-          fetch,
-        })
-        if (!response?.store) {
-          return {
-            notFound: true,
-            response: {},
+        if (!response.store) {
+          let slug = url.searchParams.get('store')
+          if (!slug) {
+            slug = session.host.split('.')[0]
           }
+          response.store = await client.query('stores:getBySlug', slug)
         }
         return {
+          notFound: !response.store,
           response,
         }
       } catch (err) {

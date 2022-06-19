@@ -1,11 +1,15 @@
 import { getUserDetails } from '$lib/db/users'
-import type { GetSession } from '@sveltejs/kit'
+import type { GetSession, Handle } from '@sveltejs/kit'
 import { handleSession } from 'svelte-kit-cookie-session'
 import cookie from 'cookie'
 import { appRoutes, getLayoutType } from '$lib/utils/layout'
 import { getDefaultHost } from '$lib/utils/host'
 
-export const handle = handleSession(
+import { router } from '$lib/__server/trpc'
+import { createTRPCHandle } from 'trpc-sveltekit'
+import { sequence } from '@sveltejs/kit/hooks'
+
+const session = handleSession(
   {
     secret: process.env['VITE_PY_SECRET'] || 'secret',
     expires: 30,
@@ -82,6 +86,33 @@ export const handle = handleSession(
     return response
   }
 )
+
+const trpc: Handle = async ({ event, resolve }) => {
+  const response = await createTRPCHandle({
+    url: '/api/trpc',
+    router,
+    event,
+    resolve,
+    createContext: async () => ({
+      event,
+      layout: event.locals.layout,
+    }),
+    responseMeta({ type, errors, ctx }) {
+      if (type === 'query' && ctx.layout === 'store' && errors.length === 0) {
+        return {
+          headers: {
+            'cache-control': `s-maxage=1, stale-while-revalidate`,
+          },
+        }
+      }
+      return {}
+    },
+  })
+
+  return response
+}
+
+export const handle = sequence(session, trpc)
 
 export const getSession: GetSession = (event) => ({
   layout: event.locals.layout,

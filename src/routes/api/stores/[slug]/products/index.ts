@@ -3,6 +3,7 @@ import {
   getProductsByStore,
   upsertProduct,
   getStoreBySlugOrHost,
+  getUserDetails,
 } from '$lib/db'
 import type { RequestHandler } from '@sveltejs/kit'
 
@@ -27,10 +28,14 @@ export const get: RequestHandler = async ({ params }) => {
 
 export const post: RequestHandler = async (event) => {
   const data = await event.request.json()
+  const { userId } = await getUserDetails(event)
   try {
-    const category = await upsertProduct({
-      ...data,
-    })
+    const category = await upsertProduct(
+      {
+        ...data,
+      },
+      userId
+    )
     return {
       body: category,
     }

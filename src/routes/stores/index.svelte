@@ -1,10 +1,21 @@
+<script context="module" lang="ts">
+  import trpc from '$lib/trpc'
+  import type { Load } from '@sveltejs/kit'
+
+  export const load: Load = async ({ fetch }) => {
+    const trpcClient = trpc(fetch)
+    const stores = await trpcClient.query('user:stores')
+    return { props: { stores } }
+  }
+</script>
+
 <script lang="ts">
   import { pageSubtitle } from '$lib'
 
   import Image from '$lib/components/caravaggio/Image.svelte'
   import type { Store } from '$lib/db'
 
-  export let stores: Store[]
+  export let stores: Store[] = []
 
   $pageSubtitle = 'Stores'
 </script>

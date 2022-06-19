@@ -99,13 +99,21 @@ export const getProductsByStore = async ({
   })
 
 export const upsertProduct = async (
-  product: Partial<Product>
+  product: Partial<Product>,
+  userId: string
 ): Promise<Product> => {
   let c: Product
   console.log(product.modifiers)
   if (product.id) {
-    c = await getProductBySlug({ slug: product.slug, storeId: product.storeId })
-    if (!c && !product.id) {
+    c = await prisma.product.findFirst({
+      where: {
+        id: product.id,
+        store: {
+          userId,
+        },
+      },
+    })
+    if (!c) {
       throw new Error('not allowed')
     }
     await prisma.product.update({

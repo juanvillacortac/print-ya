@@ -16,6 +16,7 @@
   import { fade, scale } from 'svelte/transition'
   import StripeLogo from '$lib/components/__StripeLogo.svelte'
   import PaypalLogo from '$lib/components/__PaypalLogo.svelte'
+  import trpc from '$lib/trpc'
 
   let store = $page.stuff.store as Store
 
@@ -36,8 +37,8 @@
   const submit = async () => {
     saving = true
     try {
-      const data = await post<Store>('/api/stores', store)
-      console.log(data)
+      const data = await trpc().mutation('stores:upsert', store)
+
       if (data.slug !== $page.stuff.store.slug) {
         goto(`/stores/${data.slug}/settings`)
       } else {

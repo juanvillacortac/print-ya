@@ -1,13 +1,11 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
-  import { get } from '$lib/api'
-  import type { StripedProduct } from '$lib/db/products'
+  import trpc from '$lib/trpc'
 
   export const load: Load = async ({ params, fetch, stuff }) => {
-    const data = await get<StripedProduct[]>(
-      `/api/stores/${params.slug}/products`,
-      { fetch }
-    )
+    const data = await trpc(fetch).query('products:list', {
+      storeSlug: params.slug,
+    })
     return {
       stuff: {
         ...stuff,

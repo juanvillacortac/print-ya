@@ -39,6 +39,7 @@
   import { fade, scale, slide } from 'svelte/transition'
   import { squareratio } from '$lib/actions/aspectratio'
   import Image from '$lib/components/caravaggio/Image.svelte'
+  import trpc from '$lib/trpc'
 
   let mounted = false
   let stripe: Stripe
@@ -58,8 +59,12 @@
       products = {}
       return
     }
-    const promises = [...new Set($bag.map((p) => p.productSlug))].map((p) =>
-      get<Product>(`/api/stores/${$page.stuff.store?.slug}/products/${p}`)
+    const promises = [...new Set($bag.map((p) => p.productSlug))].map(
+      (productSlug) =>
+        trpc().query('products:getBySlug', {
+          productSlug,
+          storeSlug: $page.stuff.store?.slug,
+        })
     )
     Promise.all(promises).then(
       (p) =>

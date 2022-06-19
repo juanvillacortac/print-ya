@@ -1,6 +1,6 @@
 <script lang="ts">
   import 'bytemd/dist/index.css'
-  import { page } from '$app/stores'
+  import { page, session } from '$app/stores'
   import type { Product, ProductModifier, Store } from '$lib/db'
   const store = $page.stuff.store as Store
   import { post } from '$lib/api'
@@ -15,6 +15,7 @@
   import ProductMockupImagesEditor from './ProductMockupImagesEditor.svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import { getAbsoluteURL } from '$lib/utils/host'
+  import trpc from '$lib/trpc'
 
   export let product: Partial<Product> = {
     price: 0.01,
@@ -123,14 +124,21 @@
     }
     try {
       saving = true
-      const data = await post<Product, Partial<Product>>(
-        `/api/stores/${store.slug}/products`,
-        {
+      const data = await trpc().mutation('products:upsert', {
+        storeSlug: store.slug,
+        data: {
           ...product,
           modifiers,
-          storeId: store.id,
-        }
-      )
+        },
+      })
+      // const data = await post<Product, Partial<Product>>(
+      //   `/api/stores/${store.slug}/products`,
+      //   {
+      //     ...product,
+      //     modifiers,
+      //     storeId: store.id,
+      //   }
+      // )
       notifications.send(
         `Product ${product.id ? 'updated' : 'created'}`,
         'default',
