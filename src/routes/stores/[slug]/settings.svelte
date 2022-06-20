@@ -4,7 +4,6 @@
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
   import { squareratio } from '$lib/actions/aspectratio'
-  import { post } from '$lib/api'
   import Image from '$lib/components/caravaggio/Image.svelte'
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
   import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
@@ -42,7 +41,7 @@
       if (data.slug !== $page.stuff.store!.slug) {
         goto(`/stores/${data.slug}/settings`)
       } else {
-        await invalidate(`/`)
+        await invalidate(window.location.href)
       }
     } catch (err) {
       console.log(err.message, err.error)
