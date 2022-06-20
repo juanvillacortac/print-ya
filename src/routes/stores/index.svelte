@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import trpc from '$lib/trpc'
+  import trpc from '$lib/trpc/client'
   import type { Load } from '@sveltejs/kit'
 
   export const load: Load = async ({ fetch }) => {

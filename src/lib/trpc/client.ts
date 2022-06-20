@@ -1,9 +1,9 @@
 import { browser } from '$app/env'
-import type { Router } from '$lib/__server/trpc'
+import type { Router } from '$lib/trpc/server'
 import * as trpc from '@trpc/client'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 import trpcTransformer from 'trpc-transformer'
-import { getAbsoluteURL } from './utils/host'
+import { getAbsoluteURL } from '../utils/host'
 
 const url = browser ? '/api/trpc' : getAbsoluteURL({ path: '/api/trpc' })
 

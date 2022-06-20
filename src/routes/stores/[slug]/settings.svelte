@@ -16,7 +16,7 @@
   import { fade, scale } from 'svelte/transition'
   import StripeLogo from '$lib/components/__StripeLogo.svelte'
   import PaypalLogo from '$lib/components/__PaypalLogo.svelte'
-  import trpc from '$lib/trpc'
+  import trpc from '$lib/trpc/client'
 
   let store = $page.stuff.store as Store
 
@@ -42,7 +42,7 @@
       if (data.slug !== $page.stuff.store.slug) {
         goto(`/stores/${data.slug}/settings`)
       } else {
-        await invalidate(`/api/stores/${data.slug}`)
+        await invalidate(`/`)
       }
     } catch (err) {
       console.log(err.message, err.error)

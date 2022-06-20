@@ -30,6 +30,8 @@
   import type { Product, Store } from '$lib/db'
   import type { TemplateSource } from '$lib/compiler'
   import { squareratio } from '$lib/actions/aspectratio'
+  import client from '$lib/trpc/client'
+  import { onMount } from 'svelte'
 
   export let data: string
 
@@ -49,7 +51,7 @@
   let mode: 'editor' | 'settings' | string = 'editor'
 
   const editor = writable(
-    (($page.stuff.product as Product)?.templateDraft as TemplateSource) || {
+    { ...($page.stuff.product?.templateDraft as any) } || {
       name: 'Template test',
       html: '',
       css: '',
@@ -80,10 +82,17 @@
   const persist = async () => {
     try {
       saving = true
-      await post(`/api/stores/${store.slug}/products`, {
-        ...product,
-        templateDraft: $editor,
+      await client().mutation('products:upsert', {
+        storeSlug: store.slug,
+        data: {
+          ...product,
+          templateDraft: $editor,
+        },
       })
+      // await post(`/api/stores/${store.slug}/products`, {
+      //   ...product,
+      //   templateDraft: $editor,
+      // })
       saved = true
     } catch (err) {
       notifications.send(err.message, 'default', 3000)
@@ -95,10 +104,13 @@
   const toProduction = async () => {
     try {
       saving = true
-      await post(`/api/stores/${store.slug}/products`, {
-        ...product,
-        template: $editor,
-        templateDraft: $editor,
+      await client().mutation('products:upsert', {
+        storeSlug: store.slug,
+        data: {
+          ...product,
+          template: $editor,
+          templateDraft: $editor,
+        },
       })
       notifications.send('Template published', 'default', 3000)
     } catch (err) {
@@ -110,20 +122,21 @@
 
   let timeout: NodeJS.Timeout
 
-  $: if ($editor) {
-    if (
-      !(
-        !browser ||
-        JSON.stringify(product?.templateDraft) === JSON.stringify($editor)
-      )
-    ) {
-      saved = false
-      if (timeout) {
-        clearTimeout(timeout)
+  onMount(() => {
+    const unsubscribe = editor.subscribe((editor) => {
+      console.log(editor, product.templateDraft)
+      if (JSON.stringify(product?.templateDraft) !== JSON.stringify(editor)) {
+        saved = false
+        if (timeout) {
+          clearTimeout(timeout)
+        }
+        timeout = setTimeout(persist, 2000)
       }
-      timeout = setTimeout(persist, 2000)
+    })
+    return () => {
+      unsubscribe()
     }
-  }
+  })
 
   let saved = false
 
@@ -254,23 +267,6 @@
               <svelte:component this={m.icon} />
             </button>
           {/each}
-          <button
-            on:click={() => {
-              navigator.clipboard.writeText(
-                `${window.location.protocol}//${window.location.host}${
-                  window.location.pathname
-                }?data=${window.encodeURIComponent(
-                  window.btoa(JSON.stringify($editor))
-                )}`
-              )
-              notifications.send('Copied to clipboard!', 'default', 1000)
-            }}
-            title="Copy share link"
-            class="flex hover:text-black dark:hover:text-white"
-            use:tooltip
-          >
-            <Share24 />
-          </button>
           <button
             on:click={toProduction}
             title="Save as public template"

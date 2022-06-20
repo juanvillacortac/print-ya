@@ -24,7 +24,7 @@
   import type { StripedProduct } from '$lib/db'
   import HomeIntro from '$lib/__storefront/home/HomeIntro.svelte'
   import { Viewport } from '$lib'
-  import trpc from '$lib/trpc'
+  import trpc from '$lib/trpc/client'
 
   export let data: any
 

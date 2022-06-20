@@ -35,33 +35,45 @@ export const getProductBySlug = ({
   slug: string
   storeId: string
 }): Promise<Product> =>
-  prisma.product.findFirst({
-    where: {
-      slug,
-      storeId,
-    },
-    include: {
-      storeCategory: true,
-      modifiers: {
-        where: {
-          active: true,
-        },
-        orderBy: {
-          ordinal: 'asc',
-        },
-        include: {
-          items: {
-            where: {
-              active: true,
-            },
-            orderBy: {
-              ordinal: 'asc',
+  prisma.product
+    .findFirst({
+      where: {
+        slug,
+        storeId,
+      },
+      include: {
+        storeCategory: true,
+        modifiers: {
+          where: {
+            active: true,
+          },
+          orderBy: {
+            ordinal: 'asc',
+          },
+          include: {
+            items: {
+              where: {
+                active: true,
+              },
+              orderBy: {
+                ordinal: 'asc',
+              },
             },
           },
         },
       },
-    },
-  })
+    })
+    .then((data) => {
+      data.modifiers = data.modifiers.map((m) => {
+        delete m.ordinal
+        m.items = m.items.map((i) => {
+          delete i.ordinal
+          return i
+        })
+        return m
+      })
+      return data
+    })
 
 export const getProductsByStore = async ({
   storeId,

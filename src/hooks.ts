@@ -5,7 +5,7 @@ import cookie from 'cookie'
 import { appRoutes, getLayoutType } from '$lib/utils/layout'
 import { getDefaultHost } from '$lib/utils/host'
 
-import { router } from '$lib/__server/trpc'
+import { router } from '$lib/trpc/server'
 import { createTRPCHandle } from 'trpc-sveltekit'
 import { sequence } from '@sveltejs/kit/hooks'
 

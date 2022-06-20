@@ -1,6 +1,6 @@
 import * as db from '$lib/db'
 import * as trpc from '@trpc/server'
-import type { tRPCContext } from './trpc'
+import type { tRPCContext } from '.'
 
 const mutations = trpc.router<tRPCContext>().mutation('upsert', {
   input: (input: { storeSlug: string; data: Partial<db.Product> }) => input,

@@ -116,7 +116,6 @@ const createBag = (): BagStore => {
         ])
       ),
     }
-    console.log(map)
     const obj = { productSlug: product.slug, modifiers: { ...map } }
     const flattenObject = (ob) => {
       let toReturn = {}
@@ -141,7 +140,6 @@ const createBag = (): BagStore => {
           .flat()
       ),
     ]
-    console.log(keys)
     console.log(JSON.stringify(obj, keys.sort()))
     return JSON.stringify(obj, keys.sort())
   }

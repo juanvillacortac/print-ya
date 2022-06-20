@@ -39,7 +39,7 @@
   import { fade, scale, slide } from 'svelte/transition'
   import { squareratio } from '$lib/actions/aspectratio'
   import Image from '$lib/components/caravaggio/Image.svelte'
-  import trpc from '$lib/trpc'
+  import trpc from '$lib/trpc/client'
 
   let mounted = false
   let stripe: Stripe

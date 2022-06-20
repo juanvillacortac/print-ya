@@ -2,7 +2,7 @@
   import type { Load } from '@sveltejs/kit'
   import { get } from '$lib/api'
   import type { Product } from '$lib/db'
-  import trpc from '$lib/trpc'
+  import trpc from '$lib/trpc/client'
 
   export const load: Load = async ({ params, fetch, stuff }) => {
     const data = await trpc(fetch).query('products:getBySlug', {

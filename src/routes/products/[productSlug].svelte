@@ -58,7 +58,7 @@
   } from '$lib/utils/modifiers'
   import { browser } from '$app/env'
   import { ShoppingBag16 } from 'carbon-icons-svelte'
-  import trpc from '$lib/trpc'
+  import trpc from '$lib/trpc/client'
   let quantity = product.minQuantity || 1
 
   $pageSubtitle = product?.name

@@ -15,7 +15,7 @@
   import ProductMockupImagesEditor from './ProductMockupImagesEditor.svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import { getAbsoluteURL } from '$lib/utils/host'
-  import trpc from '$lib/trpc'
+  import trpc from '$lib/trpc/client'
 
   export let product: Partial<Product> = {
     price: 0.01,
@@ -104,16 +104,25 @@
 
   const duplicate = async () => {
     if (validate()) {
-      const data = await post<Product, Partial<Product>>(
-        `/api/stores/${store.slug}/products`,
-        {
+      const data = await trpc().mutation('products:upsert', {
+        storeSlug: store.slug,
+        data: {
           ...product,
           id: '',
           public: false,
           modifiers,
-          storeId: store.id,
-        }
-      )
+        },
+      })
+      // const data = await post<Product, Partial<Product>>(
+      //   `/api/stores/${store.slug}/products`,
+      //   {
+      //     ...product,
+      //     id: '',
+      //     public: false,
+      //     modifiers,
+      //     storeId: store.id,
+      //   }
+      // )
       goto(`/stores/${store.slug}/products/${data.slug}`)
     }
   }

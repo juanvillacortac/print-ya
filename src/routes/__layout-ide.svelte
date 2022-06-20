@@ -2,19 +2,27 @@
   import type { Load } from '@sveltejs/kit'
   import { get } from '$lib/api'
 
-  export const load: Load = async ({ params, fetch }) => {
-    const data = await get(`/api/stores/${params.slug}`, { fetch })
-    const product: Product = await get(
-      `/api/stores/${params.slug}/products/${params.productSlug}`,
-      { fetch }
+  export const load: Load = async ({ params, fetch, url }) => {
+    // const data = await get(`/api/stores/${params.slug}`, { fetch })
+    const store = await client(fetch, url.host).query(
+      'stores:getBySlug',
+      params.slug
     )
-    if (!data.store || !product || product.type !== 'template')
+    const product = await client(fetch, url.host).query('products:getBySlug', {
+      productSlug: params.productSlug,
+      storeSlug: params.slug,
+    })
+    // const product: Product = await get(
+    //   `/api/stores/${params.slug}/products/${params.productSlug}`,
+    //   { fetch }
+    // )
+    if (!store || !product || product.type !== 'template')
       return {
         status: 404,
       }
     return {
       stuff: {
-        ...data,
+        store,
         product,
       },
     }
@@ -36,6 +44,7 @@
   import { onDestroy } from 'svelte'
   import Toast from '$lib/components/Toast.svelte'
   import { invalidate } from '$app/navigation'
+  import client from '$lib/trpc/client'
 
   $: path = $page.url.pathname
 
@@ -55,7 +64,7 @@
 
   $: if (path && browser) {
     invalidate(
-      `/api/stores/${$page.params.slug}/products/${$page.params.productSlug}`
+      `/stores/${$page.params.slug}/products/${$page.params.productSlug}`
     )
   }
 
