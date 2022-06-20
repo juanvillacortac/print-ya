@@ -5,11 +5,9 @@ import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 import trpcTransformer from 'trpc-transformer'
 import { getAbsoluteURL } from '../utils/host'
 
-const url = browser ? '/api/trpc' : getAbsoluteURL({ path: '/api/trpc' })
-
 export default (loadFetch?: typeof fetch, host?: string) =>
   trpc.createTRPCClient<Router>({
-    url: getAbsoluteURL({ path: '/api/trpc', host }),
+    url: browser ? '/api/trpc' : getAbsoluteURL({ path: '/api/trpc', host }),
     transformer: trpcTransformer,
     ...(loadFetch && { fetch: loadFetch }),
   })
