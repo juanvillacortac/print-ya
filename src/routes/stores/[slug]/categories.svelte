@@ -6,6 +6,7 @@
   import { post } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
   import type { Store } from '$lib/db'
+  import trpc from '$lib/trpc/client'
   import type { StoreCategory } from '@prisma/client'
 
   let store: Store
@@ -21,19 +22,16 @@
 
   const saveCategory = async () => {
     try {
-      const _ = await post<StoreCategory>(
-        `/api/stores/${store.slug}/categories`,
-        {
-          ...selected,
-          storeId: store.id,
-        }
-      )
+      await trpc().mutation('stores:upsertCategory', {
+        ...selected,
+        storeId: store.id,
+      })
       notifications.send(
         'Category ' + (selected.id ? 'updated' : 'created'),
         'default',
         3000
       )
-      await invalidate(`/api/stores/${store.slug}`)
+      await invalidate($page.url.pathname)
     } catch ({ message }) {
       notifications.send(message, 'default', 3000)
     }

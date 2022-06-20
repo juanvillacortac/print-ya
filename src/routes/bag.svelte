@@ -59,9 +59,10 @@
       products = {}
       return
     }
+    let client = trpc()
     const promises = [...new Set($bag.map((p) => p.productSlug))].map(
       (productSlug) =>
-        trpc().query('products:getBySlug', {
+        client.query('products:getBySlug', {
           productSlug,
           storeSlug: $page.stuff.store?.slug!,
         })

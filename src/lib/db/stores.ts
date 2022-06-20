@@ -77,7 +77,7 @@ export const getStoreBySubdomain = ({
   })
 
 export const upsertStoreCategory = async (
-  category: StoreCategory
+  category: Omit<StoreCategory, 'slug'>
 ): Promise<StoreCategory> => {
   let c: StoreCategory | null
   if (category.id) {

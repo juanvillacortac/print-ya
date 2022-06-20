@@ -124,6 +124,7 @@
     "svelte-splitpanes": "^0.6.3",
     "svelte-stripe": "^0.0.17",
     "three": "^0.135.0",
+    "tozod": "^3.0.0",
     "trpc-sveltekit": "^2.0.2",
     "trpc-transformer": "^2.0.2",
     "typewriter-document": "^0.6.50",
