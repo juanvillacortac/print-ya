@@ -15,9 +15,9 @@
     Subtract16,
   } from 'carbon-icons-svelte'
 
-  export const load: Load = async ({ params, fetch, stuff }) => {
+  export const load: Load = async ({ params, fetch, stuff, url }) => {
     const store = stuff.store
-    const data = await trpc(fetch).query('products:getBySlug', {
+    const data = await trpc(fetch, url.host).query('products:getBySlug', {
       storeSlug: store.slug,
       productSlug: params.productSlug,
     })

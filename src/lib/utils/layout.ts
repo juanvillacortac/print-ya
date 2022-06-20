@@ -44,7 +44,7 @@ export const fetchLayoutData = async ({
   fetch,
   session,
 }: LoadInput): Promise<{ response?: LayoutData; notFound?: boolean }> => {
-  const client = trpc(fetch)
+  const client = trpc(fetch, url.host)
   switch (session.layout) {
     case 'store':
       try {

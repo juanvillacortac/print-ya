@@ -2,11 +2,14 @@
   import type { Load } from '@sveltejs/kit'
   import { get } from '$lib/api'
 
-  export const load: Load = async ({ fetch, stuff }) => {
-    const data = await get<StripedProduct[]>(
-      `/api/stores/${stuff.store?.slug}/products`,
-      { fetch }
-    )
+  export const load: Load = async ({ fetch, stuff, url }) => {
+    const data = await trpc(fetch, url.host).query('products:list', {
+      storeSlug: stuff.store?.slug,
+    })
+    // const data = await get<StripedProduct[]>(
+    //   `/api/stores/${stuff.store?.slug}/products`,
+    //   { fetch }
+    // )
     return {
       props: {
         data: {
@@ -21,6 +24,7 @@
   import type { StripedProduct } from '$lib/db'
   import HomeIntro from '$lib/__storefront/home/HomeIntro.svelte'
   import { Viewport } from '$lib'
+  import trpc from '$lib/trpc'
 
   export let data: any
 
