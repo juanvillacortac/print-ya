@@ -1,8 +1,27 @@
+<script lang="ts" context="module">
+  import type { Load } from '@sveltejs/kit'
+  import trpc from '$lib/trpc/client'
+
+  export const load: Load = async ({ fetch, session }) => {
+    if (session.userId) {
+      const user = await trpc(fetch).query('user:whoami')
+      if (user) {
+        return {
+          status: 302,
+          redirect: '/',
+        }
+      } else {
+        await trpc(fetch).mutation('user:logout')
+      }
+    }
+    return {}
+  }
+</script>
+
 <script lang="ts">
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
   import { notifications } from '$lib/components/notifications'
-  import trpc from '$lib/trpc/client'
   import { onMount } from 'svelte'
 
   let loading = false

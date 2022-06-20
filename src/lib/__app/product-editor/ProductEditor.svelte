@@ -3,7 +3,6 @@
   import { page, session } from '$app/stores'
   import type { Product, ProductModifier, Store } from '$lib/db'
   const store = $page.stuff.store as Store
-  import { post } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
   import { goto } from '$app/navigation'
   import { Launch16 } from 'carbon-icons-svelte'
@@ -113,16 +112,6 @@
           modifiers,
         },
       })
-      // const data = await post<Product, Partial<Product>>(
-      //   `/api/stores/${store.slug}/products`,
-      //   {
-      //     ...product,
-      //     id: '',
-      //     public: false,
-      //     modifiers,
-      //     storeId: store.id,
-      //   }
-      // )
       goto(`/stores/${store.slug}/products/${data!.slug!}`)
     }
   }
@@ -140,14 +129,6 @@
           modifiers,
         },
       })
-      // const data = await post<Product, Partial<Product>>(
-      //   `/api/stores/${store.slug}/products`,
-      //   {
-      //     ...product,
-      //     modifiers,
-      //     storeId: store.id,
-      //   }
-      // )
       notifications.send(
         `Product ${product.id ? 'updated' : 'created'}`,
         'default',

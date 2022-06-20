@@ -53,6 +53,12 @@ export default trpc
       }
     },
   })
+  .query('whoami', {
+    resolve: async ({ ctx }) => {
+      const { userId } = await db.getUserDetails(ctx.event)
+      return await db.getUser({ userId: userId || '' })
+    },
+  })
   .query('stores', {
     resolve: async ({ ctx }) => {
       const { userId } = await db.getUserDetails(ctx.event)
