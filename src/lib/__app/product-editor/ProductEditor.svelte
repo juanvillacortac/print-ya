@@ -154,7 +154,7 @@
         3000
       )
       if (!product.id) {
-        goto(`/stores/${store.slug}/products`)
+        goto(`/stores/${store.slug}/products/${data?.slug}`)
         return
       }
       title = data!.name
