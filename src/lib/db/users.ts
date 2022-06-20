@@ -31,10 +31,10 @@ export async function login({
     }
   }
 
-  let uid: string
+  let uid: string | null = null
 
   if (userFound) {
-    const passwordMatch = await bcrypt.compare(password, userFound.password)
+    const passwordMatch = await bcrypt.compare(password, userFound.password!)
     if (!passwordMatch) {
       throw {
         error: 'Wrong password or email address.',
@@ -96,7 +96,7 @@ export async function login({
 export const getUserDetails = async (
   event: RequestEvent
 ): Promise<{
-  userId: string
+  userId: string | null
   status: number
   body: { message: string }
 }> => {
@@ -113,6 +113,18 @@ export const getUserDetails = async (
   return payload
 }
 
-export async function getUser({ userId }: { userId: string }): Promise<User> {
-  return await prisma.user.findUnique({ where: { id: userId } })
+export async function getUser({
+  userId,
+}: {
+  userId: string
+}): Promise<Omit<User, 'password'> | null> {
+  return await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      email: true,
+      createdAt: true,
+      id: true,
+      updatedAt: true,
+    },
+  })
 }

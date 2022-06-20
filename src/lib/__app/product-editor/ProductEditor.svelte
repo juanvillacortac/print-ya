@@ -45,7 +45,7 @@
       return false
     }
     for (let m of modifiers?.filter((m) => m.active)) {
-      const items = m.items?.filter((i) => i.active)
+      const items = m.items!.filter((i) => i.active)
       if (!m.name) {
         alert('Modifiers should have a title')
         return false
@@ -123,7 +123,7 @@
       //     storeId: store.id,
       //   }
       // )
-      goto(`/stores/${store.slug}/products/${data.slug}`)
+      goto(`/stores/${store.slug}/products/${data!.slug!}`)
     }
   }
 
@@ -157,11 +157,11 @@
         goto(`/stores/${store.slug}/products`)
         return
       }
-      title = data.name
-      modifiers = data.modifiers.map((m) => ({
+      title = data!.name
+      modifiers = data!.modifiers!.map((m) => ({
         ...m,
         internalId: (Math.random() + 1).toString(36).substring(7),
-        items: m.items.map((i) => ({
+        items: m.items!.map((i) => ({
           ...i,
           internalId: (Math.random() + 1).toString(36).substring(7),
         })),
@@ -174,7 +174,7 @@
   }
 
   let modifiers: (ProductModifier & { internalId?: string })[] = [
-    ...(product?.modifiers || []),
+    ...(product?.modifiers! || []),
   ]
 </script>
 

@@ -1,10 +1,9 @@
 <script lang="ts" context="module">
   import type { Load } from '@sveltejs/kit'
-  import { get } from '$lib/api'
 
-  export const load: Load = async ({ fetch, stuff, url }) => {
-    const data = await trpc(fetch, url.host).query('products:list', {
-      storeSlug: stuff.store?.slug,
+  export const load: Load = async ({ fetch, stuff }) => {
+    const data = await trpc(fetch).query('products:list', {
+      storeSlug: stuff.store?.slug || '',
     })
     // const data = await get<StripedProduct[]>(
     //   `/api/stores/${stuff.store?.slug}/products`,

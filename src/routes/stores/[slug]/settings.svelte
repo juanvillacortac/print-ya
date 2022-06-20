@@ -39,7 +39,7 @@
     try {
       const data = await trpc().mutation('stores:upsert', store)
 
-      if (data.slug !== $page.stuff.store.slug) {
+      if (data.slug !== $page.stuff.store!.slug) {
         goto(`/stores/${data.slug}/settings`)
       } else {
         await invalidate(`/`)
@@ -66,9 +66,9 @@
     const { url } = await uploadFile({
       file,
       bucket: 'assets',
-      path: `${$page.stuff.store.slug}`,
+      path: `${$page.stuff.store!.slug}`,
     })
-    const optimizedUrl = urlBuilder(url, options)
+    const optimizedUrl = urlBuilder(url || '', options)
 
     const _ = await loadImage(optimizedUrl)
 

@@ -74,14 +74,14 @@
       const { url, path } = await uploadFile({
         file,
         bucket: 'assets',
-        path: `${$page.stuff.store.slug}/products/${product.slug}/mockups`,
+        path: `${$page.stuff.store!.slug}/products/${product.slug}/mockups`,
       })
 
-      const optimizedUrl = urlBuilder(url, options)
+      const optimizedUrl = urlBuilder(url || '', options)
 
       const _ = await loadImage(optimizedUrl)
 
-      images.update((img) => [...img, { path, url }])
+      images.update((img) => [...img, { path, url: url || '' }])
       expanded = true
     } catch (error) {
       alert(error.message)
@@ -107,7 +107,7 @@
     product.meta.mockups = $images
   }
 
-  let hovering: number
+  let hovering: number | null
 
   $: drop = (event, target) => {
     event.dataTransfer.dropEffect = 'move'

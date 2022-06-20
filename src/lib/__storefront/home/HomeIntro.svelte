@@ -37,7 +37,7 @@
           </a>
         </div>
         <div class="flex flex-col h-full space-y-2 p-2">
-          {#each store.categories as category}
+          {#each store.categories || [] as category}
             <a
               href="/stores/{store.slug}/preview/products"
               class="flex space-x-2 text-xs hover:underline"
@@ -98,9 +98,9 @@
                 </h4>
                 <div class="flex justify-between items-end">
                   <a
-                    href="/products?category={product.storeCategory.slug}"
+                    href="/products?category={product.storeCategory?.slug}"
                     class="text-xs text-blue-500 hover:underline"
-                    >{product.storeCategory.name}</a
+                    >{product.storeCategory?.name}</a
                   >
                 </div>
               </div>

@@ -12,7 +12,10 @@ export function ErrorHandler(e: {
   status?: number
   name?: string
   error?: string
-}): { status: number; body: { message: string; error: string } } {
+}): {
+  status: number
+  body: { message: string; error: string | null | undefined }
+} {
   if (e && e instanceof Error) {
     e = new Error(e.toString())
   }

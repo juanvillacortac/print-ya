@@ -36,7 +36,7 @@
 
   export let title = ''
   export let modelValue = ''
-  let divEl: HTMLDivElement = null
+  let divEl: HTMLDivElement | null = null
 
   let view: EditorView | null = null
   let state: EditorState | null = null
@@ -64,7 +64,7 @@
         } catch {}
         break
     }
-    view.dispatch({
+    view?.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: str },
     })
     notifications.send('Document formated', 'default', 1000)

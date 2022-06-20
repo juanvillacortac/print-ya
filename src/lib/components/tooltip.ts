@@ -5,12 +5,12 @@ export function tooltip(
   element: HTMLElement,
   { show = true }: { show?: boolean } = { show: true }
 ) {
-  let title: string
+  let title: string = ''
   let tooltipComponent
   function mouseEnter(event: MouseEvent) {
     // NOTE: remove the `title` attribute, to prevent showing the default browser tooltip
     // remember to set it back on `mouseleave`
-    title = element.getAttribute('title')
+    title = element.getAttribute('title') || ''
     element.removeAttribute('title')
 
     tooltipComponent = new Tooltip({

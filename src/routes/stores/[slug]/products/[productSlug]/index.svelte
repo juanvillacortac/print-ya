@@ -5,7 +5,9 @@
   import ProductEditor from '$lib/__app/product-editor/ProductEditor.svelte'
 
   let product = $page.stuff.product
-  $pageSubtitle = product.name
+  $pageSubtitle = product?.name
 </script>
 
-<ProductEditor {product} />
+{#if product}
+  <ProductEditor {product} />
+{/if}

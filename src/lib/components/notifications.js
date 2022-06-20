@@ -4,6 +4,7 @@ function createNotificationStore() {
   const _notifications = writable([])
 
   function send(message, type = 'default', timeout) {
+    // @ts-ignore
     _notifications.update((state) => {
       return [...state, { id: id(), type, message, timeout }]
     })
@@ -19,6 +20,7 @@ function createNotificationStore() {
           state.shift()
           return state
         })
+        // @ts-ignore
       }, $_notifications[0].timeout)
       return () => {
         clearTimeout(timer)

@@ -10,7 +10,7 @@
 
   let store: Store
   $: store = $page.stuff.store as Store
-  $: categories = store.categories
+  $: categories = store.categories || []
 
   let selected: StoreCategory = {
     id: '',

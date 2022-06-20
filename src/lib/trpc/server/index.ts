@@ -13,9 +13,9 @@ export type tRPCContext = {
 
 export const router = trpc
   .router<tRPCContext>()
-  .transformer(trpcTransformer)
   .merge('user:', users)
   .merge('stores:', stores)
   .merge('products:', products)
+  .transformer(trpcTransformer)
 
-export type Router = typeof router
+export type tRPCRouter = typeof router

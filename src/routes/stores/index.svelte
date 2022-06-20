@@ -36,7 +36,7 @@
       sveltekit:prefetch
     >
       <Image
-        src={store.favicon}
+        src={store.favicon || ''}
         options={{
           q: 100,
         }}

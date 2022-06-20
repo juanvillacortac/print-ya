@@ -26,7 +26,7 @@
 
   export let modifiers: (Omit<ProductModifier, 'items'> & {
     internalId?: string
-    items?: (Unarray<ProductModifier['items']> & { internalId?: string })[]
+    items: (Unarray<ProductModifier['items']> & { internalId?: string })[]
   })[] = []
 
   const modifiersStore = writable(modifiers)
@@ -36,7 +36,7 @@
       modifiers.map((m) => ({
         ...m,
         internalId: (Math.random() + 1).toString(36).substring(7),
-        items: m.items.map((i) => ({
+        items: m.items!.map((i) => ({
           ...i,
           internalId: (Math.random() + 1).toString(36).substring(7),
           meta: i.meta || {},
@@ -58,7 +58,7 @@
       {
         internalId: newId,
         id: '',
-        productId: undefined,
+        productId: null,
         active: true,
         name: '',
         type: 'select',
@@ -97,7 +97,7 @@
       ]
       return modifiers
     })
-    expanded = $modifiersStore[idx].id || $modifiersStore[idx].internalId
+    expanded = $modifiersStore[idx].id || $modifiersStore[idx].internalId!
   }
 
   const modifierTypes = [
@@ -125,7 +125,6 @@
     {
       type: 'toggle',
       name: 'Toggle',
-      tree: false,
       embeddable: true,
       icon: CheckboxChecked16,
     },
@@ -152,9 +151,9 @@
     }
   }
 
-  let expanded: string = ''
+  let expanded: string | null | undefined = ''
   let showing = false
-  let hovering: number
+  let hovering: number | null
 
   $: drop = (event, target) => {
     event.dataTransfer.dropEffect = 'move'
@@ -257,7 +256,7 @@
                     <svelte:component this={mType.icon} />
                   </div>
                 {/if}
-                <span class="font-bold text-xs">{mType.name}</span>
+                <span class="font-bold text-xs">{mType?.name}</span>
               </div>
               <div class="flex space-x-4 items-center">
                 {#if modifierTypes.find((t) => t.type == m.type)?.tree}
@@ -307,7 +306,7 @@
                   </select>
                 </label>
               </div>
-              {#if modifierTypes.find((t) => t.type === m.type).embeddable}
+              {#if modifierTypes?.find((t) => t.type === m.type)?.embeddable}
                 <div class="flex flex-col w-full">
                   <label class="flex flex-col space-y-2">
                     <span class="font-bold text-xs">Template accessor</span>

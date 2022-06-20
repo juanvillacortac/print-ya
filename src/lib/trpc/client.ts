@@ -1,28 +1,31 @@
+import type { tRPCRouter } from '$lib/trpc/server'
 import { browser } from '$app/env'
-import type { Router } from '$lib/trpc/server'
-import * as trpc from '@trpc/client'
+import { createTRPCClient } from '@trpc/client'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 import trpcTransformer from 'trpc-transformer'
 import { getAbsoluteURL } from '../utils/host'
 
-export default (loadFetch?: typeof fetch, host?: string) =>
-  trpc.createTRPCClient<Router>({
-    url: browser ? '/api/trpc' : getAbsoluteURL({ path: '/api/trpc', host }),
+const trpc = (loadFetch?: typeof fetch) => {
+  return createTRPCClient<tRPCRouter>({
+    url: '/api/trpc',
     transformer: trpcTransformer,
     ...(loadFetch && { fetch: loadFetch }),
   })
+}
 
-type Query = keyof Router['_def']['queries']
-type Mutation = keyof Router['_def']['mutations']
+export default trpc
+
+type Query = keyof tRPCRouter['_def']['queries']
+type Mutation = keyof tRPCRouter['_def']['mutations']
 
 export type InferQueryOutput<RouteKey extends Query> = inferProcedureOutput<
-  Router['_def']['queries'][RouteKey]
+  tRPCRouter['_def']['queries'][RouteKey]
 >
 export type InferQueryInput<RouteKey extends Query> = inferProcedureInput<
-  Router['_def']['queries'][RouteKey]
+  tRPCRouter['_def']['queries'][RouteKey]
 >
 export type InferMutationOutput<RouteKey extends Mutation> =
-  inferProcedureOutput<Router['_def']['mutations'][RouteKey]>
+  inferProcedureOutput<tRPCRouter['_def']['mutations'][RouteKey]>
 export type InferMutationInput<RouteKey extends Mutation> = inferProcedureInput<
-  Router['_def']['mutations'][RouteKey]
+  tRPCRouter['_def']['mutations'][RouteKey]
 >

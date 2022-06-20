@@ -194,7 +194,7 @@
                 class="border rounded bg-light-100 border-blue-500 p-1 dark:bg-gray-100"
               >
                 <Image
-                  src={store.logo}
+                  src={store.logo || ''}
                   options={{
                     q: 100,
                   }}

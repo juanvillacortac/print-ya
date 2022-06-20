@@ -98,7 +98,7 @@ const trpc: Handle = async ({ event, resolve }) => {
       layout: event.locals.layout,
     }),
     responseMeta({ type, errors, ctx }) {
-      if (type === 'query' && ctx.layout === 'store' && errors.length === 0) {
+      if (type === 'query' && ctx?.layout === 'store' && errors.length === 0) {
         return {
           headers: {
             'cache-control': `s-maxage=1, stale-while-revalidate`,
@@ -116,7 +116,7 @@ export const handle = sequence(session, trpc)
 
 export const getSession: GetSession = (event) => ({
   layout: event.locals.layout,
-  userAgent: event.request.headers.get('user-agent'),
+  userAgent: event.request.headers.get('user-agent') || '',
   host: event.url.host,
   fullHost: `${event.url.protocol}//${event.url.host}`,
   ...event.locals.session.data,

@@ -22,7 +22,7 @@ export function search<T>(
   fields?: string[]
 ): T[] {
   try {
-    let c = []
+    let c: T[] = []
     if (test == undefined || test == null) {
       return c
     }
@@ -30,7 +30,7 @@ export function search<T>(
       const regex = new RegExp('\\b' + test, 'i')
       c = collection.filter(matcher(regex, fields))
     } else {
-      let found = []
+      let found: T[] = []
       test.forEach((t) => {
         const regex = new RegExp('\\b' + t + '\\b', 'i')
         found = [...found, ...collection.filter(matcher(regex, fields))]

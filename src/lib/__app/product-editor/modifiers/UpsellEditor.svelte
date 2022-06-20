@@ -26,7 +26,7 @@
 
   export let modifier: Omit<ProductModifier, 'items'> & {
     internalId?: string
-    items?: (Unarray<ProductModifier['items']> & { internalId?: string })[]
+    items: (Unarray<ProductModifier['items']> & { internalId?: string })[]
   }
 
   const options: CaravaggioOptions = {
@@ -42,16 +42,16 @@
   type Unarray<T> = T extends Array<infer U> ? U : T
 
   const items = writable(
-    modifier.items.map((i) => ({
+    modifier.items!.map((i) => ({
       ...i,
       internalId: (Math.random() + 1).toString(36).substring(7),
     }))
   )
 
   $: if ($items) {
-    if (modifier.items.length > $items.length) {
+    if (modifier.items!.length > $items.length) {
       $items.push({
-        ...modifier.items[modifier.items?.length - 1],
+        ...modifier.items![modifier.items!.length - 1],
         internalId: (Math.random() + 1).toString(36).substring(7),
       })
       $items = $items
@@ -62,7 +62,7 @@
   const deleteItem = (
     i: Pick<Unarray<typeof modifier['items']>, 'id' | 'internalId'>
   ) => {
-    const idx = modifier.items.findIndex((ii) =>
+    const idx = modifier.items!.findIndex((ii) =>
       i.id ? ii.id == i.id : ii.internalId == i.internalId
     )
     $items[idx].active = false
@@ -73,7 +73,7 @@
     }
   }
 
-  let hovering: number
+  let hovering: number | null | undefined
 
   $: drop = (event, target) => {
     event.dataTransfer.dropEffect = 'move'
@@ -124,10 +124,10 @@
       const { url, path } = await uploadFile({
         file,
         bucket: 'assets',
-        path: `${$page.stuff.store.slug}/upselling`,
+        path: `${$page.stuff.store!.slug}/upselling`,
       })
 
-      const optimizedUrl = urlBuilder(url, options)
+      const optimizedUrl = urlBuilder(url!, options)
 
       const _ = await loadImage(optimizedUrl)
 

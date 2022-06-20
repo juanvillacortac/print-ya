@@ -1,11 +1,8 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
 
-  export const load: Load = async ({ params, fetch, session, url }) => {
-    const store = await client(fetch, url.host).query(
-      'stores:getBySlug',
-      params.slug
-    )
+  export const load: Load = async ({ params, fetch, session }) => {
+    const store = await client(fetch).query('stores:getBySlug', params.slug)
     if (!store || store.userId !== session?.userId) {
       return {
         status: 404,

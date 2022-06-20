@@ -17,9 +17,9 @@ declare namespace App {
   }
   interface Stuff extends Record<string, unknown> {
     layout: import('$lib/utils/layout').LayoutType
-    store?: import('$lib/db').Store
-    product?: import('$lib/db').Product
-    products?: import('$lib/db').StripedProduct[]
+    store?: import('$lib/db').Store | null
+    product?: import('$lib/db').Product | null
+    products?: import('$lib/db').StripedProduct[] | null
   }
 }
 

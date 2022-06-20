@@ -12,7 +12,7 @@
   import { Add32 } from 'carbon-icons-svelte'
   import { flip } from 'svelte/animate'
   import { fly } from 'svelte/transition'
-  const store = $page.stuff.store as Store
+  const store = $page.stuff.store as Store | null
   const products = $page.stuff.products as StripedProduct[]
 
   let textSearch = ''
@@ -60,7 +60,7 @@
       bind:value={categoryId}
     >
       <option value="">All categories</option>
-      {#each store.categories as category}
+      {#each store?.categories || [] as category}
         <option value={category.id}>{category.name}</option>
       {/each}
     </select>
@@ -68,7 +68,7 @@
 </div>
 <div class="mx-auto grid gap-6 grid-cols-1 lg:w-9/10 lg:grid-cols-4">
   {#each filteredProducts as product (product.id)}
-    {@const href = `/stores/${store.slug}/products/${product.slug}`}
+    {@const href = `/stores/${store?.slug}/products/${product.slug}`}
     <div
       role="link"
       in:fly={{ y: 20 }}
@@ -107,10 +107,10 @@
       <div class="flex justify-between items-end">
         <a
           sveltekit:prefetch
-          href="/stores/{store.slug}/products?category={product.storeCategory
-            .slug}"
+          href="/stores/{store?.slug}/products?category={product.storeCategory
+            ?.slug}"
           class="text-xs text-blue-500 hover:underline"
-          >{product.storeCategory.name}</a
+          >{product.storeCategory?.name}</a
         >
       </div>
     </div>

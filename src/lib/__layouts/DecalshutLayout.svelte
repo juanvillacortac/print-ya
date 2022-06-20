@@ -29,7 +29,11 @@
   <title>{pageTitle}</title>
 </svelte:head>
 
-<Favicons favicon={store.favicon} themeColor="#000" titleName={store.name} />
+<Favicons
+  favicon={store.favicon || ''}
+  themeColor="#000"
+  titleName={store.name || ''}
+/>
 
 <div class="top-0 left-0 text-gray-700 relative dark:text-white">
   <div
@@ -41,7 +45,7 @@
       <div class="flex space-x-4 items-center">
         <a href="/" class="flex">
           <Image
-            src={store.logo}
+            src={store.logo || ''}
             class="rounded-sm p-px h-2rem lg:h-3rem dark:bg-white dark:bg-opacity-20"
             options={{
               o: 'png',
@@ -62,7 +66,7 @@
             class="bg-white border-b border-l-0 border-r-0 border-[rgb(113,3,3)]  leading-tight py-2  px-3 w-10rem appearance-none <sm:hidden !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
           >
             <option value="">All categories</option>
-            {#each store.categories as category}
+            {#each store.categories || [] as category}
               <option value={category.name}>{category.name}</option>
             {/each}
           </select>
@@ -115,7 +119,7 @@
     <div class="bg-[rgb(113,3,3)] text-white text-base w-full <lg:hidden">
       <div class="flex mx-auto space-x-4 text-white p-4 py-2 lg:w-9/10">
         <a href="./{store.name}">Home</a>
-        {#each store.categories.slice(0, 8) as category}
+        {#each store.categories?.slice(0, 8) || [] as category}
           <a href={category.name}>{category.name}</a>
         {/each}
         <a href="/faq">FAQ</a>

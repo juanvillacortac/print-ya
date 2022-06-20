@@ -6,6 +6,7 @@ export const post: RequestHandler = async ({ request }) => {
   const stripe = new Stripe(
     'sk_test_51I7RL6J2WplztltUOlXaPetKyPuxBVvltv3Sw1saE28kDZRUBHiabRq4x4CifO8szv41kI8ed5zYp6de3Be36tZ200UiY7OksM',
     {
+      // @ts-ignore
       apiVersion: null,
       typescript: true,
     }

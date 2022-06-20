@@ -20,11 +20,13 @@ export const getAbsoluteURL = ({
   const hostWithSubdomain =
     subdomain && !isGitpod ? `${subdomain}.${host}` : host
   let baseURL = isLocalhost(host)
-    ? `http://${hostWithSubdomain}`
+    ? isGitpod
+      ? `https://${hostWithSubdomain}`
+      : `http://${hostWithSubdomain}`
     : `https://${hostWithSubdomain}`
   try {
     const url = new URL(baseURL + path)
-    if (isGitpod) {
+    if (isGitpod && !path.includes('/api/trpc')) {
       url.searchParams.set('store', subdomain)
     }
     return url.toString()

@@ -7,7 +7,7 @@
 
   export let modifier: Omit<ProductModifier, 'items'> & {
     internalId?: string
-    items?: (Unarray<ProductModifier['items']> & {
+    items: (Unarray<ProductModifier['items']> & {
       internalId?: string
       meta: any
     })[]
@@ -47,7 +47,7 @@
     }
   }
 
-  let hovering: number
+  let hovering: number | null
 
   $: drop = (event, target) => {
     event.dataTransfer.dropEffect = 'move'

@@ -16,8 +16,8 @@
   } from 'carbon-icons-svelte'
 
   export const load: Load = async ({ params, fetch, stuff, url }) => {
-    const store = stuff.store
-    const data = await trpc(fetch, url.host).query('products:getBySlug', {
+    const store = stuff.store!
+    const data = await trpc(fetch).query('products:getBySlug', {
       storeSlug: store.slug,
       productSlug: params.productSlug,
     })
@@ -38,7 +38,6 @@
 </script>
 
 <script lang="ts">
-  export let product: Product
   import { bag, pageSubtitle } from '$lib'
   import { tooltip } from '$lib/components/tooltip'
   import { onMount } from 'svelte'
@@ -57,8 +56,10 @@
     type ModifiersMap,
   } from '$lib/utils/modifiers'
   import { browser } from '$app/env'
-  import { ShoppingBag16 } from 'carbon-icons-svelte'
   import trpc from '$lib/trpc/client'
+
+  export let product!: Product
+
   let quantity = product.minQuantity || 1
 
   $pageSubtitle = product?.name
@@ -68,9 +69,9 @@
   let fields = ''
 
   onMount(() => {
-    let defaultItems = product.modifiers
-      .filter((m) => m.type === 'color' || m.type === 'select')
-      .map((m) => [m.id, m.items[0]] as [string, ProductModifierItem])
+    let defaultItems = product!
+      .modifiers!.filter((m) => m.type === 'color' || m.type === 'select')
+      .map((m) => [m.id, m?.items![0]] as [string, ProductModifierItem])
     for (let [m, i] of defaultItems) {
       $modifiers[m] = {
         itemId: i.id,
@@ -83,16 +84,17 @@
     fields = getTemplateFieldsFromModifiers(product, $modifiers)
   }
 
-  $: fontsItems = product.modifiers
-    .filter((m) => m.type === 'font')
-    .map((m) => m.items)
+  $: productModifiers = product?.modifiers || []
+
+  $: fontsItems = productModifiers.filter!((m) => m.type === 'font')
+    .map((m) => m.items || [])
     .reduce((a, b) => [...a, ...b], [])
     .map((i) => ({
-      name: i?.name,
+      name: i?.name || '',
       url: i?.meta.web
-        ? i.meta.url
+        ? i?.meta?.url
         : `/api/fontface?name=${encodeURIComponent(
-            i.name
+            i?.name || ''
           )}&src=${encodeURIComponent(i.meta.url)}`,
     }))
 
@@ -111,7 +113,9 @@
   $: total = getTotalFromProductModifiers(product, $modifiers) * quantity
 
   let upsellingValues = Object.fromEntries(
-    product.modifiers.filter((m) => m.type === 'upsell').map((m) => [m.id, []])
+    product?.modifiers
+      ?.filter((m) => m?.type === 'upsell')
+      .map((m) => [m.id, [] as string[]]) || []
   )
 
   let inBag = false
@@ -157,7 +161,9 @@
       const { url } = await uploadFile({
         file,
         bucket: 'client-assets',
-        path: `${$page.stuff.store.slug}/products/${product.slug}/template-assets`,
+        path: `${$page.stuff.store!.slug}/products/${
+          product.slug
+        }/template-assets`,
       })
       $modifiers[m.id] = { ...$modifiers[m.id], value: url }
     } catch (error) {
@@ -178,8 +184,8 @@
   <div class="flex font-bold space-x-2 text-xs text-gray-400 uppercase">
     <a href="/" class="hover:underline">Home</a>
     <span>/</span>
-    <a href=".?category={product.storeCategory.slug}" class="hover:underline"
-      >{product.storeCategory.name}</a
+    <a href=".?category={product?.storeCategory?.slug}" class="hover:underline"
+      >{product.storeCategory?.name}</a
     >
   </div>
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
@@ -203,9 +209,9 @@
           </div>
         </div>
         <div class="flex flex-col space-y-4 w-full">
-          {#each product.modifiers as m}
+          {#each product?.modifiers || [] as m}
             {@const item = $modifiers[m.id]
-              ? m.items.find((i) => i.id === $modifiers[m.id]?.itemId)
+              ? m.items?.find((i) => i.id === $modifiers[m.id]?.itemId)
               : undefined}
             {@const itemName =
               m.type === 'font'
@@ -230,11 +236,11 @@
                   class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none !pr-8 lg:w-60 lg:w-7/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                   bind:value={$modifiers[m.id].itemId}
                   on:change={() =>
-                    ($modifiers[m.id].value = m.items.find(
+                    ($modifiers[m.id].value = m.items?.find(
                       (i) => i.id == $modifiers[m.id].itemId
                     )?.name)}
                 >
-                  {#each m.items as i}
+                  {#each m.items || [] as i}
                     <option value={i.id}
                       >{i.name}{#if i.cost}&nbsp;&nbsp;&ndash;&nbsp;&nbsp;<strong
                           >{i.cost < 0 ? '-' : ''}{!i.percentage
@@ -248,7 +254,7 @@
                 </select>
               {:else if m.type === 'upsell'}
                 <div class="w-full grid gap-4 grid-cols-2 lg:w-7/10">
-                  {#each m.items as i}
+                  {#each m.items?.filter((i) => i !== undefined) || [] as i}
                     <div
                       class="border rounded-lg w-full transform transition-transform duration-200 relative dark:border-gray-700 hover:scale-102"
                       style="will-change: transform"
@@ -313,7 +319,7 @@
                     use:tooltip
                     style="will-change: transform;"><CloseOutline24 /></button
                   >
-                  {#each m.items as i}
+                  {#each m.items || [] as i}
                     <button
                       class="rounded border-2 text-lg w-full p-1 transform transition-transform duration-200 dark:border-gray-600"
                       title={i.name}
@@ -407,7 +413,7 @@
                 />
               {:else if m.type === 'color'}
                 <div class="w-full grid gap-2 grid-cols-8 lg:w-7/10">
-                  {#each m.items as i}
+                  {#each m.items || [] as i}
                     <button
                       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
                       title={i?.meta?.name}

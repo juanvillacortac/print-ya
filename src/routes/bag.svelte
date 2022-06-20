@@ -42,7 +42,7 @@
   import trpc from '$lib/trpc/client'
 
   let mounted = false
-  let stripe: Stripe
+  let stripe: Stripe | null
   onMount(async () => {
     mounted = true
     stripe = await loadStripe(
@@ -63,7 +63,7 @@
       (productSlug) =>
         trpc().query('products:getBySlug', {
           productSlug,
-          storeSlug: $page.stuff.store?.slug,
+          storeSlug: $page.stuff.store?.slug!,
         })
     )
     Promise.all(promises).then(
@@ -71,7 +71,7 @@
         (products = p.reduce(
           (a, v) => ({
             ...a,
-            [v.slug]: v,
+            [v!.slug]: v,
           }),
           {}
         ))
@@ -82,10 +82,12 @@
     e: Event & {
       currentTarget?: EventTarget & HTMLInputElement
     },
-    p: Product,
+    p: Product | null,
     m: ModifiersMap
   ) => {
-    bag.setItem(p, m, Math.max(p?.minQuantity || 1, +e.currentTarget.value))
+    if (p) {
+      bag.setItem(p, m, Math.max(p?.minQuantity || 1, +e.currentTarget.value))
+    }
   }
 
   const countries = getCountries()
@@ -98,42 +100,40 @@
       'client-id':
         'AeFkK76hZkhCrPuLpM1yAiCHXSzro1INVTH2S0WFmzuWekXPCIh4tdAGW569cRVRGIoLIUdOwrggqo-T',
     }).then((paypal) => {
-      paypal
-        .Buttons({
-          style: {
-            color: 'blue',
-            shape: 'rect',
-            height: 40,
-            label: 'pay',
-            tagline: false,
-            layout: 'horizontal',
-          },
-          createOrder: function (data, actions) {
-            // Set up the transaction
-            return actions.order.create({
-              purchase_units: [
-                {
-                  amount: {
-                    value: `${amount}`,
-                    currency_code: 'USD',
-                  },
+      paypal?.Buttons!({
+        style: {
+          color: 'blue',
+          shape: 'rect',
+          height: 40,
+          label: 'pay',
+          tagline: false,
+          layout: 'horizontal',
+        },
+        createOrder: function (data, actions) {
+          // Set up the transaction
+          return actions.order.create({
+            purchase_units: [
+              {
+                amount: {
+                  value: `${amount}`,
+                  currency_code: 'USD',
                 },
-              ],
-            })
-          },
-          onApprove: function (data, actions) {
-            // Capture order after payment approved
-            return actions.order.capture().then(function (details) {
-              confirmPayment()
-            })
-          },
-          onError: function (err) {
-            // Log error if something goes wrong during approval
-            alert('Something went wrong')
-            console.log('Something went wrong', err)
-          },
-        })
-        .render(el)
+              },
+            ],
+          })
+        },
+        onApprove: function (data, actions) {
+          // Capture order after payment approved
+          return actions?.order?.capture().then(function (details) {
+            confirmPayment()
+          })!
+        },
+        onError: function (err) {
+          // Log error if something goes wrong during approval
+          alert('Something went wrong')
+          console.log('Something went wrong', err)
+        },
+      }).render(el)
     })
 
   const submit = async () => {
@@ -149,7 +149,7 @@
     // create the payment intent server-side
     const clientSecret = await createPaymentIntent()
     // confirm payment with stripe
-    const result = await stripe.confirmCardPayment(clientSecret, {
+    const result = await stripe!.confirmCardPayment(clientSecret, {
       payment_method: {
         card: cardElement,
       },
@@ -173,7 +173,7 @@
     const paymentMethod = e.detail.paymentMethod
     // create payment intent server side
     const clientSecret = await createPaymentIntent()
-    let result = await stripe.confirmCardPayment(clientSecret, {
+    let result = await stripe!.confirmCardPayment(clientSecret, {
       payment_method: paymentMethod.id,
     })
     if (result.error) {
@@ -236,14 +236,14 @@
     let xValue = +x
     let xUnit = 'px'
     const xMatch = String(x).match(/([-\d.]+)(\D+)/)
-    xValue = Number(xMatch[1])
-    xUnit = xMatch[2]
+    xValue = Number(xMatch ? xMatch[1] : 0)
+    xUnit = xMatch ? xMatch[2] : xUnit
 
     let yValue = +y
     let yUnit = 'px'
     const yMatch = String(y).match(/([-\d.]+)(\D+)/)
-    yValue = Number(yMatch[1])
-    yUnit = yMatch[2]
+    yValue = Number(yMatch ? yMatch[1] : 0)
+    yUnit = yMatch ? yMatch[2] : yUnit
 
     return {
       delay,
@@ -265,18 +265,19 @@
     const p = products[details.productSlug]
     fonts = Object.entries(details.modifiers)
       .map(([mId, m]) => ({
-        modifier: m.modifier || p.modifiers.find((m) => m.id == mId),
-        item: (m.modifier || p.modifiers.find((m) => m.id == mId)).items.find(
-          (i) => i.id === m.itemId
-        ),
+        modifier: m.modifier || p?.modifiers?.find((m) => m.id == mId),
+        item: (
+          m?.modifier || p?.modifiers?.find((m) => m.id == mId)
+        )?.items?.find((i) => i.id === m.itemId),
       }))
-      .filter(({ modifier }) => modifier.type === 'font')
+      .filter(({ modifier }) => modifier?.type === 'font')
+      .filter(({ item }) => item?.name)
       .map(({ item }) => ({
-        name: item?.name,
+        name: item?.name || '',
         url: item?.meta?.web
           ? (item?.meta?.url as string)
           : `/api/fontface?name=${encodeURIComponent(
-              item?.name
+              item?.name || ''
             )}&src=${encodeURIComponent(item?.meta?.url)}`,
       }))
   }
@@ -300,7 +301,7 @@
 </svelte:head>
 
 {#if details}
-  {@const p = products ? products[details.productSlug] : null}
+  {@const p = products ? products[details?.productSlug] : null}
   <div
     class="flex h-full w-full top-0 z-9999 fixed items-center justify-center"
   >
@@ -332,7 +333,7 @@
       <div
         class="h-full grid gap-4 grid-cols-1 items-start overflow-auto lg:grid-cols-2"
       >
-        {#if p.template && p.type === 'template'}
+        {#if p?.template && p?.type === 'template'}
           <TemplatePreview
             watermark
             template={{
@@ -345,31 +346,31 @@
         <div class="flex flex-col space-y-4 w-full">
           <div class="flex flex-col space-y-2 items-start">
             <h3 class="font-bold font-title text-black text-xl dark:text-white">
-              {p.name}
+              {p?.name || ''}
             </h3>
             <p class="font-bold text-black text-2xl dark:text-white">
-              ${p.price.toLocaleString()} <span class="text-base">/ unit</span>
+              ${p?.price.toLocaleString()} <span class="text-base">/ unit</span>
             </p>
             <p class="font-bold text-black text-base dark:text-white">
-              Total: ${getTotalFromProductModifiers(
-                p,
-                details.modifiers
+              Total: ${(p
+                ? getTotalFromProductModifiers(p, details.modifiers)
+                : 0
               ).toLocaleString()}
             </p>
           </div>
           <div class="flex flex-col space-y-2">
             {#each Object.entries(details?.modifiers || {}) as [mId, m]}
               {@const modifier =
-                m.modifier || p.modifiers.find((m) => m.id == mId)}
-              {@const itemName = modifier.name}
-              {@const item = modifier.items.find((i) => i.id === m.itemId)}
+                m.modifier || p?.modifiers?.find((m) => m.id == mId)}
+              {@const itemName = modifier?.name}
+              {@const item = modifier?.items?.find((i) => i.id === m.itemId)}
               <div class="flex flex-col space-y-1 w-full lg:w-1/3">
                 <div
                   class="font-bold font-title text-black text-xs dark:text-white"
                 >
                   {itemName}:
                 </div>
-                {#if modifier.type === 'select'}
+                {#if modifier?.type === 'select'}
                   <p class="text-xs">
                     {m.value}
                     {item?.cost
@@ -381,7 +382,7 @@
                         })}${item?.percentage ? '%' : ''}`
                       : ''}
                   </p>
-                {:else if modifier.type === 'color'}
+                {:else if modifier?.type === 'color'}
                   <div class="flex space-x-2 items-center">
                     <div
                       class="rounded pb-full border-2 h-8 w-full transform w-8 duration-200 dark:border-gray-600"
@@ -392,11 +393,11 @@
                       {item?.meta?.name}
                     </div>
                   </div>
-                {:else if modifier.type === 'toggle'}
+                {:else if modifier?.type === 'toggle'}
                   <p class="text-xs">
                     {m.value ? 'Yes' : 'No'}
                   </p>
-                {:else if modifier.type === 'font'}
+                {:else if modifier?.type === 'font'}
                   {#if item}
                     <div class="text-xl" style={`font-family: "${item?.name}"`}>
                       {item?.name}
@@ -404,14 +405,14 @@
                   {:else}
                     <p class="text-xs">N/A</p>
                   {/if}
-                {:else if modifier.type === 'text'}
+                {:else if modifier?.type === 'text'}
                   <p class="text-xs">
                     {m.value || 'N/A'}
                   </p>
-                {:else if modifier.type === 'upsell'}
+                {:else if modifier?.type === 'upsell'}
                   <div class="flex flex-col space-y-2 w-full">
                     {#each m?.itemIds || [] as id}
-                      {@const i = modifier.items.find((i) => i.id === id)}
+                      {@const i = modifier?.items?.find((i) => i.id === id)}
                       <div
                         class="border rounded-lg w-full relative dark:border-gray-700"
                       >
@@ -435,26 +436,28 @@
                                       b: '000000.0',
                                     },
                                   }}
-                                  src={i.meta?.image}
+                                  src={i?.meta?.image}
                                   class="rounded object-cover w-full aspect-square"
                                 />
                               </div>
                             </div>
                             <div class="flex flex-col">
-                              <h3 class="font-bold text-sm">{i.name}</h3>
-                              {#if i.meta.description}
+                              <h3 class="font-bold text-sm">{i?.name}</h3>
+                              {#if i?.meta.description}
                                 <p
                                   class="text-sm leading-none pb-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
                                 >
-                                  {i.meta?.description}
+                                  {i?.meta?.description}
                                 </p>
                               {/if}
                             </div>
                           </div>
                           <p class="font-bold text-right text-lg">
-                            {i.cost < 0 ? '-' : ''}{!i.percentage
+                            {(i?.cost || 0) < 0 ? '-' : ''}{!i?.percentage
                               ? '$'
-                              : ''}{Math.abs(i.cost)}{i.percentage ? '%' : ''}
+                              : ''}{Math.abs(i?.cost || 0)}{i?.percentage
+                              ? '%'
+                              : ''}
                           </p>
                         </div>
                       </div>
@@ -462,7 +465,7 @@
                       <p class="text-xs">N/A</p>
                     {/each}
                   </div>
-                {:else if modifier.type === 'image'}
+                {:else if modifier?.type === 'image'}
                   {#if item}
                     <div
                       class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none dark:bg-gray-700"
@@ -944,14 +947,16 @@
                     <button
                       class="border rounded-l-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
                       on:click={() =>
-                        bag.setItem(
-                          p,
-                          item.modifiers,
-                          Math.max(
-                            p?.minQuantity || 1,
-                            $bag[item.idx].quantity - 1
-                          )
-                        )}
+                        p
+                          ? bag.setItem(
+                              p,
+                              item.modifiers,
+                              Math.max(
+                                p?.minQuantity || 1,
+                                $bag[item.idx].quantity - 1
+                              )
+                            )
+                          : null}
                     >
                       <Subtract16 class="m-auto" />
                     </button>
@@ -966,14 +971,16 @@
                     <button
                       class="border rounded-r-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
                       on:click={() =>
-                        bag.setItem(
-                          p,
-                          item.modifiers,
-                          Math.max(
-                            p?.minQuantity || 1,
-                            $bag[item.idx].quantity + 1
-                          )
-                        )}
+                        p
+                          ? bag.setItem(
+                              p,
+                              item.modifiers,
+                              Math.max(
+                                p?.minQuantity || 1,
+                                $bag[item.idx].quantity + 1
+                              )
+                            )
+                          : null}
                     >
                       <Add16 class="m-auto" />
                     </button>
@@ -1011,7 +1018,7 @@
                     class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300 dark:hover:border-gray-500"
                     title="Delete"
                     on:click={() => {
-                      bag.delete(p, item.modifiers)
+                      p ? bag.delete(p, item.modifiers) : null
                     }}
                     use:tooltip
                     type="button"><TrashCan16 /></button

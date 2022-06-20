@@ -22,6 +22,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "outDir": "dist",
+    "strictNullChecks": true,
     "allowJs": true,
     "checkJs": true,
     "paths": {

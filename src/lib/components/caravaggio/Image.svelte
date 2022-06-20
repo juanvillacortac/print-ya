@@ -5,9 +5,12 @@
   export let src: string
   export let href = ''
   export let options: CaravaggioOptions
-  export let showOriginal: string = null
+  export let showOriginal: string = ''
 
-  $: url = src?.endsWith(showOriginal) ? src : useCaravaggio(src, options)
+  $: url =
+    src?.endsWith(showOriginal) && showOriginal
+      ? src
+      : useCaravaggio(src, options)
 </script>
 
 {#if href}

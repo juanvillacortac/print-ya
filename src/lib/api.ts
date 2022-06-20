@@ -15,7 +15,12 @@ async function send({
 
   const controller = new abortController()
   const id = setTimeout(() => controller.abort(), timeout)
-  const opts = { method, headers: {}, body: null, signal: controller.signal }
+  const opts = {
+    method,
+    headers: {},
+    body: null as any,
+    signal: controller.signal,
+  }
   if (Object.keys(data).length > 0) {
     const parsedData = data
     for (const [key, value] of Object.entries(data)) {
@@ -35,7 +40,7 @@ async function send({
       ...headers,
     }
   }
-  const response = await fetcher(`${path}`, opts)
+  const response = await fetcher(`${path}`, opts as any)
 
   clearTimeout(id)
 

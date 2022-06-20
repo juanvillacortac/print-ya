@@ -40,7 +40,7 @@
     },
   ]
 
-  $pageSubtitle = $page.stuff.store.name
+  $pageSubtitle = $page.stuff.store!.name
 </script>
 
 <div class="flex flex-col mx-auto max-w-prose space-y-4">

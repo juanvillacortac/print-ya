@@ -242,7 +242,7 @@
   let moving = false
   export let dragPos = { x: 0, y: 0 }
 
-  let previousTouch: { x: number; y: number }
+  let previousTouch: { x: number; y: number } | null
 
   const mousemove = (e: MouseEvent) => {
     // dragPos.x += e.movementX

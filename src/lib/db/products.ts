@@ -1,5 +1,6 @@
 import { prisma, slugify } from './common'
 import type {
+  Prisma,
   Product as _Product,
   ProductModifier as _ProductModifier,
   ProductModifierItem as _ProductModifierItem,
@@ -14,18 +15,18 @@ export type ProductModifierItem = Omit<_ProductModifierItem, 'ordinal'> & {
 
 export type ProductModifier = Omit<_ProductModifier, 'ordinal'> & {
   meta?: any
-  items?: ProductModifierItem[]
+  items: ProductModifierItem[]
 }
 
 export type Product<T extends TemplateSource = any> = _Product & {
   template: T
   meta?: any
-  storeCategory?: StoreCategory
-  modifiers?: ProductModifier[]
+  storeCategory: StoreCategory | null
+  modifiers: ProductModifier[]
 }
 
 export type StripedProduct = Omit<_Product, 'templateDraft'> & {
-  storeCategory?: StoreCategory
+  storeCategory: StoreCategory | null
 }
 
 export const getProductBySlug = ({
@@ -34,7 +35,7 @@ export const getProductBySlug = ({
 }: {
   slug: string
   storeId: string
-}): Promise<Product> =>
+}): Promise<Product | null> =>
   prisma.product
     .findFirst({
       where: {
@@ -63,15 +64,19 @@ export const getProductBySlug = ({
         },
       },
     })
-    .then((data) => {
-      data.modifiers = data.modifiers.map((m) => {
-        delete m.ordinal
-        m.items = m.items.map((i) => {
-          delete i.ordinal
-          return i
+    .then((data: Product | null) => {
+      if (data) {
+        data.modifiers = data!.modifiers!.map((m) => {
+          // @ts-ignore
+          delete m?.ordinal
+          m.items = m?.items!.map((i) => {
+            // @ts-ignore
+            delete i.ordinal
+            return i
+          })
+          return m
         })
-        return m
-      })
+      }
       return data
     })
 
@@ -113,18 +118,17 @@ export const getProductsByStore = async ({
 export const upsertProduct = async (
   product: Partial<Product>,
   userId: string
-): Promise<Product> => {
-  let c: Product
-  console.log(product.modifiers)
+): Promise<Product | null> => {
+  let c: Product | null
   if (product.id) {
-    c = await prisma.product.findFirst({
+    c = (await prisma.product.findFirst({
       where: {
         id: product.id,
         store: {
           userId,
         },
       },
-    })
+    })) as Product
     if (!c) {
       throw new Error('not allowed')
     }
@@ -142,14 +146,14 @@ export const upsertProduct = async (
         meta: product.meta,
         storeCategory: {
           connect: {
-            id: product.storeCategoryId,
+            id: product.storeCategoryId || undefined,
           },
         },
         template: product.template,
-        templateDraft: product.templateDraft,
+        templateDraft: product.templateDraft as Prisma.InputJsonObject,
       },
     })
-    const transactions = product.modifiers.map((m, idx) =>
+    const transactions = product.modifiers!.map((m, idx) =>
       prisma.productModifier.upsert({
         include: {
           items: {
@@ -202,8 +206,8 @@ export const upsertProduct = async (
         },
       })
     )
-    const itemsTransactions = product.modifiers
-      .map((m) => m.items.filter((i) => i.id))
+    const itemsTransactions = (product?.modifiers || [])
+      .map((m) => m?.items?.filter((i) => i.id) || [])
       .reduce((a, b) => [...a, ...b], [])
       .map((i, idx) =>
         prisma.productModifierItem.update({
@@ -224,14 +228,12 @@ export const upsertProduct = async (
     const _modifiers = await prisma.$transaction(transactions)
     const _items = await prisma.$transaction(itemsTransactions)
     const final = await getProductBySlug({
-      storeId: product.storeId,
-      slug: product.slug,
+      storeId: product.storeId!,
+      slug: product.slug!,
     })
-    return {
-      ...final,
-    }
+    return final
   }
-  let slug = slugify(product.name)
+  let slug = slugify(product.name!)
   const coincidences = await prisma.product.findMany({
     where: {
       slug: {
@@ -262,29 +264,29 @@ export const upsertProduct = async (
     name: product.name,
   }
 
-  return await prisma.product.create({
+  return (await prisma.product.create({
     data: {
-      name: product.name,
-      price: product.price,
+      name: product.name!,
+      price: product.price!,
       type: product.type,
-      public: product.public,
+      public: product.public!,
       description: product.description,
       meta: product.meta,
       store: {
         connect: {
-          id: product.storeId,
+          id: product.storeId!,
         },
       },
       storeCategory: {
         connect: {
-          id: product.storeCategoryId,
+          id: product.storeCategoryId!,
         },
       },
       template: product.template || defaultTemplate,
       templateDraft: product.template || defaultTemplate,
       modifiers: {
-        create: product.modifiers
-          .filter((m) => m.active)
+        create: product
+          .modifiers!.filter((m) => m.active)
           .map((m, idx) => ({
             ordinal: idx,
             name: m.name,
@@ -292,7 +294,7 @@ export const upsertProduct = async (
             defaultValue: m.defaultValue || undefined,
             templateAccessor: m.templateAccessor || undefined,
             items: {
-              create: m.items.map((i, idx) => ({
+              create: m.items!.map((i, idx) => ({
                 ordinal: idx,
                 name: i.name,
                 cost: i.cost,
@@ -304,5 +306,5 @@ export const upsertProduct = async (
       },
       slug,
     },
-  })
+  })) as Product
 }

@@ -33,10 +33,10 @@ export const validateLayoutRoute = (event: LoadInput | RequestEvent) => {
 }
 
 export type LayoutData = Partial<{
-  layout?: import('$lib/utils/layout').LayoutType
-  store?: import('$lib/db').Store
-  product?: import('$lib/db').Product
-  products?: import('$lib/db').StripedProduct[]
+  layout: import('$lib/utils/layout').LayoutType
+  store?: import('$lib/db').Store | null
+  product?: import('$lib/db').Product | null
+  products?: import('$lib/db').StripedProduct[] | null
 }>
 
 export const fetchLayoutData = async ({
@@ -44,7 +44,7 @@ export const fetchLayoutData = async ({
   fetch,
   session,
 }: LoadInput): Promise<{ response?: LayoutData; notFound?: boolean }> => {
-  const client = trpc(fetch, url.host)
+  const client = trpc(fetch)
   switch (session.layout) {
     case 'store':
       try {
@@ -53,10 +53,12 @@ export const fetchLayoutData = async ({
         }
         if (!response.store) {
           let slug = url.searchParams.get('store')
-          if (!slug) {
+          if (!slug && session.host) {
             slug = session.host.split('.')[0]
           }
-          response.store = await client.query('stores:getBySlug', slug)
+          if (slug) {
+            response.store = await client.query('stores:getBySlug', slug)
+          }
         }
         return {
           notFound: !response.store,

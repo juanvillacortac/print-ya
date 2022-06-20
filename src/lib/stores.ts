@@ -5,7 +5,7 @@ import type { ModifiersMap } from './utils/modifiers'
 import type { Product } from './db'
 import { flatMap, isObject, merge } from 'lodash-es'
 
-export const pageSubtitle = writable('')
+export const pageSubtitle = writable<string | null | undefined>('')
 
 export function persistentWritable<T>(
   key: string,
@@ -102,7 +102,7 @@ const createBag = (): BagStore => {
     }))
   )
 
-  const getKeys = (val, keys = []) =>
+  const getKeys = (val, keys: string[] = []) =>
     isObject(val)
       ? flatMap(val, (v, k) => getKeys(v, [...keys, k]))
       : keys[keys.length - 1]
@@ -112,7 +112,7 @@ const createBag = (): BagStore => {
       ...Object.fromEntries(
         Object.entries(modifiers).map(([mId, v]) => [
           mId,
-          { ...v, modifier: product.modifiers.find((m) => m.id === mId) },
+          { ...v, modifier: product?.modifiers!.find((m) => m.id === mId) },
         ])
       ),
     }

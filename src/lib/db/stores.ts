@@ -29,7 +29,7 @@ export const getStoreBySlugOrHost = ({
 }: {
   slug?: string
   host?: string
-}): Promise<Store> =>
+}): Promise<Store | null> =>
   prisma.store.findUnique({
     where: {
       slug,
@@ -55,7 +55,7 @@ export const getStoreBySubdomain = ({
   slug,
 }: {
   slug: string
-}): Promise<Store> =>
+}): Promise<Store | null> =>
   prisma.store.findUnique({
     where: {
       slug,
@@ -79,7 +79,7 @@ export const getStoreBySubdomain = ({
 export const upsertStoreCategory = async (
   category: StoreCategory
 ): Promise<StoreCategory> => {
-  let c: StoreCategory
+  let c: StoreCategory | null
   if (category.id) {
     c = await prisma.storeCategory.findFirst({
       where: { id: category.id, storeId: category.storeId },
@@ -125,7 +125,7 @@ export const upsertStore = async (
   store: Partial<Store>,
   userId: string
 ): Promise<Store> => {
-  let s: Store
+  let s: Store | null
   if (store.id) {
     s = await prisma.store.findUnique({ where: { id: store.id } })
     if (!s || s.userId !== userId) {
@@ -139,7 +139,7 @@ export const upsertStore = async (
         favicon: store.favicon,
         logo: store.logo,
         name: store.name,
-        slug: slugify(store.slug),
+        slug: slugify(store.slug!),
         customDomain: store.customDomain,
       },
     })
@@ -154,7 +154,7 @@ export const upsertStore = async (
       favicon: store.favicon,
       logo: store.logo,
       name: store.name,
-      slug: store.slug,
+      slug: store.slug!,
       customDomain: store.customDomain,
     },
   })

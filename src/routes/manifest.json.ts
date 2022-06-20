@@ -8,7 +8,7 @@ export const get: RequestHandler = async (event) => {
   const imageBuilder = useCaravaggioBuilder(
     event.url.protocol + '//' + event.url.host
   )
-  let store: Store
+  let store: Store | null = null
   if (layout === 'store') {
     store = await getStoreBySlugOrHost({ host: event.url.host })
     if (!store) {

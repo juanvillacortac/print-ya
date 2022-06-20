@@ -28,7 +28,11 @@
   <title>{pageTitle}</title>
 </svelte:head>
 
-<Favicons favicon={store.favicon} themeColor="#000" titleName={store.name} />
+<Favicons
+  favicon={store.favicon || ''}
+  themeColor="#000"
+  titleName={store.name || ''}
+/>
 
 <div class="top-0 left-0 text-gray-700 relative dark:text-white">
   <div
@@ -37,7 +41,7 @@
     <div class="flex mx-auto w-full p-4 justify-between items-center lg:w-7/10">
       <a href="/" class="flex">
         <Image
-          src={store.logo}
+          src={store.logo || ''}
           class="bg-white rounded p-px h-2rem sm:h-2rem"
           options={{
             q: 100,
@@ -54,7 +58,7 @@
           class="bg-white border-b border-l-0 border-r-0 border-gray-300 leading-tight py-2  px-3 w-10rem appearance-none <sm:hidden !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
         >
           <option value="">All categories</option>
-          {#each store.categories as category}
+          {#each store.categories || [] as category}
             <option value={category.name}>{category.name}</option>
           {/each}
         </select>
@@ -105,14 +109,14 @@
       <div
         class="flex mx-auto space-x-6 p-4 py-2 items-center justify-center uppercase lg:w-7/10"
       >
-        {#each store.categories.slice(0, 4) as category}
+        {#each store.categories?.slice(0, 4) || [] as category}
           <a
             href={category.name}
             class="font-bold font-title text-black dark:text-white hover:text-blue-500"
             >{category.name}</a
           >
         {/each}
-        {#if store.categories.length > 4}
+        {#if store.categories && store.categories.length > 4}
           <a
             href="./{store.name}"
             class="font-bold font-title text-black dark:text-white hover:text-blue-500"

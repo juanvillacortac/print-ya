@@ -14,7 +14,7 @@ export type ModifiersMap = Record<string, ModifierValue>
 export const createModifiersMapStore = (product?: Product) =>
   writable<ModifiersMap>(
     product
-      ? product.modifiers.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
+      ? product.modifiers?.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
       : {}
   )
 
@@ -42,7 +42,7 @@ export const getTemplateFieldsFromModifiers = (
   const mappedModifiers = Object.entries(modifiers).map(
     ([mId, mValue]) =>
       [
-        mValue.modifier || product.modifiers.find((m) => m.id === mId),
+        mValue.modifier || product.modifiers?.find((m) => m.id === mId),
         mValue,
       ] as [ProductModifier, { value?: string; itemId?: string }]
   )
@@ -63,7 +63,7 @@ export const getTemplateFieldsFromModifiers = (
       value: item.value,
       key: m.templateAccessor,
     }))
-  const f = items.reduce((a, b) => ({ ...a, [b.key]: b.value }), {})
+  const f = items.reduce((a, b) => ({ ...a, [b.key!]: b.value }), {})
   if (Object.keys(f).length) {
     fields = JSON.stringify(f)
   } else {
@@ -79,22 +79,22 @@ export const getCostFromProductModifiers = (
   Object.entries(modifiers)
     .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
     .map(([mId, mValue]) => {
-      const modifier: ProductModifier = product.modifiers.find(
+      const modifier: ProductModifier = product.modifiers!.find(
         (m) => m.id === mId
-      )
+      )!
       if (mValue.itemIds) {
         const items = mValue.itemIds.map((id) =>
-          modifier.items.find((i) => i.id === id)
+          modifier.items!.find((i) => i.id === id)
         )
         const costs = items.map((item) =>
-          item.percentage ? (item.cost / 100) * product.price : item.cost
+          item!.percentage ? (item!.cost / 100) * product.price : item!.cost
         )
         return costs.reduce((a, b) => a + b, 0)
       }
-      const item = modifier.items.find((i) => i.id === mValue.itemId)
-      const value = item.percentage
-        ? (item.cost / 100) * product.price
-        : item.cost
+      const item = modifier.items!.find((i) => i.id === mValue.itemId)
+      const value = item!.percentage
+        ? (item!.cost / 100) * product.price
+        : item!.cost
       return value
     })
     .reduce((a, b) => a + b, 0)
