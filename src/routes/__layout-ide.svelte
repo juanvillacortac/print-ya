@@ -4,11 +4,8 @@
 
   export const load: Load = async ({ params, fetch, url }) => {
     // const data = await get(`/api/stores/${params.slug}`, { fetch })
-    const store = await client(fetch, url.host).query(
-      'stores:getBySlug',
-      params.slug
-    )
-    const product = await client(fetch, url.host).query('products:getBySlug', {
+    const store = await client(fetch).query('stores:getBySlug', params.slug)
+    const product = await client(fetch).query('products:getBySlug', {
       productSlug: params.productSlug,
       storeSlug: params.slug,
     })
@@ -32,7 +29,7 @@
 <script lang="ts">
   import 'virtual:windi.css'
   import { browser } from '$app/env'
-  import { Favicons, preferences } from '$lib'
+  import { preferences } from '$lib'
   import { page } from '$app/stores'
   import type { Product, Store } from '$lib/db'
 
@@ -63,9 +60,7 @@
   }
 
   $: if (path && browser) {
-    invalidate(
-      `/stores/${$page.params.slug}/products/${$page.params.productSlug}`
-    )
+    invalidate(window.location.href)
   }
 
   onDestroy(() => {
