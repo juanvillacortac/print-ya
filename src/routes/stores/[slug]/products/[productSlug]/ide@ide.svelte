@@ -32,6 +32,7 @@
   import { squareratio } from '$lib/actions/aspectratio'
   import client from '$lib/trpc/client'
   import { onMount } from 'svelte'
+  import trpc from '$lib/trpc/client'
 
   export let data: string
 
@@ -290,10 +291,12 @@
           </button>
           <button
             on:click={() => {
-              del(`/login`, {}).then(() => {
-                notifications.send('Log out successfully', 'default', 1000)
-                goto('/login')
-              })
+              trpc()
+                .mutation('user:logout')
+                .then(() => {
+                  notifications.send('Log out successfully', 'default', 1000)
+                  goto('/login')
+                })
             }}
             class="flex relative justify-self-end self-end hover:text-black dark:hover:text-white"
             title="Log out"

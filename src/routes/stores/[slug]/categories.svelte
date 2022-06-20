@@ -31,7 +31,7 @@
         'default',
         3000
       )
-      await invalidate($page.url.pathname)
+      await invalidate(window.location.href)
     } catch ({ message }) {
       notifications.send(message, 'default', 3000)
     }

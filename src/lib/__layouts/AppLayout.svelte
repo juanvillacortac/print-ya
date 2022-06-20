@@ -24,6 +24,7 @@
   import { beforeNavigate } from '$app/navigation'
   import { fly } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
+  import trpc from '$lib/trpc/client'
 
   $: path = $page.url.pathname
 
@@ -153,10 +154,12 @@
           </button>
           <button
             on:click={() => {
-              del(`/api/login`, {}).then(() => {
-                notifications.send('Log out successfully', 'default', 1000)
-                window.location.replace('/login')
-              })
+              trpc()
+                .mutation('user:logout')
+                .then(() => {
+                  notifications.send('Log out successfully', 'default', 1000)
+                  window.location.replace('/login')
+                })
             }}
             class="flex relative items-end justify-end hover:text-black dark:hover:text-white"
             title="Log out"

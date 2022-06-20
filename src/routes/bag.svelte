@@ -150,6 +150,9 @@
     // create the payment intent server-side
     const clientSecret = await createPaymentIntent()
     // confirm payment with stripe
+    if (!clientSecret) {
+      return
+    }
     const result = await stripe!.confirmCardPayment(clientSecret, {
       payment_method: {
         card: cardElement,
@@ -174,6 +177,9 @@
     const paymentMethod = e.detail.paymentMethod
     // create payment intent server side
     const clientSecret = await createPaymentIntent()
+    if (!clientSecret) {
+      return
+    }
     let result = await stripe!.confirmCardPayment(clientSecret, {
       payment_method: paymentMethod.id,
     })
@@ -205,17 +211,11 @@
     .reduce((a, b) => a + b, 0)
 
   let cardElement: any
-  async function createPaymentIntent() {
-    const data = await post<{ clientSecret: string }>(
-      `/api/stripe/payment-intent`,
-      {
-        amount: total,
-        currency: 'usd',
-      }
-    )
-    const { clientSecret } = data
-    return clientSecret
-  }
+  const createPaymentIntent = async () =>
+    await trpc().mutation('stores:payment:createStripeIntent', {
+      amount: total,
+      currency: 'usd',
+    })
 
   export function fly(
     node,

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
-  import { post } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
+  import trpc from '$lib/trpc/client'
   import { onMount } from 'svelte'
 
   let loading = false
@@ -22,18 +22,20 @@
       }
     }
     try {
-      const data = await post(`/api/login`, {
-        email: email?.toLowerCase(),
-        password,
-        isLogin,
-      })
+      const data = await trpc().mutation(
+        isLogin ? 'user:login' : 'user:register',
+        {
+          email: email?.toLocaleLowerCase(),
+          password,
+        }
+      )
       notifications.send('Log in successfull', 'default', 1000)
       const callbackUrl = decodeURIComponent(
         $page.url.searchParams.get('callbackUrl') || encodeURIComponent('/')
       )
       window.location.replace(callbackUrl)
-    } catch ({ error }) {
-      notifications.send(error, 'default', 1000)
+    } catch ({ message }) {
+      notifications.send(message, 'default', 1000)
       loading = false
     }
   }
