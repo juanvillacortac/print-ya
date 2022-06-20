@@ -127,6 +127,7 @@
         data: {
           ...product,
           modifiers,
+          storeId: store.id,
         },
       })
       notifications.send(
