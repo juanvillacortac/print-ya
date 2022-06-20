@@ -11,13 +11,12 @@
     CloseOutline24,
     Favorite32,
     Image32,
-    ShoppingBag24,
     Subtract16,
   } from 'carbon-icons-svelte'
 
   export const load: Load = async ({ params, fetch, stuff, url }) => {
     const store = stuff.store!
-    const data = await trpc(fetch).query('products:getBySlug', {
+    const product = await trpc(fetch).query('products:getBySlug', {
       storeSlug: store.slug,
       productSlug: params.productSlug,
     })
@@ -25,13 +24,13 @@
     //   `/api/stores/${store?.slug}/products/${params.productSlug}`,
     //   { fetch }
     // )
-    if (!data)
+    if (!product || !product.public)
       return {
         status: 404,
       }
     return {
       props: {
-        product: data,
+        product,
       },
     }
   }
