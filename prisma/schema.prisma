@@ -41,6 +41,7 @@ model Store {
   categories      StoreCategory[]
   products        Product[]
   paymentGateways PaymentGateway[]
+  orders          Order[]
 }
 
 model PaymentGateway {
@@ -96,6 +97,8 @@ model Product {
 
   storeCategory   StoreCategory? @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
   storeCategoryId String?
+
+  orderItems OrderItem[]
 }
 
 model ProductImage {
@@ -134,7 +137,39 @@ model ProductModifierItem {
 }
 
 model Order {
-  id    String @id @default(cuid())
-  total Float
-  items Json
+  id    String      @id @default(cuid())
+  items OrderItem[]
+  fees  OrderFee[]
+
+  store   Store  @relation(fields: [storeId], references: [id])
+  storeId String
+
+  paymentMethods Json?
+
+  createdAt DateTime @default(now())
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  product   Product @relation(fields: [productId], references: [id])
+  modifiers Json
+  quantity  Int
+
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+
+  productId String
+}
+
+model OrderFee {
+  id String @id @default(cuid())
+
+  name String
+
+  fixed      Float @default(0)
+  percentage Float @default(0)
+
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
 }

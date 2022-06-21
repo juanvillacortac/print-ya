@@ -5,6 +5,7 @@ import users from './users'
 import stores from './stores'
 import trpcTransformer from 'trpc-transformer'
 import products from './products'
+import orders from './orders'
 
 export type tRPCContext = {
   layout: LayoutType
@@ -13,9 +14,10 @@ export type tRPCContext = {
 
 export const router = trpc
   .router<tRPCContext>()
+  .transformer(trpcTransformer)
   .merge('user:', users)
   .merge('stores:', stores)
   .merge('products:', products)
-  .transformer(trpcTransformer)
+  .merge('orders:', orders)
 
 export type tRPCRouter = typeof router

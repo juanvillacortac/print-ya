@@ -24,6 +24,10 @@
     CardExpiry,
     PaymentRequestButton,
   } from 'svelte-stripe'
+  import type { Product } from '$lib/db'
+  import type { BagItem } from '$lib'
+  import { getTotalFromProductModifiers } from '$lib/utils/modifiers'
+  import { page } from '$app/stores'
 
   const countries = getCountries()
 
@@ -35,11 +39,23 @@
   })
 
   export let open = false
-  export let total: number = 0
   export let dark = false
 
   let payment = false
   let done: number | null | undefined
+  export let products: Record<string, Product>
+  export let items: BagItem[]
+
+  $: total = items
+    .map((v) => ({
+      product: products ? products[v.productSlug] : null,
+      modifiers: v.modifiers,
+      quantity: v.quantity,
+    }))
+    .map(({ product, modifiers, quantity }) =>
+      product ? getTotalFromProductModifiers(product, modifiers) * quantity : 0
+    )
+    .reduce((a, b) => a + b, 0)
 
   let dispatch = createEventDispatcher<{
     checkout: CheckoutEvent
@@ -123,12 +139,27 @@
         },
         onApprove: function (data, actions) {
           // Capture order after payment approved
-          return actions?.order?.capture().then((details) => {
-            confirmPayment({
-              amount: total,
-              currency: 'usd',
-              method: 'paypal',
+          return actions?.order?.capture().then(async (details) => {
+            const order = await trpc().mutation('orders:create', {
+              storeId: $page.stuff.store!.id,
+              order: {
+                fees: [],
+                paymentMethods: ['paypal'],
+                items: items.map((i) => ({
+                  productId: products[i.productSlug].id,
+                  quantity: i.quantity,
+                  modifiers: i.modifiers,
+                })),
+              },
             })
+            console.log(order)
+            if (order) {
+              confirmPayment({
+                amount: total,
+                currency: 'usd',
+                method: 'paypal',
+              })
+            }
           })!
         },
         onError: function (err) {
@@ -157,17 +188,37 @@
         card: cardElement,
       },
     })
-    console.log({ result })
     if (result.error) {
       // payment failed, notify user
       error = result.error
       return
     }
-    confirmPayment({
-      amount: total,
-      currency: 'usd',
-      method: 'stripe',
+    const order = await trpc().mutation('orders:create', {
+      storeId: $page.stuff.store!.id,
+      order: {
+        fees: [
+          {
+            name: 'Stripe fee',
+            fixed: 0.3,
+            percentage: 2.9,
+          },
+        ],
+        paymentMethods: ['stripe'],
+        items: items.map((i) => ({
+          productId: products[i.productSlug].id,
+          quantity: i.quantity,
+          modifiers: i.modifiers,
+        })),
+      },
     })
+    console.log(order)
+    if (order) {
+      confirmPayment({
+        amount: total,
+        currency: 'usd',
+        method: 'stripe',
+      })
+    }
   }
 
   const confirmPayment = (event: CheckoutEvent) => {

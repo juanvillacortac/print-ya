@@ -126,7 +126,8 @@
   on:checkout={bag.clear}
   bind:open={checkout}
   dark={$preferences.darkMode}
-  {total}
+  items={$bag}
+  {products}
 />
 
 <div

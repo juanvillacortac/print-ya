@@ -1,9 +1,7 @@
 import type { tRPCRouter } from '$lib/trpc/server'
-import { browser } from '$app/env'
 import { createTRPCClient } from '@trpc/client'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 import trpcTransformer from 'trpc-transformer'
-import { getAbsoluteURL } from '../utils/host'
 
 const trpc = (loadFetch?: typeof fetch) => {
   return createTRPCClient<tRPCRouter>({

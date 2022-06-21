@@ -77,6 +77,7 @@ specifiers:
   screenfull: ^6.0.1
   sharp: ^0.29.3
   stripe: ^9.8.0
+  superjson: ^1.9.1
   svelte: ^3.48.0
   svelte-check: ^2.7.0
   svelte-datocms: ^0.6.3
@@ -166,6 +167,7 @@ dependencies:
   screenfull: 6.0.1
   sharp: 0.29.3
   stripe: 9.8.0
+  superjson: 1.9.1
   svelte-datocms: 0.6.3
   svelte-fullscreen: 2.0.0
   svelte-kit-cookie-session: 2.1.4
