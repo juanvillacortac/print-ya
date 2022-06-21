@@ -264,7 +264,7 @@
 
   $: if (details && products[details?.productSlug]) {
     const p = products[details.productSlug]
-    fonts = Object.entries(details.modifiers)
+    fonts = Object.entries(details.modifiers || {})
       .map(([mId, m]) => ({
         modifier: m.modifier || p?.modifiers?.find((m) => m.id == mId),
         item: (
