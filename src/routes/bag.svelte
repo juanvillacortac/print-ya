@@ -110,8 +110,6 @@
             )}&src=${encodeURIComponent(item?.meta?.url)}`,
       }))
   }
-
-  $: console.log(Object.entries(details?.modifiers || {}))
 </script>
 
 <svelte:head>

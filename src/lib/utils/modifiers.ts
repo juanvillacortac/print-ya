@@ -39,7 +39,7 @@ export const getTemplateFieldsFromModifiers = (
   modifiers: ModifiersMap
 ) => {
   let fields = ''
-  const mappedModifiers = Object.entries(modifiers).map(
+  const mappedModifiers = Object.entries(modifiers || {}).map(
     ([mId, mValue]) =>
       [
         mValue.modifier || product.modifiers?.find((m) => m.id === mId),
@@ -76,7 +76,7 @@ export const getCostFromProductModifiers = (
   product: Product,
   modifiers: ModifiersMap
 ) =>
-  Object.entries(modifiers)
+  Object.entries(modifiers || {})
     .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
     .map(([mId, mValue]) => {
       const modifier: ProductModifier = product.modifiers!.find(
