@@ -132,3 +132,9 @@ model ProductModifierItem {
   productModifier   ProductModifier? @relation(fields: [productModifierId], references: [id])
   productModifierId String?
 }
+
+model Order {
+  id    String @id @default(cuid())
+  total Float
+  items Json
+}
