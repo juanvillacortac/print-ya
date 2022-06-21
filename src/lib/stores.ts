@@ -110,7 +110,7 @@ const createBag = (): BagStore => {
   const getKey = (product: Product, modifiers: ModifiersMap) => {
     const map: ModifiersMap = {
       ...Object.fromEntries(
-        Object.entries(modifiers).map(([mId, v]) => [
+        Object.entries(modifiers || {}).map(([mId, v]) => [
           mId,
           { ...v, modifier: product?.modifiers!.find((m) => m.id === mId) },
         ])
