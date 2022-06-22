@@ -1,6 +1,7 @@
 import type { Product, ProductModifier } from '$lib/db'
 import { writable } from 'svelte/store'
 import { isEqual } from 'lodash-es'
+import type { Prisma } from '@prisma/client'
 
 export type ModifierValue = {
   value?: any
@@ -36,7 +37,7 @@ export const compareModifiers = (a: ModifiersMap, b: ModifiersMap) => {
 
 export const getTemplateFieldsFromModifiers = (
   product: Product,
-  modifiers: ModifiersMap
+  modifiers: ModifiersMap | Prisma.JsonValue
 ) => {
   let fields = ''
   const mappedModifiers = Object.entries(modifiers || {}).map(
@@ -74,7 +75,7 @@ export const getTemplateFieldsFromModifiers = (
 
 export const getCostFromProductModifiers = (
   product: Product,
-  modifiers: ModifiersMap
+  modifiers: ModifiersMap | Prisma.JsonValue
 ) =>
   Object.entries(modifiers || {})
     .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
@@ -101,5 +102,5 @@ export const getCostFromProductModifiers = (
 
 export const getTotalFromProductModifiers = (
   product: Product,
-  modifiers: ModifiersMap
+  modifiers: ModifiersMap | Prisma.JsonValue
 ) => getCostFromProductModifiers(product, modifiers) + product.price

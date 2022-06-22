@@ -85,6 +85,7 @@ specifiers:
   svelte-kit-cookie-session: ^2.1.3
   svelte-markdown: ^0.2.2
   svelte-marquee-text-widget: ^1.1.0
+  svelte-portal: ^2.2.0
   svelte-preprocess: ^4.10.6
   svelte-range-slider-pips: ^2.0.3
   svelte-split-pane: ^0.1.2
@@ -173,6 +174,7 @@ dependencies:
   svelte-kit-cookie-session: 2.1.4
   svelte-markdown: 0.2.2_svelte@3.48.0
   svelte-marquee-text-widget: 1.1.0
+  svelte-portal: 2.2.0
   svelte-range-slider-pips: 2.0.3
   svelte-split-pane: 0.1.2
   svelte-splitpanes: 0.6.5
@@ -5523,6 +5525,10 @@ packages:
 
   /svelte-marquee-text-widget/1.1.0:
     resolution: {integrity: sha512-mBO3fBA++Xwn7P1VdgeH4OI+MrulxxNrGwdX7NVA1GU1ZCyrQUcb7AD8V3s6s2ZWW3cRXVhbBmgXW+aABYV9kA==}
+    dev: false
+
+  /svelte-portal/2.2.0:
+    resolution: {integrity: sha512-jhtZWtD6cUE2nMw46dJ5VXWYiqnER+JH+V/BmNBQ5fNP/YdsJCpJi+DemUy9msklqGb0f+wLhJPBtKHLWQvzjg==}
     dev: false
 
   /svelte-preprocess/4.10.6_lvfi2wesz6u4l5rfbnetbucfmm:

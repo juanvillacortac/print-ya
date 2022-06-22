@@ -12,6 +12,7 @@
     getTotalFromProductModifiers,
   } from '$lib/utils/modifiers'
   import { Close24 } from 'carbon-icons-svelte'
+  import { portal } from 'svelte-portal'
   import { elasticOut, expoOut } from 'svelte/easing'
   import { fade, scale } from 'svelte/transition'
 
@@ -40,6 +41,7 @@
 {#if item && product}
   <div
     class="flex h-full w-full top-0 z-9999 fixed items-center justify-center"
+    use:portal
   >
     <div
       class="bg-black h-full w-full opacity-70 absolute"

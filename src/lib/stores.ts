@@ -4,6 +4,7 @@ import { writable, get } from 'svelte/store'
 import type { ModifiersMap } from './utils/modifiers'
 import type { Product } from './db'
 import { flatMap, isObject, merge } from 'lodash-es'
+import type { Prisma } from '@prisma/client'
 
 export const pageSubtitle = writable<string | null | undefined>('')
 
@@ -79,7 +80,7 @@ export const preferences = persistentWritable('preferences', {
 
 export type BagItem = {
   productSlug: string
-  modifiers: ModifiersMap
+  modifiers: ModifiersMap | Prisma.JsonValue
   quantity: number
   key: string
 }
