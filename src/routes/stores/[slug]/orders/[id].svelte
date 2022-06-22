@@ -92,7 +92,7 @@
       Items details ({order.items.length} items)
     </h4>
     <div
-      class="divide-y border rounded-lg flex flex-col w-full max-h-50vh relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
+      class="divide-y border rounded-lg flex flex-col w-full max-h-60vh relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
     >
       {#each order.items as item}
         {@const p = products ? products[item.productId] : null}
