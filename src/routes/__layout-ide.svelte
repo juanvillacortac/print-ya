@@ -1,6 +1,5 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
-  import { get } from '$lib/api'
 
   export const load: Load = async ({ params, fetch, url }) => {
     // const data = await get(`/api/stores/${params.slug}`, { fetch })
@@ -40,8 +39,7 @@
   import '$lib/styles/__nprogress.css'
   import { onDestroy } from 'svelte'
   import Toast from '$lib/components/Toast.svelte'
-  import { invalidate } from '$app/navigation'
-  import client from '$lib/trpc/client'
+  import client, { invalidateQuery } from '$lib/trpc/client'
 
   $: path = $page.url.pathname
 
@@ -60,7 +58,7 @@
   }
 
   $: if (path && browser) {
-    invalidate(window.location.href)
+    invalidateQuery('stores:getBySlug', 'products:getBySlug')
   }
 
   onDestroy(() => {

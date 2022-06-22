@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto, invalidate } from '$app/navigation'
+  import { goto } from '$app/navigation'
 
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
@@ -15,7 +15,7 @@
   import { fade, scale } from 'svelte/transition'
   import StripeLogo from '$lib/components/__StripeLogo.svelte'
   import PaypalLogo from '$lib/components/__PaypalLogo.svelte'
-  import trpc from '$lib/trpc/client'
+  import trpc, { invalidateQuery } from '$lib/trpc/client'
 
   let store = $page.stuff.store as Store
 
@@ -41,7 +41,7 @@
       if (data.slug !== $page.stuff.store!.slug) {
         goto(`/stores/${data.slug}/settings`)
       } else {
-        await invalidate(window.location.href)
+        await invalidateQuery('stores:getBySlug')
       }
     } catch (err) {
       console.log(err.message, err.error)
