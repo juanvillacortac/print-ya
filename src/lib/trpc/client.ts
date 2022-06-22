@@ -1,3 +1,4 @@
+import { invalidate } from '$app/navigation'
 import type { tRPCRouter } from '$lib/trpc/server'
 import { createTRPCClient } from '@trpc/client'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
@@ -13,17 +14,19 @@ const trpc = (loadFetch?: typeof fetch) => {
 
 export default trpc
 
-type Query = keyof tRPCRouter['_def']['queries']
-type Mutation = keyof tRPCRouter['_def']['mutations']
+export type QueryKey = keyof tRPCRouter['_def']['queries']
+export type MutationKey = keyof tRPCRouter['_def']['mutations']
 
-export type InferQueryOutput<RouteKey extends Query> = inferProcedureOutput<
+export type InferQueryOutput<RouteKey extends QueryKey> = inferProcedureOutput<
   tRPCRouter['_def']['queries'][RouteKey]
 >
-export type InferQueryInput<RouteKey extends Query> = inferProcedureInput<
+export type InferQueryInput<RouteKey extends QueryKey> = inferProcedureInput<
   tRPCRouter['_def']['queries'][RouteKey]
 >
-export type InferMutationOutput<RouteKey extends Mutation> =
+export type InferMutationOutput<RouteKey extends MutationKey> =
   inferProcedureOutput<tRPCRouter['_def']['mutations'][RouteKey]>
-export type InferMutationInput<RouteKey extends Mutation> = inferProcedureInput<
-  tRPCRouter['_def']['mutations'][RouteKey]
->
+export type InferMutationInput<RouteKey extends MutationKey> =
+  inferProcedureInput<tRPCRouter['_def']['mutations'][RouteKey]>
+
+export const invalidateQuery = (...keys: QueryKey[]) =>
+  invalidate((href) => keys.some((key) => href.includes(`/api/trpc/${key}`)))

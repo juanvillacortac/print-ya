@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { invalidate } from '$app/navigation'
-
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
-  import { post } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
   import type { Store } from '$lib/db'
-  import trpc from '$lib/trpc/client'
+  import trpc, { invalidateQuery } from '$lib/trpc/client'
   import type { StoreCategory } from '@prisma/client'
 
   let store: Store
@@ -31,7 +28,7 @@
         'default',
         3000
       )
-      await invalidate(window.location.href)
+      await invalidateQuery('stores:getBySlug')
     } catch ({ message }) {
       notifications.send(message, 'default', 3000)
     }

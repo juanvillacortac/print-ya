@@ -44,12 +44,6 @@
     }
     if (!$navigating) {
       NProgress.done()
-      if (browser) {
-        invalidate((href) => {
-          console.log(href)
-          return false
-        })
-      }
     }
   }
 
@@ -66,7 +60,6 @@
   import StoreLayout from '$lib/__layouts/DecalshutLayout.svelte'
   import AppLayout from '$lib/__layouts/AppLayout.svelte'
   import type { InstantiableSvelteComponentTyped } from 'svelte-markdown'
-  import { invalidate } from '$app/navigation'
 
   $: if (browser)
     document.documentElement.classList.toggle('dark', $preferences.darkMode)
