@@ -24,7 +24,7 @@
     CardExpiry,
     PaymentRequestButton,
   } from 'svelte-stripe'
-  import type { Product } from '$lib/db'
+  import type { Order, Product } from '$lib/db'
   import type { BagItem } from '$lib'
   import { getTotalFromProductModifiers } from '$lib/utils/modifiers'
   import { page } from '$app/stores'
@@ -45,6 +45,7 @@
   let done: number | null | undefined
   export let products: Record<string, Product>
   export let items: BagItem[]
+  let order: Order | undefined
 
   $: total = items
     .map((v) => ({
@@ -109,6 +110,7 @@
     })
 
   let cardElement: any
+  let paypalLoaded = false
 
   const createPaypal = (el: string | HTMLElement, amount: number) =>
     loadScript({
@@ -140,19 +142,6 @@
         onApprove: function (data, actions) {
           // Capture order after payment approved
           return actions?.order?.capture().then(async (details) => {
-            const order = await trpc().mutation('orders:create', {
-              storeId: $page.stuff.store!.id,
-              order: {
-                fees: [],
-                paymentMethods: ['paypal'],
-                items: items.map((i) => ({
-                  productId: products[i.productSlug].id,
-                  quantity: i.quantity,
-                  modifiers: i.modifiers,
-                })),
-              },
-            })
-            console.log(order)
             if (order) {
               confirmPayment({
                 amount: total,
@@ -167,11 +156,28 @@
           alert('Something went wrong')
           console.log('Something went wrong', err)
         },
-      }).render(el)
+      })
+        .render(el)
+        .then(() => {
+          paypalLoaded = true
+        })
     })
 
   const submit = async () => {
     if (!payment) {
+      order = await trpc().mutation('orders:create', {
+        storeId: $page.stuff.store!.id,
+        order: {
+          status: 'pending',
+          paymentMethods: [],
+          fees: [],
+          items: items.map((i) => ({
+            productId: products[i.productSlug].id,
+            quantity: i.quantity,
+            modifiers: i.modifiers,
+          })),
+        },
+      })
       payment = true
       createPaypal('#paypal-button', total)
       return
@@ -193,24 +199,6 @@
       error = result.error
       return
     }
-    const order = await trpc().mutation('orders:create', {
-      storeId: $page.stuff.store!.id,
-      order: {
-        fees: [
-          {
-            name: 'Stripe fee',
-            fixed: 0.3,
-            percentage: 2.9,
-          },
-        ],
-        paymentMethods: ['stripe'],
-        items: items.map((i) => ({
-          productId: products[i.productSlug].id,
-          quantity: i.quantity,
-          modifiers: i.modifiers,
-        })),
-      },
-    })
     console.log(order)
     if (order) {
       confirmPayment({
@@ -221,11 +209,32 @@
     }
   }
 
-  const confirmPayment = (event: CheckoutEvent) => {
+  const confirmPayment = async (event: CheckoutEvent) => {
+    if (!order) {
+      return
+    }
     done = event.amount
     payment = false
+    await trpc().mutation('orders:update', {
+      id: order?.id,
+      paymentMethods: [event.method],
+      status: 'paid',
+      fees:
+        event.method === 'stripe'
+          ? [
+              {
+                name: 'Stripe fee',
+                fixed: 0.3,
+                percentage: 2.9,
+              },
+            ]
+          : [],
+    })
+    order = undefined
     dispatch('checkout', event)
   }
+
+  $: console.log(order)
 
   async function pay(e) {
     const paymentMethod = e.detail.paymentMethod
@@ -255,7 +264,7 @@
 </script>
 
 {#if open}
-  <div class="contents" class:dark>
+  <div class="contents">
     <form
       on:submit|preventDefault={submit}
       class="bg-white border-l flex-grow h-full shadow-xl top-0 ease-out right-0 z-100 fixed sm:w-1/2 <sm:w-full lg:w-1/3 dark:bg-gray-800 dark:border-gray-700"
@@ -610,7 +619,7 @@
     @apply bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none;
   }
 
-  form :global(.dark .stripe-input) {
+  :global(.dark) form :global(.stripe-input) {
     @apply bg-gray-700 border-gray-600;
   }
 

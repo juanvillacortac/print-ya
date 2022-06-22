@@ -123,7 +123,7 @@
 {/if}
 
 <CheckoutSidebar
-  on:checkout={bag.clear}
+  on:checkout={() => bag.clear()}
   bind:open={checkout}
   dark={$preferences.darkMode}
   items={$bag}
