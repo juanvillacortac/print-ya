@@ -44,10 +44,12 @@
     }
     if (!$navigating) {
       NProgress.done()
-      invalidate((href) => {
-        console.log(href)
-        return false
-      })
+      if (browser) {
+        invalidate((href) => {
+          console.log(href)
+          return false
+        })
+      }
     }
   }
 
