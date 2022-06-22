@@ -189,7 +189,7 @@ export const updateOrder = async (
   const transactions = [
     ...(order.fees
       ? [
-          prisma.orderItem.deleteMany({
+          prisma.orderFee.deleteMany({
             where: {
               orderId: order.id,
             },

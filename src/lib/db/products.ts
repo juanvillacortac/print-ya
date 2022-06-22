@@ -29,6 +29,50 @@ export type StripedProduct = Omit<_Product, 'templateDraft'> & {
   storeCategory: StoreCategory | null
 }
 
+export const getProductById = (id: string): Promise<Product | null> =>
+  prisma.product
+    .findUnique({
+      where: {
+        id,
+      },
+      include: {
+        storeCategory: true,
+        modifiers: {
+          where: {
+            active: true,
+          },
+          orderBy: {
+            ordinal: 'asc',
+          },
+          include: {
+            items: {
+              where: {
+                active: true,
+              },
+              orderBy: {
+                ordinal: 'asc',
+              },
+            },
+          },
+        },
+      },
+    })
+    .then((data: Product | null) => {
+      if (data) {
+        data.modifiers = data!.modifiers!.map((m) => {
+          // @ts-ignore
+          delete m?.ordinal
+          m.items = m?.items!.map((i) => {
+            // @ts-ignore
+            delete i.ordinal
+            return i
+          })
+          return m
+        })
+      }
+      return data
+    })
+
 export const getProductBySlug = ({
   slug,
   storeId,

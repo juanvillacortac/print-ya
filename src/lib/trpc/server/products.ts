@@ -30,6 +30,12 @@ const queries = trpc
       return await db.getProductsByStore({ storeId: store.id })
     },
   })
+  .query('getById', {
+    input: z.string().cuid(),
+    resolve: async ({ input }) => {
+      return await db.getProductById(input)
+    },
+  })
   .query('getBySlug', {
     input: z.object({
       storeSlug: z.string(),

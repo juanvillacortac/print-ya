@@ -1,0 +1,191 @@
+<script context="module" lang="ts">
+  import type { Load } from '@sveltejs/kit'
+
+  export const load: Load = async ({ fetch, params }) => {
+    const store = await trpc(fetch).query('stores:getBySlug', params.slug)
+    if (!store) {
+      return {
+        status: 404,
+      }
+    }
+    const orders = await trpc(fetch).query('orders:list', {
+      storeId: store.id,
+    })
+    return {
+      props: {
+        orders,
+      },
+    }
+  }
+</script>
+
+<script lang="ts">
+  import { page } from '$app/stores'
+  import { pageSubtitle } from '$lib'
+  import type { Product, Store, StrippedOrder } from '$lib/db'
+  import trpc from '$lib/trpc/client'
+  import { tooltip } from '$lib/components/tooltip'
+  import { onMount } from 'svelte'
+  import {
+    getTotalFromProductModifiers,
+    type ModifiersMap,
+  } from '$lib/utils/modifiers'
+  import { Launch16 } from 'carbon-icons-svelte'
+
+  export let orders: StrippedOrder[] = []
+
+  let mounted = false
+  onMount(() => {
+    mounted = true
+  })
+  let products: Record<string, Product>
+  $: if (mounted && orders.length) {
+    loadProducts()
+  }
+
+  const loadProducts = () => {
+    if (!orders.length) {
+      products = {}
+      return
+    }
+    let client = trpc()
+    const promises = [
+      ...new Set(
+        orders
+          .map((o) => o.items)
+          .flat()
+          .map((i) => i.productId)
+      ),
+    ].map((id) => client.query('products:getById', id))
+    Promise.all(promises).then(
+      (p) =>
+        (products = p.reduce(
+          (a, v) => ({
+            ...a,
+            [v!.id]: v,
+          }),
+          {}
+        ))
+    )
+  }
+
+  const getTotal = (order: StrippedOrder) => {
+    const total = order.items
+      .map((i) => ({
+        product: products[i.productId],
+        quantity: i.quantity,
+        modifiers: i.modifiers as ModifiersMap,
+      }))
+      .map(
+        (i) => getTotalFromProductModifiers(i.product, i.modifiers) * i.quantity
+      )
+      .reduce((a, b) => a + b, 0)
+    return total
+  }
+
+  $pageSubtitle = 'Sales orders'
+</script>
+
+<div class="flex flex-col mx-auto space-y-4 lg:max-w-7/10">
+  <h3 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
+    Sales orders
+  </h3>
+  <div
+    class="bg-white border rounded-lg flex border-gray-200 w-full max-h-65vh relative overflow-auto dark:bg-gray-800 dark:border-gray-700"
+  >
+    {#if !products}
+      <div class="h-64vh w-full skeleton" />
+    {:else}
+      <table
+        class="text-sm text-left w-full text-gray-500 relative overflow-auto dark:text-gray-400 "
+      >
+        <thead
+          class="bg-gray-50 text-xs top-0 text-gray-700 z-20 uppercase sticky dark:bg-gray-700 dark:text-gray-400"
+        >
+          <tr>
+            <th scope="col" class="py-3 px-6"> Order Id </th>
+            <th scope="col" class="py-3 px-6"> Status </th>
+            <th scope="col" class="text-right py-3 px-6"> Order total </th>
+            <th scope="col" class="py-3 px-6"> Order date </th>
+            <th scope="col" class="text-center py-3 px-6"> Order items </th>
+            <th scope="col" class="text-center py-3 px-6"> Actions </th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each orders as o, idx}
+            <tr
+              class="bg-white dark:bg-gray-800"
+              class:border-b={idx !== orders.length - 1}
+              class:dark:border-gray-700={idx !== orders.length - 1}
+            >
+              <th
+                scope="row"
+                class="font-bold py-4 px-6 text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                <div class="flex w-15ch">
+                  <p
+                    class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
+                    title="Copy to clipboard"
+                    on:click={() => navigator.clipboard.writeText(o.id)}
+                    use:tooltip
+                  >
+                    {o.id}
+                  </p>
+                </div>
+              </th>
+              <td class="py-4 px-6">
+                <div class="flex">
+                  <p
+                    class="rounded cursor-pointer font-normal font-bold text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
+                    class:bg-green-500={o.status === 'paid'}
+                    class:bg-orange-500={o.status === 'pending'}
+                    class:bg-purple-500={o.status === 'processing'}
+                  >
+                    {o.status}
+                  </p>
+                </div>
+              </td>
+              <td>
+                <div class="flex w-full py-4 px-6">
+                  <p class="font-bold text-xs text-right w-full">
+                    {#if products}
+                      ${getTotal(o).toLocaleString('en', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {/if}
+                  </p>
+                </div>
+              </td>
+              <td>
+                <div class="flex py-4 px-6">
+                  <p class="font-bold text-xs">
+                    {o.createdAt.toLocaleString()}
+                  </p>
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="flex py-4 px-6">
+                  <p class="font-bold text-xs text-center w-full">
+                    {o.items?.length}
+                  </p>
+                </div>
+              </td>
+              <td class="text-right py-4 px-6">
+                <div class="flex">
+                  <a
+                    class="border-transparent rounded flex mx-auto border-2 p-1 duration-200 hover:border-gray-300 dark:hover:border-gray-500"
+                    title="View order"
+                    href="/stores/{$page.stuff.store?.slug}/orders/{o.id}"
+                    use:tooltip
+                    type="button"><Launch16 class="flex" /></a
+                  >
+                </div>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    {/if}
+  </div>
+</div>
