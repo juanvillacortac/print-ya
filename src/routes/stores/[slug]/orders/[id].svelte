@@ -146,8 +146,8 @@
       >{order.id}</span
     >
   </h3>
-  <div class="w-full grid gap-4 grid-cols-5">
-    <div class="flex flex-col space-y-4 col-span-3">
+  <div class="w-full grid gap-4 grid-cols-1 lg:grid-cols-5">
+    <div class="flex flex-col space-y-4 lg:col-span-3 <lg:row-start-2">
       {#if order.items.length}
         <div
           class="divide-y border rounded-lg flex flex-col w-full max-h-70vh relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
@@ -270,7 +270,7 @@
         </div>
       {/if}
     </div>
-    <div class="flex flex-col h-full space-y-4 w-full col-span-2 relative">
+    <div class="flex flex-col h-full space-y-4 w-full relative lg:col-span-2">
       <div
         class="bg-white border rounded-lg flex flex-col space-y-4 border-gray-300 w-full p-4 top-0 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
       >
