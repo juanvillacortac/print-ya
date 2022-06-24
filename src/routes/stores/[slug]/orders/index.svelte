@@ -22,7 +22,7 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
-  import type { Product, Store, StrippedOrder } from '$lib/db'
+  import type { OrderFee, Product, Store, StrippedOrder } from '$lib/db'
   import trpc from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
   import { onMount } from 'svelte'
@@ -43,7 +43,10 @@
     loadProducts()
   }
 
-  $: console.log(products)
+  const calcFee = (fee: OrderFee, base: number) =>
+    base * ((fee.percentage || 0) / 100) + (fee.fixed || 0)
+  const totalFees = (fees: OrderFee[], base: number) =>
+    fees?.map((f) => calcFee(f, base)).reduce((a, b) => a + b, 0)
 
   const loadProducts = () => {
     if (!orders.length) {
@@ -93,7 +96,7 @@
   $pageSubtitle = 'Sales orders'
 </script>
 
-<div class="flex flex-col mx-auto space-y-4 lg:max-w-7/10">
+<div class="flex flex-col mx-auto space-y-4">
   <h3 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
     Sales orders
   </h3>
@@ -112,7 +115,9 @@
           <tr>
             <th scope="col" class="py-3 px-6"> Order Id </th>
             <th scope="col" class="py-3 px-6"> Status </th>
+            <th scope="col" class="py-3 px-6"> Customer </th>
             <th scope="col" class="text-right py-3 px-6"> Order total </th>
+            <th scope="col" class="text-right py-3 px-6"> Revenue </th>
             <th scope="col" class="py-3 px-6"> Order date </th>
             <th scope="col" class="text-center py-3 px-6"> Order items </th>
             <th scope="col" class="text-center py-3 px-6"> Actions </th>
@@ -154,12 +159,37 @@
               </td>
               <td>
                 <div class="flex w-full py-4 px-6">
+                  <p class="font-bold text-xs w-full">
+                    {#if o.billingData}
+                      {o.billingData.firstName} {o.billingData.lastName}
+                    {:else}
+                      N/A
+                    {/if}
+                  </p>
+                </div>
+              </td>
+              <td>
+                <div class="flex w-full py-4 px-6">
                   <p class="font-bold text-xs text-right w-full">
                     {#if products}
                       ${getTotal(o).toLocaleString('en', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
+                    {/if}
+                  </p>
+                </div>
+              </td>
+              <td>
+                <div class="flex w-full py-4 px-6">
+                  <p class="font-bold text-xs text-right w-full">
+                    {#if products && o.status === 'paid'}
+                      ${Math.max(0, getTotal(o) - totalFees(o.fees, getTotal(o))).toLocaleString('en', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {:else}
+                      N/A
                     {/if}
                   </p>
                 </div>

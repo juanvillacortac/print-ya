@@ -9,6 +9,7 @@ import type {
 } from '@prisma/client'
 import type { StripedProduct } from './products'
 import type { ModifiersMap } from '$lib/utils/modifiers'
+import { nanoid } from 'nanoid'
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
 
@@ -29,9 +30,12 @@ export type Order = Overwrite<
   }
 >
 
-export type StrippedOrder = _Order & {
-  items: Omit<OrderItem, 'product'>[]
-}
+export type StrippedOrder = Overwrite<
+  Order,
+  {
+    items: _OrderItem[]
+  }
+>
 
 export const getOrder = (orderId: string): Promise<Order | null> =>
   prisma.order.findUnique({
@@ -95,7 +99,7 @@ export const getOrdersByStore = async ({
     orderBy: {
       createdAt: 'desc',
     },
-  })
+  }) as Promise<StrippedOrder[]>
 
 export const createOrder = async ({
   order,
@@ -117,6 +121,7 @@ export const createOrder = async ({
   prisma.order.create({
     data: {
       storeId,
+      id: nanoid(8),
       billingData: order.billingData,
       paymentMethods: order.paymentMethods || [],
       fees: {

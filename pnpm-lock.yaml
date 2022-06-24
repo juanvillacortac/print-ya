@@ -67,8 +67,10 @@ specifiers:
   html-to-image: ^1.9.0
   jsx-template-engine: ^1.0.0
   lodash-es: ^4.17.21
+  nanoid: ^4.0.0
   node-abort-controller: ^3.0.1
   nprogress: ^0.2.0
+  order-id: ^2.1.2
   prettier: ^2.6.2
   prism-theme-vars: ^0.2.2
   prisma: ^3.12.0
@@ -160,8 +162,10 @@ dependencies:
   html-to-image: 1.9.0
   jsx-template-engine: 1.0.0
   lodash-es: 4.17.21
+  nanoid: 4.0.0
   node-abort-controller: 3.0.1
   nprogress: 0.2.0
+  order-id: 2.1.2
   prettier: 2.6.2
   prism-theme-vars: 0.2.2
   prismjs: 1.28.0
@@ -4518,6 +4522,12 @@ packages:
     hasBin: true
     dev: true
 
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
+
   /napi-build-utils/1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
 
@@ -4569,6 +4579,11 @@ packages:
         optional: true
     dependencies:
       whatwg-url: 5.0.0
+    dev: false
+
+  /node-fpe/2.0.2:
+    resolution: {integrity: sha512-5rd32my+EZ+rp89UHXryaYiviAi+ttvPOzVbe9OSq6MxPRC9eVvVQKE2Cn9B8R0mnl42cwdnU7OnV3uqUMBr/g==}
+    engines: {node: '>=10.0.0'}
     dev: false
 
   /node-gyp-build/4.4.0:
@@ -4695,6 +4710,13 @@ packages:
       log-symbols: 4.1.0
       strip-ansi: 6.0.1
       wcwidth: 1.0.1
+    dev: false
+
+  /order-id/2.1.2:
+    resolution: {integrity: sha512-XCeZ1zjUt0khezGcALhWv0WpY/6ZDcaYAudJeu0TneN9FtxeUOsG+J84UHP5l/Lhx35b4frbKbNExpHEy0DQIA==}
+    engines: {node: '>=10.0.0'}
+    dependencies:
+      node-fpe: 2.0.2
     dev: false
 
   /os-tmpdir/1.0.2:

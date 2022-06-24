@@ -167,20 +167,32 @@
 
   const submit = async () => {
     if (!payment) {
-      order = await trpc().mutation('orders:create', {
-        storeId: $page.stuff.store!.id,
-        order: {
-          status: 'pending',
-          paymentMethods: [],
-          fees: [],
+      if (order) {
+        order = (await trpc().mutation('orders:update', {
+          id: order.id,
           billingData: shipping,
           items: items.map((i) => ({
             productId: products[i.productSlug].id,
             quantity: i.quantity,
             modifiers: i.modifiers,
           })),
-        },
-      })
+        })) as Order
+      } else {
+        order = await trpc().mutation('orders:create', {
+          storeId: $page.stuff.store!.id,
+          order: {
+            status: 'pending',
+            paymentMethods: [],
+            fees: [],
+            billingData: shipping,
+            items: items.map((i) => ({
+              productId: products[i.productSlug].id,
+              quantity: i.quantity,
+              modifiers: i.modifiers,
+            })),
+          },
+        })
+      }
       payment = true
       createPaypal('#paypal-button', total)
       return

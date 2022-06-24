@@ -81,6 +81,13 @@
 
   let details: BagItem | undefined
 
+  const calcFee = (fee: OrderFee, base: number) =>
+    base * ((fee.percentage || 0) / 100) + (fee.fixed || 0)
+
+  $: totalFees = order.fees
+    ?.map((f) => calcFee(f, total))
+    .reduce((a, b) => a + b, 0)
+
   const getTotal = (order: Order) => {
     const total = order.items
       .map((i) => ({
@@ -118,8 +125,7 @@
     }
     const prefix = arr.join(' + ')
     if (fee.percentage) {
-      const newTotal = total * (fee.percentage / 100) + fee.fixed
-      return `${prefix} = $${newTotal.toLocaleString('en', {
+      return `${prefix} = $${calcFee(fee, total).toLocaleString('en', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`
@@ -142,7 +148,7 @@
     class="flex font-bold font-title text-black text-xl mb-4 items-center dark:text-white"
   >
     Order # <span
-      class="rounded font-mono font-normal bg-gray-200 text-xs ml-2 p-1 dark:bg-gray-600"
+      class="rounded font-mono font-normal bg-gray-200 text-xs leading-none ml-2 p-1 dark:bg-gray-600"
       >{order.id}</span
     >
   </h3>
@@ -150,7 +156,7 @@
     <div class="flex flex-col space-y-4 lg:col-span-3 <lg:row-start-2">
       {#if order.items.length}
         <div
-          class="divide-y border rounded-lg flex flex-col w-full max-h-70vh relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
+          class="divide-y bg-white border rounded-lg flex flex-col border-gray-300 w-full max-h-70vh relative overflow-x-auto dark:divide-gray-700 dark:bg-gray-800 dark:border-gray-600"
         >
           {#each order.items as item}
             {@const p = products ? products[item.productId] : null}
@@ -164,7 +170,7 @@
                   class="flex items-center sm:space-x-4 <lg:flex-col <lg:space-y-4"
                 >
                   <div
-                    class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-42 dark:bg-gray-700"
+                    class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-42 dark:bg-gray-900"
                     style="aspect-ratio: 1/1"
                   >
                     <div class="flex h-full w-full items-center justify-center">
@@ -179,7 +185,6 @@
                               item.modifiers
                             ),
                           }}
-                          watermark
                           controls={false}
                         />
                       {/if}
@@ -189,7 +194,8 @@
                     class="flex flex-col space-y-1 w-full whitespace-normal sm:w-48"
                   >
                     <a
-                      href="/products/{p?.slug}"
+                      href="../products/{p?.slug}"
+                      target="__blank"
                       class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
                     >
                       {p?.name}
@@ -322,6 +328,17 @@
                     </div>
                   </div>
                 {/each}
+                <div class="flex flex-col font-bold space-y-4 text-xs p-2">
+                  <div class="flex justify-between">
+                    <div>Total fees:</div>
+                    <p>
+                      ${totalFees.toLocaleString('en', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           {/if}
@@ -332,7 +349,7 @@
             >
               <div class="flex flex-col font-bold space-y-4 text-xs p-2">
                 <div class="flex justify-between">
-                  <div>Subtotal:</div>
+                  <div>Subtotal ({order.items?.length || 0} items):</div>
                   <p>
                     ${total.toLocaleString('en', {
                       minimumFractionDigits: 2,
@@ -363,6 +380,20 @@
                   </p>
                 </div>
               </div>
+              <div class="flex flex-col font-bold space-y-4 text-xs p-2">
+                <div class="flex justify-between">
+                  <div>Revenue:</div>
+                  <p>
+                    Total - fees = ${Math.max(
+                      total - totalFees,
+                      0
+                    ).toLocaleString('en', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -376,6 +407,7 @@
               Customer details
             </h4>
           </div>
+          <p class="font-bold text-xs">Not registered</p>
           <div class="text-xs w-full grid gap-4 grid-cols-2">
             <div class="flex flex-col space-y-1">
               <p class="font-bold">Email:</p>

@@ -75,7 +75,7 @@ const queries = trpc
   })
   .query('get', {
     input: z.object({
-      orderId: z.string().cuid(),
+      orderId: z.string(),
     }),
     resolve: async ({ input }) => db.getOrder(input.orderId),
   })
