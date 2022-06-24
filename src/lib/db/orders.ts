@@ -1,7 +1,7 @@
 import { prisma } from './common'
 import type {
   Order as _Order,
-  OrderFee,
+  OrderFee as _OrderFee,
   OrderItem as _OrderItem,
   Product as _Product,
   ProductModifier as _ProductModifier,
@@ -16,13 +16,15 @@ export type OrderItem = _OrderItem & {
   product: StripedProduct
 }
 
+export type OrderFee = Omit<_OrderFee, 'id' | 'orderId'>
+
 export type Order = Overwrite<
   _Order,
   {
     customerId?: string
     billingData?: any
     paymentMethods: string[]
-    fees: Omit<OrderFee, 'id' | 'orderId'>[]
+    fees: OrderFee[]
     items: OrderItem[]
   }
 >
@@ -115,6 +117,7 @@ export const createOrder = async ({
   prisma.order.create({
     data: {
       storeId,
+      billingData: order.billingData,
       paymentMethods: order.paymentMethods || [],
       fees: {
         createMany: {

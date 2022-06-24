@@ -24,6 +24,7 @@
   import trpc from '$lib/trpc/client'
   import CheckoutSidebar from '$lib/__storefront/CheckoutSidebar.svelte'
   import BagItemDetails from '$lib/__storefront/BagItemDetails.svelte'
+  import type { Prisma } from '@prisma/client'
 
   let mounted = false
   onMount(() => {
@@ -64,7 +65,7 @@
       currentTarget?: EventTarget & HTMLInputElement
     },
     p: Product | null,
-    m: ModifiersMap
+    m: ModifiersMap | Prisma.JsonValue
   ) => {
     if (p) {
       bag.setItem(p, m, Math.max(p?.minQuantity || 1, +e.currentTarget.value))

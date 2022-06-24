@@ -39,24 +39,31 @@
     mounted = true
   })
   let products: Record<string, Product>
-  $: if (mounted && orders.length) {
+  $: if (mounted && orders) {
     loadProducts()
   }
+
+  $: console.log(products)
 
   const loadProducts = () => {
     if (!orders.length) {
       products = {}
       return
     }
-    let client = trpc()
-    const promises = [
+    const ids = [
       ...new Set(
         orders
           .map((o) => o.items)
           .flat()
           .map((i) => i.productId)
       ),
-    ].map((id) => client.query('products:getById', id))
+    ]
+    if (!ids?.length) {
+      products = {}
+      return
+    }
+    let client = trpc()
+    const promises = ids.map((id) => client.query('products:getById', id))
     Promise.all(promises).then(
       (p) =>
         (products = p.reduce(

@@ -47,6 +47,8 @@
   export let items: BagItem[]
   let order: Order | undefined
 
+  let shipping: Record<string, string> = {}
+
   $: total = items
     .map((v) => ({
       product: products ? products[v.productSlug] : null,
@@ -171,6 +173,7 @@
           status: 'pending',
           paymentMethods: [],
           fees: [],
+          billingData: shipping,
           items: items.map((i) => ({
             productId: products[i.productSlug].id,
             quantity: i.quantity,
@@ -416,6 +419,7 @@
                       placeholder="Ex. juan@gmail.com"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                      bind:value={shipping.email}
                     />
                   </div>
                   <div class="flex flex-col w-full">
@@ -426,6 +430,7 @@
                       type="tel"
                       placeholder="Ex. +1 XXXXXX"
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                      bind:value={shipping.phone}
                     />
                   </div>
                 </div>
@@ -438,6 +443,7 @@
                       type="text"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                      bind:value={shipping.firstName}
                     />
                   </div>
                   <div class="flex flex-col w-full">
@@ -447,6 +453,7 @@
                     <input
                       type="text"
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                      bind:value={shipping.lastName}
                     />
                   </div>
                 </div>
@@ -457,6 +464,7 @@
                   <select
                     class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                     required
+                    bind:value={shipping.country}
                   >
                     <option value="" hidden />
                     {#each countries as country}
@@ -473,6 +481,7 @@
                       type="text"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                      bind:value={shipping.province}
                     />
                   </div>
                   <div class="flex flex-col w-full">
@@ -483,6 +492,7 @@
                       type="text"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                      bind:value={shipping.address}
                     />
                   </div>
                 </div>
@@ -495,6 +505,7 @@
                       required
                       type="text"
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                      bind:value={shipping.city}
                     />
                   </div>
                   <div class="flex flex-col w-full">
@@ -505,6 +516,7 @@
                       type="text"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                      bind:value={shipping.zip}
                     />
                   </div>
                 </div>

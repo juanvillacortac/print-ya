@@ -86,10 +86,14 @@ export type BagItem = {
 }
 
 export type BagStore = Readable<BagItem[]> & {
-  delete(product: Product, modifiers: ModifiersMap): void
   clear(): void
+  delete(product: Product, modifiers: ModifiersMap | Prisma.JsonValue): void
   existInBag(product: Product, modifiers: ModifiersMap): boolean
-  setItem(product: Product, modifiers: ModifiersMap, quantity: number): void
+  setItem(
+    product: Product,
+    modifiers: ModifiersMap | Prisma.JsonValue,
+    quantity: number
+  ): void
   addToBag(product: Product, modifiers: ModifiersMap, quantity: number): void
 }
 
@@ -108,7 +112,10 @@ const createBag = (): BagStore => {
       ? flatMap(val, (v, k) => getKeys(v, [...keys, k]))
       : keys[keys.length - 1]
 
-  const getKey = (product: Product, modifiers: ModifiersMap) => {
+  const getKey = (
+    product: Product,
+    modifiers: ModifiersMap | Prisma.JsonValue
+  ) => {
     const map: ModifiersMap = {
       ...Object.fromEntries(
         Object.entries(modifiers || {}).map(([mId, v]) => [
