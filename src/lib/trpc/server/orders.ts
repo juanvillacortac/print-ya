@@ -65,11 +65,20 @@ const mutations = trpc
     resolve: async ({ input }) => db.updateOrder(input),
   })
 
+const order = z.enum(['desc', 'asc'])
+
 const queries = trpc
   .router<tRPCContext>()
   .query('list', {
     input: z.object({
       storeId: z.string().cuid(),
+      orderBy: z
+        .object({
+          id: order.optional(),
+          createdAt: order.optional(),
+          total: order.optional(),
+        })
+        .optional(),
     }),
     resolve: ({ input }) => db.getOrdersByStore(input),
   })
