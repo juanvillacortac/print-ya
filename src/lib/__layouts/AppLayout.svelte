@@ -14,6 +14,10 @@
     ChevronLeft20,
     Launch16,
     ChevronLeft24,
+    Category24,
+    Product24,
+    ColorPalette24,
+    OrderDetails24,
   } from 'carbon-icons-svelte'
   import Favicons from '$lib/components/Favicons.svelte'
   import { pageSubtitle } from '$lib/stores'
@@ -22,29 +26,65 @@
   import Image from '$lib/components/caravaggio/Image.svelte'
   import { getAbsoluteURL } from '$lib/utils/host'
   import { beforeNavigate } from '$app/navigation'
-  import { fly } from 'svelte/transition'
+  import { fly, scale, slide } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import trpc from '$lib/trpc/client'
+  import { flip } from 'svelte/animate'
 
   $: path = $page.url.pathname
+  $: store = $page.stuff.store
 
-  const pages = [
-    {
-      icon: Home24,
-      title: 'Dashboard',
-      href: '/',
-    },
-    {
-      icon: Store24,
-      title: 'Stores',
-      href: '/stores',
-    },
-    {
-      icon: Settings24,
-      title: 'User settings',
-      href: '/settings',
-    },
-  ]
+  $: pages = {
+    none: [
+      {
+        icon: Home24,
+        title: 'Dashboard',
+        href: '/',
+      },
+      {
+        icon: Store24,
+        title: 'Stores',
+        href: '/stores',
+      },
+      {
+        icon: Settings24,
+        title: 'User settings',
+        href: '/settings',
+      },
+    ],
+    stores: [
+      {
+        icon: Home24,
+        title: ` ${store?.name} Dashboard`,
+        href: `/stores/${store?.slug}`,
+      },
+      {
+        icon: Category24,
+        title: 'Categories',
+        href: `/stores/${store?.slug}/categories`,
+      },
+      {
+        icon: Product24,
+        title: 'Products',
+        href: `/stores/${store?.slug}/products`,
+      },
+      {
+        icon: OrderDetails24,
+        title: 'Orders',
+        href: `/stores/${store?.slug}/orders`,
+      },
+      {
+        icon: ColorPalette24,
+        title: 'Customize storefront',
+        href: `/stores/${store?.slug}/customization`,
+      },
+      {
+        icon: Settings24,
+        title: 'Store settings',
+        href: `/stores/${store?.slug}/settings`,
+      },
+    ],
+  }
 
   let subtitle = ''
   $: subtitle = $pageSubtitle ? $pageSubtitle : subtitle
@@ -67,7 +107,7 @@
   <div class="flex flex-col h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
       <div
-        class="bg-white border-r flex flex-col h-full  border-light-900 p-4 text-gray-400 z-10 justify-between sidebar dark:bg-gray-900 dark:border-gray-700"
+        class="bg-white border-r flex flex-col h-full  border-light-900 p-4 text-gray-400 z-60 justify-between sidebar dark:bg-gray-900 dark:border-gray-700"
         class:open={sidebar}
       >
         <div
@@ -118,13 +158,16 @@
               PY!
             </h1> -->
           </a>
-          {#each pages as p}
+          {#each store ? pages['stores'] : pages['none'] as p (p.href)}
             {@const current =
-              p.href === '/' ? path === '/' : path?.startsWith(p.href)}
+              p.href === '/' || p.href === `/stores/${store?.slug}`
+                ? path === '/' || path === `/stores/${store?.slug}`
+                : path?.startsWith(p.href)}
             <a
               title={p.title}
               use:tooltip
               class="flex hover:text-black dark:hover:text-white"
+              in:scale|local={{ start: 0.8, duration: 400, easing: expoOut }}
               sveltekit:prefetch
               class:text-black={current}
               class:dark:text-white={current}
@@ -139,7 +182,7 @@
           {/each}
         </div>
         <div
-          class="flex sm:flex-col sm:space-y-6 <sm:space-x-6 <sm:items-center <sm:justify-between"
+          class="flex sm:flex-col sm:space-y-6 <sm:space-x-6 <sm:items-center"
         >
           <button
             on:click={() => ($preferences.darkMode = !$preferences.darkMode)}

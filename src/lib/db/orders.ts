@@ -79,8 +79,16 @@ export const getOrder = (orderId: string): Promise<Order | null> =>
 
 export const getOrdersByStore = async ({
   storeId,
+  orderBy = {
+    createdAt: 'desc',
+  },
 }: {
   storeId: string
+  orderBy?: {
+    id?: 'desc' | 'asc'
+    createdAt?: 'desc' | 'asc'
+    total?: 'desc' | 'asc'
+  }
 }): Promise<StrippedOrder[]> =>
   prisma.order.findMany({
     where: {
@@ -96,9 +104,7 @@ export const getOrdersByStore = async ({
       },
       items: true,
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy,
   }) as Promise<StrippedOrder[]>
 
 export const createOrder = async ({
@@ -106,10 +112,12 @@ export const createOrder = async ({
   storeId,
 }: {
   order: Overwrite<
-    Omit<Order, 'id' | 'createdAt' | 'storeId'>,
+    Omit<Order, 'id' | 'createdAt' | 'storeId' | 'total'>,
     {
+      fulfillmentStatus?: Order['fulfillmentStatus']
       paymentMethods?: string[]
       items: {
+        cost: number
         productId: string
         modifiers?: ModifiersMap | null
         quantity: number
@@ -124,6 +132,7 @@ export const createOrder = async ({
       id: nanoid(8),
       billingData: order.billingData,
       paymentMethods: order.paymentMethods || [],
+      total: order.items.map((i) => i.cost || 0).reduce((a, b) => a + b, 0),
       fees: {
         createMany: {
           data: order.fees.map((f) => ({
@@ -138,6 +147,7 @@ export const createOrder = async ({
           data: order.items.map((i) => ({
             modifiers: i.modifiers || {},
             productId: i.productId,
+            cost: i.cost,
             quantity: i.quantity,
           })),
         },
@@ -188,6 +198,7 @@ export const updateOrder = async (
       items?: {
         productId: string
         modifiers?: ModifiersMap | null
+        cost: number
         quantity: number
       }[]
     }
@@ -225,6 +236,9 @@ export const updateOrder = async (
       paymentMethods: order.paymentMethods,
       status: order.status,
       billingData: order.billingData || undefined,
+      total: order.items
+        ? order.items.map((i) => i.cost || 0).reduce((a, b) => a + b, 0)
+        : undefined,
       fees: order.fees
         ? {
             createMany: {
@@ -242,6 +256,7 @@ export const updateOrder = async (
               data: order.items.map((i) => ({
                 modifiers: i.modifiers || {},
                 productId: i.productId,
+                cost: i.cost,
                 quantity: i.quantity,
               })),
             },

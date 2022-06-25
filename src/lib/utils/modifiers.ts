@@ -75,7 +75,8 @@ export const getTemplateFieldsFromModifiers = (
 
 export const getCostFromProductModifiers = (
   product: Product,
-  modifiers: ModifiersMap | Prisma.JsonValue
+  modifiers: ModifiersMap | Prisma.JsonValue,
+  cost?: number
 ) =>
   Object.entries(modifiers || {})
     .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
@@ -88,13 +89,15 @@ export const getCostFromProductModifiers = (
           modifier.items!.find((i) => i.id === id)
         )
         const costs = items.map((item) =>
-          item!.percentage ? (item!.cost / 100) * product.price : item!.cost
+          item!.percentage
+            ? (item!.cost / 100) * (cost ?? product.price)
+            : item!.cost
         )
         return costs.reduce((a, b) => a + b, 0)
       }
       const item = modifier.items!.find((i) => i.id === mValue.itemId)
       const value = item!.percentage
-        ? (item!.cost / 100) * product.price
+        ? (item!.cost / 100) * (cost ?? product.price)
         : item!.cost
       return value
     })
@@ -102,5 +105,8 @@ export const getCostFromProductModifiers = (
 
 export const getTotalFromProductModifiers = (
   product: Product,
-  modifiers: ModifiersMap | Prisma.JsonValue
-) => getCostFromProductModifiers(product, modifiers) + product.price
+  modifiers: ModifiersMap | Prisma.JsonValue,
+  cost?: number
+) =>
+  getCostFromProductModifiers(product, modifiers, cost) +
+  (cost ?? product.price)

@@ -16,7 +16,11 @@
   import { elasticOut, expoOut } from 'svelte/easing'
   import { fade, scale } from 'svelte/transition'
 
-  export let item: BagItem | undefined
+  export let item:
+    | (BagItem & {
+        cost?: number
+      })
+    | undefined
   export let store: Store
 
   let product: Product | undefined
@@ -101,12 +105,19 @@
                 {product.name || ''}
               </h3>
               <p class="font-bold text-black text-2xl dark:text-white">
-                ${product.price.toLocaleString()}
+                ${(item.cost ?? product.price).toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
                 <span class="text-base">/ unit</span>
               </p>
               <p class="font-bold text-black text-base dark:text-white">
                 Total: ${(product
-                  ? getTotalFromProductModifiers(product, item.modifiers)
+                  ? getTotalFromProductModifiers(
+                      product,
+                      item.modifiers,
+                      item.cost
+                    )
                   : 0
                 ).toLocaleString()}
               </p>

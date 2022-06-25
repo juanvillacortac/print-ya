@@ -115,6 +115,7 @@
           <tr>
             <th scope="col" class="py-3 px-6"> Order Id </th>
             <th scope="col" class="py-3 px-6"> Status </th>
+            <th scope="col" class="py-3 px-6"> Fulfillment Status </th>
             <th scope="col" class="py-3 px-6"> Customer </th>
             <th scope="col" class="text-right py-3 px-6"> Order total </th>
             <th scope="col" class="text-right py-3 px-6"> Revenue </th>
@@ -148,12 +149,23 @@
               <td class="py-4 px-6">
                 <div class="flex">
                   <p
-                    class="rounded cursor-pointer font-normal font-bold text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
+                    class="rounded font-normal text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
                     class:bg-green-500={o.status === 'paid'}
                     class:bg-orange-500={o.status === 'pending'}
                     class:bg-purple-500={o.status === 'processing'}
                   >
                     {o.status}
+                  </p>
+                </div>
+              </td>
+              <td class="py-4 px-6">
+                <div class="flex">
+                  <p
+                    class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
+                    class:!bg-green-500={o.fulfillmentStatus === 'fulfilled'}
+                    class:!text-white={o.fulfillmentStatus === 'fulfilled'}
+                  >
+                    {o.fulfillmentStatus.split('_').join(' ')}
                   </p>
                 </div>
               </td>
@@ -184,7 +196,10 @@
                 <div class="flex w-full py-4 px-6">
                   <p class="font-bold text-xs text-right w-full">
                     {#if products && o.status === 'paid'}
-                      ${Math.max(0, getTotal(o) - totalFees(o.fees, getTotal(o))).toLocaleString('en', {
+                      ${Math.max(
+                        0,
+                        getTotal(o) - totalFees(o.fees, getTotal(o))
+                      ).toLocaleString('en', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
