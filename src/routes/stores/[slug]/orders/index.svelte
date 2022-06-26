@@ -25,7 +25,7 @@
   import type { OrderFee, Product, Store, StrippedOrder } from '$lib/db'
   import trpc from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import {
     getTotalFromProductModifiers,
     type ModifiersMap,
@@ -39,7 +39,7 @@
   onMount(() => {
     mounted = true
   })
-  let products: Record<string, Product>
+  let products: Record<string, Product> | undefined
   $: if (mounted && orders) {
     loadProducts()
   }
@@ -83,6 +83,7 @@
   let timeout: NodeJS.Timeout
   let idSearch = ''
   const search = async (..._deps: any[]) => {
+    products = undefined
     const filtered = await trpc().query('orders:list', {
       storeId: $page.stuff.store!.id,
       filter: {
@@ -90,6 +91,8 @@
       },
     })
     orders = filtered
+    tick()
+    loadProducts()
   }
 
   $: if (browser) {
@@ -104,7 +107,7 @@
       order.total ??
       order.items
         .map((i) => ({
-          product: products[i.productId],
+          product: products![i.productId],
           quantity: i.quantity,
           modifiers: i.modifiers as ModifiersMap,
         }))
