@@ -174,7 +174,12 @@
           items: items.map((i) => ({
             productId: products[i.productSlug].id,
             quantity: i.quantity,
-            cost: products[i.productSlug].price,
+            cost:
+              getTotalFromProductModifiers(
+                products[i.productSlug],
+                i.modifiers
+              ) * i.quantity,
+            basePrice: products[i.productSlug].price,
             modifiers: i.modifiers,
           })),
         })) as Order
@@ -189,7 +194,12 @@
             items: items.map((i) => ({
               productId: products[i.productSlug].id,
               quantity: i.quantity,
-              cost: products[i.productSlug].price,
+              cost:
+                getTotalFromProductModifiers(
+                  products[i.productSlug],
+                  i.modifiers
+                ) * i.quantity,
+              basePrice: products[i.productSlug].price,
               modifiers: i.modifiers,
             })),
           },

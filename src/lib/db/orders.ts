@@ -79,11 +79,17 @@ export const getOrder = (orderId: string): Promise<Order | null> =>
 
 export const getOrdersByStore = async ({
   storeId,
+  filter,
   orderBy = {
     createdAt: 'desc',
   },
 }: {
   storeId: string
+  filter?: {
+    id?: string
+    status?: Order['status']
+    fulfillmentStatus?: Order['fulfillmentStatus']
+  }
   orderBy?: {
     id?: 'desc' | 'asc'
     createdAt?: 'desc' | 'asc'
@@ -93,6 +99,13 @@ export const getOrdersByStore = async ({
   prisma.order.findMany({
     where: {
       storeId,
+      id: filter?.id
+        ? {
+            startsWith: filter.id,
+          }
+        : undefined,
+      status: filter?.status,
+      fulfillmentStatus: filter?.fulfillmentStatus,
     },
     include: {
       fees: {
@@ -118,6 +131,7 @@ export const createOrder = async ({
       paymentMethods?: string[]
       items: {
         cost: number
+        basePrice: number
         productId: string
         modifiers?: ModifiersMap | null
         quantity: number
@@ -148,6 +162,7 @@ export const createOrder = async ({
             modifiers: i.modifiers || {},
             productId: i.productId,
             cost: i.cost,
+            basePrice: i.basePrice,
             quantity: i.quantity,
           })),
         },
@@ -201,6 +216,7 @@ export const updateOrder = async (
         modifiers?: ModifiersMap | null
         fulfilled?: number
         cost: number
+        basePrice: number
         quantity: number
       }[]
     }
@@ -261,6 +277,7 @@ export const updateOrder = async (
                 productId: i.productId,
                 fulfilled: i.fulfilled,
                 cost: i.cost,
+                basePrice: i.basePrice,
                 quantity: i.quantity,
               })),
             },

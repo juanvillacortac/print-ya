@@ -203,6 +203,7 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
   modifiers Json
   cost      Float   @default(0)
+  basePrice Float   @default(0)
   fulfilled Int     @default(0)
   quantity  Int
 

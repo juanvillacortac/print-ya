@@ -31,6 +31,7 @@
     type ModifiersMap,
   } from '$lib/utils/modifiers'
   import { Launch16 } from 'carbon-icons-svelte'
+  import { browser } from '$app/env'
 
   export let orders: StrippedOrder[] = []
 
@@ -79,17 +80,39 @@
     )
   }
 
+  let timeout: NodeJS.Timeout
+  let idSearch = ''
+  const search = async (..._deps: any[]) => {
+    const filtered = await trpc().query('orders:list', {
+      storeId: $page.stuff.store!.id,
+      filter: {
+        id: idSearch || undefined,
+      },
+    })
+    orders = filtered
+  }
+
+  $: if (browser) {
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+    timeout = setTimeout(() => search(idSearch), 500)
+  }
+
   const getTotal = (order: StrippedOrder) => {
-    const total = order.items
-      .map((i) => ({
-        product: products[i.productId],
-        quantity: i.quantity,
-        modifiers: i.modifiers as ModifiersMap,
-      }))
-      .map(
-        (i) => getTotalFromProductModifiers(i.product, i.modifiers) * i.quantity
-      )
-      .reduce((a, b) => a + b, 0)
+    const total =
+      order.total ??
+      order.items
+        .map((i) => ({
+          product: products[i.productId],
+          quantity: i.quantity,
+          modifiers: i.modifiers as ModifiersMap,
+        }))
+        .map(
+          (i) =>
+            getTotalFromProductModifiers(i.product, i.modifiers) * i.quantity
+        )
+        .reduce((a, b) => a + b, 0)
     return total
   }
 
@@ -100,6 +123,14 @@
   <h3 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
     Sales orders
   </h3>
+  <div class="flex space-x-2 w-full justify-between items-center">
+    <input
+      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+      type="text"
+      bind:value={idSearch}
+      placeholder="Search by order id"
+    />
+  </div>
   <div
     class="bg-white border rounded-lg flex border-gray-200 w-full max-h-65vh relative overflow-auto dark:bg-gray-800 dark:border-gray-700"
   >

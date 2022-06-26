@@ -378,7 +378,7 @@
                           Cost
                         </p>
                         <p class="font-bold text-sm">
-                          ${(item.cost ?? p?.price).toLocaleString('en', {
+                          ${(item.basePrice ?? p?.price).toLocaleString('en', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })} / unit
@@ -393,7 +393,7 @@
                             ? getCostFromProductModifiers(
                                 p,
                                 item.modifiers,
-                                item.cost
+                                item.basePrice
                               )
                             : 0
                           ).toLocaleString('en', {
@@ -421,7 +421,7 @@
                         ? getTotalFromProductModifiers(
                             p,
                             item.modifiers,
-                            item.cost
+                            item.basePrice
                           ) * item.quantity
                         : 0
                       ).toLocaleString('en', {
@@ -441,7 +441,7 @@
                           modifiers: item.modifiers,
                           productSlug: p?.slug || '',
                           quantity: item.quantity,
-                          cost: item.cost,
+                          cost: item.basePrice,
                         }
                       }}
                     >

@@ -4,6 +4,14 @@ import { z } from 'zod'
 import type { tRPCContext } from '.'
 
 const orderStatus = z.enum(['paid', 'processing', 'pending'])
+const fulfillmentStatus = z.enum([
+  'fulfilled',
+  'unfulfilled',
+  'partially_fulfilled',
+  'awaiting_shipment',
+  'scheduled',
+  'on_hold',
+])
 
 const mutations = trpc
   .router<tRPCContext>()
@@ -21,6 +29,7 @@ const mutations = trpc
             fulfilled: z.number().min(0).optional(),
             quantity: z.number().min(1),
             cost: z.number().min(0),
+            basePrice: z.number().min(0),
           })
         ),
         fees: z.array(
@@ -45,22 +54,14 @@ const mutations = trpc
       paymentMethods: z.array(z.string()).optional(),
       status: orderStatus.optional(),
       billingData: z.any().optional(),
-      fulfillmentStatus: z
-        .enum([
-          'fulfilled',
-          'unfulfilled',
-          'partially_fulfilled',
-          'awaiting_shipment',
-          'scheduled',
-          'on_hold',
-        ])
-        .optional(),
+      fulfillmentStatus: fulfillmentStatus.optional(),
       items: z
         .array(
           z.object({
             productId: z.string(),
             modifiers: z.any(),
             cost: z.number().min(0),
+            basePrice: z.number().min(0),
             fulfilled: z.number().min(0).optional(),
             quantity: z.number().min(1),
           })
@@ -86,6 +87,13 @@ const queries = trpc
   .query('list', {
     input: z.object({
       storeId: z.string().cuid(),
+      filter: z
+        .object({
+          id: z.string().optional(),
+          status: orderStatus.optional(),
+          fulfillmentStatus: fulfillmentStatus.optional(),
+        })
+        .optional(),
       orderBy: z
         .object({
           id: order.optional(),
