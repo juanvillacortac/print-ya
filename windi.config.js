@@ -4,9 +4,9 @@ import forms from 'windicss/plugin/forms'
 import aspectRatio from 'windicss/plugin/aspect-ratio'
 import lineClamp from 'windicss/plugin/line-clamp'
 import typography from 'windicss/plugin/typography'
+import animate from '@windicss/plugin-animations'
 
-const colors = {
-}
+const colors = {}
 
 export default defineConfig({
   darkMode: 'class', // or 'media'
@@ -33,11 +33,5 @@ export default defineConfig({
       },
     },
   },
-  plugins: [
-    filters,
-    forms,
-    aspectRatio,
-    lineClamp,
-    typography,
-  ],
+  plugins: [filters, forms, aspectRatio, lineClamp, typography, animate],
 })

@@ -48,6 +48,7 @@ specifiers:
   '@types/lodash-es': ^4.17.6
   '@types/three': ^0.135.0
   '@upstash/redis': ^1.6.1
+  '@windicss/plugin-animations': ^1.0.9
   '@windicss/plugin-icons': ^1.0.2
   bcryptjs: ^2.4.3
   bytemd: ^1.13.1
@@ -203,6 +204,7 @@ devDependencies:
   '@sveltejs/kit': 1.0.0-next.335_svelte@3.48.0
   '@types/bcrypt': 5.0.0
   '@types/three': 0.135.0
+  '@windicss/plugin-animations': 1.0.9
   '@windicss/plugin-icons': 1.0.2
   carbon-preprocess-svelte: 0.6.0_svelte@3.48.0
   cross-env: 7.0.3
@@ -2095,6 +2097,10 @@ packages:
       windicss: 3.5.3
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /@windicss/plugin-animations/1.0.9:
+    resolution: {integrity: sha512-9WsQsPzLurkwV5zaMCwmylxfSHlQ1pPmzud4ysvMkMBRB7obub9ESmqlHefcCjEhatz/ZROi1U1XOuOPPUO1nA==}
     dev: true
 
   /@windicss/plugin-icons/1.0.2:

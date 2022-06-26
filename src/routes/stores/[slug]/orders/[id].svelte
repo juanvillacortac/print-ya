@@ -26,7 +26,7 @@
 </script>
 
 <script lang="ts">
-  import type { Order, Product } from '$lib/db'
+  import type { Order, OrderItem, Product } from '$lib/db'
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
@@ -36,10 +36,12 @@
     getTotalFromProductModifiers,
   } from '$lib/utils/modifiers'
   import {
+    Add16,
     Checkmark16,
     CheckmarkFilled16,
     Close16,
     Pen16,
+    Subtract16,
     View16,
   } from 'carbon-icons-svelte'
   import BagItemDetails from '$lib/__storefront/BagItemDetails.svelte'
@@ -49,6 +51,7 @@
   import type { OrderFee } from '$lib/db'
   import { getCountries } from '$lib/utils/countries'
   import { tooltip } from '$lib/components/tooltip'
+  import { clamp } from '$lib/utils/math'
 
   const countries = getCountries()
 
@@ -86,7 +89,7 @@
     )
   }
 
-  let details: BagItem | undefined
+  let details: (BagItem & { cost: number }) | undefined
 
   const calcFee = (fee: OrderFee, base: number) =>
     base * ((fee.percentage || 0) / 100) + (fee.fixed || 0)
@@ -107,6 +110,42 @@
       )
       .reduce((a, b) => a + b, 0)
     return total
+  }
+
+  const setFulfillment = () => {
+    fulfillmentMode = !fulfillmentMode
+    itemsData = JSON.parse(JSON.stringify(order.items))
+  }
+
+  const saveFulfillment = () => {
+    const valid = Array.from(
+      (document.getElementsByClassName(
+        'fulfillment'
+      ) as HTMLCollectionOf<HTMLInputElement>) || []
+    )
+      .map((el) => el.reportValidity())
+      .every((el) => el)
+    if (valid) {
+      itemsData = null
+      fulfillmentMode = false
+      const made = order.items
+        .map((i) => i.fulfilled)
+        .reduce((a, b) => a + b, 0)
+      const total = order.items
+        .map((i) => i.quantity)
+        .reduce((a, b) => a + b, 0)
+      order.fulfillmentStatus =
+        total === made
+          ? 'fulfilled'
+          : made === 0
+          ? 'unfulfilled'
+          : 'partially_fulfilled'
+      trpc().mutation('orders:update', {
+        id: order.id,
+        items: order.items,
+        fulfillmentStatus: order.fulfillmentStatus,
+      })
+    }
   }
 
   $: total = products ? getTotal(order) : 0
@@ -157,12 +196,15 @@
     }
   }
 
-  let fulfillmentMode = true
+  let fulfillmentMode = false
+  let itemsData: OrderItem[] | null = null
 
   const methodsLogo = {
     stripe: StripeLogo,
     paypal: PaypalLogo,
   }
+
+  $: console.log(order.items)
 </script>
 
 {#if $page.stuff.store}
@@ -187,16 +229,62 @@
           <div
             class="border-b flex space-x-2 border-gray-300 w-full p-4 justify-between items-center dark:border-gray-600"
           >
-            <p class="font-bold text-xs">{order.items.length} items</p>
-            <button
-              class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
-              >Set fulfillment</button
-            >
+            <div class="flex space-x-2 items-center">
+              <div class="flex">
+                <p
+                  class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
+                  class:!bg-green-500={order.fulfillmentStatus === 'fulfilled'}
+                  class:!text-white={order.fulfillmentStatus === 'fulfilled'}
+                >
+                  {order.fulfillmentStatus.split('_').join(' ')}
+                </p>
+              </div>
+              <p class="font-bold text-xs">
+                Fulfilled {Math.min(
+                  order.items.map((i) => i.quantity).reduce((a, b) => a + b, 0),
+                  order.items.map((i) => i.fulfilled).reduce((a, b) => a + b, 0)
+                )} of {order.items
+                  .map((i) => i.quantity)
+                  .reduce((a, b) => a + b, 0)} items
+              </p>
+            </div>
+            <div class="flex space-x-2 items-center">
+              {#if fulfillmentMode}
+                <button
+                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                  title="Cancel"
+                  use:tooltip
+                  on:click={() => {
+                    order.items = [...(itemsData || [])]
+                    itemsData = null
+                    fulfillmentMode = false
+                  }}
+                >
+                  <Close16 />
+                </button>
+                <button
+                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                  title="Save"
+                  use:tooltip
+                  on:click={() => {
+                    saveFulfillment()
+                  }}
+                >
+                  <Checkmark16 />
+                </button>
+              {:else if order.fulfillmentStatus !== 'fulfilled'}
+                <button
+                  class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+                  on:click={setFulfillment}
+                  >{fulfillmentMode ? 'Save' : 'Set'} fulfillment</button
+                >
+              {/if}
+            </div>
           </div>
           <div
             class="divide-y flex flex-col border-gray-300 w-full max-h-65vh relative overflow-x-auto overscroll-auto dark:divide-gray-700 dark:bg-gray-800 dark:border-gray-600"
           >
-            {#each order.items as item}
+            {#each order.items as item, idx}
               {@const p = products ? products[item.productId] : null}
               <div class="relative">
                 <div
@@ -208,7 +296,7 @@
                     class="flex items-center sm:space-x-4 <lg:flex-col <lg:space-y-4"
                   >
                     <div
-                      class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-36 dark:bg-gray-900"
+                      class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-36  dark:bg-gray-900"
                       style="aspect-ratio: 1/1"
                     >
                       <div
@@ -242,45 +330,88 @@
                       </a>
                     </div>
                   </div>
-                  <div class="flex flex-col space-y-3">
-                    <div class="flex flex-col">
+                  {#if fulfillmentMode}
+                    <div class="flex flex-col space-y-1">
                       <p class="font-bold text-xs text-black dark:text-white">
-                        Cost
+                        Fulfilled ({itemsData ? itemsData[idx]?.fulfilled : 0} from
+                        {item.quantity})
+                      </p>
+                      <div class="flex !text-xs">
+                        <button
+                          class="border rounded-l-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
+                          on:click={() => {
+                            item.fulfilled = clamp({
+                              max: item.quantity,
+                              min: itemsData ? itemsData[idx].fulfilled : 0,
+                              val: item.fulfilled - 1,
+                            })
+                          }}
+                        >
+                          <Subtract16 class="m-auto" />
+                        </button>
+                        <input
+                          class="bg-white border-t border-b border-gray-300 border-l-0 border-r-0 text-xs text-center leading-tight py-1 px-2 w-8ch quantity fulfillment dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+                          type="number"
+                          bind:value={item.fulfilled}
+                          min={itemsData ? itemsData[idx].fulfilled : 0}
+                          max={item.quantity}
+                          required
+                        />
+                        <button
+                          class="border rounded-r-full flex bg-light-600 border-gray-300 p-1 items-center dark:bg-gray-700  dark:border-gray-600"
+                          on:click={() => {
+                            item.fulfilled = clamp({
+                              max: item.quantity,
+                              min: itemsData ? itemsData[idx].fulfilled : 0,
+                              val: item.fulfilled + 1,
+                            })
+                          }}
+                        >
+                          <Add16 class="m-auto" />
+                        </button>
+                      </div>
+                    </div>
+                  {:else}
+                    <div class="flex flex-col space-y-3">
+                      <div class="flex flex-col">
+                        <p class="font-bold text-xs text-black dark:text-white">
+                          Cost
+                        </p>
+                        <p class="font-bold text-sm">
+                          ${(item.cost ?? p?.price).toLocaleString('en', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })} / unit
+                        </p>
+                      </div>
+                      <div class="flex flex-col">
+                        <p class="font-bold text-xs text-black dark:text-white">
+                          Aditional cost
+                        </p>
+                        <p class="font-bold text-sm">
+                          ${(p
+                            ? getCostFromProductModifiers(
+                                p,
+                                item.modifiers,
+                                item.cost
+                              )
+                            : 0
+                          ).toLocaleString('en', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })} / unit
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex flex-col space-y-1">
+                      <p class="font-bold text-xs text-black dark:text-white">
+                        Quantity
                       </p>
                       <p class="font-bold text-sm">
-                        ${(item.cost ?? p?.price).toLocaleString('en', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })} / unit
+                        {item.quantity}
                       </p>
                     </div>
-                    <div class="flex flex-col">
-                      <p class="font-bold text-xs text-black dark:text-white">
-                        Aditional cost
-                      </p>
-                      <p class="font-bold text-sm">
-                        ${(p
-                          ? getCostFromProductModifiers(
-                              p,
-                              item.modifiers,
-                              item.cost
-                            )
-                          : 0
-                        ).toLocaleString('en', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })} / unit
-                      </p>
-                    </div>
-                  </div>
-                  <div class="flex flex-col space-y-1">
-                    <p class="font-bold text-xs text-black dark:text-white">
-                      Quantity
-                    </p>
-                    <p class="font-bold text-sm">
-                      {item.quantity}
-                    </p>
-                  </div>
+                  {/if}
                   <div class="flex flex-col space-y-1">
                     <p class="font-bold text-xs text-black dark:text-white">
                       Total
@@ -310,6 +441,7 @@
                           modifiers: item.modifiers,
                           productSlug: p?.slug || '',
                           quantity: item.quantity,
+                          cost: item.cost,
                         }
                       }}
                     >
@@ -341,15 +473,6 @@
                 class:bg-purple-500={order.status === 'processing'}
               >
                 {order.status}
-              </p>
-            </div>
-            <div class="flex">
-              <p
-                class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
-                class:!bg-green-500={order.fulfillmentStatus === 'fulfilled'}
-                class:!text-white={order.fulfillmentStatus === 'fulfilled'}
-              >
-                {order.fulfillmentStatus.split('_').join(' ')}
               </p>
             </div>
           </div>
@@ -612,6 +735,14 @@
 </div>
 
 <style>
+  .quantity::-webkit-outer-spin-button,
+  .quantity::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .quantity {
+    -moz-appearance: textfield;
+  }
   .skeleton * {
     opacity: 0;
   }

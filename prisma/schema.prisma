@@ -169,7 +169,7 @@ enum OrderStatus {
 enum FulfillmentStatus {
   fulfilled
   unfulfilled
-  partially_fullfilled
+  partially_fulfilled
   awaiting_shipment
   scheduled
   on_hold

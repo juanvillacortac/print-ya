@@ -195,9 +195,11 @@ export const updateOrder = async (
       id: string
       paymentMethods?: string[]
       fees?: Order['fees']
+      fulfillmentStatus?: Order['fulfillmentStatus']
       items?: {
         productId: string
         modifiers?: ModifiersMap | null
+        fulfilled?: number
         cost: number
         quantity: number
       }[]
@@ -250,12 +252,14 @@ export const updateOrder = async (
             },
           }
         : undefined,
+      fulfillmentStatus: order.fulfillmentStatus,
       items: order.items
         ? {
             createMany: {
               data: order.items.map((i) => ({
                 modifiers: i.modifiers || {},
                 productId: i.productId,
+                fulfilled: i.fulfilled,
                 cost: i.cost,
                 quantity: i.quantity,
               })),

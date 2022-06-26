@@ -18,7 +18,9 @@ const mutations = trpc
           z.object({
             productId: z.string(),
             modifiers: z.any(),
+            fulfilled: z.number().min(0).optional(),
             quantity: z.number().min(1),
+            cost: z.number().min(0),
           })
         ),
         fees: z.array(
@@ -43,11 +45,23 @@ const mutations = trpc
       paymentMethods: z.array(z.string()).optional(),
       status: orderStatus.optional(),
       billingData: z.any().optional(),
+      fulfillmentStatus: z
+        .enum([
+          'fulfilled',
+          'unfulfilled',
+          'partially_fulfilled',
+          'awaiting_shipment',
+          'scheduled',
+          'on_hold',
+        ])
+        .optional(),
       items: z
         .array(
           z.object({
             productId: z.string(),
             modifiers: z.any(),
+            cost: z.number().min(0),
+            fulfilled: z.number().min(0).optional(),
             quantity: z.number().min(1),
           })
         )
