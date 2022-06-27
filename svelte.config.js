@@ -14,6 +14,7 @@ const adapter = () => {
     case 'vercel':
       return vercel({
         split: true,
+        external: ['@prisma/client'],
       })
     default:
       return auto()
