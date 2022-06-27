@@ -246,6 +246,14 @@ export const updateOrder = async (
   if (transactions.length) {
     await prisma.$transaction(transactions)
   }
+  const original = await prisma.order.findUnique({
+    where: {
+      id: order.id,
+    },
+    select: {
+      billingData: true,
+    },
+  })
   const updated = await prisma.order.update({
     where: {
       id: order.id,
@@ -253,7 +261,12 @@ export const updateOrder = async (
     data: {
       paymentMethods: order.paymentMethods,
       status: order.status,
-      billingData: order.billingData || undefined,
+      billingData: order.billingData
+        ? {
+            ...((original?.billingData as any) || {}),
+            ...order.billingData,
+          }
+        : undefined,
       total: order.items
         ? order.items.map((i) => i.cost || 0).reduce((a, b) => a + b, 0)
         : undefined,

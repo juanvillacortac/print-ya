@@ -1,6 +1,7 @@
 import * as db from '$lib/db'
 import * as trpc from '@trpc/server'
 import { z } from 'zod'
+import geoip from 'geoip-lite'
 import type { tRPCContext } from '.'
 
 const orderStatus = z.enum(['paid', 'processing', 'pending'])
@@ -21,7 +22,7 @@ const mutations = trpc
         paymentMethods: z.array(z.string()),
         status: orderStatus,
         customerId: z.string().optional(),
-        billingData: z.any().optional(),
+        billingData: z.any(),
         items: z.array(
           z.object({
             productId: z.string(),
@@ -42,11 +43,19 @@ const mutations = trpc
       }),
       storeId: z.string().cuid(),
     }),
-    resolve: async ({ input }) =>
-      db.createOrder({
-        order: input.order,
+    resolve: async ({ input, ctx }) => {
+      const geo = geoip.lookup(ctx.event.clientAddress)
+      return db.createOrder({
+        order: {
+          ...input.order,
+          billingData: {
+            ...input.order.billingData,
+            geo: geo || undefined,
+          },
+        },
         storeId: input.storeId,
-      }),
+      })
+    },
   })
   .mutation('update', {
     input: z.object({
