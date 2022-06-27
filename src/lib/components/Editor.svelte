@@ -15,9 +15,8 @@
 
   import { basicSetup, hoverPreview } from '$lib/editorplugin'
   import { indentWithTab } from '@codemirror/commands'
-  import prettier from 'prettier'
-  import prettierHtml from 'prettier/esm/parser-html.mjs'
-  import prettierCss from 'prettier/esm/parser-postcss.mjs'
+  import htmlPrettify from 'html-prettify'
+  import Beautify, { OUTPUT_FORMATS } from 'css-zero-beautify'
   import {
     Copy16,
     PaintBrushAlt16,
@@ -45,18 +44,10 @@
     let str = modelValue
     switch (language) {
       case 'html':
-        str = prettier.format(str, {
-          semi: false,
-          parser: 'html',
-          plugins: [prettierHtml],
-        })
+        str = htmlPrettify(str)
         break
       case 'css':
-        str = prettier.format(str, {
-          semi: false,
-          parser: 'css',
-          plugins: [prettierCss],
-        })
+        str = Beautify(str, { output: OUTPUT_FORMATS.plaintext })
         break
       case 'json':
         try {

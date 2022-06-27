@@ -61,12 +61,14 @@ specifiers:
   codemirror-theme-vars: ^0.1.1
   cookie: ^0.5.0
   cross-env: ^7.0.3
+  css-zero-beautify: ^2.0.5
   currency-list: ^1.0.8
   ejs: ^3.1.7
   geoip-lite: ^1.4.5
   handlebars: ^4.7.7
   handlebars-esm: ^1.0.0
   html-minifier: ^4.0.0
+  html-prettify: ^1.0.7
   html-to-image: ^1.9.0
   jsx-template-engine: ^1.0.0
   lodash-es: ^4.17.21
@@ -157,12 +159,14 @@ dependencies:
   cleanslate: 0.10.1
   codemirror-theme-vars: 0.1.1
   cookie: 0.5.0
+  css-zero-beautify: 2.0.5
   currency-list: 1.0.8
   ejs: 3.1.8
   geoip-lite: 1.4.5
   handlebars: 4.7.7
   handlebars-esm: 1.0.0
   html-minifier: 4.0.0
+  html-prettify: 1.0.7
   html-to-image: 1.9.0
   jsx-template-engine: 1.0.0
   lodash-es: 4.17.21
@@ -2928,6 +2932,16 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
+  /css-zero-beautify/2.0.5:
+    resolution: {integrity: sha512-h0+267Sdhq5KVg1Y+nDlE0LUAXgm2pXRWFOFJGgl/GNx/NLHGEtqvfJqiENxZhk9Kmoz5aWweJHJJFbqS+cO6A==}
+    dependencies:
+      css-zero-lexer: 1.0.2
+    dev: false
+
+  /css-zero-lexer/1.0.2:
+    resolution: {integrity: sha512-J6T9YUMZzJXDFxsvwqr8VmivpRf3GxwHmSf/Icv6qSqRVloFvbSMA11z53ktTCM523C9n/7ZIxABFs9L8FJiOg==}
+    dev: false
+
   /cssesc/3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
@@ -4153,6 +4167,10 @@ packages:
       param-case: 2.1.1
       relateurl: 0.2.7
       uglify-js: 3.15.5
+    dev: false
+
+  /html-prettify/1.0.7:
+    resolution: {integrity: sha512-99pRsP2PV2DyWnrVibNyad7gNmzCP7AANO8jw7Z9yanWyXH9dPdqdMXGefySplroqCNdk95u7j5TLxfyJ1Cbbg==}
     dev: false
 
   /html-to-image/1.9.0:
