@@ -14,7 +14,7 @@ const adapter = () => {
     case 'vercel':
       return vercel({
         split: true,
-        external: ['@prisma/client'],
+        external: ['geoip-lite'],
       })
     default:
       return auto()

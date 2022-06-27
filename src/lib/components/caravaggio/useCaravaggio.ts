@@ -1,5 +1,4 @@
 import { session } from '$app/stores'
-import { isLocalhost } from '$lib/utils/host'
 import { get } from 'svelte/store'
 import type { CaravaggioContext, CaravaggioOptions } from './urlBuilder'
 import { urlBuilder } from './urlBuilder'

@@ -1,7 +1,6 @@
 <script>
-  import { page, session, navigating } from '$app/stores'
+  import { page, session } from '$app/stores'
   import { preferences } from '$lib'
-  import { del } from '$lib/api'
   import { notifications } from '$lib/components/notifications'
   import { tooltip } from '$lib/components/tooltip'
   import {
@@ -26,10 +25,9 @@
   import Image from '$lib/components/caravaggio/Image.svelte'
   import { getAbsoluteURL } from '$lib/utils/host'
   import { beforeNavigate } from '$app/navigation'
-  import { fly, scale, slide } from 'svelte/transition'
+  import { fly, scale } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import trpc from '$lib/trpc/client'
-  import { flip } from 'svelte/animate'
 
   $: path = $page.url.pathname
   $: store = $page.stuff.store
