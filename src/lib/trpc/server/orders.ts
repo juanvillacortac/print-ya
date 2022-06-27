@@ -44,7 +44,7 @@ const mutations = trpc
       storeId: z.string().cuid(),
     }),
     resolve: async ({ input, ctx }) => {
-      const geo = await get(`http://ipwho.is/${ctx.event.clientAddress}`)
+      const geo = await get(`https://ipwho.is/${ctx.event.clientAddress}`)
       return db.createOrder({
         order: {
           ...input.order,
