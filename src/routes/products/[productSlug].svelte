@@ -1,18 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
-  import { get } from '$lib/api'
   import type { Product, ProductModifier } from '$lib/db'
-  import Preview from '$lib/components/Preview.svelte'
-  import Markdown from 'svelte-markdown'
-  import {
-    Add16,
-    Add24,
-    Close24,
-    CloseOutline24,
-    Favorite32,
-    Image32,
-    Subtract16,
-  } from 'carbon-icons-svelte'
 
   export const load: Load = async ({ params, fetch, stuff, url }) => {
     const store = stuff.store!
@@ -47,15 +35,23 @@
   import { page } from '$app/stores'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
+  import Markdown from 'svelte-markdown'
   import {
-    compareModifiers,
     createModifiersMapStore,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
-    type ModifiersMap,
   } from '$lib/utils/modifiers'
   import { browser } from '$app/env'
   import trpc from '$lib/trpc/client'
+  import {
+    Add16,
+    Add24,
+    Close24,
+    CloseOutline24,
+    Favorite32,
+    Image32,
+    Subtract16,
+  } from 'carbon-icons-svelte'
 
   export let product!: Product
 
@@ -552,76 +548,7 @@
 </div>
 
 <style>
-  .preview-button {
-    @apply bg-white border rounded flex border-gray-400 shadow p-1 transform transition-transform duration-200;
-  }
-
-  .preview-button:hover {
-    @apply -translate-y-px;
-  }
-
-  :global(.dark) .preview-button {
-    @apply border-transparent border bg-gray-700  border-gray-600;
-  }
-
-  :global(.dark) .preview-button:hover {
-    @apply border-gray-300;
-  }
-
-  .checkerboard,
-  .checkerboard-sm {
-    --black-cell: rgba(55, 65, 81, 0.2);
-    background-image: linear-gradient(
-        45deg,
-        var(--black-cell) 25%,
-        transparent 25%,
-        transparent 75%,
-        var(--black-cell) 75%,
-        var(--black-cell)
-      ),
-      linear-gradient(
-        45deg,
-        var(--black-cell) 25%,
-        transparent 25%,
-        transparent 75%,
-        var(--black-cell) 75%,
-        var(--black-cell)
-      );
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
-  }
-  :global(.dark) .checkerboard,
-  :global(.dark) .checkerboard-sm {
-    --black-cell: rgba(55, 65, 81, 0.5);
-    background-color: rgba(80, 80, 80, 0.2);
-  }
-  .checkerboard-sm {
-    background-size: 10px 10px;
-    background-position: 0 0, 5px 5px;
-  }
-  .quantity::-webkit-outer-spin-button,
-  .quantity::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
   .quantity {
     -moz-appearance: textfield;
-  }
-
-  .outlined {
-    position: relative;
-  }
-  .outlined:hover:after {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: '';
-    outline: 2px dashed rgba(10, 10, 10, 0.4);
-    outline-offset: -2px;
-  }
-  :global(.dark) .outlined:hover:after {
-    outline: 2px dashed rgba(255, 255, 255, 0.5);
   }
 </style>

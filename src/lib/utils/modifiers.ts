@@ -1,6 +1,5 @@
 import type { Product, ProductModifier } from '$lib/db'
 import { writable } from 'svelte/store'
-import { isEqual } from 'lodash-es'
 import type { Prisma } from '@prisma/client'
 
 export type ModifierValue = {
@@ -18,22 +17,6 @@ export const createModifiersMapStore = (product?: Product) =>
       ? product.modifiers?.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
       : {}
   )
-
-export const compareModifiers = (a: ModifiersMap, b: ModifiersMap) => {
-  debugger
-  const getKeys = (m: ModifiersMap) =>
-    Object.keys(m).filter((k) => Object.values(m[k]).length)
-  const [aKeys, bKeys] = [getKeys(a), getKeys(b)]
-  if (!isEqual(aKeys, bKeys)) return false
-  for (let k of aKeys) {
-    const [aObj, bObj] = [a[k], b[k]]
-    if (!isEqual(aObj.itemIds, bObj.itemIds)) {
-      return false
-    }
-    if (aObj.itemId !== bObj.itemId || aObj.value !== bObj.value) return false
-  }
-  return true
-}
 
 export const getTemplateFieldsFromModifiers = (
   product: Product,
