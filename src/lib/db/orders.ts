@@ -222,7 +222,6 @@ export const updateOrder = async (
     }
   >
 ): Promise<Order | null> => {
-  console.log(order)
   const transactions = [
     ...(order.fees
       ? [
