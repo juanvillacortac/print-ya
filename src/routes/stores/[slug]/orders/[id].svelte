@@ -38,8 +38,8 @@
   import {
     Add16,
     Checkmark16,
-    CheckmarkFilled16,
     Close16,
+    Map16,
     Pen16,
     Subtract16,
     View16,
@@ -91,6 +91,9 @@
   }
 
   let details: (BagItem & { cost: number }) | undefined
+
+  const getMapsUrl = (lat: number, long: number) =>
+    `https://www.google.com/maps/place/${lat},${long}`
 
   const calcFee = (fee: OrderFee, base: number) =>
     base * ((fee.percentage || 0) / 100) + (fee.fixed || 0)
@@ -615,6 +618,20 @@
                   <Checkmark16 />
                 </button>
               {:else}
+                {#if order.billingData?.geo}
+                  <a
+                    class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                    href={getMapsUrl(
+                      order.billingData?.geo?.latitude,
+                      order.billingData?.geo?.longitude
+                    )}
+                    target="__blank"
+                    title="View checkout location (by geolocation)"
+                    use:tooltip
+                  >
+                    <Map16 class="flex" />
+                  </a>
+                {/if}
                 <button
                   class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
                   title="Edit customer"
