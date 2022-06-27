@@ -24,7 +24,8 @@
     "postbuild@comment": "cp node_modules/sharp/build .vercel_build_output/functions/node/render -r;cp node_modules/sharp/vendor/8.11.3/linux-x64/lib/libvips-cpp.so.42 .vercel_build_output/functions/node/render/;ls .vercel_build_output/functions/node/render/",
     "vercel-build@comment": "ls node_modules/@prisma && prisma generate && cross-env VITE_DATABASE_URL=$MIGRATION_DB prisma migrate deploy && svelte-kit build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/",
     "vercel-build@Caca": "prisma generate && svelte-kit build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/",
-    "vercel-build": "prisma generate && svelte-kit build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/"
+    "vercel-build@2": "prisma generate && svelte-kit build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/",
+    "vercel-build": "prisma generate && svelte-kit build"
   },
   "devDependencies": {
     "@poppanator/sveltekit-svg": "^0.2.3",
@@ -33,8 +34,8 @@
     "@sveltejs/adapter-netlify": "^1.0.0-next.55",
     "@sveltejs/adapter-node": "1.0.0-next.73",
     "@sveltejs/adapter-static": "^1.0.0-next.29",
-    "@sveltejs/adapter-vercel": "1.0.0-next.50",
-    "@sveltejs/kit": "1.0.0-next.335",
+    "@sveltejs/adapter-vercel": "1.0.0-next.59",
+    "@sveltejs/kit": "1.0.0-next.354",
     "@types/bcrypt": "^5.0.0",
     "@types/geoip-lite": "^1.4.1",
     "@types/three": "^0.135.0",
