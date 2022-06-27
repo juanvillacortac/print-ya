@@ -5,7 +5,7 @@ import cookie from 'cookie'
 import { appRoutes, getLayoutType } from '$lib/utils/layout'
 import { getDefaultHost } from '$lib/utils/host'
 
-import { router } from '$lib/trpc/server'
+import { router, type tRPCRouter } from '$lib/trpc/server'
 import { createTRPCHandle } from 'trpc-sveltekit'
 import { sequence } from '@sveltejs/kit/hooks'
 
@@ -88,7 +88,7 @@ const session = handleSession(
 )
 
 const trpc: Handle = async ({ event, resolve }) => {
-  const response = await createTRPCHandle({
+  const response = await createTRPCHandle<tRPCRouter>({
     url: '/api/trpc',
     router,
     event,

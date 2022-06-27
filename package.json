@@ -106,7 +106,6 @@
     "currency-list": "^1.0.8",
     "ejs": "^3.1.7",
     "encoding": "^0.1.13",
-    "geoip-lite": "^1.4.5",
     "handlebars": "^4.7.7",
     "handlebars-esm": "^1.0.0",
     "html-minifier": "^4.0.0",

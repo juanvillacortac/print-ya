@@ -1,8 +1,8 @@
 import * as db from '$lib/db'
 import * as trpc from '@trpc/server'
 import { z } from 'zod'
-import geoip from 'geoip-lite'
 import type { tRPCContext } from '.'
+import { get } from '$lib/api'
 
 const orderStatus = z.enum(['paid', 'processing', 'pending'])
 const fulfillmentStatus = z.enum([
@@ -44,13 +44,13 @@ const mutations = trpc
       storeId: z.string().cuid(),
     }),
     resolve: async ({ input, ctx }) => {
-      const geo = geoip.lookup(ctx.event.clientAddress)
+      const geo = await get(`http://ipwho.is/${ctx.event.clientAddress}`)
       return db.createOrder({
         order: {
           ...input.order,
           billingData: {
             ...input.order.billingData,
-            geo: geo || undefined,
+            geo: geo?.success ? geo : undefined,
           },
         },
         storeId: input.storeId,

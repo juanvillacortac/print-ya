@@ -14,7 +14,6 @@ const adapter = () => {
     case 'vercel':
       return vercel({
         split: true,
-        external: ['geoip-lite'],
       })
     default:
       return auto()
