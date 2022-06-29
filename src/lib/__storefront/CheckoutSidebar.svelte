@@ -287,6 +287,33 @@
     }
   }
 
+  const fillShipping = () => {
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        if (!pos?.coords) {
+          return
+        }
+        const geo = await trpc().query('utils:geocoding', {
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        })
+        if (!geo) return
+        console.log(geo)
+        const data = geo.features[0]?.properties
+        shipping.country = data.country_code.toUpperCase()
+        shipping.city = data.city
+        shipping.province = data.state
+        shipping.zip = data.postcode
+        shipping.address = data.address_line1
+        // shipping.country = geo.countryCode
+      },
+      (err) => console.log(err),
+      {
+        enableHighAccuracy: true,
+      }
+    )
+  }
+
   let error: StripeError
 </script>
 
@@ -548,19 +575,7 @@
                   class="rounded flex font-bold space-x-2 border-blue-500 border-2 shadow text-xs text-center w-full py-2 px-4 text-blue-500 duration-200 justify-center items-center hover:(bg-blue-500 text-white) disabled:cursor-not-allowed "
                   type="button"
                   style="will-change: transform"
-                  on:click={() => {
-                    navigator.geolocation.getCurrentPosition(
-                      (pos) => {
-                        navigator.clipboard.writeText(
-                          `${pos?.coords?.latitude},${pos?.coords?.longitude}`
-                        )
-                      },
-                      (err) => console.log(err),
-                      {
-                        enableHighAccuracy: true,
-                      }
-                    )
-                  }}
+                  on:click={fillShipping}
                 >
                   Detect address automatically
                 </button>
