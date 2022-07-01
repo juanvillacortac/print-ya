@@ -515,15 +515,15 @@
                     <Checkmark16 />
                   </button>
                 {:else}
-                  {#if order.billingData?.geo}
+                  {#if order.billingData?.coords}
                     <a
                       class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
                       href={getMapsUrl(
-                        order.billingData?.geo?.latitude,
-                        order.billingData?.geo?.longitude
+                        order.billingData?.coords?.latitude,
+                        order.billingData?.coords?.longitude
                       )}
                       target="__blank"
-                      title="View checkout location (by geolocation)"
+                      title="View real billing geolocation in a map"
                       use:tooltip
                     >
                       <Map16 class="flex" />
@@ -679,15 +679,15 @@
                     <Checkmark16 />
                   </button>
                 {:else}
-                  {#if order.shippingData?.geo}
+                  {#if order.shippingData?.coords}
                     <a
                       class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
                       href={getMapsUrl(
-                        order.shippingData?.geo?.latitude,
-                        order.shippingData?.geo?.longitude
+                        order.shippingData?.coords?.latitude,
+                        order.shippingData?.coords?.longitude
                       )}
                       target="__blank"
-                      title="View checkout location (by geolocation)"
+                      title="View real shipping geolocation in a map"
                       use:tooltip
                     >
                       <Map16 class="flex" />

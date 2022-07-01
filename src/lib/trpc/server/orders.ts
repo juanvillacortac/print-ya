@@ -44,13 +44,22 @@ const mutations = trpc
       storeId: z.string().cuid(),
     }),
     resolve: async ({ input, ctx }) => {
-      const geo = await get(`https://ipwho.is/${ctx.event.clientAddress}`)
+      let coords: any
+      if (!input.order.billingData?.coords) {
+        const geo = await get(`https://ipwho.is/${ctx.event.clientAddress}`)
+        if (geo) {
+          coords = {
+            latitude: geo.latitude,
+            longitude: geo.longitude
+          }
+        }
+      }
       return db.createOrder({
         order: {
           ...input.order,
           billingData: {
             ...input.order.billingData,
-            geo: geo?.success ? geo : undefined,
+            coords: coords ? coords : undefined,
           },
         },
         storeId: input.storeId,
