@@ -60,8 +60,8 @@
   export let items: BagItem[]
   let order: Order | undefined
 
-  let billing: Record<string, string> = {}
-  let shipping: Record<string, string> = {}
+  let billing: Record<string, any> = {}
+  let shipping: Record<string, any> = {}
 
   $: total = items
     .map((v) => ({
@@ -539,9 +539,10 @@
               }}
             >
               <div
-                class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-gray-600"
+                class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs w-8 items-center justify-center dark:border-gray-600"
                 class:!border-transparent={completedSteps.billing ||
                   step === 'billing'}
+                class:text-white={completedSteps.billing || step === 'billing'}
                 class:bg-[rgb(113,3,3)]={completedSteps.billing ||
                   step === 'billing'}
               >
@@ -696,6 +697,8 @@
               <div
                 class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-gray-600"
                 class:!border-transparent={completedSteps.shipping ||
+                  step === 'shipping'}
+                class:text-white={completedSteps.shipping ||
                   step === 'shipping'}
                 class:bg-[rgb(113,3,3)]={completedSteps.shipping ||
                   step === 'shipping'}
@@ -882,6 +885,7 @@
                 class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-gray-600"
                 class:!border-transparent={completedSteps.payment ||
                   step === 'payment'}
+                class:text-white={completedSteps.payment || step === 'payment'}
                 class:bg-[rgb(113,3,3)]={completedSteps.payment ||
                   step === 'payment'}
               >
