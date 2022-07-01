@@ -1,5 +1,5 @@
 import { prisma, slugify } from './common'
-import * as bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import type { RequestEvent } from '@sveltejs/kit/types/internal'
 import type { User } from '@prisma/client'
 
