@@ -24,6 +24,7 @@ export type Order = Overwrite<
   {
     customerId?: string
     billingData?: any
+    shippingData?: any
     paymentMethods: string[]
     fees: OrderFee[]
     items: OrderItem[]
@@ -251,6 +252,7 @@ export const updateOrder = async (
     },
     select: {
       billingData: true,
+      shippingData: true,
     },
   })
   const updated = await prisma.order.update({
@@ -264,6 +266,12 @@ export const updateOrder = async (
         ? {
             ...((original?.billingData as any) || {}),
             ...order.billingData,
+          }
+        : undefined,
+      shippingData: order.shippingData
+        ? {
+            ...((original?.shippingData as any) || {}),
+            ...order.shippingData,
           }
         : undefined,
       total: order.items

@@ -238,7 +238,7 @@
                   {#each m.items || [] as i}
                     <option value={i.id}
                       >{i.name}{#if i.cost}&nbsp;&nbsp;&ndash;&nbsp;&nbsp;<strong
-                          >{i.cost < 0 ? '-' : ''}{!i.percentage
+                          >{i.cost < 0 ? '-' : '+'}{!i.percentage
                             ? '$'
                             : ''}{Math.abs(i.cost)}{i.percentage
                             ? '%'
@@ -462,14 +462,25 @@
           class="flex justify-between sm:space-x-4 sm:items-center <sm:flex-col <sm:space-y-4 !w-full"
         >
           <div class="flex space-x-4 w-full items-center">
-            <button
-              class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
-              on:click={() => bag.addToBag(product, $modifiers, quantity)}
-              style="will-change: transform"
-            >
-              <Add24 class="m-auto" />
-              <span>Add to bag{inBag ? ' (in bag)' : ''}</span></button
-            >
+            <div class="flex space-x-2">
+              <button
+                class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                on:click={() => bag.addToBag(product, $modifiers, quantity)}
+                style="will-change: transform"
+              >
+                <Add16 class="m-auto" />
+                <span>{inBag ? 'Add more' : 'Add'} to bag</span></button
+              >
+              {#if inBag}
+                <a
+                  class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                  href="/bag?checkout"
+                  style="will-change: transform"
+                >
+                  Go to checkout</a
+                >
+              {/if}
+            </div>
             <button
               class="flex text-gray-400 relative hover:text-pink-500"
               title="Add to favorites"
@@ -548,6 +559,11 @@
 </div>
 
 <style>
+  .quantity::-webkit-outer-spin-button,
+  .quantity::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
   .quantity {
     -moz-appearance: textfield;
   }

@@ -103,7 +103,8 @@ model Product {
 
   type ProductType @default(template)
 
-  public Boolean
+  public   Boolean
+  archived Boolean @default(false)
 
   description String?
 
@@ -183,7 +184,8 @@ model Order {
   fulfillmentStatus FulfillmentStatus @default(unfulfilled)
   total             Float             @default(0)
 
-  billingData Json?
+  billingData  Json?
+  shippingData Json?
 
   store   Store  @relation(fields: [storeId], references: [id])
   storeId String

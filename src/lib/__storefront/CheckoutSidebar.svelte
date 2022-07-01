@@ -7,14 +7,22 @@
 </script>
 
 <script lang="ts">
-  import { CheckmarkFilled32, ChevronLeft24 } from 'carbon-icons-svelte'
+  import {
+    CheckmarkFilled32,
+    ChevronLeft24,
+    Hourglass32,
+  } from 'carbon-icons-svelte'
   import { elasticOut, expoOut } from 'svelte/easing'
   import { loadStripe, type Stripe, type StripeError } from '@stripe/stripe-js'
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onMount, tick } from 'svelte'
   import trpc from '$lib/trpc/client'
-  import { loadScript } from '@paypal/paypal-js'
+  import {
+    loadScript,
+    type PayPalButtonsComponent,
+    type PayPalNamespace,
+  } from '@paypal/paypal-js'
   import { squareratio } from '$lib/actions/aspectratio'
-  import { scale, slide } from 'svelte/transition'
+  import { fade, scale, slide } from 'svelte/transition'
   import { tooltip } from '$lib/components/tooltip'
   import { getCountries } from '$lib/utils/countries'
   import {
@@ -32,10 +40,15 @@
   const countries = getCountries()
 
   let stripe: Stripe | null
+  let paypal: PayPalNamespace | null
   onMount(async () => {
     stripe = await loadStripe(
       'pk_test_51I7RL6J2WplztltUdJyNQb1xLxVbXhB6QUu3R753Vuxq1xatD8cpU49K5m3q0fPfnK4ayhMPfg8xjLxxbrVqHjG600IC5Q2yzL'
     )
+    paypal = await loadScript({
+      'client-id':
+        'AeFkK76hZkhCrPuLpM1yAiCHXSzro1INVTH2S0WFmzuWekXPCIh4tdAGW569cRVRGIoLIUdOwrggqo-T',
+    })
   })
 
   export let open = false
@@ -47,6 +60,7 @@
   export let items: BagItem[]
   let order: Order | undefined
 
+  let billing: Record<string, string> = {}
   let shipping: Record<string, string> = {}
 
   $: total = items
@@ -114,83 +128,98 @@
   let cardElement: any
   let paypalLoaded = false
 
-  const createPaypal = (el: string | HTMLElement, amount: number) =>
-    loadScript({
-      'client-id':
-        'AeFkK76hZkhCrPuLpM1yAiCHXSzro1INVTH2S0WFmzuWekXPCIh4tdAGW569cRVRGIoLIUdOwrggqo-T',
-    }).then((paypal) => {
-      paypal?.Buttons!({
-        style: {
-          color: 'blue',
-          shape: 'rect',
-          height: 40,
-          label: 'pay',
-          tagline: false,
-          layout: 'horizontal',
-        },
-        createOrder: function (data, actions) {
-          // Set up the transaction
-          return actions.order.create({
-            purchase_units: [
-              {
-                amount: {
-                  value: `${amount}`,
-                  currency_code: 'USD',
-                },
+  let completedSteps: Record<typeof step, boolean> = {
+    billing: false,
+    shipping: false,
+    payment: false,
+  }
+
+  let canUseAutoPayment: boolean | undefined
+
+  const createPaypalButton = (amount: number) =>
+    paypal?.Buttons!({
+      style: {
+        color: 'blue',
+        shape: 'rect',
+        height: 40,
+        label: 'buynow',
+        tagline: false,
+        layout: 'horizontal',
+      },
+      createOrder: function (data, actions) {
+        // Set up the transaction
+        return actions.order.create({
+          purchase_units: [
+            {
+              amount: {
+                value: `${amount}`,
+                currency_code: 'USD',
               },
-            ],
-          })
-        },
-        onApprove: function (data, actions) {
-          // Capture order after payment approved
-          return actions?.order?.capture().then(async (details) => {
-            if (order) {
-              confirmPayment({
-                amount: total,
-                currency: 'usd',
-                method: 'paypal',
-              })
-            }
-          })!
-        },
-        onError: function (err) {
-          // Log error if something goes wrong during approval
-          alert('Something went wrong')
-          console.log('Something went wrong', err)
-        },
-      })
-        .render(el)
-        .then(() => {
-          paypalLoaded = true
+            },
+          ],
         })
+      },
+      onApprove: function (data, actions) {
+        // Capture order after payment approved
+        return actions?.order?.capture().then(async (details) => {
+          if (order) {
+            confirmPayment({
+              amount: total,
+              currency: 'usd',
+              method: 'paypal',
+            })
+          }
+        })!
+      },
+      onError: function (err) {
+        // Log error if something goes wrong during approval
+        alert('Something went wrong')
+        console.log('Something went wrong', err)
+      },
     })
 
+  let paypalButtonComponent: PayPalButtonsComponent | undefined
+  let paypalButtonRef: HTMLDivElement | undefined
+
+  const updateOrder = async () => {
+    waiting = true
+    const billingData = Object.keys(billing).length ? billing : undefined
+    const shippingData = mergeAddress
+      ? billingData
+      : Object.keys(shipping).length
+      ? shipping
+      : undefined
+    order = (await trpc().mutation('orders:update', {
+      id: order!.id,
+      billingData,
+      shippingData,
+      items: items.map((i) => ({
+        productId: products[i.productSlug].id,
+        quantity: i.quantity,
+        cost:
+          getTotalFromProductModifiers(products[i.productSlug], i.modifiers) *
+          i.quantity,
+        basePrice: products[i.productSlug].price,
+        modifiers: i.modifiers,
+      })),
+    })) as Order
+    waiting = false
+  }
+
+  let waiting = false
   const submit = async () => {
-    if (!payment) {
+    if (step !== 'payment') {
       if (order) {
-        order = (await trpc().mutation('orders:update', {
-          id: order.id,
-          billingData: shipping,
-          items: items.map((i) => ({
-            productId: products[i.productSlug].id,
-            quantity: i.quantity,
-            cost:
-              getTotalFromProductModifiers(
-                products[i.productSlug],
-                i.modifiers
-              ) * i.quantity,
-            basePrice: products[i.productSlug].price,
-            modifiers: i.modifiers,
-          })),
-        })) as Order
+        await updateOrder()
       } else {
+        waiting = true
         order = await trpc().mutation('orders:create', {
           storeId: $page.stuff.store!.id,
           order: {
             status: 'pending',
             paymentMethods: [],
             fees: [],
-            billingData: shipping,
+            billingData: billing,
             items: items.map((i) => ({
               productId: products[i.productSlug].id,
               quantity: i.quantity,
@@ -205,8 +234,24 @@
           },
         })
       }
-      payment = true
-      createPaypal('#paypal-button', total)
+      waiting = false
+      switch (step) {
+        case 'billing':
+          if (!completedSteps.billing) {
+            completedSteps.billing = true
+          }
+          step = 'shipping'
+          break
+        case 'shipping':
+          if (!completedSteps.shipping) {
+            completedSteps.shipping = true
+          }
+          step = 'payment'
+          await tick()
+          paypalButtonComponent = createPaypalButton(total)
+          paypalButtonComponent?.render(paypalButtonRef as HTMLElement)
+          break
+      }
       return
     }
 
@@ -241,7 +286,6 @@
       return
     }
     done = event.amount
-    payment = false
     await trpc().mutation('orders:update', {
       id: order?.id,
       paymentMethods: [event.method],
@@ -287,7 +331,13 @@
     }
   }
 
-  const fillShipping = () => {
+  let step: 'billing' | 'shipping' | 'payment' = 'billing'
+
+  let mergeAddress = true
+
+  let detectingShipping = false
+  const fillAddress = (obj: any) => {
+    detectingShipping = true
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         if (!pos?.coords) {
@@ -297,21 +347,41 @@
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
         })
+        detectingShipping = false
         if (!geo) return
         console.log(geo)
         const data = geo.features[0]?.properties
-        shipping.country = data.country_code.toUpperCase()
-        shipping.city = data.city
-        shipping.province = data.state
-        shipping.zip = data.postcode
-        shipping.address = data.address_line1
+        obj.country = data.country_code.toUpperCase()
+        obj.city = data.city
+        obj.province = data.state
+        obj.zip = data.postcode
+        obj.address = data.address_line1
         // shipping.country = geo.countryCode
       },
-      (err) => console.log(err),
+      (err) => {
+        console.log(err)
+        detectingShipping = false
+      },
       {
         enableHighAccuracy: true,
       }
     )
+  }
+
+  const changeStep = async (to: typeof step) => {
+    if (to == 'payment' && completedSteps.billing && completedSteps.shipping) {
+      step = to
+      tick().then(() => {
+        paypalButtonComponent = createPaypalButton(total)
+        paypalButtonComponent?.render(paypalButtonRef as HTMLElement)
+      })
+      return
+    }
+    if (completedSteps[to]) {
+      await updateOrder()
+      paypalButtonComponent?.close()
+      step = to
+    }
   }
 
   let error: StripeError
@@ -325,6 +395,16 @@
       style="will-change: transform"
       transition:fly|local={{ x: '100%', opacity: 1, duration: 400 }}
     >
+      {#if waiting}
+        <div
+          class="bg-white flex h-full w-full z-30 absolute items-center justify-center !bg-opacity-50 dark:bg-gray-900"
+          transition:fade={{ duration: 200 }}
+        >
+          <Hourglass32
+            class="h-48px w-48px roll !animate-loop !animate-duration-1500"
+          />
+        </div>
+      {/if}
       <div class="flex flex-col h-full space-y-4 p-4 overflow-y-auto">
         <div class="flex space-x-4 items-center">
           <button
@@ -384,7 +464,7 @@
           <div
             class="divide-y border rounded rounded-lg flex flex-col w-full dark:divide-gray-600 dark:border-gray-600"
           >
-            {#if !payment}
+            {#if step !== 'payment'}
               <div
                 class="flex space-x-2 w-full p-2 items-center justify-between"
                 transition:slide|local={{ duration: 400, easing: expoOut }}
@@ -443,19 +523,25 @@
           >
             <div
               class="flex space-x-2 w-full items-center"
-              on:click={() => (payment = false)}
-              class:cursor-pointer={payment}
+              on:click={() => changeStep('billing')}
+              class:cursor-pointer={step != 'billing' && completedSteps.billing}
               title="Change billing details"
-              use:tooltip={{ show: payment }}
+              use:tooltip={{
+                show: step != 'billing' && completedSteps.billing,
+              }}
             >
               <div
-                class="rounded-full flex font-bold font-title bg-[rgb(113,3,3)] h-8 shadow text-xs text-white w-8 items-center justify-center"
+                class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-gray-600"
+                class:!border-transparent={completedSteps.billing ||
+                  step === 'billing'}
+                class:bg-[rgb(113,3,3)]={completedSteps.billing ||
+                  step === 'billing'}
               >
                 1
               </div>
-              <div class="font-bold font-title text-xs">Shipping</div>
+              <div class="font-bold font-title text-xs">Billing</div>
             </div>
-            {#if !payment}
+            {#if step === 'billing'}
               <div
                 class="flex flex-col space-y-2"
                 transition:slide|local={{ duration: 400, easing: expoOut }}
@@ -470,7 +556,7 @@
                       placeholder="Ex. juan@gmail.com"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                      bind:value={shipping.email}
+                      bind:value={billing.email}
                     />
                   </div>
                   <div class="flex flex-col w-full">
@@ -481,7 +567,7 @@
                       type="tel"
                       placeholder="Ex. +1 XXXXXX"
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                      bind:value={shipping.phone}
+                      bind:value={billing.phone}
                     />
                   </div>
                 </div>
@@ -494,7 +580,7 @@
                       type="text"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                      bind:value={shipping.firstName}
+                      bind:value={billing.firstName}
                     />
                   </div>
                   <div class="flex flex-col w-full">
@@ -504,7 +590,7 @@
                     <input
                       type="text"
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                      bind:value={shipping.lastName}
+                      bind:value={billing.lastName}
                     />
                   </div>
                 </div>
@@ -515,7 +601,7 @@
                   <select
                     class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                     required
-                    bind:value={shipping.country}
+                    bind:value={billing.country}
                   >
                     <option value="" hidden />
                     {#each countries as country}
@@ -532,7 +618,7 @@
                       type="text"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                      bind:value={shipping.province}
+                      bind:value={billing.province}
                     />
                   </div>
                   <div class="flex flex-col w-full">
@@ -543,7 +629,7 @@
                       type="text"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                      bind:value={shipping.address}
+                      bind:value={billing.address}
                     />
                   </div>
                 </div>
@@ -556,7 +642,7 @@
                       required
                       type="text"
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                      bind:value={shipping.city}
+                      bind:value={billing.city}
                     />
                   </div>
                   <div class="flex flex-col w-full">
@@ -567,38 +653,238 @@
                       type="text"
                       required
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                      bind:value={shipping.zip}
+                      bind:value={billing.zip}
                     />
                   </div>
                 </div>
                 <button
-                  class="rounded flex font-bold space-x-2 border-blue-500 border-2 shadow text-xs text-center w-full py-2 px-4 text-blue-500 duration-200 justify-center items-center hover:(bg-blue-500 text-white) disabled:cursor-not-allowed "
+                  class="rounded flex font-bold space-x-2 border-blue-500 border-2 shadow text-xs text-center w-full py-2 px-4 text-blue-500 duration-200 justify-center items-center disabled:cursor-not-allowed disabled:opacity-75 hover:not-disabled:(bg-blue-500 text-white) "
                   type="button"
                   style="will-change: transform"
-                  on:click={fillShipping}
+                  disabled={detectingShipping}
+                  on:click={() => fillAddress(billing)}
                 >
-                  Detect address automatically
+                  {detectingShipping
+                    ? 'Detecting...'
+                    : 'Detect address automatically'}
                 </button>
               </div>
             {/if}
           </div>
+
           <div
             class="border rounded rounded-lg flex flex-col space-y-4 w-full p-2 dark:divide-gray-600 dark:border-gray-600"
           >
-            <div class="flex space-x-2 w-full items-center">
+            <div
+              class="flex space-x-2 w-full items-center"
+              on:click={() => changeStep('shipping')}
+              class:cursor-pointer={step != 'shipping' &&
+                completedSteps.shipping}
+              title="Change shipping details"
+              use:tooltip={{
+                show: step != 'shipping' && completedSteps.shipping,
+              }}
+            >
               <div
-                class="border rounded-full flex font-bold font-title h-8 text-xs w-8 items-center justify-center dark:border-gray-600"
-                class:bg-[rgb(113,3,3)]={payment}
-                class:text-white={payment}
+                class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-gray-600"
+                class:!border-transparent={completedSteps.shipping ||
+                  step === 'shipping'}
+                class:bg-[rgb(113,3,3)]={completedSteps.shipping ||
+                  step === 'shipping'}
               >
                 2
               </div>
-              <div class="font-bold font-title text-xs">Billing</div>
+              <div class="font-bold font-title text-xs">Shipping</div>
             </div>
-            {#if stripe && payment}
+            {#if step === 'shipping'}
+              <div
+                class="flex flex-col space-y-4 w-full"
+                transition:slide|local={{ duration: 400, easing: expoOut }}
+              >
+                <label class="flex font-bold space-x-2 text-xs items-center">
+                  <span> Use billing address </span>
+                  <input type="checkbox" bind:checked={mergeAddress} />
+                </label>
+                {#if !mergeAddress}
+                  <div
+                    class="flex flex-col space-y-2"
+                    transition:slide|local={{ duration: 400, easing: expoOut }}
+                  >
+                    <div class="flex space-x-3">
+                      <div class="flex flex-col w-full">
+                        <label
+                          class="font-bold text-xs mb-2 block"
+                          for="fieldId"
+                        >
+                          Email *
+                        </label>
+                        <input
+                          type="email"
+                          placeholder="Ex. juan@gmail.com"
+                          required
+                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                          bind:value={shipping.email}
+                        />
+                      </div>
+                      <div class="flex flex-col w-full">
+                        <label
+                          class="font-bold text-xs mb-2 block"
+                          for="fieldId"
+                        >
+                          Phone number
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="Ex. +1 XXXXXX"
+                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                          bind:value={shipping.phone}
+                        />
+                      </div>
+                    </div>
+                    <div class="flex space-x-3">
+                      <div class="flex flex-col w-full">
+                        <label
+                          class="font-bold text-xs mb-2 block"
+                          for="fieldId">First name *</label
+                        >
+                        <input
+                          type="text"
+                          required
+                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                          bind:value={shipping.firstName}
+                        />
+                      </div>
+                      <div class="flex flex-col w-full">
+                        <label
+                          class="font-bold text-xs mb-2 block"
+                          for="fieldId">Last name</label
+                        >
+                        <input
+                          type="text"
+                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                          bind:value={shipping.lastName}
+                        />
+                      </div>
+                    </div>
+                    <div class="flex flex-col w-full">
+                      <label class="font-bold text-xs mb-2 block" for="fieldId">
+                        Country/Region *
+                      </label>
+                      <select
+                        class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                        required
+                        bind:value={shipping.country}
+                      >
+                        <option value="" hidden />
+                        {#each countries as country}
+                          <option value={country.code}>{country.name}</option>
+                        {/each}
+                      </select>
+                    </div>
+                    <div class="flex space-x-3">
+                      <div class="flex flex-col w-full">
+                        <label
+                          class="font-bold text-xs mb-2 block"
+                          for="fieldId"
+                        >
+                          Province/State *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                          bind:value={shipping.province}
+                        />
+                      </div>
+                      <div class="flex flex-col w-full">
+                        <label
+                          class="font-bold text-xs mb-2 block"
+                          for="fieldId"
+                        >
+                          Address *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                          bind:value={shipping.address}
+                        />
+                      </div>
+                    </div>
+                    <div class="flex space-x-3">
+                      <div class="flex flex-col w-full">
+                        <label
+                          class="font-bold text-xs mb-2 block"
+                          for="fieldId">City *</label
+                        >
+                        <input
+                          required
+                          type="text"
+                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                          bind:value={shipping.city}
+                        />
+                      </div>
+                      <div class="flex flex-col w-full">
+                        <label
+                          class="font-bold text-xs mb-2 block"
+                          for="fieldId">ZIP/Postal code *</label
+                        >
+                        <input
+                          type="text"
+                          required
+                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
+                          bind:value={shipping.zip}
+                        />
+                      </div>
+                    </div>
+                    <button
+                      class="rounded flex font-bold space-x-2 border-blue-500 border-2 shadow text-xs text-center w-full py-2 px-4 text-blue-500 duration-200 justify-center items-center disabled:cursor-not-allowed disabled:opacity-75 hover:not-disabled:(bg-blue-500 text-white) "
+                      type="button"
+                      style="will-change: transform"
+                      disabled={detectingShipping}
+                      on:click={() => fillAddress(shipping)}
+                    >
+                      {detectingShipping
+                        ? 'Detecting...'
+                        : 'Detect address automatically'}
+                    </button>
+                  </div>
+                {/if}
+              </div>
+            {/if}
+          </div>
+          <div
+            class="border rounded rounded-lg flex flex-col w-full p-2 dark:divide-gray-600 dark:border-gray-600"
+          >
+            <div
+              class="flex space-x-2 w-full items-center"
+              on:click={() => changeStep('payment')}
+              class:cursor-pointer={step != 'payment' &&
+                completedSteps.billing &&
+                completedSteps.shipping}
+              title="Return to payment"
+              use:tooltip={{
+                show:
+                  step != 'payment' &&
+                  completedSteps.shipping &&
+                  completedSteps.billing,
+              }}
+            >
+              <div
+                class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-gray-600"
+                class:!border-transparent={completedSteps.payment ||
+                  step === 'payment'}
+                class:bg-[rgb(113,3,3)]={completedSteps.payment ||
+                  step === 'payment'}
+              >
+                3
+              </div>
+              <div class="font-bold font-title text-xs">Payment</div>
+            </div>
+            {#if stripe && step === 'payment'}
               <StripeContainer {stripe}>
                 <div
-                  class="border rounded rounded-lg flex flex-col space-y-2 w-full p-2 dark:border-gray-600"
+                  class="border rounded rounded-lg flex flex-col space-y-2 mt-4 w-full p-2 dark:border-gray-600"
                   in:scale|local={{
                     duration: 600,
                     start: 0.2,
@@ -651,8 +937,9 @@
                     </button>
                   </div>
                 </div>
-                <div class="flex w-full">
+                <div class="flex w-full" class:mt-2={canUseAutoPayment}>
                   <PaymentRequestButton
+                    bind:canMakePayment={canUseAutoPayment}
                     paymentRequest={{
                       country: 'US',
                       currency: 'usd',
@@ -667,16 +954,16 @@
                     on:paymentmethod={pay}
                   />
                 </div>
-                <div class="flex w-full" id="paypal-button" />
+                <div class="flex mt-2 w-full" bind:this={paypalButtonRef} />
               </StripeContainer>
             {/if}
           </div>
-          {#if !payment}
+          {#if step !== 'payment'}
             <button
               class="rounded flex font-bold ml-auto space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
               style="will-change: transform"
             >
-              Go to payment
+              Next step
             </button>
           {/if}
         {/if}
@@ -696,5 +983,33 @@
 
   form :global(.stripe-input:focus) {
     @apply outline-none;
+  }
+
+  @keyframes rollIn {
+    from {
+      opacity: 0;
+      -webkit-transform: translate3d(-100%, 0, 0) rotate3d(0, 0, 1, -120deg);
+      transform: translate3d(-100%, 0, 0) rotate3d(0, 0, 1, -120deg);
+    }
+    to {
+      opacity: 1;
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @-webkit-keyframes global-roll {
+    0% {
+      transform: rotate3d(0, 0, 1, -180deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate3d(0, 0, 1, 180deg);
+    }
+  }
+  :global(.roll) {
+    -webkit-animation: global-roll;
+    animation: global-roll;
   }
 </style>

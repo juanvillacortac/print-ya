@@ -63,6 +63,7 @@ const mutations = trpc
       paymentMethods: z.array(z.string()).optional(),
       status: orderStatus.optional(),
       billingData: z.any().optional(),
+      shippingData: z.any().optional(),
       fulfillmentStatus: fulfillmentStatus.optional(),
       items: z
         .array(

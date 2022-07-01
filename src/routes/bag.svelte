@@ -28,27 +28,35 @@
 
   let mounted = false
   onMount(() => {
-    mounted = true
+    const unsuscribe = bag.subscribe((items) => {
+      if (!$page.stuff.store) return
+      loadProducts(items)?.then(() => {
+        if (mounted) return
+        const flag = $page.url.searchParams.get('checkout')
+        checkout = Boolean(flag === '' || flag)
+        mounted = true
+      })
+    })
+    return () => {
+      unsuscribe()
+    }
   })
   let products: Record<string, Product>
-  $: if (mounted && $page.stuff.store && $bag.length) {
-    loadProducts()
-  }
 
-  const loadProducts = () => {
-    if (!$bag.length) {
+  const loadProducts = (items: BagItem[]) => {
+    if (!items.length) {
       products = {}
       return
     }
     let client = trpc()
-    const promises = [...new Set($bag.map((p) => p.productSlug))].map(
+    const promises = [...new Set(items.map((p) => p.productSlug))].map(
       (productSlug) =>
         client.query('products:getBySlug', {
           productSlug,
           storeSlug: $page.stuff.store?.slug!,
         })
     )
-    Promise.all(promises).then(
+    return Promise.all(promises).then(
       (p) =>
         (products = p.reduce(
           (a, v) => ({

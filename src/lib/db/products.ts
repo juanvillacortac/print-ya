@@ -18,14 +18,17 @@ export type ProductModifier = Omit<_ProductModifier, 'ordinal'> & {
   items: ProductModifierItem[]
 }
 
-export type Product<T extends TemplateSource = any> = _Product & {
+export type Product<T extends TemplateSource = any> = Omit<
+  _Product,
+  'archived'
+> & {
   template: T
   meta?: any
   storeCategory: StoreCategory | null
   modifiers: ProductModifier[]
 }
 
-export type StripedProduct = Omit<_Product, 'templateDraft'> & {
+export type StripedProduct = Omit<_Product, 'templateDraft' | 'archived'> & {
   storeCategory: StoreCategory | null
 }
 
@@ -135,6 +138,7 @@ export const getProductsByStore = async ({
     where: {
       storeId,
       public: published,
+      archived: false,
     },
     select: {
       id: true,
@@ -163,16 +167,16 @@ export const upsertProduct = async (
   product: Partial<Product>,
   userId: string
 ): Promise<Product | null> => {
-  let c: Product | null
+  let c: _Product | null
   if (product.id) {
-    c = (await prisma.product.findFirst({
+    c = await prisma.product.findFirst({
       where: {
         id: product.id,
         store: {
           userId,
         },
       },
-    })) as Product
+    })
     if (!c) {
       throw new Error('not allowed')
     }
@@ -350,5 +354,5 @@ export const upsertProduct = async (
       },
       slug,
     },
-  })) as Product
+  })) as unknown as Product
 }
