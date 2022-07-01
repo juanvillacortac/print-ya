@@ -356,6 +356,8 @@
         obj.province = data.state
         obj.zip = data.postcode
         obj.address = data.address_line1
+        obj = obj
+        tick()
         // shipping.country = geo.countryCode
       },
       (err) => {
