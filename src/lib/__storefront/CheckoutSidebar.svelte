@@ -343,15 +343,16 @@
         if (!pos?.coords) {
           return
         }
-        const geo = await trpc().query('utils:geocoding', {
+        const coords = {
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
-        })
+        }
+        const geo = await trpc().query('utils:geocoding', coords)
         detectingShipping = false
         if (!geo) return
-        console.log(geo)
         let obj = mode === 'shipping' ? { ...shipping } : { ...billing }
         const data = geo.features[0]?.properties
+        obj.coords = coords
         obj.country = data.country_code.toUpperCase()
         obj.city = data.city
         obj.province = data.state
