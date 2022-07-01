@@ -932,6 +932,28 @@
               </div>
             </div>
           </div>
+          <div class="flex space-x-2 w-full items-center">
+            <div class="relative">
+              <div
+                class="rounded-full flex bg-green-500 h-8px animate-ping w-8px absolute"
+              />
+              <div
+                class="rounded-full flex bg-green-500 h-8px w-8px relative"
+              />
+            </div>
+            {#if order.billingData.ip}
+              <p class="text-xs">
+                This order was placed from IP address <span
+                  class="rounded cursor-pointer font-bold font-mono bg-gray-100 p-1 dark:bg-gray-700"
+                  title="Copy address"
+                  on:click={() => {
+                    navigator.clipboard.writeText(order.billingData.ip)
+                  }}
+                  use:tooltip>{order.billingData.ip}</span
+                >
+              </p>
+            {/if}
+          </div>
         </div>
       </div>
     </div>
