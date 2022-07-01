@@ -119,8 +119,8 @@
     }
   }
 
-  const createPaymentIntent = async () =>
-    await trpc().mutation('stores:payment:createStripeIntent', {
+  const createPaymentIntent = () =>
+    trpc().mutation('stores:payment:createStripeIntent', {
       amount: total,
       currency: 'usd',
     })
@@ -161,20 +161,27 @@
       },
       onApprove: function (data, actions) {
         // Capture order after payment approved
-        return actions?.order?.capture().then(async (details) => {
-          if (order) {
-            confirmPayment({
-              amount: total,
-              currency: 'usd',
-              method: 'paypal',
-            })
-          }
-        })!
+        waiting = true
+        return actions?.order
+          ?.capture()
+          .then(async (details) => {
+            if (order) {
+              confirmPayment({
+                amount: total,
+                currency: 'usd',
+                method: 'paypal',
+              })
+            }
+          })
+          .finally(() => {
+            waiting = false
+          })!
       },
       onError: function (err) {
         // Log error if something goes wrong during approval
         alert('Something went wrong')
         console.log('Something went wrong', err)
+        waiting = false
       },
     })
 
@@ -256,28 +263,37 @@
     }
 
     // create the payment intent server-side
-    const clientSecret = await createPaymentIntent()
-    // confirm payment with stripe
-    if (!clientSecret) {
-      return
-    }
-    const result = await stripe!.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: cardElement,
-      },
-    })
-    if (result.error) {
-      // payment failed, notify user
-      error = result.error
-      return
-    }
-    console.log(order)
-    if (order) {
-      confirmPayment({
-        amount: total,
-        currency: 'usd',
-        method: 'stripe',
+    waiting = true
+    try {
+      const clientSecret = await createPaymentIntent()
+      // confirm payment with stripe
+      if (!clientSecret) {
+        waiting = false
+        return
+      }
+
+      const result = await stripe!.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+        },
       })
+      if (result.error) {
+        // payment failed, notify user
+        waiting = false
+        error = result.error
+        return
+      }
+      console.log(order)
+      if (order) {
+        confirmPayment({
+          amount: total,
+          currency: 'usd',
+          method: 'stripe',
+        })
+      }
+    } catch (err) {
+      console.log(err)
+      waiting = false
     }
   }
 
@@ -286,21 +302,27 @@
       return
     }
     done = event.amount
-    await trpc().mutation('orders:update', {
-      id: order?.id,
-      paymentMethods: [event.method],
-      status: 'paid',
-      fees:
-        event.method === 'stripe'
-          ? [
-              {
-                name: 'Stripe fee',
-                fixed: 0.3,
-                percentage: 2.9,
-              },
-            ]
-          : [],
-    })
+    try {
+      await trpc().mutation('orders:update', {
+        id: order?.id,
+        paymentMethods: [event.method],
+        status: 'paid',
+        fees:
+          event.method === 'stripe'
+            ? [
+                {
+                  name: 'Stripe fee',
+                  fixed: 0.3,
+                  percentage: 2.9,
+                },
+              ]
+            : [],
+      })
+    } catch (err) {
+      console.error(err)
+    } finally {
+      waiting = false
+    }
     order = undefined
     dispatch('checkout', event)
   }
@@ -308,15 +330,18 @@
   $: console.log(order)
 
   async function pay(e) {
+    waiting = true
     const paymentMethod = e.detail.paymentMethod
     // create payment intent server side
     const clientSecret = await createPaymentIntent()
     if (!clientSecret || !stripe) {
+      waiting = false
       return
     }
     let result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: paymentMethod.id,
     })
+    waiting = false
     if (result.error) {
       e.detail.complete('fail')
       // payment failed, notify user
@@ -405,7 +430,7 @@
     >
       {#if waiting}
         <div
-          class="bg-white flex h-full w-full z-30 absolute items-center justify-center !bg-opacity-50 dark:bg-gray-900"
+          class="bg-white flex h-full w-full z-110 absolute items-center justify-center !bg-opacity-50 dark:bg-gray-900"
           transition:fade={{ duration: 200 }}
         >
           <Hourglass32
