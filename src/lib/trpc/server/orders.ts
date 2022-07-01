@@ -58,6 +58,7 @@ const mutations = trpc
         order: {
           ...input.order,
           billingData: {
+            ip: ctx.event.clientAddress,
             ...input.order.billingData,
             coords: coords ? coords : input.order.billingData?.coords,
           },
