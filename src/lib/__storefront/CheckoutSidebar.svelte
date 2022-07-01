@@ -336,7 +336,7 @@
   let mergeAddress = true
 
   let detectingShipping = false
-  const fillAddress = (obj: any) => {
+  const fillAddress = (mode: 'shipping' | 'billing') => {
     detectingShipping = true
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -350,13 +350,18 @@
         detectingShipping = false
         if (!geo) return
         console.log(geo)
+        let obj = mode === 'shipping' ? { ...shipping } : { ...billing }
         const data = geo.features[0]?.properties
         obj.country = data.country_code.toUpperCase()
         obj.city = data.city
         obj.province = data.state
         obj.zip = data.postcode
         obj.address = data.address_line1
-        obj = obj
+        if (mode === 'shipping') {
+          shipping = { ...obj }
+        } else {
+          billing = { ...obj }
+        }
         tick()
         // shipping.country = geo.countryCode
       },
@@ -664,7 +669,7 @@
                   type="button"
                   style="will-change: transform"
                   disabled={detectingShipping}
-                  on:click={() => fillAddress(billing)}
+                  on:click={() => fillAddress('billing')}
                 >
                   {detectingShipping
                     ? 'Detecting...'
@@ -844,7 +849,7 @@
                       type="button"
                       style="will-change: transform"
                       disabled={detectingShipping}
-                      on:click={() => fillAddress(shipping)}
+                      on:click={() => fillAddress('shipping')}
                     >
                       {detectingShipping
                         ? 'Detecting...'
