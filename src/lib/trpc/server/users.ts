@@ -25,8 +25,7 @@ export default trpc
         })
         ctx.event.locals.session.data = body
       } catch (err) {
-        console.log(err.message)
-        console.log(err)
+        console.error(err.message)
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: err.error,
