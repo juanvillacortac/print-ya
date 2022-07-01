@@ -50,7 +50,7 @@ const mutations = trpc
         if (geo) {
           coords = {
             latitude: geo.latitude,
-            longitude: geo.longitude
+            longitude: geo.longitude,
           }
         }
       }
@@ -59,7 +59,7 @@ const mutations = trpc
           ...input.order,
           billingData: {
             ...input.order.billingData,
-            coords: coords ? coords : undefined,
+            coords: coords ? coords : input.order.billingData?.coords,
           },
         },
         storeId: input.storeId,
