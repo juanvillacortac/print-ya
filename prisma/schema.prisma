@@ -103,8 +103,9 @@ model Product {
 
   type ProductType @default(template)
 
-  public   Boolean
-  archived Boolean @default(false)
+  public     Boolean
+  archived   Boolean   @default(false)
+  archivedAt DateTime?
 
   description String?
 

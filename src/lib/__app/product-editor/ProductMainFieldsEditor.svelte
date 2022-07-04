@@ -48,21 +48,24 @@
             type="text"
             placeholder="Ex. Red camera sign"
             required
+            disabled={product.archived}
             bind:value={product.name}
           />
         </div>
-        <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">
-            Product type
-          </label>
-          <select
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={product.type}
-          >
-            <option value={'template'}>Custom template</option>
-            <option value={'generic'}>Static product</option>
-          </select>
-        </div>
+        {#if !product.id}
+          <div class="flex flex-col w-full">
+            <label class="font-bold text-xs mb-2 block" for="fieldId">
+              Product type
+            </label>
+            <select
+              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              bind:value={product.type}
+            >
+              <option value={'template'}>Custom template</option>
+              <option value={'generic'}>Static product</option>
+            </select>
+          </div>
+        {/if}
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId">
             Product category
@@ -70,6 +73,7 @@
           <select
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
             bind:value={product.storeCategoryId}
+            disabled={product.archived}
           >
             {#each store?.categories || [] as category}
               <option value={category.id}>{category.name}</option>
@@ -85,6 +89,7 @@
             type="number"
             min={0.01}
             step="any"
+            disabled={product.archived}
             bind:value={product.price}
           />
         </div>
@@ -96,6 +101,7 @@
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
             type="number"
             min={0}
+            disabled={product.archived}
             bind:value={product.minQuantity}
           />
         </div>

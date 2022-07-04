@@ -35,7 +35,7 @@
     "@sveltejs/adapter-node": "1.0.0-next.73",
     "@sveltejs/adapter-static": "^1.0.0-next.29",
     "@sveltejs/adapter-vercel": "1.0.0-next.59",
-    "@sveltejs/kit": "1.0.0-next.354",
+    "@sveltejs/kit": "1.0.0-next.357",
     "@types/bcrypt": "^5.0.0",
     "@types/geoip-lite": "^1.4.1",
     "@types/three": "^0.135.0",

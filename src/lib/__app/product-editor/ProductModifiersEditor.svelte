@@ -23,6 +23,7 @@
   type Unarray<T> = T extends Array<infer U> ? U : T
 
   let mounted = false
+  export let disabled = false
 
   export let modifiers: (Omit<ProductModifier, 'items'> & {
     internalId?: string
@@ -156,6 +157,7 @@
   let hovering: number | null
 
   $: drop = (event, target) => {
+    if (disabled) return
     event.dataTransfer.dropEffect = 'move'
     const start = parseInt(event.dataTransfer.getData('text/plain'))
     const newTracklist = $modifiersStore
@@ -172,6 +174,7 @@
   }
 
   const dragstart = (event, i) => {
+    if (disabled) return
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.dropEffect = 'move'
     const start = i
@@ -198,17 +201,19 @@
       >
       <h3 class="font-bold text-xs block">Product modifiers</h3>
     </div>
-    <div class="flex space-x-1">
-      <button
-        class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-        title="Add modifier"
-        type="button"
-        on:click={addModifier}
-        use:tooltip
-      >
-        <AddAlt16 class="font-bold" />
-      </button>
-    </div>
+    {#if !disabled}
+      <div class="flex space-x-1">
+        <button
+          class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+          title="Add modifier"
+          type="button"
+          on:click={addModifier}
+          use:tooltip
+        >
+          <AddAlt16 class="font-bold" />
+        </button>
+      </div>
+    {/if}
   </div>
   {#if showing}
     <div
@@ -221,11 +226,11 @@
           in:fly|local={{ x: -20 }}
           out:slide|local={{ duration: 400, easing: expoOut }}
           class="flex flex-col flex-grow space-y-2 w-full"
-          draggable={true}
+          draggable={!disabled}
           on:dragstart={(event) => dragstart(event, idx)}
           on:drop|preventDefault={(event) => drop(event, idx)}
           on:dragover|preventDefault={() => {}}
-          on:dragenter={() => (hovering = idx)}
+          on:dragenter={() => (disabled ? null : (hovering = idx))}
           on:dragend={() => (hovering = null)}
           class:bg-blue-100={hovering == idx}
           class:dark:bg-gray-900={hovering == idx}
@@ -258,24 +263,26 @@
                 {/if}
                 <span class="font-bold text-xs">{mType?.name}</span>
               </div>
-              <div class="flex space-x-4 items-center">
-                {#if modifierTypes.find((t) => t.type == m.type)?.tree}
+              {#if !disabled}
+                <div class="flex space-x-4 items-center">
+                  {#if modifierTypes.find((t) => t.type == m.type)?.tree}
+                    <button
+                      class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                      title="Add item"
+                      use:tooltip
+                      on:click={() => addItem(m)}
+                      type="button"><AddAlt16 /></button
+                    >
+                  {/if}
                   <button
                     class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                    title="Add item"
+                    title="Delete modifier"
                     use:tooltip
-                    on:click={() => addItem(m)}
-                    type="button"><AddAlt16 /></button
+                    on:click={() => deleteModifier(m)}
+                    type="button"><TrashCan16 /></button
                   >
-                {/if}
-                <button
-                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                  title="Delete modifier"
-                  use:tooltip
-                  on:click={() => deleteModifier(m)}
-                  type="button"><TrashCan16 /></button
-                >
-              </div>
+                </div>
+              {/if}
             </div>
             <div
               class="flex w-full p-4 pt-0 items-center lg:space-x-4 <lg:flex-col <lg:space-y-4"
@@ -288,6 +295,7 @@
                     placeholder="Modifier title"
                     class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                     required
+                    {disabled}
                     bind:value={m.name}
                   />
                 </label>
@@ -299,6 +307,7 @@
                     class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                     bind:value={m.type}
                     on:change={() => (m.defaultValue = '')}
+                    {disabled}
                   >
                     {#each modifierTypes as type}
                       <option value={type.type}>{type.name}</option>
@@ -315,6 +324,7 @@
                       placeholder="Template accessor"
                       bind:value={m.templateAccessor}
                       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+                      {disabled}
                     />
                   </label>
                 </div>
@@ -326,7 +336,11 @@
                 class="flex-grow w-full px-4 pb-4 overflow-x-auto"
                 transition:slide|local={{ duration: 600, easing: expoOut }}
               >
-                <svelte:component this={mType?.tree} bind:modifier={m} />
+                <svelte:component
+                  this={mType?.tree}
+                  bind:modifier={m}
+                  {disabled}
+                />
               </div>
             {/if}
           </div>

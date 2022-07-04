@@ -29,6 +29,8 @@
     items: (Unarray<ProductModifier['items']> & { internalId?: string })[]
   }
 
+  export let disabled = false
+
   const options: CaravaggioOptions = {
     progressive: true,
     o: 'png',
@@ -76,6 +78,7 @@
   let hovering: number | null | undefined
 
   $: drop = (event, target) => {
+    if (disabled) return
     event.dataTransfer.dropEffect = 'move'
     const start = parseInt(event.dataTransfer.getData('text/plain'))
     const newTracklist = $items
@@ -92,6 +95,7 @@
   }
 
   const dragstart = (event, i) => {
+    if (disabled) return
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.dropEffect = 'move'
     const start = i
@@ -147,12 +151,12 @@
     <div
       class="flex flex-col space-y-4 w-full p-4"
       transition:slide|local={{ duration: 400, easing: expoOut }}
-      draggable={true}
+      draggable={!disabled}
       on:dragstart|stopPropagation={(event) => dragstart(event, idx)}
       on:drop|preventDefault|stopPropagation={(event) => drop(event, idx)}
       on:dragover|preventDefault={() => {}}
-      on:dragenter|stopPropagation={() => (hovering = idx)}
-      on:dragend={() => (hovering = null)}
+      on:dragenter|stopPropagation={() => (disabled ? null : (hovering = idx))}
+      on:dragend={() => (disabled ? null : (hovering = null))}
       class:bg-blue-100={hovering == idx}
       class:dark:bg-gray-900={hovering == idx}
     >
@@ -176,17 +180,19 @@
             {i.name || `Upsell product #${idx + 1}`}
           </h3>
         </div>
-        <div class="flex space-x-1">
-          <button
-            class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-            title="Delete item"
-            type="button"
-            on:click={() => deleteItem(i)}
-            use:tooltip
-          >
-            <TrashCan16 class="font-bold" />
-          </button>
-        </div>
+        {#if !disabled}
+          <div class="flex space-x-1">
+            <button
+              class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+              title="Delete item"
+              type="button"
+              on:click={() => deleteItem(i)}
+              use:tooltip
+            >
+              <TrashCan16 class="font-bold" />
+            </button>
+          </div>
+        {/if}
       </div>
       {#if open[i.internalId]}
         <div
@@ -202,6 +208,7 @@
               type="text"
               required
               bind:value={i.name}
+              {disabled}
             />
           </div>
           <div class="flex flex-col w-full">
@@ -212,6 +219,7 @@
               class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
               type="text"
               bind:value={i.meta.description}
+              {disabled}
             />
           </div>
           <div class="flex flex-col w-full">
@@ -223,6 +231,7 @@
               type="number"
               step="any"
               bind:value={i.cost}
+              {disabled}
             />
           </div>
           <div class="flex flex-col w-full">
@@ -232,13 +241,14 @@
             <select
               class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
               bind:value={i.percentage}
+              {disabled}
             >
               <option value={false}>Fixed</option>
               <option value={true}>Percentage</option>
             </select>
           </div>
           <div class="relative">
-            {#if i.meta?.image}
+            {#if i.meta?.image && !disabled}
               <button
                 type="button"
                 class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
@@ -248,7 +258,7 @@
               >
                 <Close24 />
               </button>
-            {:else if !uploading[i.internalId]}
+            {:else if !uploading[i.internalId] && !disabled}
               <input
                 type="file"
                 name=""
@@ -273,7 +283,9 @@
                 >
                   <Image32 class="mb-1" />
                   <span class="font-normal block"
-                    >{uploading[i.internalId]
+                    >{disabled
+                      ? 'Without image'
+                      : uploading[i.internalId]
                       ? 'Uploading image...'
                       : 'Upload an image'}</span
                   >

@@ -1,3 +1,20 @@
+<script context="module" lang="ts">
+  import type { Load } from '@sveltejs/kit'
+  import trpc from '$lib/trpc/client'
+
+  export const load: Load = async ({ params, fetch, stuff }) => {
+    const products = await trpc(fetch).query('products:listDeleted', {
+      storeSlug: params.slug,
+    })
+    return {
+      props: {
+        products,
+      },
+      stuff,
+    }
+  }
+</script>
+
 <script lang="ts">
   import { browser } from '$app/env'
   import { goto } from '$app/navigation'
@@ -6,48 +23,35 @@
   import { pageSubtitle } from '$lib'
   import { squareratio } from '$lib/actions/aspectratio'
   import Preview from '$lib/components/Preview.svelte'
-  import { tooltip } from '$lib/components/tooltip'
   import type { Store, StripedProduct } from '$lib/db'
   import { search } from '$lib/utils/search'
-  import { Add24, TrashCan24 } from 'carbon-icons-svelte'
   import { flip } from 'svelte/animate'
   import { fly } from 'svelte/transition'
   const store = $page.stuff.store as Store | null
-  const products = $page.stuff.products as StripedProduct[]
+  export let products: StripedProduct[] = []
+
+  $: console.log(products)
 
   let textSearch = ''
   let categoryId = ''
-  let visibility: boolean | '' = true
 
-  $: filteredProducts = search(products, textSearch, ['name'])
-    .filter((p) => (categoryId ? p.storeCategoryId === categoryId : true))
-    .filter((p) =>
-      typeof visibility != 'string' ? p.public == visibility : true
-    )
+  $: filteredProducts = search(products, textSearch, ['name']).filter((p) =>
+    categoryId ? p.storeCategoryId === categoryId : true
+  )
 
-  $pageSubtitle = 'Products'
+  $pageSubtitle = 'Deleted products'
 </script>
 
 <h2 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
-  Products
+  Deleted products
 </h2>
-<div class="flex space-x-2 right-4 bottom-4 z-20 fixed items-center">
-  <a
-    class="rounded-full flex bg-red-500 shadow-lg text-white p-3 transform duration-200 hover:scale-95"
-    title="Deleted products"
-    href="deleted-products"
-    use:tooltip
-  >
-    <TrashCan24 />
-  </a>
-  <a
-    class="rounded-full flex bg-blue-500 shadow-lg text-white p-3 transform duration-200 hover:scale-95"
-    title="Add new product"
-    href="products/new"
-    use:tooltip
-  >
-    <Add24 />
-  </a>
+<div
+  class="border-dashed rounded-lg flex bg-red-500 bg-opacity-20 border-2 border-red-500 mb-8 p-4 lg:w-2/10"
+>
+  <p class="text-xs">
+    <span class="font-bold">Advice:</span> products listed here will be removed after
+    30 days of being added.
+  </p>
 </div>
 <div class="flex mx-auto justify-center items-center lg:w-9/10">
   <div class="flex mb-8 <sm:hidden !text-xs">
@@ -57,14 +61,6 @@
       bind:value={textSearch}
       placeholder="Enter keywords to search..."
     />
-    <select
-      class="bg-white border-b border-l-0 border-gray-300 leading-tight py-2  px-3 w-10rem appearance-none <sm:hidden !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-      bind:value={visibility}
-    >
-      <option value="">Published and hidden</option>
-      <option value={true}>Published</option>
-      <option value={false}>Hidden</option>
-    </select>
     <select
       class="bg-white border-b rounded-r-full border-l-0 border-gray-300 leading-tight py-2  px-3 w-10rem appearance-none <sm:hidden !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
       bind:value={categoryId}
@@ -76,7 +72,7 @@
     </select>
   </div>
 </div>
-<div class="mx-auto grid gap-6 grid-cols-1 lg:w-9/10 lg:grid-cols-4">
+<div class="mx-auto grid gap-6 grid-cols-1 lg:w-10/10 lg:grid-cols-4">
   {#each filteredProducts as product (product.id)}
     {@const href = `/stores/${store?.slug}/products/${product.slug}`}
     <div

@@ -1,5 +1,5 @@
 import type { LayoutType } from '$lib/utils/layout'
-import type { RequestEvent } from '@sveltejs/kit/types'
+import type { Handle, RequestEvent } from '@sveltejs/kit/types'
 import * as trpc from '@trpc/server'
 import users from './users'
 import stores from './stores'

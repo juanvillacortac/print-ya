@@ -1,13 +1,12 @@
 import trpc from '$lib/trpc/client'
-import type { LoadInput } from '@sveltejs/kit'
-import type { RequestEvent } from '@sveltejs/kit/types/private'
+import type { RequestEvent, LoadEvent } from '@sveltejs/kit'
 import { isCanonical } from './host'
 
 export type LayoutType = 'app' | 'store'
 
 export const getLayoutType = ({
   url,
-}: LoadInput | RequestEvent): LayoutType => {
+}: LoadEvent | RequestEvent): LayoutType => {
   if (url.searchParams.get('store')) return 'store'
   if (!isCanonical(url.host)) {
     return 'store'
@@ -18,7 +17,7 @@ export const getLayoutType = ({
 export const storeRoutes = ['/products', '/bag', '/cart']
 export const appRoutes = ['/stores', '/login', '/settings', '/app']
 
-export const validateLayoutRoute = (event: LoadInput | RequestEvent) => {
+export const validateLayoutRoute = (event: LoadEvent | RequestEvent) => {
   const layout = getLayoutType(event)
   switch (layout) {
     case 'store':
@@ -43,7 +42,7 @@ export const fetchLayoutData = async ({
   url,
   fetch,
   session,
-}: LoadInput): Promise<{ response?: LayoutData; notFound?: boolean }> => {
+}: LoadEvent): Promise<{ response?: LayoutData; notFound?: boolean }> => {
   const client = trpc(fetch)
   switch (session.layout) {
     case 'store':

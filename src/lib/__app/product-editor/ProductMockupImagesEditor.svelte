@@ -110,6 +110,7 @@
   let hovering: number | null
 
   $: drop = (event, target) => {
+    if (product.archived) return
     event.dataTransfer.dropEffect = 'move'
     const start = parseInt(event.dataTransfer.getData('text/plain'))
     const newTracklist = $images
@@ -126,6 +127,7 @@
   }
 
   const dragstart = (event, i) => {
+    if (product.archived) return
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.dropEffect = 'move'
     const start = i
@@ -175,7 +177,7 @@
             <div />
           </div>
         </button>
-      {:else}
+      {:else if !product.archived}
         <button
           class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
           title="Add image"
@@ -199,12 +201,13 @@
           <div
             class="relative"
             animate:flip={{ duration: 400, easing: expoOut }}
-            draggable={true}
+            draggable={!product.archived}
             on:dragstart|stopPropagation={(event) => dragstart(event, idx)}
             on:drop|preventDefault|stopPropagation={(event) => drop(event, idx)}
             on:dragover|preventDefault={() => {}}
-            on:dragenter|stopPropagation={() => (hovering = idx)}
-            on:dragend={() => (hovering = null)}
+            on:dragenter|stopPropagation={() =>
+              product.archived ? null : (hovering = idx)}
+            on:dragend={() => (product.archived ? null : (hovering = null))}
             in:scale|local={{
               duration: 400,
               easing: expoOut,
@@ -212,15 +215,17 @@
               opacity: 0.5,
             }}
           >
-            <button
-              type="button"
-              class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
-              title="Delete image"
-              on:click={() => deleteImage(path)}
-              use:tooltip
-            >
-              <Close24 />
-            </button>
+            {#if !product.archived}
+              <button
+                type="button"
+                class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
+                title="Delete image"
+                on:click={() => deleteImage(path)}
+                use:tooltip
+              >
+                <Close24 />
+              </button>
+            {/if}
             <div
               class="border-dashed rounded-lg flex border-2 overflow-hidden relative aspect-square dark:border-gray-700"
               use:squareratio

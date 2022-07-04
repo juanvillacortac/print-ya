@@ -343,13 +343,23 @@
                     <div
                       class="flex flex-col space-y-1 w-full whitespace-normal sm:w-40"
                     >
-                      <a
-                        href="../products/{p?.slug}"
-                        target="__blank"
-                        class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
-                      >
-                        {p?.name}
-                      </a>
+                      {#if p?.archived}
+                        <p
+                          class="font-bold text-lg leading-tight text-red-500 line-through sm:text-xs"
+                          title="Deleted product"
+                          use:tooltip
+                        >
+                          {p?.name}
+                        </p>
+                      {:else}
+                        <a
+                          href="../products/{p?.slug}"
+                          target="__blank"
+                          class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
+                        >
+                          {p?.name}
+                        </a>
+                      {/if}
                     </div>
                   </div>
                   {#if fulfillmentMode}

@@ -13,6 +13,8 @@
     })[]
   }
 
+  export let disabled = false
+
   type Unarray<T> = T extends Array<infer U> ? U : T
 
   const items = writable(
@@ -50,6 +52,7 @@
   let hovering: number | null
 
   $: drop = (event, target) => {
+    if (disabled) return
     event.dataTransfer.dropEffect = 'move'
     const start = parseInt(event.dataTransfer.getData('text/plain'))
     const newTracklist = $items
@@ -66,6 +69,7 @@
   }
 
   const dragstart = (event, i) => {
+    if (disabled) return
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.dropEffect = 'move'
     const start = i
@@ -94,21 +98,24 @@
           class:sr-only={!modifier.items?.filter((m) => m.active).length}
           >Name</th
         >
-        <th scope="col" class="py-3 px-6">
-          <span class="sr-only">Actions</span>
-        </th>
+        {#if !disabled}
+          <th scope="col" class="py-3 px-6">
+            <span class="sr-only">Actions</span>
+          </th>
+        {/if}
       </tr>
     </thead>
     <tbody class="z-10 relative">
       {#each $items?.filter((i) => i.active) as i, idx (i.internalId)}
         <tr
           in:fly|local={{ x: -20 }}
-          draggable={true}
+          draggable={!disabled}
           on:dragstart|stopPropagation={(event) => dragstart(event, idx)}
           on:drop|preventDefault|stopPropagation={(event) => drop(event, idx)}
           on:dragover|preventDefault={() => {}}
-          on:dragenter|stopPropagation={() => (hovering = idx)}
-          on:dragend={() => (hovering = null)}
+          on:dragenter|stopPropagation={() =>
+            disabled ? null : (hovering = idx)}
+          on:dragend={() => (disabled ? null : (hovering = null))}
           class:bg-blue-100={hovering == idx}
           class:dark:bg-gray-900={hovering == idx}
           class="bg-white dark:bg-gray-800"
@@ -128,11 +135,13 @@
                   type="color"
                   bind:value={i.name}
                   class="h-0 opacity-0 w-0 overflow-hidden absolute"
+                  {disabled}
                 />
                 <button
                   class="rounded h-full border-2 h-32px w-full transform w-32px relative dark:border-gray-600"
                   title={i.meta.name}
                   type="button"
+                  {disabled}
                   on:click={() =>
                     document.getElementById(`color-${i.id}`)?.click()}
                   style="will-change: transform; background-color: {i.name ||
@@ -165,19 +174,22 @@
               placeholder="Color name"
               class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none <sm:w-24ch dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
               bind:value={i.meta.name}
+              {disabled}
               required
             />
           </td>
 
-          <td class="flex text-right py-4 px-6 items-center justify-end">
-            <button
-              class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-              title="Delete"
-              use:tooltip
-              on:click={() => deleteItem(i)}
-              type="button"><TrashCan16 /></button
-            >
-          </td>
+          {#if !disabled}
+            <td class="flex text-right py-4 px-6 items-center justify-end">
+              <button
+                class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                title="Delete"
+                use:tooltip
+                on:click={() => deleteItem(i)}
+                type="button"><TrashCan16 /></button
+              >
+            </td>
+          {/if}
         </tr>
       {:else}
         <tr

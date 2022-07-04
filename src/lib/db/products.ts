@@ -18,10 +18,7 @@ export type ProductModifier = Omit<_ProductModifier, 'ordinal'> & {
   items: ProductModifierItem[]
 }
 
-export type Product<T extends TemplateSource = any> = Omit<
-  _Product,
-  'archived'
-> & {
+export type Product<T extends TemplateSource = any> = _Product & {
   template: T
   meta?: any
   storeCategory: StoreCategory | null
@@ -127,18 +124,37 @@ export const getProductBySlug = ({
       return data
     })
 
+const getLastDays = (days: number) =>
+  new Date(Date.now() - 24 * days * 60 * 60 * 1000)
+
 export const getProductsByStore = async ({
   storeId,
   published,
+  archived,
 }: {
   storeId: string
   published?: boolean
+  archived?: boolean
 }): Promise<StripedProduct[]> =>
   prisma.product.findMany({
     where: {
       storeId,
       public: published,
-      archived: false,
+      archived: archived || false,
+      OR: archived
+        ? [
+            {
+              archivedAt: {
+                gte: getLastDays(30).toISOString(),
+              },
+            },
+            {
+              archivedAt: {
+                equals: null,
+              },
+            },
+          ]
+        : undefined,
     },
     select: {
       id: true,
@@ -157,6 +173,7 @@ export const getProductsByStore = async ({
       template: true,
       minQuantity: true,
       meta: true,
+      archivedAt: true,
     },
     orderBy: {
       name: 'asc',
@@ -192,89 +209,102 @@ export const upsertProduct = async (
         public: product.public,
         description: product.description,
         meta: product.meta,
-        storeCategory: {
-          connect: {
-            id: product.storeCategoryId || undefined,
-          },
-        },
+        archived: product.archived,
+        archivedAt:
+          product.archived !== undefined || product.archived !== null
+            ? product.archived
+              ? new Date()
+              : null
+            : undefined,
+        storeCategory: product.storeCategoryId
+          ? {
+              connect: {
+                id: product.storeCategoryId || undefined,
+              },
+            }
+          : undefined,
         template: product.template,
         templateDraft: product.templateDraft as Prisma.InputJsonObject,
       },
     })
-    const transactions = product.modifiers!.map((m, idx) =>
-      prisma.productModifier.upsert({
-        include: {
-          items: {
-            where: {
-              active: true,
+    if (product.modifiers) {
+      const transactions = product.modifiers!.map((m, idx) =>
+        prisma.productModifier.upsert({
+          include: {
+            items: {
+              where: {
+                active: true,
+              },
             },
           },
-        },
-        create: {
-          name: m.name,
-          id: undefined,
-          product: {
-            connect: {
-              id: product.id,
+          create: {
+            name: m.name,
+            id: undefined,
+            product: {
+              connect: {
+                id: product.id,
+              },
             },
-          },
-          ordinal: idx,
-          type: m.type,
-          defaultValue: m.defaultValue || undefined,
-          templateAccessor: m.templateAccessor || undefined,
-          items: {
-            create: m.items?.map((i) => ({
-              name: i.name,
-              cost: i.cost,
-              percentage: i.percentage,
-            })),
-          },
-        },
-        update: {
-          name: m.name,
-          type: m.type,
-          active: m.active,
-          defaultValue: m.defaultValue || undefined,
-          templateAccessor: m.templateAccessor || undefined,
-          ordinal: idx,
-          items: {
-            create: m.items
-              ?.filter((i) => !i.id)
-              .map((i, idx) => ({
-                ordinal: idx,
+            ordinal: idx,
+            type: m.type,
+            defaultValue: m.defaultValue || undefined,
+            templateAccessor: m.templateAccessor || undefined,
+            items: {
+              create: m.items?.map((i) => ({
                 name: i.name,
-                meta: i.meta,
                 cost: i.cost,
                 percentage: i.percentage,
               })),
+            },
           },
-        },
-        where: {
-          id: m.id,
-        },
-      })
-    )
-    const itemsTransactions = (product?.modifiers || [])
-      .map((m) => m?.items?.filter((i) => i.id) || [])
-      .reduce((a, b) => [...a, ...b], [])
-      .map((i, idx) =>
-        prisma.productModifierItem.update({
-          where: {
-            id: i.id,
-          },
-          data: {
+          update: {
+            name: m.name,
+            type: m.type,
+            active: m.active,
+            defaultValue: m.defaultValue || undefined,
+            templateAccessor: m.templateAccessor || undefined,
             ordinal: idx,
-            active: i.active,
-            name: i.name,
-            meta: i.meta,
-            cost: i.cost,
-            percentage: i.percentage,
+            items: {
+              create: m.items
+                ?.filter((i) => !i.id)
+                .map((i, idx) => ({
+                  ordinal: idx,
+                  name: i.name,
+                  meta: i.meta,
+                  cost: i.cost,
+                  percentage: i.percentage,
+                })),
+            },
+          },
+          where: {
+            id: m.id,
           },
         })
       )
 
-    const _modifiers = await prisma.$transaction(transactions)
-    const _items = await prisma.$transaction(itemsTransactions)
+      const itemsTransactions = (product?.modifiers || [])
+        .map((m) => m?.items?.filter((i) => i.id) || [])
+        .reduce((a, b) => [...a, ...b], [])
+        .map((i, idx) =>
+          prisma.productModifierItem.update({
+            where: {
+              id: i.id,
+            },
+            data: {
+              ordinal: idx,
+              active: i.active,
+              name: i.name,
+              meta: i.meta,
+              cost: i.cost,
+              percentage: i.percentage,
+            },
+          })
+        )
+
+      const _modifiers = await prisma.$transaction(transactions)
+      const _items = await prisma.$transaction(itemsTransactions)
+    }
+
     const final = await getProductBySlug({
       storeId: product.storeId!,
       slug: product.slug!,

@@ -6,6 +6,7 @@ import type { tRPCContext } from '.'
 const mutations = trpc.router<tRPCContext>().mutation('upsert', {
   input: (input: { storeSlug: string; data: Partial<db.Product> }) => input,
   resolve: async ({ ctx, input }) => {
+    console.log(input)
     const { userId } = await db.getUserDetails(ctx.event)
     if (!userId) {
       throw new Error('not allowed')
@@ -14,20 +15,36 @@ const mutations = trpc.router<tRPCContext>().mutation('upsert', {
   },
 })
 
-const listInput = z.object({
-  storeSlug: z.string(),
-})
-
 const queries = trpc
   .router<tRPCContext>()
   .query('list', {
-    input: listInput,
+    input: z.object({
+      storeSlug: z.string(),
+    }),
     resolve: async ({ input }) => {
       const store = await db.getStoreBySlugOrHost({ slug: input.storeSlug })
       if (!store) {
         return []
       }
-      return await db.getProductsByStore({ storeId: store.id })
+      return await db.getProductsByStore({
+        storeId: store.id,
+        archived: false,
+      })
+    },
+  })
+  .query('listDeleted', {
+    input: z.object({
+      storeSlug: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      const store = await db.getStoreBySlugOrHost({ slug: input.storeSlug })
+      if (!store) {
+        return []
+      }
+      return await db.getProductsByStore({
+        storeId: store.id,
+        archived: true,
+      })
     },
   })
   .query('getById', {

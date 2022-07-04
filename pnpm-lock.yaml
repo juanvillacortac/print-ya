@@ -39,7 +39,7 @@ specifiers:
   '@sveltejs/adapter-node': 1.0.0-next.73
   '@sveltejs/adapter-static': ^1.0.0-next.29
   '@sveltejs/adapter-vercel': 1.0.0-next.59
-  '@sveltejs/kit': 1.0.0-next.354
+  '@sveltejs/kit': 1.0.0-next.357
   '@sveltejs/svelte-virtual-list': ^3.0.1
   '@trpc/client': ^9.25.3
   '@trpc/server': ^9.25.3
@@ -199,7 +199,7 @@ dependencies:
   svelte-stripe: 0.0.17
   three: 0.135.0
   tozod: 3.0.0_zod@3.17.3
-  trpc-sveltekit: 2.0.2_3u3gsigpao726m4pdvhdouex6i
+  trpc-sveltekit: 2.0.2_zt6dut26lzlzl7vjxww2eido6i
   trpc-transformer: 2.0.2
   typewriter-document: 0.6.50
   typewriter-editor: 0.7.9_svelte@3.48.0
@@ -214,7 +214,7 @@ devDependencies:
   '@sveltejs/adapter-node': 1.0.0-next.73
   '@sveltejs/adapter-static': 1.0.0-next.30
   '@sveltejs/adapter-vercel': 1.0.0-next.59_encoding@0.1.13
-  '@sveltejs/kit': 1.0.0-next.354_svelte@3.48.0
+  '@sveltejs/kit': 1.0.0-next.357_svelte@3.48.0
   '@types/bcrypt': 5.0.0
   '@types/geoip-lite': 1.4.1
   '@types/three': 0.135.0
@@ -1935,8 +1935,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.354_svelte@3.48.0:
-    resolution: {integrity: sha512-dTfFT0c3sxztFpiw6H4bQnPd+PtHgEZG6j6ssT9sWLONfzUgWRX0S7H/WoPEjr7u65o2HNazoj8jmEq3ZTwb9g==}
+  /@sveltejs/kit/1.0.0-next.357_svelte@3.48.0:
+    resolution: {integrity: sha512-nCAehVybIEpQNnPu61V/EFVdfDb1nBSiQUfW9EcSSDEUbyAMCVBOKZZuzQ0qQDp3xniqRkyDzpBA4wN+ADxHBw==}
     engines: {node: '>=16.7'}
     hasBin: true
     peerDependencies:
@@ -7339,13 +7339,13 @@ packages:
     resolution: {integrity: sha512-iawgk0hLP3SxGKDfnDJf8wTz4p2qImnyihM5Hh/sGvQ3K37dPi/w8sRhdNIxYA1TwFwc5mDhIJq+O0RsvXBKdQ==}
     dev: false
 
-  /trpc-sveltekit/2.0.2_3u3gsigpao726m4pdvhdouex6i:
+  /trpc-sveltekit/2.0.2_zt6dut26lzlzl7vjxww2eido6i:
     resolution: {integrity: sha512-OV9lBpLPERV5+T8vtsBuvmx1YrYqxBx1KGN5hXmAAkzYuJd3D0OFe/jXegu3abulyYfDKGBQmZfCDz4l5uKIwQ==}
     peerDependencies:
       '@sveltejs/kit': ^1.0.0-next
       '@trpc/server': ^9.24.0
     dependencies:
-      '@sveltejs/kit': 1.0.0-next.354_svelte@3.48.0
+      '@sveltejs/kit': 1.0.0-next.357_svelte@3.48.0
       '@trpc/server': 9.25.3
     dev: false
 

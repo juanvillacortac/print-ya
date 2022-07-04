@@ -6,8 +6,8 @@ import { appRoutes, getLayoutType } from '$lib/utils/layout'
 import { getDefaultHost } from '$lib/utils/host'
 
 import { router, type tRPCRouter } from '$lib/trpc/server'
-import { createTRPCHandle } from 'trpc-sveltekit'
 import { sequence } from '@sveltejs/kit/hooks'
+import { createTRPCHandle } from '$lib/trpc/handler'
 
 const session = handleSession(
   {
@@ -59,11 +59,40 @@ const session = handleSession(
         )
       }
 
-      response = await resolve(event, {
-        ssr: event.locals.layout !== 'app',
-      })
+      const { response: trpcResponse, trpc } =
+        await createTRPCHandle<tRPCRouter>(
+          {
+            url: '/api/trpc',
+            router,
+            event,
+            resolve,
+            createContext: async () => ({
+              event,
+              layout: event.locals.layout,
+            }),
+            responseMeta({ type, errors, ctx }) {
+              if (
+                type === 'query' &&
+                ctx?.layout === 'store' &&
+                errors.length === 0
+              ) {
+                return {
+                  headers: {
+                    'cache-control': `s-maxage=1, stale-while-revalidate`,
+                  },
+                }
+              }
+              return {}
+            },
+          },
+          {
+            ssr: event.locals.layout !== 'app',
+          }
+        )
 
-      if (event.locals.layout === 'store') {
+      response = trpcResponse
+
+      if (event.locals.layout === 'store' && !trpc) {
         response.headers.set(
           'Cache-Control',
           's-maxage=1, stale-while-revalidate'
@@ -87,32 +116,7 @@ const session = handleSession(
   }
 )
 
-const trpc: Handle = async ({ event, resolve }) => {
-  const response = await createTRPCHandle<tRPCRouter>({
-    url: '/api/trpc',
-    router,
-    event,
-    resolve,
-    createContext: async () => ({
-      event,
-      layout: event.locals.layout,
-    }),
-    responseMeta({ type, errors, ctx }) {
-      if (type === 'query' && ctx?.layout === 'store' && errors.length === 0) {
-        return {
-          headers: {
-            'cache-control': `s-maxage=1, stale-while-revalidate`,
-          },
-        }
-      }
-      return {}
-    },
-  })
-
-  return response
-}
-
-export const handle = sequence(session, trpc)
+export const handle = sequence(session)
 
 export const getSession: GetSession = (event) => ({
   layout: event.locals.layout,
