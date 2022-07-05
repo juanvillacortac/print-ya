@@ -183,7 +183,8 @@
           'products:list',
           'products:listDeleted'
         )
-        window.location.reload()
+        saving = false
+        // window.location.reload()
       }
     } catch (err) {
       saving = false

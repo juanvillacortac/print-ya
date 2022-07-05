@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
-  import trpc from '$lib/trpc/client'
+  import trpc, { invalidateQuery } from '$lib/trpc/client'
 
   export const load: Load = async ({ params, fetch, stuff }) => {
     const products = await trpc(fetch).query('products:listDeleted', {
@@ -26,10 +26,11 @@
   import type { Store, StripedProduct } from '$lib/db'
   import { search } from '$lib/utils/search'
   import { flip } from 'svelte/animate'
-  import { fly } from 'svelte/transition'
-  import { Warning32 } from 'carbon-icons-svelte'
+  import { fly, slide } from 'svelte/transition'
+  import { Redo16, View16, Warning32 } from 'carbon-icons-svelte'
   import Ufo from '$lib/components/__Ufo.svelte'
   import { expoOut } from 'svelte/easing'
+  import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   const store = $page.stuff.store as Store | null
   export let products: StripedProduct[] = []
 
@@ -43,6 +44,17 @@
   )
 
   $pageSubtitle = 'Deleted products'
+
+  const restoreProduct = async (id: string) => {
+    await trpc().mutation('products:upsert', {
+      storeSlug: store!.slug,
+      data: {
+        id,
+        archived: false,
+      },
+    })
+    await invalidateQuery('products:list', 'products:listDeleted')
+  }
 </script>
 
 <h2 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
@@ -77,60 +89,100 @@
   </div>
 </div>
 {#if filteredProducts?.length}
-  <div class="mx-auto grid gap-6 grid-cols-1 lg:w-10/10 lg:grid-cols-4">
-    {#each filteredProducts as product (product.id)}
-      {@const href = `/stores/${store?.slug}/products/${product.slug}`}
+  <div
+    class="divide-y border rounded-lg flex flex-col border-gray-300 w-full relative overscroll-auto dark:divide-gray-700 dark:bg-gray-800 dark:border-gray-700 "
+    in:fly|local={{ y: 10, duration: 400, easing: expoOut }}
+  >
+    {#each filteredProducts as product, idx (product.id)}
       <div
-        role="link"
-        in:fly={{ y: 20 }}
-        animate:flip={{ duration: 400 }}
-        class="bg-white rounded-xl cursor-pointer flex flex-col h-full space-y-2 shadow w-full p-4 transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-98"
-        on:click={() => goto(href)}
-        style="will-change: transform"
+        class="relative"
+        transition:slide|local={{
+          duration: 600,
+          easing: expoOut,
+        }}
       >
-        <a
-          class="rounded-lg bg-gray-100 w-full overflow-hidden select-none dark:bg-gray-700"
-          style="aspect-ratio: 1/1"
-          use:squareratio
-          sveltekit:prefetch
-          {href}
+        <div
+          class="flex p-4 text-gray-500 justify-between relative sm:items-center <sm:flex-col <sm:space-y-4 dark:text-gray-400"
+          class:skeleton={!product}
+          class:pointer-events-none={!product}
         >
           <div
-            class="flex h-full w-full items-center justify-center pointer-events-none"
+            class="flex items-center sm:space-x-4 <lg:flex-col <lg:space-y-4"
           >
-            {#if browser}
-              <Preview template={product?.template || {}} fitParent />
-            {/if}
+            <div
+              class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-36  dark:bg-gray-900"
+              style="aspect-ratio: 1/1"
+            >
+              <div class="flex h-full w-full items-center justify-center">
+                {#if product.template}
+                  <TemplatePreview
+                    lazy
+                    showFonts
+                    template={product.template}
+                    controls={false}
+                  />
+                {/if}
+              </div>
+            </div>
+            <div
+              class="flex flex-col space-y-1 w-full whitespace-normal sm:w-40"
+            >
+              <a
+                href="products/{product?.slug}"
+                class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
+                sveltekit:prefetch
+              >
+                {product.name}
+              </a>
+            </div>
           </div>
-        </a>
-        <p class="font-bold text-sm">
-          ${product.price.toLocaleString()}{!product.public
-            ? ' - Unpublished'
-            : ''}
-        </p>
-        <a
-          class="font-title font-bold text-black dark:text-white"
-          sveltekit:prefetch
-          {href}
-        >
-          {product.name}
-        </a>
-        <div class="flex justify-between items-end">
-          <a
-            sveltekit:prefetch
-            href="/stores/{store?.slug}/products?category={product.storeCategory
-              ?.slug}"
-            class="text-xs text-blue-500 hover:underline"
-            >{product.storeCategory?.name}</a
-          >
+          <div class="flex flex-col space-y-1">
+            <p class="font-bold text-xs text-black dark:text-white">Category</p>
+            <button
+              class="flex text-sm text-blue-500 hover:underline"
+              on:click={() => (categoryId = product.storeCategory?.id || '')}
+            >
+              {product.storeCategory?.name}
+            </button>
+          </div>
+          <div class="flex flex-col space-y-1">
+            <p class="font-bold text-xs text-black dark:text-white">
+              Base price
+            </p>
+            <p class="font-bold text-sm">
+              ${product.price.toLocaleString('en', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </p>
+          </div>
+          <div class="flex space-x-2 items-center <sm:ml-auto">
+            <button
+              class="border-transparent rounded flex space-x-1 border-2 p-1 text-green-500 duration-200 items-center hover:border-green-500"
+              title="Delete product"
+              type="button"
+              on:click={() => restoreProduct(product.id)}
+            >
+              <div class="text-xs">Restore product</div>
+              <Redo16 /></button
+            >
+            <a
+              class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 items-center hover:border-gray-300 dark:hover:border-gray-500"
+              title="View details"
+              href="products/{product.slug}"
+            >
+              <div class="text-xs">View product</div>
+              <View16 /></a
+            >
+          </div>
         </div>
       </div>
     {/each}
   </div>
 {:else}
   <div
-    class="flex flex-col h-full space-y-6 w-full py-10 items-center"
-    in:fly={{ y: 10, duration: 400, easing: expoOut }}
+    class="flex flex-col h-full space-y-6 w-full py-8 items-center"
+    in:fly|local={{ y: 10, duration: 400, easing: expoOut }}
   >
     <div class="w-2/10">
       <Ufo class="h-auto w-full" />

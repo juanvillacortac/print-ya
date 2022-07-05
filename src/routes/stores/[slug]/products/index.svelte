@@ -14,8 +14,10 @@
     View16,
     ViewOff16,
   } from 'carbon-icons-svelte'
+  import Portal from 'svelte-portal'
+  import { flip } from 'svelte/animate'
   import { expoOut } from 'svelte/easing'
-  import { fly } from 'svelte/transition'
+  import { fly, slide } from 'svelte/transition'
   const store = $page.stuff.store as Store | null
   $: products = $page.stuff.products as StripedProduct[]
 
@@ -53,24 +55,26 @@
 <h2 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
   Products
 </h2>
-<div class="flex space-x-2 right-4 bottom-4 z-20 fixed items-center">
-  <a
-    class="rounded-full flex bg-red-500 shadow-lg text-white p-3 transform duration-200 hover:scale-95"
-    title="Deleted products"
-    href="deleted-products"
-    use:tooltip
-  >
-    <TrashCan24 />
-  </a>
-  <a
-    class="rounded-full flex bg-blue-500 shadow-lg text-white p-3 transform duration-200 hover:scale-95"
-    title="Add new product"
-    href="products/new"
-    use:tooltip
-  >
-    <Add24 />
-  </a>
-</div>
+<Portal>
+  <div class="flex space-x-2 right-4 bottom-4 z-20 fixed items-center">
+    <a
+      class="rounded-full flex bg-red-500 shadow-lg text-white p-3 transform duration-200 hover:scale-95"
+      title="Deleted products"
+      href="deleted-products"
+      use:tooltip
+    >
+      <TrashCan24 />
+    </a>
+    <a
+      class="rounded-full flex bg-blue-500 shadow-lg text-white p-3 transform duration-200 hover:scale-95"
+      title="Add new product"
+      href="products/new"
+      use:tooltip
+    >
+      <Add24 />
+    </a>
+  </div>
+</Portal>
 <div class="flex mx-auto justify-center items-center lg:w-9/10">
   <div class="flex mb-8 <sm:hidden !text-xs">
     <input
@@ -100,11 +104,17 @@
 </div>
 {#if filteredProducts?.length}
   <div
-    class="divide-y border rounded-lg flex flex-col border-gray-300 w-full relative overflow-x-auto overscroll-auto dark:divide-gray-700 dark:bg-gray-800 dark:border-gray-700 "
-    in:fly={{ y: 10, duration: 400, easing: expoOut }}
+    class="divide-y border rounded-lg flex flex-col border-gray-300 w-full relative overscroll-auto dark:divide-gray-700 dark:bg-gray-800 dark:border-gray-700 "
+    in:fly|local={{ y: 10, duration: 400, easing: expoOut }}
   >
     {#each filteredProducts as product, idx (product.id)}
-      <div class="relative">
+      <div
+        class="relative"
+        transition:slide|local={{
+          duration: 600,
+          easing: expoOut,
+        }}
+      >
         <div
           class="flex p-4 text-gray-500 justify-between relative sm:items-center <sm:flex-col <sm:space-y-4 dark:text-gray-400"
           class:skeleton={!product}
@@ -222,8 +232,8 @@
   </div>
 {:else}
   <div
-    class="flex flex-col h-full space-y-6 w-full py-10 items-center"
-    in:fly={{ y: 10, duration: 400, easing: expoOut }}
+    class="flex flex-col h-full space-y-6 w-full py-8 items-center"
+    in:fly|local={{ y: 10, duration: 400, easing: expoOut }}
   >
     <div class="w-2/10">
       <Ufo class="h-auto w-full" />
