@@ -17,7 +17,7 @@
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'
   const store = $page.stuff.store as Store | null
-  let products = $page.stuff.products as StripedProduct[]
+  $: products = $page.stuff.products as StripedProduct[]
 
   let textSearch = ''
   let categoryId = ''
