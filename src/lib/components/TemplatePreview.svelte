@@ -29,7 +29,7 @@
    * }[]} */
   export let mockups = []
 
-  /** @type {import('$lib/compiler').TemplateSource} */
+  /** @type {import('$lib/compiler').TemplateSource | import('@prisma/client').Prisma.JsonValue} */
   export let template
   export let watermark = false
 

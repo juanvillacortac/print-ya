@@ -27,6 +27,9 @@
   import { search } from '$lib/utils/search'
   import { flip } from 'svelte/animate'
   import { fly } from 'svelte/transition'
+  import { Warning32 } from 'carbon-icons-svelte'
+  import Ufo from '$lib/components/__Ufo.svelte'
+  import { expoOut } from 'svelte/easing'
   const store = $page.stuff.store as Store | null
   export let products: StripedProduct[] = []
 
@@ -46,9 +49,10 @@
   Deleted products
 </h2>
 <div
-  class="border-dashed rounded-lg flex bg-red-500 bg-opacity-20 border-2 border-red-500 mb-8 p-4 lg:w-2/10"
+  class="border-dashed rounded-lg flex space-x-4 bg-red-500 bg-opacity-20 border-2 border-red-500 mb-8 p-4 items-center"
 >
-  <p class="text-xs">
+  <Warning32 class="text-red-500" />
+  <p class="m-auto text-xs">
     <span class="font-bold">Advice:</span> products listed here will be removed after
     30 days of being added.
   </p>
@@ -72,53 +76,65 @@
     </select>
   </div>
 </div>
-<div class="mx-auto grid gap-6 grid-cols-1 lg:w-10/10 lg:grid-cols-4">
-  {#each filteredProducts as product (product.id)}
-    {@const href = `/stores/${store?.slug}/products/${product.slug}`}
-    <div
-      role="link"
-      in:fly={{ y: 20 }}
-      animate:flip={{ duration: 400 }}
-      class="bg-white rounded-xl cursor-pointer flex flex-col h-full space-y-2 shadow w-full p-4 transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-98"
-      on:click={() => goto(href)}
-      style="will-change: transform"
-    >
-      <a
-        class="rounded-lg bg-gray-100 w-full overflow-hidden select-none dark:bg-gray-700"
-        style="aspect-ratio: 1/1"
-        use:squareratio
-        sveltekit:prefetch
-        {href}
+{#if filteredProducts?.length}
+  <div class="mx-auto grid gap-6 grid-cols-1 lg:w-10/10 lg:grid-cols-4">
+    {#each filteredProducts as product (product.id)}
+      {@const href = `/stores/${store?.slug}/products/${product.slug}`}
+      <div
+        role="link"
+        in:fly={{ y: 20 }}
+        animate:flip={{ duration: 400 }}
+        class="bg-white rounded-xl cursor-pointer flex flex-col h-full space-y-2 shadow w-full p-4 transform duration-400 relative overflow-hidden dark:bg-gray-800 hover:scale-98"
+        on:click={() => goto(href)}
+        style="will-change: transform"
       >
-        <div
-          class="flex h-full w-full items-center justify-center pointer-events-none"
-        >
-          {#if browser}
-            <Preview template={product?.template || {}} fitParent />
-          {/if}
-        </div>
-      </a>
-      <p class="font-bold text-sm">
-        ${product.price.toLocaleString()}{!product.public
-          ? ' - Unpublished'
-          : ''}
-      </p>
-      <a
-        class="font-title font-bold text-black dark:text-white"
-        sveltekit:prefetch
-        {href}
-      >
-        {product.name}
-      </a>
-      <div class="flex justify-between items-end">
         <a
+          class="rounded-lg bg-gray-100 w-full overflow-hidden select-none dark:bg-gray-700"
+          style="aspect-ratio: 1/1"
+          use:squareratio
           sveltekit:prefetch
-          href="/stores/{store?.slug}/products?category={product.storeCategory
-            ?.slug}"
-          class="text-xs text-blue-500 hover:underline"
-          >{product.storeCategory?.name}</a
+          {href}
         >
+          <div
+            class="flex h-full w-full items-center justify-center pointer-events-none"
+          >
+            {#if browser}
+              <Preview template={product?.template || {}} fitParent />
+            {/if}
+          </div>
+        </a>
+        <p class="font-bold text-sm">
+          ${product.price.toLocaleString()}{!product.public
+            ? ' - Unpublished'
+            : ''}
+        </p>
+        <a
+          class="font-title font-bold text-black dark:text-white"
+          sveltekit:prefetch
+          {href}
+        >
+          {product.name}
+        </a>
+        <div class="flex justify-between items-end">
+          <a
+            sveltekit:prefetch
+            href="/stores/{store?.slug}/products?category={product.storeCategory
+              ?.slug}"
+            class="text-xs text-blue-500 hover:underline"
+            >{product.storeCategory?.name}</a
+          >
+        </div>
       </div>
+    {/each}
+  </div>
+{:else}
+  <div
+    class="flex flex-col h-full space-y-6 w-full py-10 items-center"
+    in:fly={{ y: 10, duration: 400, easing: expoOut }}
+  >
+    <div class="w-2/10">
+      <Ufo class="h-auto w-full" />
     </div>
-  {/each}
-</div>
+    <div class="font-bold font-title text-xl">Nothing here</div>
+  </div>
+{/if}
