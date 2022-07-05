@@ -19,9 +19,12 @@
 
 <script lang="ts">
   import { page } from '$app/stores'
-  import client from '$lib/trpc/client'
+  import { browser } from '$app/env'
+  import client, { invalidateQuery } from '$lib/trpc/client'
 
-  $: store = $page.stuff.store
+  $: if ($page.url && browser) {
+    invalidateQuery('stores:getBySlug')
+  }
 </script>
 
 <slot />

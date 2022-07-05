@@ -23,14 +23,14 @@ export const getUserStores = ({
     },
   })
 
-export const getStoreBySlugOrHost = ({
+export const getStoreBySlugOrHost = async ({
   slug,
   host: customDomain,
 }: {
   slug?: string
   host?: string
-}): Promise<Store | null> =>
-  prisma.store.findUnique({
+}): Promise<Store | null> => {
+  const store = await prisma.store.findUnique({
     where: {
       slug,
       customDomain,
@@ -38,9 +38,12 @@ export const getStoreBySlugOrHost = ({
     include: {
       categories: {
         include: {
-          _count: {
+          products: {
+            where: {
+              archived: false,
+            },
             select: {
-              products: true,
+              id: true,
             },
           },
         },
@@ -50,6 +53,18 @@ export const getStoreBySlugOrHost = ({
       },
     },
   })
+  return store
+    ? {
+        ...store,
+        categories: store.categories.map((c) => ({
+          ...c,
+          _count: {
+            products: c.products.length,
+          },
+        })),
+      }
+    : null
+}
 
 export const getStoreBySubdomain = ({
   slug,
