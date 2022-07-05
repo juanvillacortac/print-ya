@@ -197,7 +197,7 @@
 </script>
 
 <h2
-  class="font-bold font-title mx-auto my-2 text-black text-xl w-full lg:max-w-9/10 dark:text-white"
+  class="font-bold font-title mx-auto my-2 text-black text-xl w-full lg:max-w-10/10 dark:text-white"
 >
   <span>
     {product.id ? title : 'New product'}&nbsp;
@@ -220,7 +220,7 @@
 </h2>
 <form
   on:submit|preventDefault|stopPropagation={submit}
-  class="flex flex-col mx-auto space-y-4 w-full lg:max-w-9/10"
+  class="flex flex-col mx-auto space-y-4 w-full lg:max-w-10/10"
 >
   <div class="flex flex-col space-y-4 lg:items-end">
     <div
@@ -336,7 +336,9 @@
       class:lg:col-span-2={product.template && product.type === 'template'}
     >
       <ProductMainFieldsEditor bind:product />
-      <ProductMockupImagesEditor bind:product />
+      {#if product.type === 'template'}
+        <ProductMockupImagesEditor bind:product />
+      {/if}
       <ProductModifiersEditor bind:modifiers disabled={product.archived} />
     </div>
     {#if product.template && product.type === 'template'}
