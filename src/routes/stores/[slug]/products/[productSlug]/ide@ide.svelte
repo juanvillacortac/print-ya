@@ -15,6 +15,7 @@
     CloudUpload24,
     Logout24,
     ArrowLeft20,
+    Redo24,
   } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
   import { preferences } from '$lib'
@@ -105,6 +106,36 @@
   const toProduction = async () => {
     try {
       saving = true
+      await client().mutation('products:upsert', {
+        storeSlug: store.slug,
+        data: {
+          ...product,
+          template: $editor,
+          templateDraft: $editor,
+        },
+      })
+      notifications.send('Template published', 'default', 3000)
+    } catch (err) {
+      notifications.send(err.message, 'default', 3000)
+    } finally {
+      saving = false
+    }
+  }
+
+  const rollBack = async () => {
+    try {
+      saving = true
+
+      $editor = { ...($page.stuff.product?.template as any) } || {
+        name: 'Template test',
+        html: '',
+        css: '',
+        fields: '',
+        windi: true,
+        width: 300,
+        height: 300,
+        sizeUnit: 'px',
+      }
       await client().mutation('products:upsert', {
         storeSlug: store.slug,
         data: {
@@ -268,6 +299,14 @@
               <svelte:component this={m.icon} />
             </button>
           {/each}
+          <button
+            on:click={rollBack}
+            title="Roll back draft"
+            class="flex text-red-500"
+            use:tooltip
+          >
+            <Redo24 />
+          </button>
           <button
             on:click={toProduction}
             title="Save as public template"
