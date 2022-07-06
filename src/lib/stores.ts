@@ -5,6 +5,31 @@ import type { ModifiersMap } from './utils/modifiers'
 import type { Product } from './db'
 import { flatMap, isObject, merge } from 'lodash-es'
 import type { Prisma } from '@prisma/client'
+import { page } from '$app/stores'
+import { goto } from '$app/navigation'
+
+export function createQueryStore<T = any>(prop: string): Writable<T> {
+  let query: Record<string, any> = {}
+  const set = (v) => {
+    query[prop] = v
+    const urlSearchParams = new URLSearchParams(query)
+    const g = `?${urlSearchParams.toString()}`
+    goto(g, { keepfocus: true, replaceState: true, noscroll: true })
+  }
+  return {
+    subscribe: (h) => {
+      return page.subscribe((p) => {
+        query = Object.fromEntries(p.url.searchParams.entries())
+        h(query[prop])
+      })
+    },
+    update(cb: CallableFunction) {
+      const value = cb(query[prop])
+      set(value)
+    },
+    set,
+  }
+}
 
 export const pageSubtitle = writable<string | null | undefined>('')
 

@@ -179,8 +179,11 @@
   <div class="flex font-bold space-x-2 text-xs text-gray-400 uppercase">
     <a href="/" class="hover:underline">Home</a>
     <span>/</span>
-    <a href=".?category={product?.storeCategory?.slug}" class="hover:underline"
-      >{product.storeCategory?.name}</a
+    <a href="/products" class="hover:underline">Products</a>
+    <span>/</span>
+    <a
+      href="/products?category={product?.storeCategory?.slug}"
+      class="hover:underline">{product.storeCategory?.name}</a
     >
   </div>
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />

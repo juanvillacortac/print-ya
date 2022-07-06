@@ -39,7 +39,7 @@
   })
 
   $: {
-    if ($navigating) {
+    if ($navigating && $navigating.from.pathname !== $navigating.to.pathname) {
       NProgress.start()
     }
     if (!$navigating) {
