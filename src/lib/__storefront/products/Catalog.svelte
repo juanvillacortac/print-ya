@@ -71,7 +71,7 @@
   </div>
   {#if filteredProducts.length}
     <div
-      class="grid gap-4 grid-cols-4 lg:w-8/10"
+      class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:w-8/10 lg:grid-cols-4"
       in:fly|local={{ y: 10, duration: 400 }}
     >
       {#each filteredProducts as p (p.id)}
