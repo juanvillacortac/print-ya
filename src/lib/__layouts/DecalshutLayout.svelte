@@ -138,7 +138,7 @@
     </div>
     <div class="bg-[rgb(113,3,3)] text-white text-base w-full <lg:hidden">
       <div class="flex mx-auto space-x-4 text-white p-4 py-2 lg:w-9/10">
-        <a href="./{store.name}">Home</a>
+        <a href="/">Home</a>
         {#each store.categories?.slice(0, 8) || [] as category}
           <a href="/products?category={category.slug}">{category.name}</a>
         {/each}
