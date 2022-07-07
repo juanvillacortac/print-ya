@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import { squareratio } from '$lib/actions/aspectratio'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
@@ -76,13 +77,14 @@
     >
       {#each filteredProducts as p (p.id)}
         <div
-          class="border rounded-lg flex flex-col space-y-2 p-2 relative dark:border-gray-600"
+          class="bg-white border rounded-lg cursor-pointer flex flex-col space-y-2 border-gray-300 p-2 transform transition-all relative dark:bg-gray-800 dark:border-gray-600 hover:shadow-lg hover:scale-102"
           animate:flip={{ duration: 400, easing: expoOut }}
           style="will-change: transform"
+          on:click={() => goto(`/products/${p.slug}`)}
         >
           {#if p.template}
             <div
-              class="w-full pointer-events-none aspect-square"
+              class="flex h-full w-full pointer-events-none aspect-square"
               use:squareratio
             >
               <TemplatePreview
@@ -94,17 +96,20 @@
               />
             </div>
           {/if}
-          <div class="flex flex-col space-y-1">
-            <a
-              href="/products/{p.slug}"
-              class="font-bold text-sm hover:underline">{p.name}</a
-            >
-            <a
-              href="/products?category={p.storeCategory?.slug}"
-              class="text-xs text-blue-500 hover:underline"
-              >{p.storeCategory?.name}</a
-            >
-            <p class="font-bold">
+          <div class="flex flex-col flex-grow h-full space-y-1 justify-between">
+            <div class="flex flex-col space-y-1">
+              <a
+                href="/products/{p.slug}"
+                class="font-bold text-sm <sm:text-xl hover:underline"
+                >{p.name}</a
+              >
+              <a
+                href="/products?category={p.storeCategory?.slug}"
+                class="text-xs text-blue-500 hover:underline"
+                >{p.storeCategory?.name}</a
+              >
+            </div>
+            <p class="font-bold self-end">
               ${p.price.toLocaleString('en', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,

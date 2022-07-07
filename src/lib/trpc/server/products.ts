@@ -20,6 +20,7 @@ const queries = trpc
   .query('list', {
     input: z.object({
       storeSlug: z.string(),
+      public: z.boolean().optional(),
     }),
     resolve: async ({ input }) => {
       const store = await db.getStoreBySlugOrHost({ slug: input.storeSlug })
@@ -28,6 +29,7 @@ const queries = trpc
       }
       return await db.getProductsByStore({
         storeId: store.id,
+        published: input.public,
         archived: false,
       })
     },
