@@ -59,6 +59,8 @@
         {#each store?.categories || [] as category}
           <a
             href={getCategoryLink(category.slug)}
+            sveltekit:prefetch
+            sveltekit:noscroll
             class="flex space-x-2 text-xs hover:underline"
           >
             <Categories16 />
