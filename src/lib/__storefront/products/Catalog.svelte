@@ -51,6 +51,8 @@
       >
         <a
           href={getCategoryLink('')}
+          sveltekit:prefetch
+          sveltekit:noscroll
           class="flex space-x-2 text-xs hover:underline"
         >
           <Categories16 />
