@@ -13,6 +13,7 @@
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
   import { bag, pageSubtitle, preferences } from '$lib/stores'
+  import { goto } from '$app/navigation'
 
   export let store: Store
 
@@ -27,7 +28,8 @@
   let search = ''
   let category = ''
 
-  $: if (!$navigating) {
+  const submitSearch = async () => {
+    await goto(getSearchUrl())
     search = ''
     category = ''
   }
@@ -71,10 +73,14 @@
             }}
           />
         </a>
-        <div class="flex py-2 <sm:hidden !text-xs">
+        <form
+          class="flex py-2 <sm:hidden !text-xs"
+          on:submit|preventDefault={submitSearch}
+        >
           <input
             class="bg-white border border-[rgb(113,3,3)]  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
-            type="text"
+            type="search"
+            name="q"
             bind:value={search}
             placeholder="Enter keywords to search..."
           />
@@ -87,13 +93,10 @@
               <option value={category.slug}>{category.name}</option>
             {/each}
           </select>
-          <a
-            class="flex bg-[rgb(113,3,3)]  text-white p-2 items-center"
-            href={getSearchUrl()}
-          >
+          <button class="flex bg-[rgb(113,3,3)]  text-white p-2 items-center">
             <Search16 class="m-auto" />
-          </a>
-        </div>
+          </button>
+        </form>
       </div>
       <div class="flex space-x-2 text-gray-400 items-center lg:space-x-4">
         <button
