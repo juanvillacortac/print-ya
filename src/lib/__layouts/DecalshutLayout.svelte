@@ -118,14 +118,15 @@
         >
           <UserAvatar24 />
         </a>
-        <button
+        <a
           class="flex relative hover:text-pink-500"
           title="Favorites"
           use:tooltip
+          href="/favorites"
           style="width: 24px; height: 24px"
         >
           <Favorite24 />
-        </button>
+        </a>
         <a
           class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
           title="Shopping Bag"

@@ -7,6 +7,7 @@ import { flatMap, isObject, merge } from 'lodash-es'
 import type { Prisma } from '@prisma/client'
 import { page } from '$app/stores'
 import { goto } from '$app/navigation'
+import * as sj from 'superjson'
 
 export function createQueryStore<T = any>(prop: string): Writable<T> {
   let query: Record<string, any> = {}
@@ -65,7 +66,7 @@ export function persistentWritable<T>(
 
   // use the value from localStorage if it exists
   if (json) {
-    store.set(JSON.parse(json, reviver))
+    store.set(sj.parse(json))
   }
 
   if (typeof window !== 'undefined') {
@@ -74,7 +75,7 @@ export function persistentWritable<T>(
 
       // use the value from localStorage if it exists
       if (json) {
-        store.set(JSON.parse(json, reviver))
+        store.set(sj.parse(json))
       }
     })
   }
@@ -82,7 +83,7 @@ export function persistentWritable<T>(
   const set = (value: T) => {
     store.set(value)
     if (!browser) return
-    localStorage.setItem(key, JSON.stringify(value, replacer))
+    localStorage.setItem(key, sj.stringify(value))
   }
 
   // return an object with the same interface as svelte's writable()
@@ -99,7 +100,7 @@ export function persistentWritable<T>(
   }
 }
 
-export const preferences = persistentWritable('preferences', {
+export const preferences = persistentWritable('preferences-v2', {
   darkMode: false,
 })
 
@@ -123,7 +124,7 @@ export type BagStore = Readable<BagItem[]> & {
 }
 
 const createBag = (): BagStore => {
-  const store = persistentWritable<Map<string, number>>('bag-v2', new Map())
+  const store = persistentWritable<Map<string, number>>('bag-v3', new Map())
   const items = derived([store], ([s]) =>
     [...s.entries()].map<BagItem>(([k, q]) => ({
       ...JSON.parse(k),
@@ -210,3 +211,46 @@ const createBag = (): BagStore => {
   }
 }
 export const bag = createBag()
+
+export type Favorites = {
+  items(): string[]
+  existInFavorites(id: string): boolean
+}
+
+export type FavoritesStore = Readable<Favorites> & {
+  clear(): void
+  delete(id: string): void
+  addToFavorites(id: string): void
+}
+
+const createFavorites = (): FavoritesStore => {
+  const store = persistentWritable<Set<string>>('favorites', new Set())
+  const addToFavorites = (id) =>
+    store.update((store) => {
+      store.add(id)
+      return store
+    })
+  const items = derived<[typeof store], Favorites>(
+    [store],
+    ([s]) =>
+      ({
+        items: () => [...s],
+        existInFavorites: (id) => s.has(id),
+      } as Favorites)
+  )
+
+  return {
+    ...items,
+    addToFavorites,
+    delete: (id) =>
+      store.update((store) => {
+        store.delete(id)
+        return store
+      }),
+    clear: () =>
+      store.update(() => {
+        return new Set<string>()
+      }),
+  }
+}
+export const favorites = createFavorites()

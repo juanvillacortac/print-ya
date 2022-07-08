@@ -25,7 +25,7 @@
 </script>
 
 <script lang="ts">
-  import { bag, pageSubtitle } from '$lib'
+  import { bag, favorites, pageSubtitle } from '$lib'
   import { tooltip } from '$lib/components/tooltip'
   import { onMount } from 'svelte'
   import type { ProductModifierItem } from '@prisma/client'
@@ -49,6 +49,7 @@
     Close24,
     CloseOutline24,
     Favorite32,
+    FavoriteFilled32,
     Image32,
     Subtract16,
   } from 'carbon-icons-svelte'
@@ -484,14 +485,27 @@
                 >
               {/if}
             </div>
-            <button
-              class="flex text-gray-400 relative hover:text-pink-500"
-              title="Add to favorites"
-              use:tooltip
-              style="width: 32px; height: 32px"
-            >
-              <Favorite32 />
-            </button>
+            {#if $favorites.existInFavorites(product.id)}
+              <button
+                class="flex text-pink-500 relative hover:text-pink-400"
+                title="Remove from favorites"
+                on:click|preventDefault|stopPropagation={() =>
+                  favorites.delete(product.id)}
+                use:tooltip
+              >
+                <FavoriteFilled32 />
+              </button>
+            {:else}
+              <button
+                class="flex text-gray-400 relative hover:text-pink-500"
+                title="Add to favorites"
+                on:click|preventDefault|stopPropagation={() =>
+                  favorites.addToFavorites(product.id)}
+                use:tooltip
+              >
+                <Favorite32 />
+              </button>
+            {/if}
           </div>
           <div class="font-bold text-lg text-black dark:text-white">
             Total ${total.toLocaleString()}

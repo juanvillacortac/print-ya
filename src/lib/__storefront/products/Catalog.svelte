@@ -3,11 +3,20 @@
   import { page } from '$app/stores'
   import { squareratio } from '$lib/actions/aspectratio'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
+  import { tooltip } from '$lib/components/tooltip'
   import Ufo from '$lib/components/__Ufo.svelte'
 
   import type { StripedProduct } from '$lib/db'
+  import { favorites } from '$lib/stores'
   import { search as s } from '$lib/utils/search'
-  import { Categories16, Category16 } from 'carbon-icons-svelte'
+  import AppLayout from '$lib/__layouts/AppLayout.svelte'
+  import {
+    Categories16,
+    Category16,
+    Favorite24,
+    Favorite32,
+    FavoriteFilled24,
+  } from 'carbon-icons-svelte'
   import { flip } from 'svelte/animate'
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'
@@ -113,12 +122,35 @@
                 >{p.storeCategory?.name}</a
               >
             </div>
-            <p class="font-bold self-end">
-              ${p.price.toLocaleString('en', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </p>
+            <div class="flex w-full justify-between items-end">
+              <p class="font-bold self-end">
+                ${p.price.toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
+              {#if $favorites.existInFavorites(p.id)}
+                <button
+                  class="flex text-pink-500 relative hover:text-pink-400"
+                  title="Remove from favorites"
+                  on:click|preventDefault|stopPropagation={() =>
+                    favorites.delete(p.id)}
+                  use:tooltip
+                >
+                  <FavoriteFilled24 />
+                </button>
+              {:else}
+                <button
+                  class="flex text-gray-400 relative hover:text-pink-500"
+                  title="Add to favorites"
+                  on:click|preventDefault|stopPropagation={() =>
+                    favorites.addToFavorites(p.id)}
+                  use:tooltip
+                >
+                  <Favorite24 />
+                </button>
+              {/if}
+            </div>
           </div>
         </div>
       {/each}
