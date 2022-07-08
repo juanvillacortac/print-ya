@@ -54,7 +54,7 @@
 
 <div class="top-0 left-0 text-gray-700 relative dark:text-white">
   <div
-    class="bg-white flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
+    class="bg-white flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg <sm:border-b !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
   >
     <div
       class="flex mx-auto w-full p-4 py-2 justify-between items-center lg:w-9/10"
@@ -139,6 +139,30 @@
         </a>
       </div>
     </div>
+    <form
+      class="flex p-4 py-2 pb-4 sm:hidden !text-xs"
+      on:submit|preventDefault={submitSearch}
+    >
+      <input
+        class="bg-white border border-[rgb(113,3,3)]  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+        type="search"
+        name="q"
+        bind:value={search}
+        placeholder="Enter keywords to search..."
+      />
+      <select
+        class="bg-white border-b border-l-0 border-r-0 border-[rgb(113,3,3)]  leading-tight py-2  px-3 w-14rem appearance-none !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+        bind:value={category}
+      >
+        <option value="">All categories</option>
+        {#each store.categories || [] as category}
+          <option value={category.slug}>{category.name}</option>
+        {/each}
+      </select>
+      <button class="flex bg-[rgb(113,3,3)]  text-white p-2 items-center">
+        <Search16 class="m-auto" />
+      </button>
+    </form>
     <div class="bg-[rgb(113,3,3)] text-white text-base w-full <lg:hidden">
       <div class="flex mx-auto space-x-4 text-white p-4 py-2 lg:w-9/10">
         <a href="/">Home</a>
