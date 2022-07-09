@@ -99,7 +99,6 @@ const session = handleSession(
         )
       }
     } catch (error) {
-      console.error(error)
       response = await resolve(event, {
         ssr: event.locals.layout !== 'app',
       })

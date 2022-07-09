@@ -176,4 +176,80 @@
   </div>
 
   <slot />
+  <div class="bg-[#e3a1a1] w-full dark:bg-red-900">
+    <div
+      class="flex flex-col m-auto space-y-3 w-full p-4 items-center lg:w-8/10"
+    >
+      <Image
+        src={$page.stuff.store?.favicon || ''}
+        class="w-32px"
+        options={{
+          rs: {
+            s: '32x',
+          },
+        }}
+      />
+      <p class="font-bold text-sm text-center sm:text-lg">
+        All trademarks not owned by <i>{$page.url.host}</i> that appear on this
+        site are the property of their respective owners, who may or may not be
+        affiliated with, connected to, or sponsored by <i>{$page.url.host}</i> or
+        its subsidiaries.
+      </p>
+    </div>
+  </div>
+  <div class="bg-[rgb(113,3,3)] w-full">
+    <div
+      class="divide-white mx-auto text-white w-full grid grid-cols-1 lg:divide-x-1 lg:w-9/10 lg:grid-cols-4 <lg:divide-y-1"
+    >
+      <div class="flex-col h-full space-y-4 p-4 justify-center items-center">
+        <h4 class="font-bold font-title">Stay In The Loop</h4>
+        <div class="flex items-center">
+          <input
+            class="bg-white border border-[rgb(113,3,3)] text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10"
+            type="search"
+            name="q"
+            placeholder="Enter your email address"
+          />
+          <button
+            class="flex font-bold  bg-red-800 text-white text-xs p-2 items-center uppercase"
+          >
+            Submit
+          </button>
+        </div>
+        <p class="font-light italic">
+          Become a Decals Hut Insider and get 10% off your order today. Plus
+          we'll keep you up-to-date with the latest designs.
+        </p>
+      </div>
+      <div class="grid p-4 grid-cols-2 grid-rows-4">
+        <a href="/">Home</a>
+        {#each store.categories?.slice(0, 7) || [] as category}
+          <a href="/products?category={category.slug}" class="hover:underline"
+            >{category.name}</a
+          >
+        {/each}
+        <a href="/products" class="hover:underline">More products</a>
+        <a href="/faq" class="hover:underline">FAQ</a>
+      </div>
+      <div class="w-full <lg:hidden" />
+      <div
+        class="flex-col flex h-full space-y-4 p-4 items-center justify-center "
+      >
+        <h4 class="font-bold font-title text-center">Secure Checkout</h4>
+        <p class="text-center">
+          We use encrypted SSL security to ensure that your credit card
+          information is 100% protected.
+        </p>
+        <Image
+          src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/ff-checkout-single.png?v=151997186021135005011631037864"
+          class="mx-auto"
+          options={{
+            rs: {
+              s: '200x',
+            },
+          }}
+        />
+      </div>
+    </div>
+  </div>
 </div>
