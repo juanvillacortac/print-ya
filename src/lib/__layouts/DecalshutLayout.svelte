@@ -9,6 +9,10 @@
     ShoppingBag24,
     Favorite24,
     UserAvatar24,
+    LogoTwitter32,
+    LogoInstagram32,
+    LogoInstagram24,
+    LogoTwitter24,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
@@ -249,6 +253,32 @@
             },
           }}
         />
+      </div>
+    </div>
+  </div>
+  <div class="bg-gray-900 w-full !text-white">
+    <div
+      class="flex mx-auto text-xs w-full p-4 justify-between items-center <sm:flex-col <sm:space-y-4 <sm:items-center lg:w-9/10"
+    >
+      <p>
+        &copy; {new Date().getFullYear()}
+        {$page.stuff.store?.name}. All rights reserved.
+      </p>
+      <div class="flex space-x-4 items-center">
+        <a
+          href="https://twitter.com/decalshutca"
+          target="__blank"
+          class="duration-200 !hover:text-gray-400"
+        >
+          <LogoTwitter24 />
+        </a>
+        <a
+          href="https://www.instagram.com/decalshutca"
+          target="__blank"
+          class="duration-200 !hover:text-gray-400"
+        >
+          <LogoInstagram24 />
+        </a>
       </div>
     </div>
   </div>
