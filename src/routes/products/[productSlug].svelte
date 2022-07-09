@@ -468,7 +468,7 @@
           <div class="flex space-x-4 w-full items-center">
             <div class="flex space-x-2">
               <button
-                class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                class="rounded flex font-bold space-x-2 bg-red-900 shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
                 on:click={() => bag.addToBag(product, $modifiers, quantity)}
                 style="will-change: transform"
               >
@@ -477,7 +477,7 @@
               >
               {#if inBag}
                 <a
-                  class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                  class="rounded flex font-bold space-x-2 bg-red-900 shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
                   href="/bag?checkout"
                   style="will-change: transform"
                 >

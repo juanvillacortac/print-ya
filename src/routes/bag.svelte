@@ -325,7 +325,7 @@
           })}
         </p>
         <button
-          class="rounded flex font-bold space-x-2 bg-[rgb(113,3,3)] shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+          class="rounded flex font-bold space-x-2 bg-red-900 shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
           style="will-change: transform"
           on:click={() => {
             checkout = true

@@ -43,14 +43,14 @@
     class="flex-col flex h-full space-y-2 w-full lg:w-2/10 lg:overflow-hidden"
   >
     <input
-      class="bg-white border border-[rgb(113,3,3)] text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+      class="bg-white border border-red-900 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
       type="text"
       bind:value={search}
       placeholder="Enter keywords to search..."
     />
     <div class="flex flex-col">
       <div
-        class="rounded-tl rounded-tr flex space-x-2  bg-[rgb(113,3,3)] text-white w-full p-2 items-center"
+        class="rounded-tl rounded-tr flex space-x-2  bg-red-900 text-white w-full p-2 items-center"
       >
         <Category16 />
         <h3 class="font-bold text-xs">Categories</h3>

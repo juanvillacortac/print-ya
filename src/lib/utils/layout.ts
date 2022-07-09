@@ -15,7 +15,7 @@ export const getLayoutType = ({
 }
 
 export const storeRoutes = ['/products', '/bag', '/favorites']
-export const appRoutes = ['/stores', '/login', '/settings', '/app']
+export const appRoutes = ['/stores', '/settings', '/app']
 
 export const validateLayoutRoute = (event: LoadEvent | RequestEvent) => {
   const layout = getLayoutType(event)

@@ -56,7 +56,9 @@
   titleName={store.name || ''}
 />
 
-<div class="top-0 left-0 text-gray-700 relative dark:text-white">
+<div
+  class="flex flex-col min-h-screen top-0 left-0 text-gray-700 relative dark:text-white"
+>
   <div
     class="bg-white flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg <sm:border-b !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
   >
@@ -82,14 +84,14 @@
           on:submit|preventDefault={submitSearch}
         >
           <input
-            class="bg-white border border-[rgb(113,3,3)]  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+            class="bg-white border border-red-900  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
             type="search"
             name="q"
             bind:value={search}
             placeholder="Enter keywords to search..."
           />
           <select
-            class="bg-white border-b border-l-0 border-r-0 border-[rgb(113,3,3)]  leading-tight py-2  px-3 w-10rem appearance-none <sm:hidden !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            class="bg-white border-b border-l-0 border-r-0 border-red-900  leading-tight py-2  px-3 w-10rem appearance-none <sm:hidden !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
             bind:value={category}
           >
             <option value="">All categories</option>
@@ -97,7 +99,7 @@
               <option value={category.slug}>{category.name}</option>
             {/each}
           </select>
-          <button class="flex bg-[rgb(113,3,3)]  text-white p-2 items-center">
+          <button class="flex bg-red-900  text-white p-2 items-center">
             <Search16 class="m-auto" />
           </button>
         </form>
@@ -149,14 +151,14 @@
       on:submit|preventDefault={submitSearch}
     >
       <input
-        class="bg-white border border-[rgb(113,3,3)]  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+        class="bg-white border border-red-900  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
         type="search"
         name="q"
         bind:value={search}
         placeholder="Enter keywords to search..."
       />
       <select
-        class="bg-white border-b border-l-0 border-r-0 border-[rgb(113,3,3)]  leading-tight py-2  px-3 w-14rem appearance-none !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+        class="bg-white border-b border-l-0 border-r-0 border-red-900  leading-tight py-2  px-3 w-14rem appearance-none !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
         bind:value={category}
       >
         <option value="">All categories</option>
@@ -164,11 +166,11 @@
           <option value={category.slug}>{category.name}</option>
         {/each}
       </select>
-      <button class="flex bg-[rgb(113,3,3)]  text-white p-2 items-center">
+      <button class="flex bg-red-900  text-white p-2 items-center">
         <Search16 class="m-auto" />
       </button>
     </form>
-    <div class="bg-[rgb(113,3,3)] text-white text-base w-full <lg:hidden">
+    <div class="bg-red-900 text-white text-base w-full <lg:hidden">
       <div class="flex mx-auto space-x-4 text-white p-4 py-2 lg:w-9/10">
         <a href="/">Home</a>
         {#each store.categories?.slice(0, 8) || [] as category}
@@ -179,8 +181,11 @@
     </div>
   </div>
 
-  <slot />
-  <div class="bg-[#e3a1a1] w-full dark:bg-red-900">
+  <div class="flex-grow">
+    <slot />
+  </div>
+
+  <div class="bg-[#e3a1a1] w-full dark:bg-red-800">
     <div
       class="flex flex-col m-auto space-y-3 w-full p-4 items-center lg:w-8/10"
     >
@@ -201,7 +206,7 @@
       </p>
     </div>
   </div>
-  <div class="bg-[rgb(113,3,3)] w-full">
+  <div class="bg-red-900 w-full">
     <div
       class="divide-white mx-auto text-white w-full grid grid-cols-1 lg:divide-x-1 lg:w-9/10 lg:grid-cols-4 <lg:divide-y-1"
     >
@@ -209,7 +214,7 @@
         <h4 class="font-bold font-title">Stay In The Loop</h4>
         <div class="flex items-center">
           <input
-            class="bg-white border border-[rgb(113,3,3)] text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10"
+            class="bg-white border border-red-900 text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10"
             type="search"
             name="q"
             placeholder="Enter your email address"
