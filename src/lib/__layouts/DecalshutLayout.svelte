@@ -1,6 +1,6 @@
 <script lang="ts">
   import Favicons from '$lib/components/Favicons.svelte'
-  import { navigating, page } from '$app/stores'
+  import { navigating, page, session } from '$app/stores'
   import Image from '$lib/components/caravaggio/Image.svelte'
   import {
     Moon24,
@@ -9,15 +9,17 @@
     ShoppingBag24,
     Favorite24,
     UserAvatar24,
-    LogoTwitter32,
-    LogoInstagram32,
     LogoInstagram24,
     LogoTwitter24,
+    Logout16,
+    Settings16,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
-  import { bag, pageSubtitle, preferences } from '$lib/stores'
+  import { bag, customer, pageSubtitle, preferences } from '$lib/stores'
   import { goto } from '$app/navigation'
+  import Submenu from '$lib/components/Submenu.svelte'
+  import trpc from '$lib/trpc/client'
 
   export let store: Store
 
@@ -116,14 +118,65 @@
             <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
           </div>
         </button>
-        <a
-          class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
-          title="Log in"
-          href="/login"
-          use:tooltip
-        >
-          <UserAvatar24 />
-        </a>
+        {#if !$session.customerId}
+          <a
+            class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
+            title="Log in"
+            href="/login?callbackUrl={encodeURIComponent(
+              $page.url.pathname === '/login' ? '/' : $page.url.pathname
+            )}"
+            use:tooltip
+          >
+            <UserAvatar24 />
+          </a>
+        {:else}
+          <Submenu>
+            <div class="content" slot="button">
+              {#if !$customer}
+                <div class="rounded-full h-32px w-32px skeleton" />
+              {:else}
+                <div
+                  class="bg-gradient-to-br border rounded-full cursor-pointer flex font-bold font-title from-green-300 to-pink-600 border-gray-200 h-32px text-white text-xs leading-[0] w-32px items-center justify-center uppercase dark:bg-gray-600 dark:from-green-400 dark:to-pink-700"
+                >
+                  {$customer?.firstName[0]}
+                </div>
+              {/if}
+            </div>
+            <div
+              class="flex flex-col font-bold space-y-3 text-xs text-gray-800 items-end dark:text-white"
+              slot="body"
+            >
+              {#if !$customer}
+                <p>Loading...</p>
+              {:else}
+                <p>Hi, {$customer?.firstName}!</p>
+              {/if}
+              <a
+                class="flex font-normal space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                href="/account"
+              >
+                <span>Settings</span> <Settings16 class="flex" /></a
+              >
+              <button
+                class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                on:click={() => {
+                  trpc()
+                    .mutation('customer:logout')
+                    .then(() => {
+                      if ($page.url.pathname.startsWith('/account')) {
+                        window.location.replace('/login')
+                      } else {
+                        window.location.reload()
+                      }
+                    })
+                }}
+                type="button"
+              >
+                <span>Log out</span> <Logout16 class="flex" /></button
+              >
+            </div>
+          </Submenu>
+        {/if}
         <a
           class="flex relative hover:text-pink-500"
           title="Favorites"
@@ -185,7 +238,7 @@
     <slot />
   </div>
 
-  <div class="bg-[#e3a1a1] w-full dark:bg-red-800">
+  <div class="bg-red-800 text-white w-full">
     <div
       class="flex flex-col m-auto space-y-3 w-full p-4 items-center lg:w-8/10"
     >

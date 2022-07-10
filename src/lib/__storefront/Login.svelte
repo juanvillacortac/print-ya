@@ -3,15 +3,16 @@
   import trpc from '$lib/trpc/client'
 
   export const load: Load = async ({ fetch, session }) => {
-    if (session.userId) {
-      const user = await trpc(fetch).query('user:whoami')
-      if (user) {
+    console.log(session)
+    if (session.customerId) {
+      const customer = await trpc(fetch).query('customer:whoami')
+      if (customer) {
         return {
           status: 302,
           redirect: '/',
         }
       } else {
-        await trpc(fetch).mutation('user:logout')
+        await trpc(fetch).mutation('customer:logout')
       }
     }
     return {}
@@ -23,15 +24,24 @@
   import { pageSubtitle } from '$lib'
   import { notifications } from '$lib/components/notifications'
   import { onMount } from 'svelte'
+  import { expoOut } from 'svelte/easing'
+  import { slide } from 'svelte/transition'
 
   let loading = false
-  let isLogin = true
+  $: isLogin = $page.url.searchParams.get('register') === null
   let emailEl: HTMLInputElement
-  let email: string, password: string, rePassword: string
+  let email: string,
+    password: string,
+    rePassword: string,
+    firstName: string,
+    lastName: string
 
   onMount(() => {
     emailEl.focus()
   })
+
+  let error: string | undefined
+
   async function handleSubmit() {
     loading = true
     if (!isLogin) {
@@ -41,20 +51,28 @@
       }
     }
     try {
-      const data = await trpc().mutation(
-        isLogin ? 'user:login' : 'user:register',
-        {
+      if (isLogin) {
+        await trpc().mutation('customer:login', {
           email: email?.toLocaleLowerCase(),
           password,
-        }
-      )
+          storeId: $page.stuff.store?.id!,
+        })
+      } else {
+        await trpc().mutation('customer:register', {
+          email: email?.toLocaleLowerCase(),
+          firstName,
+          lastName,
+          password,
+          storeId: $page.stuff.store?.id!,
+        })
+      }
       notifications.send('Log in successfull', 'default', 1000)
       const callbackUrl = decodeURIComponent(
         $page.url.searchParams.get('callbackUrl') || encodeURIComponent('/')
       )
       window.location.replace(callbackUrl)
     } catch ({ message }) {
-      notifications.send(message, 'default', 1000)
+      error = message
       loading = false
     }
   }
@@ -73,42 +91,107 @@
   <div class="flex flex-col items-center">
     <form
       on:submit|preventDefault|stopPropagation={handleSubmit}
-      class="flex flex-col space-y-4 w-full transition-opacity duration-400 lg:w-5/10"
+      class="flex flex-col space-y-2 w-full transition-opacity duration-400 lg:w-5/10"
     >
-      <h3 class="font-bold font-title text-lg">Account Login</h3>
-      <input
-        class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-        type="email"
-        autocomplete="off"
-        placeholder="Email address"
-        required
-        bind:value={email}
-        bind:this={emailEl}
-      />
-      <input
-        class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-        type="password"
-        autocomplete="off"
-        placeholder="Password"
-        required
-        bind:value={password}
-      />
+      <h3 class="font-bold font-title text-lg mb-2">
+        {isLogin ? 'Log In Account' : 'Create Account'}
+      </h3>
+      {#if error}
+        <p
+          transition:slide|local={{ duration: 400, easing: expoOut }}
+          class="text-xs pb-2 text-red-500"
+        >
+          <span class="font-bold">Error:</span>
+          {error}
+        </p>
+      {/if}
       {#if !isLogin}
+        <div class="flex space-x-2 items-center">
+          <label class="flex flex-col space-y-2 w-1/2">
+            <span class="font-bold text-xs">First name</span>
+            <input
+              class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              type="text"
+              autocomplete="off"
+              placeholder="First name"
+              required
+              bind:value={firstName}
+            />
+          </label>
+          <label class="flex flex-col space-y-2 w-1/2">
+            <span class="font-bold text-xs">Last name</span>
+            <input
+              class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              type="text"
+              autocomplete="off"
+              placeholder="Last name"
+              required
+              bind:value={lastName}
+            />
+          </label>
+        </div>
+      {/if}
+      <label class="flex flex-col space-y-2 w-full">
+        <span class="font-bold text-xs">Email address</span>
         <input
           class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-          type="password"
+          type="email"
           autocomplete="off"
-          placeholder="Repeat the password"
+          placeholder="Ex. juan@gmail.com"
           required
-          bind:value={rePassword}
+          bind:value={email}
+          bind:this={emailEl}
         />
-      {/if}
+      </label>
+      <div class="flex space-x-2 w-full pb-2 items-center">
+        <label class="flex flex-col space-y-2 w-full" class:!w-[50%]={!isLogin}>
+          <span class="font-bold text-xs">Password</span>
+          <input
+            class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            type="password"
+            autocomplete="off"
+            placeholder="Password"
+            required
+            bind:value={password}
+          />
+        </label>
+        {#if !isLogin}
+          <label class="flex flex-col space-y-2 w-1/2">
+            <span class="font-bold text-xs">Repeat the password</span>
+            <input
+              class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              type="password"
+              autocomplete="off"
+              placeholder="Repeat the password"
+              required
+              bind:value={rePassword}
+            />
+          </label>
+        {/if}
+      </div>
       <button
-        class="flex font-bold mr-auto bg-red-900 text-sm py-2 px-6 transform-gpu duration-200 !text-white hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px"
+        class="rounded flex font-bold mr-auto bg-red-900 text-sm py-2 px-6 transform-gpu duration-200 !text-white hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px"
         disabled={loading}
         type="submit"
         >{loading ? 'Loading...' : isLogin ? 'Log in' : 'Register'}</button
       >
+      <div class="flex space-x-2 text-sm pt-2 items-center">
+        {#if isLogin}
+          <span>Don't have an account yet?</span>
+          <a
+            href="?register"
+            class="font-bold text-red-900 dark:text-red-500 hover:underline"
+            >Create account</a
+          >
+        {:else}
+          <span>Do you have an account?</span>
+          <a
+            href="/login"
+            class="font-bold text-red-900 dark:text-red-500 hover:underline"
+            >Log in</a
+          >
+        {/if}
+      </div>
     </form>
   </div>
 </div>

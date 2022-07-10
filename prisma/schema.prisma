@@ -24,14 +24,32 @@ model User {
 }
 
 model Customer {
-  id        String    @id @unique @default(cuid())
-  currency  String    @default("usd")
-  lingData  Json?
+  id        String @id @unique @default(cuid())
   email     String
   firstName String
   lastName  String
+  currency  String @default("usd")
+
+  addresses CustomerAddress[]
   orders    Order[]
   accounts  Account[]
+  store     Store?            @relation(fields: [storeId], references: [id])
+  storeId   String?
+}
+
+enum CustomerAddressType {
+  billing
+  shipping
+}
+
+model CustomerAddress {
+  id      String               @id @unique @default(cuid())
+  name    String
+  onlyFor CustomerAddressType?
+  data    Json
+
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
 }
 
 model Account {
@@ -65,6 +83,7 @@ model Store {
   products        Product[]
   paymentGateways PaymentGateway[]
   orders          Order[]
+  customers       Customer[]
 }
 
 model PaymentGateway {

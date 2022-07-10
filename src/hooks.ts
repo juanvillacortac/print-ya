@@ -8,6 +8,7 @@ import { getDefaultHost } from '$lib/utils/host'
 import { router, type tRPCRouter } from '$lib/trpc/server'
 import { sequence } from '@sveltejs/kit/hooks'
 import { createTRPCHandle } from '$lib/trpc/handler'
+import { getCustomerDetails } from '$lib/db'
 
 const session = handleSession(
   {
@@ -25,8 +26,10 @@ const session = handleSession(
       if (event.locals.cookies) {
         if (event.locals.cookies['kit.session']) {
           const { userId } = await getUserDetails(event)
+          const { customerId } = await getCustomerDetails(event)
           const newSession = {
             userId,
+            customerId,
             expires: event.locals.session.data.expires,
           }
 
@@ -44,10 +47,15 @@ const session = handleSession(
         (Boolean(appRoutes.find((url) => event.url.pathname.startsWith(url))) ||
           event.url.pathname === '/')
 
+      console.log(event.locals.session.data)
+
       if (
-        isAppPage &&
-        !event.locals.session?.data?.userId &&
-        event.url.pathname !== '/login'
+        (isAppPage &&
+          !event.locals.session?.data?.userId &&
+          event.url.pathname !== '/login') ||
+        (!isAppPage &&
+          !event.locals.session.data?.customerId &&
+          event.url.pathname.startsWith('/account'))
       ) {
         return Response.redirect(
           `${getDefaultHost() === 'localhost:3000' ? 'http://' : 'https://'}${

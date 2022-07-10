@@ -4,10 +4,11 @@ import { writable, get } from 'svelte/store'
 import type { ModifiersMap } from './utils/modifiers'
 import type { Product } from './db'
 import { flatMap, isObject, merge } from 'lodash-es'
-import type { Prisma } from '@prisma/client'
-import { page } from '$app/stores'
+import type { Customer, Prisma } from '@prisma/client'
+import { page, session } from '$app/stores'
 import { goto } from '$app/navigation'
 import * as sj from 'superjson'
+import trpc from './trpc/client'
 
 export function createQueryStore<T = any>(prop: string): Writable<T> {
   let query: Record<string, any> = {}
@@ -254,3 +255,38 @@ const createFavorites = (): FavoritesStore => {
   }
 }
 export const favorites = createFavorites()
+
+export type CustomerStore = Readable<Customer | null | undefined> & {
+  invalidate(): void
+}
+
+const createCustomerStore = (): CustomerStore => {
+  const tick = writable(Symbol())
+  const createStore = () =>
+    derived<[typeof session, typeof tick], Customer | null | undefined>(
+      [session, tick],
+      ([session], set) => {
+        if (!browser || !session.customerId) {
+          set(null)
+          return
+        }
+
+        trpc()
+          .query('customer:whoami')
+          .then((c) => {
+            set(c)
+          })
+      },
+      undefined
+    )
+
+  let store = createStore()
+
+  return {
+    ...store,
+    invalidate: () => {
+      tick.set(Symbol())
+    },
+  }
+}
+export const customer = createCustomerStore()

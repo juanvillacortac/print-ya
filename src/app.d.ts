@@ -25,5 +25,6 @@ declare namespace App {
 
 interface SessionData {
   userId?: string | null
+  customerId?: string | null
   expires?: string | null
 }
