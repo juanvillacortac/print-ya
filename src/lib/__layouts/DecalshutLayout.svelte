@@ -120,7 +120,7 @@
           </div>
         </button>
         {#if browser}
-          {#if !$customer === undefined}
+          {#if $customer === null}
             <a
               class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
               title="Log in"
