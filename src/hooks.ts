@@ -10,120 +10,114 @@ import { sequence } from '@sveltejs/kit/hooks'
 import { createTRPCHandle } from '$lib/trpc/handler'
 import { getCustomerDetails } from '$lib/db'
 
-const session = handleSession(
-  {
-    secret: process.env['VITE_PY_SECRET'] || 'secret',
-    expires: 30,
-    cookie: { secure: false },
-  },
-  async function ({ event, resolve }) {
-    let response: Response
+export const session = handleSession({
+  secret: process.env['VITE_PY_SECRET'] || 'secret',
+  expires: 30,
+})
 
-    event.locals.layout = getLayoutType(event)
+const logic: Handle = async ({ event, resolve }) => {
+  let response: Response
 
-    // Set default locale if user preferred locale does not match
-    try {
-      if (event.locals.cookies) {
-        if (event.locals.cookies['kit.session']) {
-          const { userId } = await getUserDetails(event)
-          const { customerId } = await getCustomerDetails(event)
-          const newSession = {
-            userId,
-            customerId,
-            expires: event.locals.session.data.expires,
-          }
+  event.locals.layout = getLayoutType(event)
 
-          if (
-            JSON.stringify(event.locals.session.data) !==
-            JSON.stringify(newSession)
-          ) {
-            event.locals.session.data = { ...newSession }
+  // Set default locale if user preferred locale does not match
+  // try {
+  //   if (event.locals.cookies) {
+  //     if (event.locals.cookies['kit.session']) {
+  //       const { userId } = await getUserDetails(event)
+  //       const { customerId } = await getCustomerDetails(event)
+  //       const newSession = {
+  //         userId,
+  //         customerId,
+  //         expires: event.locals.session.data.expires,
+  //       }
+
+  //       if (
+  //         JSON.stringify(event.locals.session.data) !==
+  //         JSON.stringify(newSession)
+  //       ) {
+  //         event.locals.session.data = { ...newSession }
+  //       }
+  //     }
+  //   }
+
+  const isAppPage =
+    event.locals.layout === 'app' &&
+    (Boolean(appRoutes.find((url) => event.url.pathname.startsWith(url))) ||
+      event.url.pathname === '/')
+
+  console.log(event.locals.session.data)
+
+  if (
+    (isAppPage &&
+      !event.locals.session?.data?.userId &&
+      event.url.pathname !== '/login') ||
+    (!isAppPage &&
+      !event.locals.session.data?.customerId &&
+      event.url.pathname.startsWith('/account'))
+  ) {
+    return Response.redirect(
+      `${getDefaultHost() === 'localhost:3000' ? 'http://' : 'https://'}${
+        event.url.host === process.env.VERCEL_URL
+          ? process.env.VERCEL_URL
+          : getDefaultHost()
+      }/login?callbackUrl=${encodeURIComponent(event.url.pathname)}`,
+      303
+    )
+  }
+
+  const { response: trpcResponse, trpc } = await createTRPCHandle<tRPCRouter>(
+    {
+      url: '/api/trpc',
+      router,
+      event,
+      resolve,
+      createContext: async () => ({
+        event,
+        layout: event.locals.layout,
+      }),
+      responseMeta({ type, errors, ctx }) {
+        if (
+          type === 'query' &&
+          ctx?.layout === 'store' &&
+          errors.length === 0
+        ) {
+          return {
+            headers: {
+              'cache-control': `s-maxage=1, stale-while-revalidate`,
+            },
           }
         }
-      }
-
-      const isAppPage =
-        event.locals.layout === 'app' &&
-        (Boolean(appRoutes.find((url) => event.url.pathname.startsWith(url))) ||
-          event.url.pathname === '/')
-
-      console.log(event.locals.session.data)
-
-      if (
-        (isAppPage &&
-          !event.locals.session?.data?.userId &&
-          event.url.pathname !== '/login') ||
-        (!isAppPage &&
-          !event.locals.session.data?.customerId &&
-          event.url.pathname.startsWith('/account'))
-      ) {
-        return Response.redirect(
-          `${getDefaultHost() === 'localhost:3000' ? 'http://' : 'https://'}${
-            event.url.host === process.env.VERCEL_URL
-              ? process.env.VERCEL_URL
-              : getDefaultHost()
-          }/login?callbackUrl=${encodeURIComponent(event.url.pathname)}`,
-          303
-        )
-      }
-
-      const { response: trpcResponse, trpc } =
-        await createTRPCHandle<tRPCRouter>(
-          {
-            url: '/api/trpc',
-            router,
-            event,
-            resolve,
-            createContext: async () => ({
-              event,
-              layout: event.locals.layout,
-            }),
-            responseMeta({ type, errors, ctx }) {
-              if (
-                type === 'query' &&
-                ctx?.layout === 'store' &&
-                errors.length === 0
-              ) {
-                return {
-                  headers: {
-                    'cache-control': `s-maxage=1, stale-while-revalidate`,
-                  },
-                }
-              }
-              return {}
-            },
-          },
-          {
-            ssr: event.locals.layout !== 'app',
-          }
-        )
-
-      response = trpcResponse
-
-      if (event.locals.layout === 'store' && !trpc) {
-        response.headers.set(
-          'Cache-Control',
-          's-maxage=1, stale-while-revalidate'
-        )
-      }
-    } catch (error) {
-      response = await resolve(event, {
-        ssr: event.locals.layout !== 'app',
-      })
-      response.headers.append(
-        'Set-Cookie',
-        cookie.serialize('kit.session', '', {
-          path: '/',
-          expires: new Date('Thu, 01 Jan 1970 00:00:01 GMT'),
-        })
-      )
+        return {}
+      },
+    },
+    {
+      ssr: event.locals.layout !== 'app',
     }
+  )
 
-    return response
+  response = trpcResponse
+
+  if (event.locals.layout === 'store' && !trpc) {
+    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
   }
-)
+  // } catch (error) {
+  //   response = await resolve(event, {
+  //     ssr: event.locals.layout !== 'app',
+  //   })
+  //   response.headers.append(
+  //     'Set-Cookie',
+  //     cookie.serialize('kit.session', '', {
+  //       path: '/',
+  //       expires: new Date('Thu, 01 Jan 1970 00:00:01 GMT'),
+  //     })
+  //   )
+  // }
 
-export const handle = sequence(session)
+  return response
+}
+
+export const handle = sequence(session, logic)
 
 export const getSession: GetSession = (event) => ({
   layout: event.locals.layout,

@@ -23,7 +23,9 @@ export default trpc
           password,
           isLogin: false,
         })
-        ctx.event.locals.session.data = body
+        await ctx.event.locals.session.set({
+          userId: body.userId,
+        })
       } catch (err) {
         console.error(err.message)
         throw new TRPCError({
@@ -45,7 +47,9 @@ export default trpc
           password,
           isLogin: true,
         })
-        ctx.event.locals.session.data = body
+        await ctx.event.locals.session.set({
+          userId: body.userId,
+        })
       } catch (err) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
@@ -63,6 +67,7 @@ export default trpc
   .query('stores', {
     resolve: async ({ ctx }) => {
       const { userId } = await db.getUserDetails(ctx.event)
+      await ctx.event.locals.session.refresh()
       if (!userId) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',

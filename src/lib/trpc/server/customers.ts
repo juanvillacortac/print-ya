@@ -22,7 +22,9 @@ export default trpc
     resolve: async ({ ctx, input }) => {
       try {
         const { body } = await db.registerCustomer(input)
-        ctx.event.locals.session.data = body
+        await ctx.event.locals.session.set({
+          customerId: body.customerId,
+        })
       } catch (err) {
         console.error(err.message)
         throw new TRPCError({
@@ -45,7 +47,9 @@ export default trpc
           password,
           storeId,
         })
-        ctx.event.locals.session.data = body
+        await ctx.event.locals.session.set({
+          customerId: body.customerId,
+        })
       } catch (err) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
@@ -57,6 +61,7 @@ export default trpc
   .query('whoami', {
     resolve: async ({ ctx }) => {
       const { customerId } = await db.getCustomerDetails(ctx.event)
+      await ctx.event.locals.session.refresh()
       if (!customerId) return null
       return await db.getCustomer({ customerId: customerId })
     },
