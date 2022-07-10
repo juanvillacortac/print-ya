@@ -20,6 +20,7 @@
   import { goto } from '$app/navigation'
   import Submenu from '$lib/components/Submenu.svelte'
   import trpc from '$lib/trpc/client'
+  import { browser } from '$app/env'
 
   export let store: Store
 
@@ -118,7 +119,9 @@
             <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
           </div>
         </button>
-        {#if !$session.customerId}
+        {#if !browser}
+          <div class="rounded-full h-32px w-32px skeleton" />
+        {:else if !$session.customerId}
           <a
             class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
             title="Log in"
