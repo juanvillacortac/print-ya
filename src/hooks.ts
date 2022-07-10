@@ -13,6 +13,10 @@ import { getCustomerDetails } from '$lib/db'
 export const session = handleSession({
   secret: process.env['VITE_PY_SECRET'] || 'secret',
   expires: 30,
+  cookie: {
+    httpOnly: true,
+    secure: true,
+  },
 })
 
 const logic: Handle = async ({ event, resolve }) => {
@@ -76,11 +80,18 @@ const logic: Handle = async ({ event, resolve }) => {
         event,
         layout: event.locals.layout,
       }),
-      responseMeta({ type, errors, ctx }) {
+      responseMeta({ type, errors, ctx, paths }) {
+        const isPublic = paths?.every(
+          (p) =>
+            !p.includes('whoami') ||
+            !p.includes('login') ||
+            !p.includes('register')
+        )
         if (
           type === 'query' &&
           ctx?.layout === 'store' &&
-          errors.length === 0
+          errors.length === 0 &&
+          isPublic
         ) {
           return {
             headers: {
