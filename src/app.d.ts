@@ -7,7 +7,7 @@ declare namespace App {
     cookies: Record<string, string>
   }
   interface Platform {}
-  interface Session extends SessionData {
+  interface Session extends Pick<SessionData, 'userId'> {
     layout: import('$lib/utils/layout').LayoutType
     host?: string
     fullHost?: string

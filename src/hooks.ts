@@ -1,7 +1,5 @@
-import { getUserDetails } from '$lib/db/users'
 import type { GetSession, Handle } from '@sveltejs/kit'
 import { handleSession } from 'svelte-kit-cookie-session'
-import cookie from 'cookie'
 import { appRoutes, getLayoutType } from '$lib/utils/layout'
 import { getDefaultHost } from '$lib/utils/host'
 
@@ -139,5 +137,5 @@ export const getSession: GetSession = (event) => ({
   userAgent: event.request.headers.get('user-agent') || '',
   host: event.url.host,
   fullHost: `${event.url.protocol}//${event.url.host}`,
-  ...event.locals.session.data,
+  userId: event.locals.session.data.userId || undefined,
 })

@@ -263,10 +263,10 @@ export type CustomerStore = Readable<Customer | null | undefined> & {
 const createCustomerStore = (): CustomerStore => {
   const tick = writable(Symbol())
   const createStore = () =>
-    derived<[typeof session, typeof tick], Customer | null | undefined>(
-      [session, tick],
-      ([session], set) => {
-        if (!browser || !session.customerId) {
+    derived<[typeof tick], Customer | null | undefined>(
+      [tick],
+      (_, set) => {
+        if (!browser) {
           set(null)
           return
         }
@@ -282,6 +282,8 @@ const createCustomerStore = (): CustomerStore => {
     )
 
   let store = createStore()
+
+  store.subscribe((s) => console.log(s))
 
   return {
     ...store,

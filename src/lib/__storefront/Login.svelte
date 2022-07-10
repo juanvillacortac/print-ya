@@ -3,17 +3,14 @@
   import trpc from '$lib/trpc/client'
 
   export const load: Load = async ({ fetch, session }) => {
-    console.log(session)
-    if (session.customerId) {
-      const customer = await trpc(fetch).query('customer:whoami')
-      if (customer) {
-        return {
-          status: 302,
-          redirect: '/',
-        }
-      } else {
-        await trpc(fetch).mutation('customer:logout')
+    const customer = await trpc(fetch).query('customer:whoami')
+    if (customer) {
+      return {
+        status: 302,
+        redirect: '/',
       }
+    } else {
+      await trpc(fetch).mutation('customer:logout')
     }
     return {}
   }
