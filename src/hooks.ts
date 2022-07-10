@@ -81,16 +81,20 @@ const logic: Handle = async ({ event, resolve }) => {
         layout: event.locals.layout,
       }),
       responseMeta({ type, errors, ctx, paths }) {
+        console.log(paths)
         const isPublic = paths?.every(
           (p) =>
-            !p.includes('whoami') ||
-            !p.includes('login') ||
-            !p.includes('register')
+            !(
+              p.includes('whoami') ||
+              p.includes('login') ||
+              p.includes('register')
+            )
         )
+        console.log(isPublic)
         if (
           type === 'query' &&
-          ctx?.layout === 'store' &&
           errors.length === 0 &&
+          ctx?.layout === 'store' &&
           isPublic
         ) {
           return {
