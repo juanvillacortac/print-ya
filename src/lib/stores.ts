@@ -274,6 +274,7 @@ const createCustomerStore = (): CustomerStore => {
         trpc()
           .query('customer:whoami')
           .then((c) => {
+            console.log(c)
             set(c)
           })
       },
