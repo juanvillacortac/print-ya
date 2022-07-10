@@ -61,6 +61,8 @@ export default trpc
   .query('whoami', {
     resolve: async ({ ctx }) => {
       const { userId } = await db.getUserDetails(ctx.event)
+      if (!userId) return null
+      await ctx.event.locals.session.refresh()
       return await db.getUser({ userId: userId || '' })
     },
   })
