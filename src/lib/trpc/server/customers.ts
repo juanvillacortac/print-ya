@@ -8,7 +8,7 @@ export default trpc
   .router<tRPCContext>()
   .mutation('logout', {
     resolve: async ({ ctx: { event } }) => {
-      await event.locals.session.destroy()
+      return await event.locals.session.destroy()
     },
   })
   .mutation('register', {
@@ -62,7 +62,6 @@ export default trpc
     resolve: async ({ ctx }) => {
       const { customerId } = await db.getCustomerDetails(ctx.event)
       if (!customerId) return null
-      await ctx.event.locals.session.refresh()
       return await db.getCustomer({ customerId: customerId })
     },
   })
