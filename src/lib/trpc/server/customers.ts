@@ -8,7 +8,7 @@ export default trpc
   .router<tRPCContext>()
   .mutation('logout', {
     resolve: async ({ ctx: { event } }) => {
-      event.locals.session.destroy()
+      await event.locals.session.destroy()
     },
   })
   .mutation('register', {
