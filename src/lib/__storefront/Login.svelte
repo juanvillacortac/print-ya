@@ -31,7 +31,8 @@
     password: string,
     rePassword: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    phone: string
 
   onMount(() => {
     emailEl.focus()
@@ -60,6 +61,7 @@
           firstName,
           lastName,
           password,
+          phone,
           storeId: $page.stuff.store?.id!,
         })
       }
@@ -128,18 +130,33 @@
           </label>
         </div>
       {/if}
-      <label class="flex flex-col space-y-2 w-full">
-        <span class="font-bold text-xs">Email address</span>
-        <input
-          class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-          type="email"
-          autocomplete="off"
-          placeholder="Ex. juan@gmail.com"
-          required
-          bind:value={email}
-          bind:this={emailEl}
-        />
-      </label>
+      <div class="flex space-x-2 w-full pb-2 items-center">
+        <label class="flex flex-col space-y-2 w-full" class:!w-[50%]={!isLogin}>
+          <span class="font-bold text-xs">Email address</span>
+          <input
+            class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            type="email"
+            autocomplete="off"
+            placeholder="Ex. juan@gmail.com"
+            required
+            bind:value={email}
+            bind:this={emailEl}
+          />
+        </label>
+        {#if !isLogin}
+          <label class="flex flex-col space-y-2 w-1/2">
+            <span class="font-bold text-xs">Phone number</span>
+            <input
+              class="bg-white border rounded border-gray-300 leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+              type="tel"
+              autocomplete="off"
+              placeholder="+1 23456789"
+              required
+              bind:value={phone}
+            />
+          </label>
+        {/if}
+      </div>
       <div class="flex space-x-2 w-full pb-2 items-center">
         <label class="flex flex-col space-y-2 w-full" class:!w-[50%]={!isLogin}>
           <span class="font-bold text-xs">Password</span>
