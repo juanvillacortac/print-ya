@@ -24,11 +24,12 @@ model User {
 }
 
 model Customer {
-  id        String @id @unique @default(cuid())
-  email     String
-  firstName String
-  lastName  String
-  currency  String @default("usd")
+  id          String @id @unique @default(cuid())
+  email       String
+  firstName   String
+  lastName    String
+  phoneNumber String @default("")
+  currency    String @default("usd")
 
   addresses CustomerAddress[]
   orders    Order[]

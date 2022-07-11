@@ -9,6 +9,12 @@ import { page, session } from '$app/stores'
 import { goto } from '$app/navigation'
 import * as sj from 'superjson'
 import trpc from './trpc/client'
+import { Redis } from '@upstash/redis'
+
+const redis = new Redis({
+  url: import.meta.env.VITE_UPSTASH_REDIS_URL,
+  token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+})
 
 export function createQueryStore<T = any>(prop: string): Writable<T> {
   let query: Record<string, any> = {}
@@ -39,26 +45,6 @@ export function persistentWritable<T>(
   key: string,
   initialValue: T
 ): Writable<T> {
-  function replacer(key, value) {
-    if (value instanceof Map) {
-      return {
-        es6: true,
-        dataType: 'Map',
-        value: Array.from(value.entries()), // or with spread: value: [...value]
-      }
-    } else {
-      return value
-    }
-  }
-  function reviver(key, value) {
-    if (typeof value === 'object' && value !== null && value.es6) {
-      if (value.dataType === 'Map') {
-        return new Map(value.value)
-      }
-    }
-    return value
-  }
-
   // create an underlying store
   const store = writable(initialValue)
   const { subscribe } = store
@@ -101,6 +87,68 @@ export function persistentWritable<T>(
   }
 }
 
+export function redisWritable<T>(
+  initialValue?: T,
+  key?: string
+): Writable<T> & {
+  setKey(key: string): void
+} {
+  // create an underlying store
+  const store = writable(initialValue)
+  const keyStore = writable(key)
+  const { subscribe } = store
+
+  const updateStore = (key?: string) => {
+    const k = key || get(keyStore)
+    if (k) {
+      redis.get(k).then((d) => {
+        console.log(d)
+        if (!d) return
+        store.set(sj.parse(JSON.stringify(d as string)))
+      })
+    }
+  }
+
+  keyStore.subscribe((key) => {
+    updateStore(key)
+  })
+
+  if (browser) {
+    updateStore()
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('focus', () => {
+      updateStore()
+    })
+  }
+
+  const set = (value: T) => {
+    store.set(value)
+    if (!browser) return
+    const key = get(keyStore)
+    if (key) {
+      redis.set(get(keyStore), sj.stringify(value))
+    }
+  }
+
+  // return an object with the same interface as svelte's writable()
+  return {
+    // capture set and write to localStorage
+    set,
+    setKey(key: string) {
+      keyStore.set(key)
+    },
+    // capture updates and write to localStore
+    update(cb: CallableFunction) {
+      const value = cb(get(store))
+      set(value)
+    },
+    // punt subscriptions to underlying store
+    subscribe,
+  }
+}
+
 export const preferences = persistentWritable('preferences-v2', {
   darkMode: false,
 })
@@ -124,15 +172,24 @@ export type BagStore = Readable<BagItem[]> & {
   addToBag(product: Product, modifiers: ModifiersMap, quantity: number): void
 }
 
-const createBag = (): BagStore => {
-  const store = persistentWritable<Map<string, number>>('bag-v3', new Map())
-  const items = derived([store], ([s]) =>
-    [...s.entries()].map<BagItem>(([k, q]) => ({
+const createBag = (customerStore: CustomerStore): BagStore => {
+  let store = persistentWritable<Map<string, number>>('bag-v3', new Map())
+  let redis = redisWritable<Map<string, number>>(new Map())
+  const items = derived([store, redis, customerStore], ([s, r, c]) =>
+    [...(c ? r : s).entries()].map<BagItem>(([k, q]) => ({
       ...JSON.parse(k),
       quantity: q,
       key: k,
     }))
   )
+
+  const getStore = () => (get(customerStore) ? redis : store)
+
+  customerStore.subscribe((c) => {
+    if (c) {
+      redis.setKey(`bag:${c.id}`)
+    }
+  })
 
   const getKeys = (val, keys: string[] = []) =>
     isObject(val)
@@ -175,12 +232,11 @@ const createBag = (): BagStore => {
           .flat()
       ),
     ]
-    console.log(JSON.stringify(obj, keys.sort()))
     return JSON.stringify(obj, keys.sort())
   }
 
   const setItem: BagStore['setItem'] = (product, modifiers, quantity) =>
-    store.update((store) => {
+    getStore().update((store) => {
       if (!quantity || quantity < 0) {
         return store
       }
@@ -196,22 +252,21 @@ const createBag = (): BagStore => {
       setItem(
         product,
         modifiers,
-        (get(store).get(getKey(product, modifiers)) ?? 0) + quantity
+        (get(getStore()).get(getKey(product, modifiers)) ?? 0) + quantity
       ),
     delete: (product, modifiers) =>
-      store.update((store) => {
+      getStore().update((store) => {
         store.delete(getKey(product, modifiers))
         return store
       }),
     clear: () =>
-      store.update(() => {
+      getStore().update(() => {
         return new Map()
       }),
     existInBag: (product, modifiers) =>
-      get(store).get(getKey(product, modifiers)) !== undefined,
+      get(getStore()).get(getKey(product, modifiers)) !== undefined,
   }
 }
-export const bag = createBag()
 
 export type Favorites = {
   items(): string[]
@@ -224,19 +279,29 @@ export type FavoritesStore = Readable<Favorites> & {
   addToFavorites(id: string): void
 }
 
-const createFavorites = (): FavoritesStore => {
+const createFavorites = (customerStore: CustomerStore): FavoritesStore => {
   const store = persistentWritable<Set<string>>('favorites', new Set())
+  const redis = redisWritable<Set<string>>(new Set())
+
+  const getStore = () => (get(customerStore) ? redis : store)
+
+  customerStore.subscribe((c) => {
+    if (c) {
+      redis.setKey(`favorites:${c.id}`)
+    }
+  })
+
   const addToFavorites = (id) =>
-    store.update((store) => {
+    getStore().update((store) => {
       store.add(id)
       return store
     })
-  const items = derived<[typeof store], Favorites>(
-    [store],
-    ([s]) =>
+  const items = derived(
+    [store, redis, customerStore],
+    ([s, r, c]) =>
       ({
-        items: () => [...s],
-        existInFavorites: (id) => s.has(id),
+        items: () => [...(c ? r : s)],
+        existInFavorites: (id) => (c ? r : s).has(id),
       } as Favorites)
   )
 
@@ -244,17 +309,16 @@ const createFavorites = (): FavoritesStore => {
     ...items,
     addToFavorites,
     delete: (id) =>
-      store.update((store) => {
+      getStore().update((store) => {
         store.delete(id)
         return store
       }),
     clear: () =>
-      store.update(() => {
+      getStore().update(() => {
         return new Set<string>()
       }),
   }
 }
-export const favorites = createFavorites()
 
 export type CustomerStore = Readable<Customer | null | undefined> & {
   invalidate(): void
@@ -262,28 +326,23 @@ export type CustomerStore = Readable<Customer | null | undefined> & {
 
 const createCustomerStore = (): CustomerStore => {
   const tick = writable(Symbol())
-  const createStore = () =>
-    derived<[typeof tick], Customer | null | undefined>(
-      [tick],
-      (_, set) => {
-        if (!browser) {
-          set(null)
-          return
-        }
+  const store = derived<[typeof tick], Customer | null | undefined>(
+    [tick],
+    (_, set) => {
+      if (!browser) {
+        set(null)
+        return
+      }
 
-        trpc()
-          .query('customer:whoami')
-          .then((c) => {
-            console.log(c)
-            set(c)
-          })
-      },
-      undefined
-    )
-
-  let store = createStore()
-
-  store.subscribe((s) => console.log(s))
+      trpc()
+        .query('customer:whoami')
+        .then((c) => {
+          console.log(c)
+          set(c)
+        })
+    },
+    undefined
+  )
 
   return {
     ...store,
@@ -293,3 +352,5 @@ const createCustomerStore = (): CustomerStore => {
   }
 }
 export const customer = createCustomerStore()
+export const bag = createBag(customer)
+export const favorites = createFavorites(customer)

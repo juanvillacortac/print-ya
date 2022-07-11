@@ -72,12 +72,14 @@ export async function loginCustomer({
 export async function registerCustomer({
   firstName,
   lastName,
+  phone,
   email,
   password,
   storeId,
 }: {
   firstName: string
   lastName: string
+  phone: string
   email: string
   password: string
   storeId
@@ -104,6 +106,7 @@ export async function registerCustomer({
       email,
       firstName,
       lastName,
+      phoneNumber: phone,
       store: {
         connect: {
           id: storeId,
