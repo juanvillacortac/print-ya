@@ -111,7 +111,11 @@ const logic: Handle = async ({ event, resolve }) => {
 
   response = trpcResponse
 
-  if (event.locals.layout === 'store' && !trpc) {
+  if (
+    event.locals.layout === 'store' &&
+    !event.url.pathname.startsWith('/account') &&
+    !trpc
+  ) {
     response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
   }
   // } catch (error) {

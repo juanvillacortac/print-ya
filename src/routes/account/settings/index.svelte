@@ -41,7 +41,7 @@
     Account Settings
   </h3>
   <form
-    class="border rounded-lg flex flex-col mx-auto space-y-4 border-gray-300 p-4 items-center lg:w-3/10 dark:border-gray-600"
+    class="border rounded-lg flex flex-col mx-auto space-y-4 border-gray-300 w-full p-4 items-center lg:w-3/10 dark:border-gray-600"
     on:submit|preventDefault={submitCustomer}
   >
     {#if c}
