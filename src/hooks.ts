@@ -6,7 +6,6 @@ import { getDefaultHost } from '$lib/utils/host'
 import { router, type tRPCRouter } from '$lib/trpc/server'
 import { sequence } from '@sveltejs/kit/hooks'
 import { createTRPCHandle } from '$lib/trpc/handler'
-import { getCustomerDetails } from '$lib/db'
 
 export const session = handleSession({
   secret: process.env['VITE_PY_SECRET'] || 'secret',
