@@ -13,6 +13,7 @@
     LogoTwitter24,
     Logout16,
     Settings16,
+    OrderDetails16,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
@@ -155,7 +156,13 @@
                 {/if}
                 <a
                   class="flex font-normal space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
-                  href="/account"
+                  href="/account/orders"
+                >
+                  <span>Orders</span> <OrderDetails16 class="flex" /></a
+                >
+                <a
+                  class="flex font-normal space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                  href="/account/settings"
                 >
                   <span>Settings</span> <Settings16 class="flex" /></a
                 >

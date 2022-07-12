@@ -8,6 +8,8 @@ async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, saltRounds)
 }
 
+type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
+
 export async function loginCustomer({
   email,
   password,
@@ -132,6 +134,53 @@ export async function registerCustomer({
       customerId: customer.id,
     },
   }
+}
+
+export async function modifyCustomer({
+  id,
+  firstName,
+  lastName,
+  email,
+  phoneNumber,
+  currency,
+}: Overwrite<
+  Partial<Omit<Customer, 'storeId'>>,
+  {
+    id: string
+  }
+>): Promise<Customer> {
+  const customerFound = await prisma.customer.findFirst({
+    where: {
+      email,
+      id: {
+        not: id,
+      },
+    },
+    select: {
+      email: true,
+    },
+    rejectOnNotFound: false,
+  })
+  if (customerFound) {
+    throw {
+      error: 'Email already registered.',
+    }
+  }
+
+  const customer = await prisma.customer.update({
+    data: {
+      email,
+      firstName,
+      lastName,
+      currency,
+      phoneNumber,
+    },
+    where: {
+      id,
+    },
+  })
+
+  return customer
 }
 
 export const getCustomerDetails = async (

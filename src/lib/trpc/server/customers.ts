@@ -35,6 +35,27 @@ export default trpc
       }
     },
   })
+  .mutation('update', {
+    input: z.object({
+      id: z.string().cuid(),
+      firstName: z.string().optional(),
+      lastName: z.string().optional(),
+      phoneNumber: z.string().optional(),
+      email: z.string().email().optional(),
+    }),
+    resolve: async ({ ctx, input }) => {
+      try {
+        const customer = await db.modifyCustomer(input)
+        await ctx.event.locals.session.refresh()
+      } catch (err) {
+        console.error(err.message)
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: err.error,
+        })
+      }
+    },
+  })
   .mutation('login', {
     input: z.object({
       email: z.string().email(),
