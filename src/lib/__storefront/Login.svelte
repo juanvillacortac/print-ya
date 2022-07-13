@@ -41,6 +41,10 @@
 
   let error: string | undefined
 
+  const resetLogin = (...deps: any[]) => (error = '')
+
+  $: resetLogin(isLogin)
+
   async function handleSubmit() {
     loading = true
     if (!isLogin) {
