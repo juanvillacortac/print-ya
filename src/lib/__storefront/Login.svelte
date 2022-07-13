@@ -2,12 +2,13 @@
   import type { Load } from '@sveltejs/kit'
   import trpc from '$lib/trpc/client'
 
-  export const load: Load = async ({ fetch, session }) => {
+  export const load: Load = async ({ fetch, session, stuff, url }) => {
     const customer = await trpc(fetch).query('customer:whoami')
+    const store = stuff.store!
     if (customer) {
       return {
         status: 302,
-        redirect: '/',
+        redirect: `{}`,
       }
     } else {
       await trpc(fetch).mutation('customer:logout')
