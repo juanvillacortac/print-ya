@@ -72,6 +72,7 @@
       )
       window.location.replace(callbackUrl)
     } catch ({ message }) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       error = message
       loading = false
     }
