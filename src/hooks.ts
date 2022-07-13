@@ -59,9 +59,7 @@ const logic: Handle = async ({ event, resolve }) => {
   ) {
     return Response.redirect(
       `${getDefaultHost() === 'localhost:3000' ? 'http://' : 'https://'}${
-        event.url.host === process.env.VERCEL_URL
-          ? process.env.VERCEL_URL
-          : getDefaultHost()
+        event.url.host
       }/login?callbackUrl=${encodeURIComponent(event.url.pathname)}`,
       303
     )
