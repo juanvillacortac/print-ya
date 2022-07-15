@@ -30,8 +30,9 @@
     getTotalFromProductModifiers,
     type ModifiersMap,
   } from '$lib/utils/modifiers'
-  import { Launch16 } from 'carbon-icons-svelte'
+  import { CaretSort16, ChevronSort16, Launch16 } from 'carbon-icons-svelte'
   import { browser } from '$app/env'
+  import Submenu from '$lib/components/Submenu.svelte'
 
   export let orders: StrippedOrder[] = []
 
@@ -137,123 +138,67 @@
   <h3 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
     Sales orders
   </h3>
-  <div class="flex space-x-2 w-full justify-between items-center">
-    <input
-      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-      type="text"
-      bind:value={idSearch}
-      placeholder="Search by order id"
-    />
-  </div>
   <div
-    class="bg-white border rounded-lg flex border-gray-200 w-full max-h-65vh relative overflow-auto dark:bg-gray-800 dark:border-gray-700"
+    class="border rounded-lg flex flex-col space-y-4 bg-gray-50 border-gray-300 p-4 dark:bg-gray-800 dark:border-gray-800"
   >
-    {#if !products}
-      <div class="h-64vh w-full skeleton" />
-    {:else if $media.small}
-      <div
-        class="flex flex-col divide-y-1 divide-gray-300 w-full dark:divide-gray-600"
+    <div
+      class="flex flex-wrap text-sm w-full text-gray-500 gap-4 items-center !font-bold"
+    >
+      <button
+        class="font-bold border-gray-800 border-b-2 pb-1 text-gray-800 dark:border-white dark:text-white"
+        >All</button
       >
-        {#each orders as o, idx}
-          <a
-            class="flex flex-col space-y-2 w-full p-2"
-            href="/stores/{$page.stuff.store?.slug}/orders/{o.id}"
-          >
-            <div class="flex w-full items-center justify-between">
-              <div class="flex space-x-2 items-center">
-                <p
-                  class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
-                  title="Copy to clipboard"
-                  on:click={() => navigator.clipboard.writeText(o.id)}
-                  use:tooltip
-                >
-                  {o.id}
-                </p>
-                <p
-                  class="rounded font-normal text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
-                  class:bg-green-500={o.status === 'paid'}
-                  class:bg-orange-500={o.status === 'pending'}
-                  class:bg-purple-500={o.status === 'processing'}
-                >
-                  {o.status}
-                </p>
-              </div>
-              <p class="text-xs">
-                {o.createdAt.toLocaleString()}
-              </p>
-            </div>
-            <div class="flex w-full justify-between items-center">
-              <p class="font-bold text-sm w-full">
-                {#if o.billingData}
-                  {o.billingData.firstName} {o.billingData.lastName}
-                {:else}
-                  N/A
-                {/if}
-              </p>
-              <p class="font-bold text-xs">
-                ${getTotal(o).toLocaleString('en', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
-            </div>
-            <div class="flex w-full justify-between items-center">
-              <div class="flex space-x-2 items-center">
-                <p
-                  class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
-                  class:!bg-green-500={o.fulfillmentStatus === 'fulfilled'}
-                  class:!text-white={o.fulfillmentStatus === 'fulfilled'}
-                >
-                  {o.fulfillmentStatus.split('_').join(' ')}
-                </p>
-                <p class="text-xs">{o.items?.length || 0} items</p>
-              </div>
-              <p class="text-xs">
-                Revenue: <span class="font-bold"
-                  >${Math.max(
-                    0,
-                    getTotal(o) - totalFees(o.fees, getTotal(o))
-                  ).toLocaleString('en', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}</span
-                >
-              </p>
-            </div>
-          </a>
-        {/each}
-      </div>
-    {:else}
-      <table
-        class="text-sm text-left w-full text-gray-500 relative overflow-auto dark:text-gray-400"
+      <button
+        class="border-transparent font-bold border-b-2 pb-1 hover:text-gray-800 dark:hover:text-white"
+        >Paid</button
       >
-        <thead
-          class="bg-gray-50 text-xs top-0 text-gray-700 z-20 uppercase sticky dark:bg-gray-700 dark:text-gray-400"
+      <button
+        class="border-transparent font-bold border-b-2 pb-1 hover:text-gray-800 dark:hover:text-white"
+        >Unpaid</button
+      >
+      <button
+        class="border-transparent font-bold border-b-2 pb-1 hover:text-gray-800 dark:hover:text-white"
+        >Fulfilled</button
+      >
+      <button
+        class="border-transparent font-bold border-b-2 pb-1 hover:text-gray-800 dark:hover:text-white"
+        >Unfulfilled</button
+      >
+    </div>
+    <div class="flex space-x-2 w-full justify-between items-center">
+      <input
+        class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+        type="text"
+        bind:value={idSearch}
+        placeholder="Search by order id"
+      />
+      <Submenu>
+        <button
+          class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 whitespace-nowrap items-center hover:border-gray-300 dark:hover:border-gray-500"
+          type="button"
+          slot="button"
         >
-          <tr>
-            <th scope="col" class="py-3 px-6"> Order Id </th>
-            <th scope="col" class="py-3 px-6"> Status </th>
-            <th scope="col" class="py-3 px-6"> Fulfillment Status </th>
-            <th scope="col" class="py-3 px-6"> Customer </th>
-            <th scope="col" class="text-right py-3 px-6"> Order total </th>
-            <th scope="col" class="text-right py-3 px-6"> Revenue </th>
-            <th scope="col" class="py-3 px-6"> Order date </th>
-            <th scope="col" class="text-center py-3 px-6"> Order items </th>
-            <th scope="col" class="text-center py-3 px-6"> Actions </th>
-          </tr>
-        </thead>
-        <tbody>
+          <div class="text-xs">Sort by</div>
+          <ChevronSort16 /></button
+        >
+      </Submenu>
+    </div>
+    <div
+      class="bg-white border rounded-lg flex border-gray-300 w-full max-h-65vh relative overflow-auto dark:bg-gray-800 dark:border-gray-700"
+    >
+      {#if !products}
+        <div class="h-64vh w-full skeleton" />
+      {:else if $media.small}
+        <div
+          class="flex flex-col divide-y-1 divide-gray-300 w-full dark:divide-gray-600"
+        >
           {#each orders as o, idx}
-            <tr
-              class="bg-white dark:bg-gray-800"
-              class:border-b={idx !== orders.length - 1}
-              class:dark:border-gray-700={idx !== orders.length - 1}
+            <a
+              class="flex flex-col space-y-2 w-full p-2"
+              href="/stores/{$page.stuff.store?.slug}/orders/{o.id}"
             >
-              <th
-                scope="row"
-                class="font-bold py-4 px-6 text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                <div class="flex w-15ch">
+              <div class="flex w-full items-center justify-between">
+                <div class="flex space-x-2 items-center">
                   <p
                     class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
                     title="Copy to clipboard"
@@ -262,10 +207,6 @@
                   >
                     {o.id}
                   </p>
-                </div>
-              </th>
-              <td class="py-4 px-6">
-                <div class="flex">
                   <p
                     class="rounded font-normal text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
                     class:bg-green-500={o.status === 'paid'}
@@ -275,9 +216,27 @@
                     {o.status}
                   </p>
                 </div>
-              </td>
-              <td class="py-4 px-6">
-                <div class="flex">
+                <p class="text-xs">
+                  {o.createdAt.toLocaleString()}
+                </p>
+              </div>
+              <div class="flex w-full justify-between items-center">
+                <p class="font-bold text-sm w-full">
+                  {#if o.billingData}
+                    {o.billingData.firstName} {o.billingData.lastName}
+                  {:else}
+                    N/A
+                  {/if}
+                </p>
+                <p class="font-bold text-xs">
+                  ${getTotal(o).toLocaleString('en', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
+              </div>
+              <div class="flex w-full justify-between items-center">
+                <div class="flex space-x-2 items-center">
                   <p
                     class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
                     class:!bg-green-500={o.fulfillmentStatus === 'fulfilled'}
@@ -285,77 +244,157 @@
                   >
                     {o.fulfillmentStatus.split('_').join(' ')}
                   </p>
+                  <p class="text-xs">{o.items?.length || 0} items</p>
                 </div>
-              </td>
-              <td>
-                <div class="flex w-full py-4 px-6">
-                  <p class="font-bold text-xs w-full">
-                    {#if o.billingData}
-                      {o.billingData.firstName} {o.billingData.lastName}
-                    {:else}
-                      N/A
-                    {/if}
-                  </p>
-                </div>
-              </td>
-              <td>
-                <div class="flex w-full py-4 px-6">
-                  <p class="font-bold text-xs text-right w-full">
-                    {#if products}
-                      ${getTotal(o).toLocaleString('en', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    {/if}
-                  </p>
-                </div>
-              </td>
-              <td>
-                <div class="flex w-full py-4 px-6">
-                  <p class="font-bold text-xs text-right w-full">
-                    {#if products && o.status === 'paid'}
-                      ${Math.max(
-                        0,
-                        getTotal(o) - totalFees(o.fees, getTotal(o))
-                      ).toLocaleString('en', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    {:else}
-                      N/A
-                    {/if}
-                  </p>
-                </div>
-              </td>
-              <td>
-                <div class="flex py-4 px-6">
-                  <p class="font-bold text-xs">
-                    {o.createdAt.toLocaleString()}
-                  </p>
-                </div>
-              </td>
-              <td class="text-center">
-                <div class="flex py-4 px-6">
-                  <p class="font-bold text-xs text-center w-full">
-                    {o.items?.length}
-                  </p>
-                </div>
-              </td>
-              <td class="text-right py-4 px-6">
-                <div class="flex">
-                  <a
-                    class="border-transparent rounded flex mx-auto border-2 p-1 duration-200 hover:border-gray-300 dark:hover:border-gray-500"
-                    title="View order"
-                    href="/stores/{$page.stuff.store?.slug}/orders/{o.id}"
-                    use:tooltip
-                    type="button"><Launch16 class="flex" /></a
+                <p class="text-xs">
+                  Revenue: <span class="font-bold"
+                    >${Math.max(
+                      0,
+                      getTotal(o) - totalFees(o.fees, getTotal(o))
+                    ).toLocaleString('en', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}</span
                   >
-                </div>
-              </td>
-            </tr>
+                </p>
+              </div>
+            </a>
           {/each}
-        </tbody>
-      </table>
-    {/if}
+        </div>
+      {:else}
+        <table
+          class="text-sm text-left w-full text-gray-500 relative overflow-auto dark:text-gray-400"
+        >
+          <thead
+            class="bg-gray-50 text-xs top-0 text-gray-700 z-20 uppercase sticky dark:bg-gray-700 dark:text-gray-400"
+          >
+            <tr>
+              <th scope="col" class="py-3 px-6"> Order Id </th>
+              <th scope="col" class="py-3 px-6"> Status </th>
+              <th scope="col" class="py-3 px-6"> Fulfillment Status </th>
+              <th scope="col" class="py-3 px-6"> Customer </th>
+              <th scope="col" class="text-right py-3 px-6"> Order total </th>
+              <th scope="col" class="text-right py-3 px-6"> Revenue </th>
+              <th scope="col" class="py-3 px-6"> Order date </th>
+              <th scope="col" class="text-center py-3 px-6"> Order items </th>
+              <th scope="col" class="text-center py-3 px-6"> Actions </th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each orders as o, idx}
+              <tr
+                class="bg-white dark:bg-gray-800"
+                class:border-b={idx !== orders.length - 1}
+                class:dark:border-gray-700={idx !== orders.length - 1}
+              >
+                <th
+                  scope="row"
+                  class="font-bold py-4 px-6 text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  <div class="flex w-15ch">
+                    <p
+                      class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
+                      title="Copy to clipboard"
+                      on:click={() => navigator.clipboard.writeText(o.id)}
+                      use:tooltip
+                    >
+                      {o.id}
+                    </p>
+                  </div>
+                </th>
+                <td class="py-4 px-6">
+                  <div class="flex">
+                    <p
+                      class="rounded font-normal text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
+                      class:bg-green-500={o.status === 'paid'}
+                      class:bg-orange-500={o.status === 'pending'}
+                      class:bg-purple-500={o.status === 'processing'}
+                    >
+                      {o.status}
+                    </p>
+                  </div>
+                </td>
+                <td class="py-4 px-6">
+                  <div class="flex">
+                    <p
+                      class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
+                      class:!bg-green-500={o.fulfillmentStatus === 'fulfilled'}
+                      class:!text-white={o.fulfillmentStatus === 'fulfilled'}
+                    >
+                      {o.fulfillmentStatus.split('_').join(' ')}
+                    </p>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex w-full py-4 px-6">
+                    <p class="font-bold text-xs w-full">
+                      {#if o.billingData}
+                        {o.billingData.firstName} {o.billingData.lastName}
+                      {:else}
+                        N/A
+                      {/if}
+                    </p>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex w-full py-4 px-6">
+                    <p class="font-bold text-xs text-right w-full">
+                      {#if products}
+                        ${getTotal(o).toLocaleString('en', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      {/if}
+                    </p>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex w-full py-4 px-6">
+                    <p class="font-bold text-xs text-right w-full">
+                      {#if products && o.status === 'paid'}
+                        ${Math.max(
+                          0,
+                          getTotal(o) - totalFees(o.fees, getTotal(o))
+                        ).toLocaleString('en', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      {:else}
+                        N/A
+                      {/if}
+                    </p>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex py-4 px-6">
+                    <p class="font-bold text-xs">
+                      {o.createdAt.toLocaleString()}
+                    </p>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <div class="flex py-4 px-6">
+                    <p class="font-bold text-xs text-center w-full">
+                      {o.items?.length}
+                    </p>
+                  </div>
+                </td>
+                <td class="text-right py-4 px-6">
+                  <div class="flex">
+                    <a
+                      class="border-transparent rounded flex mx-auto border-2 p-1 duration-200 hover:border-gray-300 dark:hover:border-gray-500"
+                      title="View order"
+                      href="/stores/{$page.stuff.store?.slug}/orders/{o.id}"
+                      use:tooltip
+                      type="button"><Launch16 class="flex" /></a
+                    >
+                  </div>
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      {/if}
+    </div>
   </div>
 </div>
