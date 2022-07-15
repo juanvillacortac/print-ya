@@ -16,6 +16,48 @@ const redis = new Redis({
   token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
 })
 
+type Media<Query extends Record<string, string> = Record<string, string>> = {
+  [K in keyof Query]?: boolean | string
+} & {
+  classNames: string
+}
+
+type MediaQueryLists = Record<string, MediaQueryList>
+
+function calculateMedia(mqls: MediaQueryLists) {
+  let media: Media = { classNames: '' }
+  let mediaClasses: string[] = []
+  for (let name in mqls) {
+    media[name] = mqls[name].matches
+    if (media[name]) {
+      mediaClasses.push(`media-${name}`)
+    }
+  }
+  media.classNames = mediaClasses.join(' ')
+  return media
+}
+
+export function watchMedia<Query extends Record<string, string>>(
+  mediaqueries: Query
+) {
+  return writable<Media<Query>>({ classNames: '' }, (set) => {
+    if (typeof window === 'undefined') return
+    let mqls: MediaQueryLists = {}
+    let updateMedia = () => set(calculateMedia(mqls))
+    for (let key in mediaqueries) {
+      let foo = window.matchMedia(mediaqueries[key])
+      mqls[key] = foo
+      mqls[key].addListener(updateMedia)
+    }
+    updateMedia()
+    return () => {
+      for (let key in mqls) {
+        mqls[key].removeListener(updateMedia)
+      }
+    }
+  })
+}
+
 export function createQueryStore<T = any>(prop: string): Writable<T> {
   let query: Record<string, any> = {}
   const set = (v) => {
@@ -167,6 +209,11 @@ export type BagStore = Readable<BagItem[]> & {
   setItem(
     product: Product,
     modifiers: ModifiersMap | Prisma.JsonValue,
+    newModifiers: ModifiersMap | Prisma.JsonValue
+  ): void
+  setItem(
+    product: Product,
+    modifiers: ModifiersMap | Prisma.JsonValue,
     quantity: number
   ): void
   addToBag(product: Product, modifiers: ModifiersMap, quantity: number): void
@@ -235,14 +282,32 @@ const createBag = (customerStore: CustomerStore): BagStore => {
     return JSON.stringify(obj, keys.sort())
   }
 
-  const setItem: BagStore['setItem'] = (product, modifiers, quantity) =>
+  const setItem = (
+    product: Product,
+    modifiers: ModifiersMap | Prisma.JsonValue,
+    value: ModifiersMap | Prisma.JsonValue | number
+  ) =>
     getStore().update((store) => {
-      if (!quantity || quantity < 0) {
+      if (typeof value === 'number') {
+        const quantity = value
+        if (!quantity || quantity < 0) {
+          return store
+        }
+        const key = getKey(product, modifiers)
+        store.set(key, quantity)
         return store
       }
-      const key = getKey(product, modifiers)
-      store.set(key, quantity)
-      return store
+      const oldKey = getKey(product, modifiers)
+      const newKey = getKey(product, value)
+      const newStore = new Map<string, number>()
+      for (const [k, v] of store.entries()) {
+        if (k == oldKey) {
+          newStore.set(newKey, v)
+        } else {
+          newStore.set(k, v)
+        }
+      }
+      return newStore
     })
 
   return {

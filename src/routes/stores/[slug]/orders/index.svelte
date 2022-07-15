@@ -21,7 +21,7 @@
 
 <script lang="ts">
   import { page } from '$app/stores'
-  import { pageSubtitle } from '$lib'
+  import { pageSubtitle, watchMedia } from '$lib'
   import type { OrderFee, Product, Store, StrippedOrder } from '$lib/db'
   import trpc from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
@@ -118,6 +118,17 @@
         .reduce((a, b) => a + b, 0)
     return total
   }
+  const mediaqueries = {
+    small: '(max-width: 849px)',
+    large: '(min-width: 850px)',
+    short: '(max-height: 399px)',
+    landscape: '(orientation: landscape) and (max-height: 499px)',
+    tiny: '(orientation: portrait) and (max-height: 599px)',
+    dark: '(prefers-color-scheme: dark)',
+    noanimations: '(prefers-reduced-motion: reduce)',
+  }
+
+  const media = watchMedia(mediaqueries)
 
   $pageSubtitle = 'Sales orders'
 </script>
@@ -139,9 +150,82 @@
   >
     {#if !products}
       <div class="h-64vh w-full skeleton" />
+    {:else if $media.small}
+      <div
+        class="flex flex-col divide-y-1 divide-gray-300 w-full dark:divide-gray-600"
+      >
+        {#each orders as o, idx}
+          <a
+            class="flex flex-col space-y-2 w-full p-2"
+            href="/stores/{$page.stuff.store?.slug}/orders/{o.id}"
+          >
+            <div class="flex w-full items-center justify-between">
+              <div class="flex space-x-2 items-center">
+                <p
+                  class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
+                  title="Copy to clipboard"
+                  on:click={() => navigator.clipboard.writeText(o.id)}
+                  use:tooltip
+                >
+                  {o.id}
+                </p>
+                <p
+                  class="rounded font-normal text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
+                  class:bg-green-500={o.status === 'paid'}
+                  class:bg-orange-500={o.status === 'pending'}
+                  class:bg-purple-500={o.status === 'processing'}
+                >
+                  {o.status}
+                </p>
+              </div>
+              <p class="text-xs">
+                {o.createdAt.toLocaleString()}
+              </p>
+            </div>
+            <div class="flex w-full justify-between items-center">
+              <p class="font-bold text-sm w-full">
+                {#if o.billingData}
+                  {o.billingData.firstName} {o.billingData.lastName}
+                {:else}
+                  N/A
+                {/if}
+              </p>
+              <p class="font-bold text-xs">
+                ${getTotal(o).toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
+            </div>
+            <div class="flex w-full justify-between items-center">
+              <div class="flex space-x-2 items-center">
+                <p
+                  class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
+                  class:!bg-green-500={o.fulfillmentStatus === 'fulfilled'}
+                  class:!text-white={o.fulfillmentStatus === 'fulfilled'}
+                >
+                  {o.fulfillmentStatus.split('_').join(' ')}
+                </p>
+                <p class="text-xs">{o.items?.length || 0} items</p>
+              </div>
+              <p class="text-xs">
+                Revenue: <span class="font-bold"
+                  >${Math.max(
+                    0,
+                    getTotal(o) - totalFees(o.fees, getTotal(o))
+                  ).toLocaleString('en', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}</span
+                >
+              </p>
+            </div>
+          </a>
+        {/each}
+      </div>
     {:else}
       <table
-        class="text-sm text-left w-full text-gray-500 relative overflow-auto dark:text-gray-400 "
+        class="text-sm text-left w-full text-gray-500 relative overflow-auto dark:text-gray-400"
       >
         <thead
           class="bg-gray-50 text-xs top-0 text-gray-700 z-20 uppercase sticky dark:bg-gray-700 dark:text-gray-400"

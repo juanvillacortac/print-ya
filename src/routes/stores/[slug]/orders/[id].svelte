@@ -230,7 +230,7 @@
 </script>
 
 {#if $page.stuff.store}
-  <BagItemDetails bind:item={details} store={$page.stuff.store} />
+  <BagItemDetails bind:item={details} store={$page.stuff.store} disabled />
 {/if}
 
 <div class="flex flex-col mx-auto space-y-4 pb-4">

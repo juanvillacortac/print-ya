@@ -251,7 +251,7 @@
     <slot />
   </div>
 
-  <div class="bg-red-800 text-white w-full">
+  <div class="bg-red-300 w-full text-gray-500 dark:(text-white bg-red-700) ">
     <div
       class="flex flex-col m-auto space-y-3 w-full p-4 items-center lg:w-8/10"
     >
@@ -280,13 +280,13 @@
         <h4 class="font-bold font-title">Stay In The Loop</h4>
         <div class="flex items-center">
           <input
-            class="bg-white border border-red-900 text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10"
+            class="bg-white border-0 h-32px text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10"
             type="search"
             name="q"
             placeholder="Enter your email address"
           />
           <button
-            class="flex font-bold  bg-red-800 text-white text-xs p-2 items-center uppercase"
+            class="flex font-bold h-full bg-red-400 text-white text-xs p-2 items-center uppercase"
           >
             Submit
           </button>

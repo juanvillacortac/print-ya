@@ -27,32 +27,23 @@
 <script lang="ts">
   import { bag, favorites, pageSubtitle } from '$lib'
   import { tooltip } from '$lib/components/tooltip'
-  import { onMount } from 'svelte'
-  import type { ProductModifierItem } from '@prisma/client'
   import Image from '$lib/components/caravaggio/Image.svelte'
-  import { squareratio } from '$lib/actions/aspectratio'
-  import { uploadFile } from '$lib/supabase'
-  import { page } from '$app/stores'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
-  import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
   import Markdown from 'svelte-markdown'
   import {
-    createModifiersMapStore,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
+    type ModifiersMap,
   } from '$lib/utils/modifiers'
   import { browser } from '$app/env'
   import trpc from '$lib/trpc/client'
   import {
     Add16,
-    Add24,
-    Close24,
-    CloseOutline24,
     Favorite32,
     FavoriteFilled32,
-    Image32,
     Subtract16,
   } from 'carbon-icons-svelte'
+  import ModifiersControls from '$lib/__storefront/ModifiersControls.svelte'
 
   export let product!: Product
 
@@ -60,121 +51,20 @@
 
   $pageSubtitle = product?.name
 
-  let modifiers = createModifiersMapStore(product)
+  let modifiers: ModifiersMap
 
-  let fields = ''
-
-  onMount(() => {
-    let defaultItems = product!
-      .modifiers!.filter((m) => m.type === 'color' || m.type === 'select')
-      .map((m) => [m.id, m?.items![0]] as [string, ProductModifierItem])
-    for (let [m, i] of defaultItems) {
-      $modifiers[m] = {
-        itemId: i.id,
-        value: i.name,
-      }
-    }
-  })
-
-  $: if (product.type === 'template') {
-    fields = getTemplateFieldsFromModifiers(product, $modifiers)
+  $: template = {
+    ...(product.template as any),
+    fields: getTemplateFieldsFromModifiers(product, modifiers),
   }
 
-  $: productModifiers = product?.modifiers || []
-
-  $: fontsItems = productModifiers.filter!((m) => m.type === 'font')
-    .map((m) => m.items || [])
-    .reduce((a, b) => [...a, ...b], [])
-    .map((i) => ({
-      name: i?.name || '',
-      url: i?.meta.web
-        ? i?.meta?.url
-        : `/api/fontface?name=${encodeURIComponent(
-            i?.name || ''
-          )}&src=${encodeURIComponent(i.meta.url)}`,
-    }))
-
-  $: template = { ...(product.template as any), fields }
-
-  const options: CaravaggioOptions = {
-    progressive: true,
-    o: 'png',
-    rs: {
-      s: '480x480',
-      m: 'embed',
-      b: '000000.0',
-    },
-  }
-
-  $: total = getTotalFromProductModifiers(product, $modifiers) * quantity
-
-  let upsellingValues = Object.fromEntries(
-    product?.modifiers
-      ?.filter((m) => m?.type === 'upsell')
-      .map((m) => [m.id, [] as string[]]) || []
-  )
+  $: total = getTotalFromProductModifiers(product, modifiers) * quantity
 
   let inBag = false
-  $: if (browser && $bag && $modifiers) {
-    inBag = bag.existInBag(product, $modifiers)
-  }
-
-  $: if (browser) {
-    let u = { ...upsellingValues }
-    for (let mId in u) {
-      $modifiers[mId] = { ...$modifiers[mId], itemIds: u[mId] }
-    }
-  }
-
-  let uploadingImage: Record<string, boolean> = {}
-  const onModifierImagePaste = async (m: ProductModifier) => {
-    try {
-      const fileUrl = await navigator.clipboard.readText()
-      $modifiers[m.id] = { ...$modifiers[m.id], value: fileUrl }
-    } catch (error) {
-      alert(error.message)
-    } finally {
-      // uploadingImage[m.id] = false
-    }
-  }
-  const onModifierImageSelected = async <
-    T extends Event & {
-      currentTarget: EventTarget & HTMLInputElement
-    }
-  >(
-    event: T,
-    m: ProductModifier
-  ) => {
-    try {
-      if (
-        !event.currentTarget.files ||
-        event.currentTarget.files.length === 0
-      ) {
-        throw new Error('You must select an image to upload.')
-      }
-      uploadingImage[m.id] = true
-      const file = event.currentTarget.files[0]
-      const { url } = await uploadFile({
-        file,
-        bucket: 'client-assets',
-        path: `${$page.stuff.store!.slug}/products/${
-          product.slug
-        }/template-assets`,
-      })
-      $modifiers[m.id] = { ...$modifiers[m.id], value: url }
-    } catch (error) {
-      alert(error.message)
-    } finally {
-      uploadingImage[m.id] = false
-    }
+  $: if (browser && $bag && modifiers) {
+    inBag = bag.existInBag(product, modifiers)
   }
 </script>
-
-<svelte:head>
-  {#each fontsItems as f}
-    <link href={f.url} rel="stylesheet" />
-  {/each}
-</svelte:head>
 
 <div class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10">
   <div class="flex font-bold space-x-2 text-xs text-gray-400 uppercase">
@@ -207,232 +97,8 @@
             Total: ${total.toLocaleString()}
           </div>
         </div>
-        <div class="flex flex-col space-y-4 w-full">
-          {#each product?.modifiers || [] as m}
-            {@const item = $modifiers[m.id]
-              ? m.items?.find((i) => i.id === $modifiers[m.id]?.itemId)
-              : undefined}
-            {@const itemName =
-              m.type === 'font'
-                ? item?.name
-                : m.type === 'color'
-                ? item?.meta?.name
-                : ''}
-            <div
-              class="flex w-full {m.type
-                ? 'space-y-2 flex-col'
-                : 'space-x-4 items-center justify-end'} lg:justify-between"
-            >
-              <div
-                class="font-bold font-title text-black text-xs dark:text-white"
-              >
-                {m.name}{#if itemName}: <span class="font-normal"
-                    >{itemName}</span
-                  >{/if}
-              </div>
-              {#if m.type === 'select'}
-                <select
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none !pr-8 lg:w-60 lg:w-7/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-                  bind:value={$modifiers[m.id].itemId}
-                  on:change={() =>
-                    ($modifiers[m.id].value = m.items?.find(
-                      (i) => i.id == $modifiers[m.id].itemId
-                    )?.name)}
-                >
-                  {#each m.items || [] as i}
-                    <option value={i.id}
-                      >{i.name}{#if i.cost}&nbsp;&nbsp;&ndash;&nbsp;&nbsp;<strong
-                          >{i.cost < 0 ? '-' : '+'}{!i.percentage
-                            ? '$'
-                            : ''}{Math.abs(i.cost)}{i.percentage
-                            ? '%'
-                            : ''}</strong
-                        >{/if}</option
-                    >
-                  {/each}
-                </select>
-              {:else if m.type === 'upsell'}
-                <div class="w-full grid gap-4 grid-cols-2 lg:w-7/10">
-                  {#each m.items?.filter((i) => i !== undefined) || [] as i}
-                    <div
-                      class="border rounded-lg w-full transform transition-transform duration-200 relative dark:border-gray-700 hover:scale-102"
-                      style="will-change: transform"
-                      class:!shadow={upsellingValues[m.id]?.includes(i.id)}
-                      class:!scale-102={upsellingValues[m.id]?.includes(i.id)}
-                      class:!border-blue-500={upsellingValues[m.id]?.includes(
-                        i.id
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        class="cursor-pointer h-full w-full opacity-0 z-20 absolute"
-                        bind:group={upsellingValues[m.id]}
-                        on:change={() => (upsellingValues = upsellingValues)}
-                        value={i.id}
-                      />
-                      <div
-                        class="flex flex-col h-full space-y-2 p-2 justify-between"
-                      >
-                        <div class="flex flex-col space-y-2">
-                          <div
-                            class="rounded-lg bg-gray-100 w-auto overflow-hidden pointer-events-none select-none dark:bg-gray-700"
-                          >
-                            <div
-                              class="flex w-full p-2 items-center justify-center aspect-square"
-                            >
-                              <Image
-                                {options}
-                                src={i.meta?.image}
-                                class="rounded object-cover w-full aspect-square"
-                              />
-                            </div>
-                          </div>
-                          <div class="flex flex-col">
-                            <h3 class="font-bold text-sm">{i.name}</h3>
-                            {#if i.meta.description}
-                              <p
-                                class="text-sm leading-none pb-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
-                              >
-                                {i.meta?.description}
-                              </p>
-                            {/if}
-                          </div>
-                        </div>
-                        <p class="font-bold text-right text-lg">
-                          {i.cost < 0 ? '-' : ''}{!i.percentage
-                            ? '$'
-                            : ''}{Math.abs(i.cost)}{i.percentage ? '%' : ''}
-                        </p>
-                      </div>
-                    </div>
-                  {/each}
-                </div>
-              {:else if m.type === 'font'}
-                <div
-                  class="w-full grid gap-4 grid-cols-3 lg:w-full lg:w-7/10 lg:grid-cols-3"
-                >
-                  <button
-                    class="border-dashed rounded flex border-2 text-lg w-full p-2 transform transition-transform text-gray-200 duration-200 items-center justify-center dark:border-gray-600 dark:text-gray-600"
-                    title="Unset font"
-                    on:click={() => ($modifiers[m.id] = {})}
-                    use:tooltip
-                    style="will-change: transform;"><CloseOutline24 /></button
-                  >
-                  {#each m.items || [] as i}
-                    <button
-                      class="rounded border-2 text-lg w-full p-1 transform transition-transform duration-200 dark:border-gray-600"
-                      title={i.name}
-                      on:click={() =>
-                        ($modifiers[m.id] = {
-                          itemId: i.id,
-                          value: {
-                            name: i?.name,
-                            url: i?.meta.web
-                              ? i.meta.url
-                              : `/api/fontface?name=${encodeURIComponent(
-                                  i.name
-                                )}&src=${encodeURIComponent(i.meta.url)}`,
-                          },
-                        })}
-                      class:scale-120={$modifiers[m.id].itemId == i.id}
-                      class:!border-blue-800={$modifiers[m.id].itemId == i.id}
-                      use:tooltip
-                      style={`will-change: transform; font-family: "${i.name}";`}
-                      >Hello</button
-                    >
-                  {/each}
-                </div>
-              {:else if m.type === 'toggle'}
-                <input
-                  type="checkbox"
-                  bind:checked={$modifiers[m.id].value}
-                  class="justify-start"
-                  on:change={() =>
-                    ($modifiers[m.id].itemId = $modifiers[m.id].itemId)}
-                />
-              {:else if m.type === 'image'}
-                <div
-                  class="border-dotted border-dashed rounded-lg flex bg-gray-100 border-gray-300 border-2 p-8 relative justify-center items-center lg:w-7/10 dark:bg-gray-700 dark:border-gray-600"
-                  class:cursor-pointer={!uploadingImage[m.id]}
-                  class:cursor-not-allowed={uploadingImage[m.id]}
-                >
-                  {#if !uploadingImage[m.id] && $modifiers[m.id].value}
-                    <button
-                      class="top-2 right-2 text-gray-400 z-30 absolute"
-                      title="Delete image"
-                      use:tooltip
-                      on:click|preventDefault|stopPropagation={() =>
-                        ($modifiers[m.id] = {})}
-                    >
-                      <Close24 />
-                    </button>
-                  {/if}
-                  <div
-                    class="flex flex-col text-center text-gray-400 items-center justify-center"
-                  >
-                    {#if $modifiers[m.id]?.value && !uploadingImage[m.id]}
-                      <img
-                        src={$modifiers[m.id]?.value}
-                        alt=""
-                        class="object-contain h-32px mb-1 w-32px"
-                      />
-                    {:else}
-                      <Image32 class="mb-1" />
-                    {/if}
-                    <span class="font-normal block"
-                      >{uploadingImage[m.id]
-                        ? 'Uploading image...'
-                        : 'Upload an image (png and svg only)'}</span
-                    >
-                  </div>
-
-                  <input
-                    type="file"
-                    name=""
-                    class="flex h-full w-full opacity-0 absolute"
-                    class:!cursor-pointer={!uploadingImage[m.id]}
-                    class:!cursor-not-allowed={uploadingImage[m.id]}
-                    accept="image/png, image/svg+xml"
-                    disabled={uploadingImage[m.id]}
-                    on:change={(e) => onModifierImageSelected(e, m)}
-                  />
-                </div>
-              {:else if m.type === 'text'}
-                <input
-                  type="text"
-                  placeholder="Write something..."
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-7/10 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
-                  bind:value={$modifiers[m.id].value}
-                  on:input={() =>
-                    ($modifiers[m.id].itemId = $modifiers[m.id].itemId)}
-                  on:change={() =>
-                    !$modifiers[m.id].value?.trim()
-                      ? ($modifiers[m.id] = {})
-                      : null}
-                />
-              {:else if m.type === 'color'}
-                <div class="w-full grid gap-2 grid-cols-8 lg:w-7/10">
-                  {#each m.items || [] as i}
-                    <button
-                      class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"
-                      title={i?.meta?.name}
-                      class:scale-110={$modifiers[m.id].itemId == i.id}
-                      class:!border-blue-800={$modifiers[m.id].itemId == i.id}
-                      on:click={() =>
-                        ($modifiers[m.id] = {
-                          itemId: i.id,
-                          value: i.name,
-                        })}
-                      use:tooltip
-                      use:squareratio
-                      style="will-change: transform; aspect-ratio: 1/1; background-color: {i.name ||
-                        'black'}"
-                    />
-                  {/each}
-                </div>
-              {/if}
-            </div>
-          {/each}
+        <div class="flex w-full lg:w-7/10">
+          <ModifiersControls bind:product bind:modifiers />
         </div>
         <div class="flex space-x-2 items-center">
           <div class="font-bold font-title text-black text-xs dark:text-white">
@@ -469,7 +135,7 @@
             <div class="flex space-x-2">
               <button
                 class="rounded flex font-bold space-x-2 bg-red-900 shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105 active:not-disabled:scale-95"
-                on:click={() => bag.addToBag(product, $modifiers, quantity)}
+                on:click={() => bag.addToBag(product, modifiers, quantity)}
                 style="will-change: transform"
               >
                 <Add16 class="m-auto" />

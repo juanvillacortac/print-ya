@@ -11,12 +11,11 @@ export type ModifierValue = {
 
 export type ModifiersMap = Record<string, ModifierValue>
 
+export const createModifiersMap = (product?: Product): ModifiersMap =>
+  product ? product.modifiers?.reduce((a, v) => ({ ...a, [v.id]: {} }), {}) : {}
+
 export const createModifiersMapStore = (product?: Product) =>
-  writable<ModifiersMap>(
-    product
-      ? product.modifiers?.reduce((a, v) => ({ ...a, [v.id]: {} }), {})
-      : {}
-  )
+  writable<ModifiersMap>(createModifiersMap(product))
 
 export const getTemplateFieldsFromModifiers = (
   product: Product,
@@ -64,24 +63,25 @@ export const getCostFromProductModifiers = (
   Object.entries(modifiers || {})
     .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
     .map(([mId, mValue]) => {
-      const modifier: ProductModifier = product.modifiers!.find(
+      const modifier: ProductModifier | undefined = product.modifiers.find(
         (m) => m.id === mId
-      )!
+      )
       if (mValue.itemIds) {
-        const items = mValue.itemIds.map((id) =>
-          modifier.items!.find((i) => i.id === id)
-        )
+        const items =
+          mValue.itemIds?.map((id) =>
+            modifier?.items?.find((i) => i.id === id)
+          ) || []
         const costs = items.map((item) =>
-          item!.percentage
-            ? (item!.cost / 100) * (cost ?? product.price)
-            : item!.cost
+          item?.percentage
+            ? (item?.cost / 100) * (cost ?? product.price)
+            : item?.cost || 0
         )
         return costs.reduce((a, b) => a + b, 0)
       }
-      const item = modifier.items!.find((i) => i.id === mValue.itemId)
-      const value = item!.percentage
+      const item = modifier?.items?.find((i) => i.id === mValue.itemId)
+      const value = item?.percentage
         ? (item!.cost / 100) * (cost ?? product.price)
-        : item!.cost
+        : item?.cost || 0
       return value
     })
     .reduce((a, b) => a + b, 0)

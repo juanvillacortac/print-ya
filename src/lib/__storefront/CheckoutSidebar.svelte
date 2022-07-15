@@ -10,6 +10,7 @@
   import {
     CheckmarkFilled32,
     ChevronLeft24,
+    Close24,
     Hourglass32,
   } from 'carbon-icons-svelte'
   import { elasticOut, expoOut } from 'svelte/easing'
@@ -442,14 +443,14 @@
         <div class="flex space-x-4 items-center">
           <button
             type="reset"
-            class="transform transition-transform duration-200 hover:scale-90"
+            class="transform transition-transform duration-200 hover:scale-80"
             on:click={() => {
               open = false
               payment = false
               done = undefined
             }}
           >
-            <ChevronLeft24 />
+            <Close24 />
           </button>
           <div class="font-title font-bold text-2xl">Checkout</div>
         </div>
@@ -531,7 +532,7 @@
               <div class="flex justify-between">
                 <div>Shipping:</div>
                 <p>
-                  ${total.toLocaleString('en', {
+                  ${(0).toLocaleString('en', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
