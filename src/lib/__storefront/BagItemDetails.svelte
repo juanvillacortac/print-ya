@@ -158,11 +158,7 @@
               </p>
               <p class="font-bold text-black text-base dark:text-white">
                 Total: ${(product
-                  ? getTotalFromProductModifiers(
-                      product,
-                      item.modifiers,
-                      item.cost
-                    )
+                  ? getTotalFromProductModifiers(product, $modifiers, item.cost)
                   : 0
                 ).toLocaleString()}
               </p>
