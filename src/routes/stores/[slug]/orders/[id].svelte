@@ -498,7 +498,7 @@
           >
             <div class="flex space-x-2 items-center justify-between">
               <h4 class="font-bold font-title text-black dark:text-white">
-                Customer details
+                Biling details
               </h4>
               <div class="flex space-x-2 items-center items-end">
                 {#if editCustomer}
@@ -553,7 +553,6 @@
                 {/if}
               </div>
             </div>
-            <p class="font-bold text-xs">Not registered</p>
             <div class="text-xs w-full grid gap-4 grid-cols-2">
               <div class="flex flex-col space-y-1">
                 <p class="font-bold">Email:</p>

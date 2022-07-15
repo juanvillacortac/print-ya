@@ -111,7 +111,7 @@
       transition:fade={{ duration: 400, easing: expoOut }}
     />
     <div
-      class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 p-4 w-8/10 relative dark:bg-gray-900"
+      class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 p-4 w-9/10 relative lg:w-8/10 dark:bg-gray-900"
       transition:scale={{ start: 0.9, duration: 400, easing: expoOut }}
     >
       <div class="flex items-center justify-between">

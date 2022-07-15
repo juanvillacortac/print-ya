@@ -88,8 +88,8 @@ export const getOrdersByStore = async ({
   storeId: string
   filter?: {
     id?: string
-    status?: Order['status']
-    fulfillmentStatus?: Order['fulfillmentStatus']
+    status?: Order['status'][]
+    fulfillmentStatus?: Order['fulfillmentStatus'][]
   }
   orderBy?: {
     id?: 'desc' | 'asc'
@@ -105,8 +105,16 @@ export const getOrdersByStore = async ({
             startsWith: filter.id,
           }
         : undefined,
-      status: filter?.status,
-      fulfillmentStatus: filter?.fulfillmentStatus,
+      status: filter?.status
+        ? {
+            in: filter.status,
+          }
+        : undefined,
+      fulfillmentStatus: filter?.fulfillmentStatus
+        ? {
+            in: filter.fulfillmentStatus,
+          }
+        : undefined,
     },
     include: {
       fees: {

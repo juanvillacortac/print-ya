@@ -18,7 +18,7 @@
   $: list = items.filter((i) => (disabled ? value.itemId == i.id : true))
 </script>
 
-<div class="w-full grid gap-3 grid-cols-8">
+<div class="w-full grid gap-3 grid-cols-6 sm:grid-cols-8">
   {#each list || [] as i}
     <button
       class="rounded pb-full border-2 w-full transform duration-200 dark:border-gray-600"

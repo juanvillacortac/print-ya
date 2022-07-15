@@ -110,8 +110,8 @@ const queries = trpc
       filter: z
         .object({
           id: z.string().optional(),
-          status: orderStatus.optional(),
-          fulfillmentStatus: fulfillmentStatus.optional(),
+          status: z.array(orderStatus).optional(),
+          fulfillmentStatus: z.array(fulfillmentStatus).optional(),
         })
         .optional(),
       orderBy: z
