@@ -1,5 +1,6 @@
 import { prisma } from './common'
 import type {
+  Customer,
   Order as _Order,
   OrderFee as _OrderFee,
   OrderItem as _OrderItem,
@@ -23,6 +24,7 @@ export type Order = Overwrite<
   _Order,
   {
     customerId?: string
+    customer: Customer | null
     billingData?: any
     shippingData?: any
     paymentMethods: string[]
@@ -34,6 +36,7 @@ export type Order = Overwrite<
 export type StrippedOrder = Overwrite<
   Order,
   {
+    customer: Customer | null
     items: _OrderItem[]
   }
 >
@@ -88,6 +91,7 @@ export const getOrdersByStore = async ({
   storeId: string
   filter?: {
     id?: string
+    customerId?: string
     status?: Order['status'][]
     fulfillmentStatus?: Order['fulfillmentStatus'][]
   }
@@ -100,6 +104,7 @@ export const getOrdersByStore = async ({
   prisma.order.findMany({
     where: {
       storeId,
+      customerId: filter?.customerId,
       id: filter?.id
         ? {
             startsWith: filter.id,
@@ -117,6 +122,7 @@ export const getOrdersByStore = async ({
         : undefined,
     },
     include: {
+      customer: true,
       fees: {
         select: {
           name: true,
@@ -134,7 +140,7 @@ export const createOrder = async ({
   storeId,
 }: {
   order: Overwrite<
-    Omit<Order, 'id' | 'createdAt' | 'storeId' | 'total'>,
+    Omit<Order, 'id' | 'createdAt' | 'storeId' | 'total' | 'customer'>,
     {
       fulfillmentStatus?: Order['fulfillmentStatus']
       paymentMethods?: string[]
@@ -153,6 +159,7 @@ export const createOrder = async ({
     data: {
       storeId,
       id: nanoid(8),
+      customerId: order.customerId,
       billingData: order.billingData,
       paymentMethods: order.paymentMethods || [],
       total: order.items.map((i) => i.cost || 0).reduce((a, b) => a + b, 0),
@@ -178,6 +185,7 @@ export const createOrder = async ({
       },
     },
     include: {
+      customer: true,
       fees: {
         select: {
           name: true,
@@ -314,6 +322,7 @@ export const updateOrder = async (
         : undefined,
     },
     include: {
+      customer: true,
       fees: {
         select: {
           name: true,

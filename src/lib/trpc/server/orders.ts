@@ -110,6 +110,7 @@ const queries = trpc
       filter: z
         .object({
           id: z.string().optional(),
+          customerId: z.string().cuid().optional(),
           status: z.array(orderStatus).optional(),
           fulfillmentStatus: z.array(fulfillmentStatus).optional(),
         })

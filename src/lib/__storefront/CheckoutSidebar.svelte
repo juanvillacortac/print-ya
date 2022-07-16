@@ -4,6 +4,7 @@
     currency: string
     method: 'stripe' | 'paypal'
   }
+  const a = null
 </script>
 
 <script lang="ts">
@@ -37,6 +38,7 @@
   import type { BagItem } from '$lib'
   import { getTotalFromProductModifiers } from '$lib/utils/modifiers'
   import { page } from '$app/stores'
+  import { customer } from '$lib/stores'
 
   const countries = getCountries()
 
@@ -224,6 +226,7 @@
         order = await trpc().mutation('orders:create', {
           storeId: $page.stuff.store!.id,
           order: {
+            customerId: $customer?.id || undefined,
             status: 'pending',
             paymentMethods: [],
             fees: [],
