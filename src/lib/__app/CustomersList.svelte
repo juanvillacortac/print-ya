@@ -322,59 +322,56 @@
               on:click={() =>
                 goto(`/stores/${$page.stuff.store?.slug}/customers/${c.id}`)}
             >
-              <!-- <div class="flex w-full items-center justify-between">
+              <div class="flex w-full items-center justify-between">
                 <div class="flex space-x-2 items-center">
-                  <p
-                    class="rounded cursor-pointer font-normal bg-gray-100 text-xs text-white p-1 transform text-gray-80 whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible"
-                    title="Copy to clipboard"
-                    on:click={() => navigator.clipboard.writeText(c.id)}
-                    use:tooltip
-                  >
-                    {c.id}
-                  </p>
-                  <p
+                  <div class="flex w-12ch">
+                    <p
+                      class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
+                      title="Copy to clipboard"
+                      on:click={() => navigator.clipboard.writeText(c.id)}
+                      use:tooltip
+                    >
+                      {c.id}
+                    </p>
+                  </div>
+                  <!-- <p
                     class="rounded font-normal text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
                     class:bg-green-500={c.status === 'paid'}
                     class:bg-orange-500={c.status === 'pending'}
                     class:bg-purple-500={c.status === 'processing'}
                   >
                     {c.status}
-                  </p>
+                  </p> -->
                 </div>
                 <p class="text-xs">
                   {c.createdAt.toLocaleString()}
                 </p>
               </div>
-              <div class="flex w-full justify-between items-center">
-                {#if c.customer}
-                  <a
-                    href="/stores/{$page.stuff.store?.slug}/customers/{c
-                      .customer.id}"
-                    class="font-bold space-x-2 text-sm text-gray-800 inline-flex items-center dark:text-white hover:underline"
-                  >
-                    <span>
-                      {c.customer.firstName}
-                      {c.customer.lastName}
-                    </span>
-                    <Launch16 class="inline-flex" />
-                  </a>
-                {:else}
-                  <p class="text-sm">
-                    {#if c.billingData}
-                      {c.billingData.firstName} {c.billingData.lastName}
-                    {:else}
-                      N/A
-                    {/if}
-                  </p>
-                {/if}
-                <p class="font-bold text-xs text-gray-800 dark:text-white">
-                  ${getTotal(c).toLocaleString('en', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
+              <div class="flex space-x-2 w-full items-center">
+                <div
+                  class="bg-gradient-to-br border rounded-full cursor-pointer flex font-bold font-title from-green-300 to-pink-600 border-gray-200 h-32px text-white text-xs min-w-32px leading-[0] items-center justify-center uppercase dark:bg-gray-600 dark:from-green-400 dark:to-pink-700"
+                >
+                  {c.firstName[0]}
+                </div>
+                <div class="flex flex-col space-y-2 w-full">
+                  <div class="flex justify-between items-center">
+                    <p class="font-bold text-xs text-gray-800 dark:text-white">
+                      {c.firstName}
+                      {c.lastName}
+                    </p>
+                  </div>
+                  <div class="flex w-full justify-between items-center">
+                    <p class="text-sm">
+                      {c.email}
+                    </p>
+                    <p class="text-sm">
+                      {c._count.orders}
+                      orders
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div class="flex w-full justify-between items-center">
+              <!-- <div class="flex w-full justify-between items-center">
                 <div class="flex space-x-2 items-center">
                   <p
                     class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
@@ -409,6 +406,7 @@
           >
             <tr>
               <th scope="col" class="py-3 px-6"> Customer Id </th>
+              <th scope="col" class="text-center py-3 px-6"> Avatar </th>
               <th scope="col" class="py-3 px-6"> First name </th>
               <th scope="col" class="py-3 px-6"> Last name </th>
               <th scope="col" class="py-3 px-6"> Email </th>
@@ -440,6 +438,15 @@
                     </p>
                   </div>
                 </th>
+                <td>
+                  <div class="flex">
+                    <div
+                      class="bg-gradient-to-br border rounded-full cursor-pointer flex font-bold font-title mx-auto from-green-300 to-pink-600 border-gray-200 h-32px text-white text-xs min-w-32px leading-[0] w-32px items-center justify-center uppercase dark:bg-gray-600 dark:from-green-400 dark:to-pink-700"
+                    >
+                      {c.firstName[0]}
+                    </div>
+                  </div>
+                </td>
                 <td>
                   <div class="flex w-full py-4 px-6">
                     <p class="font-bold text-xs w-full">
