@@ -8,6 +8,7 @@
     OrderDetails32,
     Product32,
     Settings32,
+    UserAvatar32,
   } from 'carbon-icons-svelte'
 
   $: store = $page.stuff.store as Store
@@ -24,19 +25,24 @@
       href: `/stores/${store.slug}/products`,
     },
     {
-      icon: Settings32,
-      title: 'Store settings',
-      href: `/stores/${store.slug}/settings`,
-    },
-    {
       icon: OrderDetails32,
       title: 'Orders',
       href: `/stores/${store.slug}/orders`,
     },
     {
+      icon: UserAvatar32,
+      title: 'Customers',
+      href: `/stores/${store.slug}/customers`,
+    },
+    {
       icon: ColorPalette32,
       title: 'Customize storefront',
       href: `/stores/${store.slug}/customization`,
+    },
+    {
+      icon: Settings32,
+      title: 'Store settings',
+      href: `/stores/${store.slug}/settings`,
     },
   ]
 

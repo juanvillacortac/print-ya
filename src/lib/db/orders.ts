@@ -47,6 +47,7 @@ export const getOrder = (orderId: string): Promise<Order | null> =>
       id: orderId,
     },
     include: {
+      customer: true,
       fees: {
         select: {
           name: true,

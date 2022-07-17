@@ -17,6 +17,7 @@
     Product24,
     ColorPalette24,
     OrderDetails24,
+    UserAvatar24,
   } from 'carbon-icons-svelte'
   import Favicons from '$lib/components/Favicons.svelte'
   import { pageSubtitle } from '$lib/stores'
@@ -70,6 +71,11 @@
         icon: OrderDetails24,
         title: 'Orders',
         href: `/stores/${store?.slug}/orders`,
+      },
+      {
+        icon: UserAvatar24,
+        title: 'Customers',
+        href: `/stores/${store?.slug}/customers`,
       },
       {
         icon: ColorPalette24,

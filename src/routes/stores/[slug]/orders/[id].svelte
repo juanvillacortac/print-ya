@@ -39,6 +39,8 @@
     Add16,
     Checkmark16,
     Close16,
+    FaceDizzy32,
+    Launch16,
     Map16,
     Pen16,
     Subtract16,
@@ -964,6 +966,77 @@
             {/if}
           </div>
         </div>
+      </div>
+      <div
+        class="bg-white border rounded-lg flex flex-col space-y-4 border-gray-300 w-full p-4 top-0 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
+      >
+        <div class="flex w-full items-center justify-between">
+          <h4 class="font-bold font-title text-black dark:text-white">
+            Customer details
+          </h4>
+          {#if order.customer}
+            <div class="flex space-x-2 items-center">
+              <a
+                class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
+                href="/stores/{$page.stuff.store
+                  ?.slug}/customers/{order.customerId}"
+                title="Go to customer page"
+                use:tooltip
+              >
+                <Launch16 class="flex" />
+              </a>
+            </div>
+          {/if}
+        </div>
+        <div
+          class="border rounded-full flex font-bold font-title mx-auto from-green-300 to-pink-600 border-gray-500 h-72px text-4xl leading-[0] w-72px items-center justify-center uppercase dark:bg-gray-600 dark:from-green-400 dark:to-pink-700"
+          class:!border-gray-200={order.customer}
+          class:bg-gradient-to-br={order.customer}
+          class:text-white={order.customer}
+        >
+          {#if order.customer}
+            {order.customer.firstName[0]}
+          {:else}
+            <FaceDizzy32 />
+          {/if}
+        </div>
+        <p class="font-bold font-title text-black text-center dark:text-white">
+          {#if order.customer}
+            {order.customer.firstName}
+            {order.customer.lastName}
+            <br />
+            <a
+              class="font-normal text-xs hover:underline"
+              href="mailto:{order.customer.email}">{order.customer.email}</a
+            >
+          {:else}
+            Not registered
+          {/if}
+        </p>
+        {#if order.customer}
+          <div class="flex w-full items-center justify-between">
+            <p
+              class="font-bold font-title text-black text-left text-xs dark:text-white"
+            >
+              Registered at
+              <br />
+              <span class="font-normal"
+                >{order.customer.createdAt.toLocaleString()}</span
+              >
+            </p>
+            <p
+              class="font-bold font-title text-black text-right text-xs dark:text-white"
+            >
+              Phone number
+              <br />
+              <a
+                class="font-normal hover:underline"
+                href="tel:{order.customer.phoneNumber}"
+                >{order.customer.phoneNumber}</a
+              >
+            </p>
+          </div>
+        {/if}
       </div>
     </div>
   </div>

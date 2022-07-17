@@ -1,7 +1,7 @@
 import { prisma } from './common'
 import bcrypt from 'bcryptjs'
 import type { RequestEvent } from '@sveltejs/kit/types/internal'
-import type { Customer } from '@prisma/client'
+import type { Customer, Prisma } from '@prisma/client'
 
 async function hashPassword(password: string): Promise<string> {
   const saltRounds = 15
@@ -9,6 +9,83 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
+
+export async function getCustomers({
+  storeId,
+  filter,
+  orderBy = {
+    createdAt: 'desc',
+  },
+  page = 1,
+  pageSize = 20,
+}: {
+  storeId: string
+  filter?: {
+    name?: string
+    email?: string
+  }
+  orderBy?: {
+    id?: 'desc' | 'asc'
+    firstName?: 'desc' | 'asc'
+    lastName?: 'desc' | 'asc'
+    email?: 'desc' | 'asc'
+    createdAt?: 'desc' | 'asc'
+  }
+  page?: number
+  pageSize?: number
+}) {
+  const segments = filter?.name?.split(' ') || []
+  const isFullSearch = segments.length > 1
+  const where: Prisma.CustomerWhereInput = {
+    storeId,
+    email: filter?.email
+      ? {
+          contains: filter.email,
+        }
+      : undefined,
+    OR: filter?.name
+      ? [
+          {
+            id: {
+              startsWith: filter.name,
+            },
+          },
+          {
+            email: {
+              startsWith: filter.name,
+            },
+          },
+          {
+            firstName: {
+              startsWith: isFullSearch ? segments[0] : filter.name,
+            },
+          },
+          {
+            lastName: {
+              startsWith: isFullSearch ? segments[1] : filter.name,
+            },
+          },
+        ]
+      : undefined,
+  }
+  const [count, customers] = await prisma.$transaction([
+    prisma.customer.count({ where }),
+    prisma.customer.findMany({
+      where,
+      orderBy,
+      take: pageSize,
+      skip: pageSize * Math.max(page - 1, 0),
+      include: {
+        _count: {
+          select: {
+            orders: true,
+          },
+        },
+      },
+    }),
+  ])
+  return { count, customers }
+}
 
 export async function loginCustomer({
   email,

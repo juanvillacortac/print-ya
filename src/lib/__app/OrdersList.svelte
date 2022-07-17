@@ -21,6 +21,8 @@
   export let orders: StrippedOrder[] | undefined = undefined
   export let customerId: string | undefined = undefined
 
+  export let small = false
+
   const calcFee = (fee: OrderFee, base: number) =>
     base * ((fee.percentage || 0) / 100) + (fee.fixed || 0)
   const totalFees = (fees: OrderFee[], base: number) =>
@@ -148,7 +150,7 @@
 </script>
 
 <div
-  class="border rounded-lg flex flex-col space-y-4 bg-gray-50 border-gray-300 p-4 dark:bg-gray-800 dark:border-gray-800"
+  class="border rounded-lg flex flex-col space-y-4 bg-gray-50 border-gray-300 p-4 dark:bg-gray-800 dark:border-gray-600"
 >
   <div
     class="flex flex-wrap text-sm w-full text-gray-500 gap-4 items-center !font-bold"
@@ -328,35 +330,37 @@
                   {o.createdAt.toLocaleString()}
                 </p>
               </div>
-              <div class="flex w-full justify-between items-center">
-                {#if o.customer}
-                  <a
-                    href="/stores/{$page.stuff.store?.slug}/customers/{o
-                      .customer.id}"
-                    class="font-bold space-x-2 text-sm text-gray-800 inline-flex items-center dark:text-white hover:underline"
-                  >
-                    <span>
-                      {o.customer.firstName}
-                      {o.customer.lastName}
-                    </span>
-                    <Launch16 class="inline-flex" />
-                  </a>
-                {:else}
-                  <p class="text-sm">
-                    {#if o.billingData}
-                      {o.billingData.firstName} {o.billingData.lastName}
-                    {:else}
-                      N/A
-                    {/if}
+              {#if !customerId}
+                <div class="flex w-full justify-between items-center">
+                  {#if o.customer}
+                    <a
+                      href="/stores/{$page.stuff.store?.slug}/customers/{o
+                        .customer.id}"
+                      class="font-bold space-x-2 text-sm text-gray-800 inline-flex items-center dark:text-white hover:underline"
+                    >
+                      <span>
+                        {o.customer.firstName}
+                        {o.customer.lastName}
+                      </span>
+                      <Launch16 class="inline-flex" />
+                    </a>
+                  {:else}
+                    <p class="text-sm">
+                      {#if o.billingData}
+                        {o.billingData.firstName} {o.billingData.lastName}
+                      {:else}
+                        N/A
+                      {/if}
+                    </p>
+                  {/if}
+                  <p class="font-bold text-xs text-gray-800 dark:text-white">
+                    ${getTotal(o).toLocaleString('en', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </p>
-                {/if}
-                <p class="font-bold text-xs text-gray-800 dark:text-white">
-                  ${getTotal(o).toLocaleString('en', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
+                </div>
+              {/if}
               <div class="flex w-full justify-between items-center">
                 <div class="flex space-x-2 items-center">
                   <p
@@ -394,9 +398,13 @@
               <th scope="col" class="py-3 px-6"> Order Id </th>
               <th scope="col" class="py-3 px-6"> Status </th>
               <th scope="col" class="py-3 px-6"> Fulfillment Status </th>
-              <th scope="col" class="py-3 px-6"> Customer </th>
+              {#if !customerId}
+                <th scope="col" class="py-3 px-6"> Customer </th>
+              {/if}
               <th scope="col" class="text-right py-3 px-6"> Order total </th>
-              <th scope="col" class="text-right py-3 px-6"> Revenue </th>
+              {#if !small}
+                <th scope="col" class="text-right py-3 px-6"> Revenue </th>
+              {/if}
               <th scope="col" class="py-3 px-6"> Order date </th>
               <th scope="col" class="text-center py-3 px-6"> Order items </th>
               <th scope="col" class="text-center py-3 px-6"> Actions </th>
@@ -413,7 +421,7 @@
                   scope="row"
                   class="font-bold py-4 px-6 text-gray-900 whitespace-nowrap dark:text-white"
                 >
-                  <div class="flex w-15ch">
+                  <div class="flex w-12ch">
                     <p
                       class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
                       title="Copy to clipboard"
@@ -447,31 +455,33 @@
                     </p>
                   </div>
                 </td>
-                <td>
-                  <div class="flex w-full py-4 px-6">
-                    {#if o.customer}
-                      <a
-                        href="/stores/{$page.stuff.store?.slug}/customers/{o
-                          .customer.id}"
-                        class="font-bold space-x-2 text-xs text-gray-800 inline-flex items-center dark:text-white hover:underline"
-                      >
-                        <span>
-                          {o.customer.firstName}
-                          {o.customer.lastName}
-                        </span>
-                        <Launch16 class="inline-flex" />
-                      </a>
-                    {:else}
-                      <p class="font-bold text-xs w-full">
-                        {#if o.billingData}
-                          {o.billingData.firstName} {o.billingData.lastName}
-                        {:else}
-                          N/A
-                        {/if}
-                      </p>
-                    {/if}
-                  </div>
-                </td>
+                {#if !customerId}
+                  <td>
+                    <div class="flex w-full py-4 px-6">
+                      {#if o.customer}
+                        <a
+                          href="/stores/{$page.stuff.store?.slug}/customers/{o
+                            .customer.id}"
+                          class="font-bold space-x-2 text-xs text-gray-800 inline-flex items-center dark:text-white hover:underline"
+                        >
+                          <span>
+                            {o.customer.firstName}
+                            {o.customer.lastName}
+                          </span>
+                          <Launch16 class="inline-flex" />
+                        </a>
+                      {:else}
+                        <p class="font-bold text-xs w-full">
+                          {#if o.billingData}
+                            {o.billingData.firstName} {o.billingData.lastName}
+                          {:else}
+                            N/A
+                          {/if}
+                        </p>
+                      {/if}
+                    </div>
+                  </td>
+                {/if}
                 <td>
                   <div class="flex w-full py-4 px-6">
                     <p class="font-bold text-xs text-right w-full">
@@ -482,23 +492,25 @@
                     </p>
                   </div>
                 </td>
-                <td>
-                  <div class="flex w-full py-4 px-6">
-                    <p class="font-bold text-xs text-right w-full">
-                      {#if o.status === 'paid'}
-                        ${Math.max(
-                          0,
-                          getTotal(o) - totalFees(o.fees, getTotal(o))
-                        ).toLocaleString('en', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      {:else}
-                        N/A
-                      {/if}
-                    </p>
-                  </div>
-                </td>
+                {#if !small}
+                  <td>
+                    <div class="flex w-full py-4 px-6">
+                      <p class="font-bold text-xs text-right w-full">
+                        {#if o.status === 'paid'}
+                          ${Math.max(
+                            0,
+                            getTotal(o) - totalFees(o.fees, getTotal(o))
+                          ).toLocaleString('en', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        {:else}
+                          N/A
+                        {/if}
+                      </p>
+                    </div>
+                  </td>
+                {/if}
                 <td>
                   <div class="flex py-4 px-6">
                     <p class="font-bold text-xs">

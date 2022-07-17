@@ -4,6 +4,8 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import type { tRPCContext } from '.'
 
+const order = z.enum(['desc', 'asc'])
+
 export default trpc
   .router<tRPCContext>()
   .mutation('logout', {
@@ -79,6 +81,33 @@ export default trpc
         })
       }
     },
+  })
+  .query('list', {
+    input: z.object({
+      storeId: z.string().cuid(),
+      filter: z
+        .object({
+          name: z.string().optional(),
+          email: z.string().email().optional(),
+        })
+        .optional(),
+      orderBy: z
+        .object({
+          id: order.optional(),
+          firstName: order.optional(),
+          lastName: order.optional(),
+          email: order.optional(),
+          createdAt: order.optional(),
+        })
+        .optional(),
+      page: z.number().int().min(1).optional(),
+      pageSize: z.number().int().min(1).optional(),
+    }),
+    resolve: ({ input }) => db.getCustomers(input),
+  })
+  .query('get', {
+    input: z.string().cuid(),
+    resolve: async ({ input }) => db.getCustomer({ customerId: input }),
   })
   .query('whoami', {
     resolve: async ({ ctx }) => {

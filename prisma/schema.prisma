@@ -36,6 +36,8 @@ model Customer {
   accounts  Account[]
   store     Store?            @relation(fields: [storeId], references: [id])
   storeId   String?
+
+  createdAt DateTime @default(now())
 }
 
 enum CustomerAddressType {
