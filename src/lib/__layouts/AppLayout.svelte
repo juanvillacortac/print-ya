@@ -102,6 +102,7 @@
 
   let el: HTMLDivElement | undefined
   let gradientVisible = false
+  let navHeight = 0
 
   $: if (el) {
     gradientVisible = el.clientWidth < el.scrollWidth
@@ -134,6 +135,7 @@
         <div
           class="w-full overflow-auto relative no-scrollbar"
           bind:this={el}
+          bind:clientHeight={navHeight}
           on:scroll={scroll}
         >
           <div class="flex space-x-4 m-4 w-full">
@@ -400,7 +402,9 @@
           </div>
         {/if}
         <Transition url={$page.url.pathname}>
-          <slot />
+          <div class="<lg:pb-$nh" style:--nh="{navHeight}px">
+            <slot />
+          </div>
         </Transition>
       </div>
     </div>
