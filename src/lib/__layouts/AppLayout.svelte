@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { page, session } from '$app/stores'
   import { preferences } from '$lib'
   import { notifications } from '$lib/components/notifications'
@@ -99,6 +99,18 @@
   $: pageTitle = (subtitle ? subtitle + ' | ' : '') + 'ShackCart'
 
   let sidebar = false
+
+  let el: HTMLDivElement | undefined
+  let gradientVisible = false
+
+  $: if (el) {
+    gradientVisible = el.clientWidth < el.scrollWidth
+  }
+
+  const scroll = () => {
+    if (!el) return
+    gradientVisible = el.offsetWidth + el.scrollLeft < el?.scrollWidth
+  }
 </script>
 
 <svelte:head>
@@ -111,10 +123,114 @@
   <div class="flex flex-col h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
       <div
+        class="bg-white border-t flex flex-col border-light-900 w-full  bottom-0 left-0 text-gray-400 z-60 fixed justify-between sm:hidden dark:bg-gray-900 dark:border-gray-700"
+      >
+        {#if gradientVisible}
+          <div
+            class="bg-gradient-to-r from-transparent to-white h-full top-0 right-0 w-96px z-20 absolute pointer-events-none dark:to-gray-900"
+            transition:fly|local={{ x: 10, duration: 200 }}
+          />
+        {/if}
+        <div
+          class="w-full overflow-auto relative no-scrollbar"
+          bind:this={el}
+          on:scroll={scroll}
+        >
+          <div class="flex space-x-4 m-4 w-full">
+            <a
+              class="flex h-24px min-h-24px min-w-24px w-24px relative items-center justify-center"
+              href="/"
+              title="Home"
+              use:tooltip
+            >
+              <div
+                class="rounded-lg h-auto bg-gray-100 -left-4px w-[calc(100%+8px)] absolute dark:bg-gray-800"
+                style="aspect-ratio: 1/1"
+                use:squareratio
+              />
+
+              <svg
+                viewBox="0 0 50 39"
+                class="h-full m-auto w-full relative"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M16.4992 2H37.5808L22.0816 24.9729H1L16.4992 2Z"
+                  class="ccompli1  !dark:fill-white"
+                  fill="#007AFF"
+                />
+                <path
+                  d="M17.4224 27.102L11.4192 36H33.5008L49 13.0271H32.7024L23.2064 27.102H17.4224Z"
+                  class="ccustom  !dark:fill-white"
+                  fill="#312ECB"
+                />
+              </svg>
+              <!-- <h1
+              class="font-logo font-black text-transparent text-center text-2xl select-none pointer-events-none rainbow-bg relative !bg-clip-text"
+            >
+              PY!
+            </h1> -->
+            </a>
+            {#each store ? pages['stores'] : pages['none'] as p (p.href)}
+              {@const current =
+                p.href === '/' || p.href === `/stores/${store?.slug}`
+                  ? path === '/' || path === `/stores/${store?.slug}`
+                  : path?.startsWith(p.href)}
+              <a
+                title={p.title}
+                use:tooltip
+                class="flex hover:text-black dark:hover:text-white"
+                in:scale|local={{ start: 0.8, duration: 400, easing: expoOut }}
+                sveltekit:prefetch
+                class:text-black={current}
+                class:dark:text-white={current}
+                href={p.href}
+                style="width: 24px; height: 24px"
+                on:click={() => (sidebar = false)}
+              >
+                <div class="flex space-x-2">
+                  <svelte:component this={p.icon} />
+                </div>
+              </a>
+            {/each}
+            <button
+              on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
+              class="flex relative hover:text-black dark:hover:text-white"
+              title="Toggle theme"
+              use:tooltip
+              style="min-width: 24px; min-height: 24px"
+            >
+              <div class="absolute pointer-events-none">
+                <svelte:component
+                  this={$preferences.darkMode ? Moon24 : Sun24}
+                />
+              </div>
+            </button>
+            <button
+              on:click={() => {
+                trpc()
+                  .mutation('user:logout')
+                  .then(() => {
+                    notifications.send('Log out successfully', 'default', 1000)
+                    window.location.replace('/login')
+                  })
+              }}
+              class="flex relative hover:text-black dark:hover:text-white"
+              title="Log out"
+              use:tooltip
+              style="min-width: 24px; min-height: 24px"
+            >
+              <Logout24 />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
         class="bg-white border-r flex flex-col h-full  border-light-900 p-4 text-gray-400 z-60 justify-between sidebar dark:bg-gray-900 dark:border-gray-700"
         class:open={sidebar}
       >
-        <div
+        <!-- <div
           class="opacity-50 right-[calc(-52px-16px)] bottom-4 absolute sm:hidden"
         >
           <button
@@ -125,7 +241,7 @@
               class="transform duration-400 {!sidebar ? 'rotate-180' : ''}"
             />
           </button>
-        </div>
+        </div> -->
         <div class="flex flex-col h-full space-y-6">
           <a
             class="flex h-24px w-24px relative items-center justify-center"
