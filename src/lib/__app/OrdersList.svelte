@@ -310,7 +310,7 @@
               <div class="flex w-full items-center justify-between">
                 <div class="flex space-x-2 items-center">
                   <p
-                    class="rounded cursor-pointer font-normal bg-gray-100 text-xs text-white p-1 transform text-gray-80 whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible"
+                    class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform text-gray-800 text-gray-80 whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 dark:text-white hover:overflow-visible"
                     title="Copy to clipboard"
                     on:click={() => navigator.clipboard.writeText(o.id)}
                     use:tooltip
