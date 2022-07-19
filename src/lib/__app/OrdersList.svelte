@@ -20,6 +20,8 @@
 
   export let orders: StrippedOrder[] | undefined = undefined
   export let customerId: string | undefined = undefined
+  export let urlPrefix: string
+  export let load = true
 
   export let small = false
 
@@ -128,7 +130,7 @@
     wait = false
   }
 
-  $: if (browser) {
+  $: if (browser && load) {
     search(idSearch, filter, sortBy, customerId)
   }
 
@@ -305,7 +307,7 @@
             <button
               class="flex flex-col space-y-2 w-full p-2 text-gray-700 dark:text-gray-400"
               on:click={() =>
-                goto(`/stores/${$page.stuff.store?.slug}/orders/${o.id}`)}
+                goto(`${urlPrefix}/${o.id}`)}
             >
               <div class="flex w-full items-center justify-between">
                 <div class="flex space-x-2 items-center">

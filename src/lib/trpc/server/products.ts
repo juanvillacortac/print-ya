@@ -23,7 +23,7 @@ const queries = trpc
       public: z.boolean().optional(),
     }),
     resolve: async ({ input }) => {
-      const store = await db.getStoreBySlugOrHost({ slug: input.storeSlug })
+      const store = await db.getStore({ slug: input.storeSlug })
       if (!store) {
         return []
       }
@@ -39,7 +39,7 @@ const queries = trpc
       storeSlug: z.string(),
     }),
     resolve: async ({ input }) => {
-      const store = await db.getStoreBySlugOrHost({ slug: input.storeSlug })
+      const store = await db.getStore({ slug: input.storeSlug })
       if (!store) {
         return []
       }
@@ -61,7 +61,7 @@ const queries = trpc
       productSlug: z.string(),
     }),
     resolve: async ({ input }) => {
-      const store = await db.getStoreBySlugOrHost({ slug: input.storeSlug })
+      const store = await db.getStore({ slug: input.storeSlug })
       if (!store) {
         return null
       }

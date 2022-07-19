@@ -16,6 +16,7 @@
 <script lang="ts">
   import { pageSubtitle } from '$lib'
   import OrdersList from '$lib/__app/OrdersList.svelte'
+  import { page } from '$app/stores'
 
   $pageSubtitle = 'Sales orders'
 </script>
@@ -24,5 +25,5 @@
   <h3 class="font-bold font-title text-black mb-4 text-2xl dark:text-white">
     Sales orders
   </h3>
-  <OrdersList />
+  <OrdersList urlPrefix="/stores/{$page.stuff.store?.slug}/orders" />
 </div>

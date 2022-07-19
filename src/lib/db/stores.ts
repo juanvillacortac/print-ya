@@ -23,15 +23,18 @@ export const getUserStores = ({
     },
   })
 
-export const getStoreBySlugOrHost = async ({
+export const getStore = async ({
+  id,
   slug,
   host: customDomain,
 }: {
+  id?: string
   slug?: string
   host?: string
 }): Promise<Store | null> => {
   const store = await prisma.store.findUnique({
     where: {
+      id,
       slug,
       customDomain,
     },

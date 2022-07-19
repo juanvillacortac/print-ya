@@ -38,12 +38,22 @@
   import type { BagItem } from '$lib'
   import { getTotalFromProductModifiers } from '$lib/utils/modifiers'
   import { page } from '$app/stores'
-  import { customer } from '$lib/stores'
+  import { customer, redisWritable } from '$lib/stores'
 
   const countries = getCountries()
 
   let stripe: Stripe | null
   let paypal: PayPalNamespace | null
+
+  const stripeKey = redisWritable<string | undefined>(
+    undefined,
+    `stripe:public-key:${$page.stuff.store?.id}`
+  )
+  const paypalKey = redisWritable<string | undefined>(
+    undefined,
+    `paypal:client-id:${$page.stuff.store?.id}`
+  )
+
   onMount(async () => {
     stripe = await loadStripe(
       'pk_test_51I7RL6J2WplztltUdJyNQb1xLxVbXhB6QUu3R753Vuxq1xatD8cpU49K5m3q0fPfnK4ayhMPfg8xjLxxbrVqHjG600IC5Q2yzL'
@@ -457,7 +467,7 @@
           </button>
           <div class="font-title font-bold text-2xl">Checkout</div>
         </div>
-        {#if done || done == 0}
+        {#if (done || done == 0) && order}
           <div
             class="flex flex-col h-full space-y-4 w-full items-center justify-center"
           >
@@ -484,17 +494,35 @@
               Thank you!
             </p>
             <p
-              class="font-bold text-center"
+              class="font-bold text-center w-9/10"
               in:fly={{
                 delay: 300,
                 duration: 400,
                 y: '1.5rem',
               }}
             >
-              Your checkout for ${done.toLocaleString('en', {
+              Your order <span
+                class="rounded font-mono font-bold bg-gray-700 text-xs leading-none p-[0.2rem]"
+                >#{order.id}</span
+              >
+              for ${done.toLocaleString('en', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              })} was sucesfully payed
+              })} was succesfully placed
+            </p>
+            <p
+              class="text-sm text-center text-gray-500 w-9/10"
+              in:fly={{
+                delay: 400,
+                duration: 400,
+                y: '1.5rem',
+              }}
+            >
+              We have just sent you an email with details about the order. You
+              can also track the order <a
+                class="text-blue-500 hover:underline"
+                href="/account/orders/{order.id}">here</a
+              >
             </p>
           </div>
         {:else}

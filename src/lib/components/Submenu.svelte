@@ -34,11 +34,11 @@
     will-change: transform;
   }
   .bottom .body {
-    bottom: -100%;
+    top: 100%;
   }
 
   .top .body {
-    top: -100%;
+    bottom: 100%;
   }
 
   .wrapper:not(:hover) > .body {

@@ -3,6 +3,8 @@ import * as trpc from '@trpc/server'
 import { z } from 'zod'
 import type { tRPCContext } from '.'
 import { get } from '$lib/api'
+import sendgrid from '@sendgrid/mail'
+import { getAbsoluteURL } from '$lib/utils/host'
 
 const orderStatus = z.enum(['paid', 'processing', 'pending'])
 const fulfillmentStatus = z.enum([
@@ -97,7 +99,50 @@ const mutations = trpc
         )
         .optional(),
     }),
-    resolve: async ({ input }) => db.updateOrder(input),
+    resolve: async ({ input }) => {
+      if (input.status === 'paid') {
+        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        const order = await db.getOrder(input.id)
+        if (!order) {
+          return null
+        }
+        const store = await db.getStore({ id: order.storeId })
+        if (!store) {
+          return null
+        }
+        let recipient = order.billingData.email
+        if (order.customer) {
+          recipient = order.customer.email
+        }
+        const orderUrl = getAbsoluteURL({
+          path: `/account/orders/${order.id}`,
+          subdomain: !store.customDomain ? store.slug : undefined,
+          host: store.customDomain || undefined,
+        })
+        const ordersUrl = getAbsoluteURL({
+          path: `/account/orders`,
+          subdomain: !store.customDomain ? store.slug : undefined,
+          host: store.customDomain || undefined,
+        })
+        const html = `<p><strong>Hello, ${
+          order.customer?.firstName || order.billingData.firstName
+        }</strong></p>
+<p>Thank you for placing an order on <strong>${store.name}</strong></p>
+<p>We've successfully received your order <a href="${orderUrl}">#${
+          order.id
+        }</a></p>
+<p>To view the status of this order, visit <a href="${orderUrl}">the order page</a>.</p>
+<p>Manage your orders <a href="${ordersUrl}">here</a>.</p>`
+        const msg = {
+          to: recipient,
+          from: `${store.slug}@shackcart.com`,
+          subject: `Order #${order.id} | Thanks for shopping with us!`,
+          html,
+        }
+        await sendgrid.send(msg)
+      }
+      return await db.updateOrder(input)
+    },
   })
 
 const order = z.enum(['desc', 'asc'])

@@ -47,11 +47,11 @@ const queries = trpc
   .router<tRPCContext>()
   .query('getBySlug', {
     input: z.string(),
-    resolve: ({ input }) => db.getStoreBySlugOrHost({ slug: input }),
+    resolve: ({ input }) => db.getStore({ slug: input }),
   })
   .query('getByHost', {
     input: z.string(),
-    resolve: ({ input }) => db.getStoreBySlugOrHost({ host: input }),
+    resolve: ({ input }) => db.getStore({ host: input }),
   })
 
 const payment = trpc.router<tRPCContext>().mutation('createStripeIntent', {

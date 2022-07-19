@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit'
 import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
 import { fetchLayoutData } from '$lib/utils/layout'
-import { getStoreBySlugOrHost, type Store } from '$lib/db'
+import { getStore, type Store } from '$lib/db'
 
 export const get: RequestHandler = async (event) => {
   let layout = event.locals.layout
@@ -10,13 +10,13 @@ export const get: RequestHandler = async (event) => {
   )
   let store: Store | null = null
   if (layout === 'store') {
-    store = await getStoreBySlugOrHost({ host: event.url.host })
+    store = await getStore({ host: event.url.host })
     if (!store) {
       let slug = event.url.searchParams.get('store')
       if (!slug) {
         slug = event.url.host.split('.')[0]
       }
-      store = await getStoreBySlugOrHost({ slug })
+      store = await getStore({ slug })
     }
   }
   const icon = store?.favicon || '/images/logo.svg'
