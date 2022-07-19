@@ -72,6 +72,7 @@
   export let products: Record<string, Product>
   export let items: BagItem[]
   let order: Order | undefined
+  let placedOrder: Order | undefined
 
   let billing: Record<string, any> = {}
   let shipping: Record<string, any> = {}
@@ -317,7 +318,7 @@
     }
     done = event.amount
     try {
-      await trpc().mutation('orders:update', {
+      placedOrder = (await trpc().mutation('orders:update', {
         id: order?.id,
         paymentMethods: [event.method],
         status: 'paid',
@@ -331,7 +332,7 @@
                 },
               ]
             : [],
-      })
+      }))!
     } catch (err) {
       console.error(err)
     } finally {
@@ -467,7 +468,7 @@
           </button>
           <div class="font-title font-bold text-2xl">Checkout</div>
         </div>
-        {#if (done || done == 0) && order}
+        {#if (done || done == 0) && placedOrder}
           <div
             class="flex flex-col h-full space-y-4 w-full items-center justify-center"
           >
@@ -503,7 +504,7 @@
             >
               Your order <span
                 class="rounded font-mono font-bold bg-gray-700 text-xs leading-none p-[0.2rem]"
-                >#{order.id}</span
+                >#{placedOrder.id}</span
               >
               for ${done.toLocaleString('en', {
                 minimumFractionDigits: 2,
@@ -518,10 +519,16 @@
                 y: '1.5rem',
               }}
             >
-              We have just sent you an email with details about the order. You
-              can also track the order <a
+              We have just sent an email to <span class="font-bold"
+                >{placedOrder.customer?.email ||
+                  placedOrder.billingData.email}</span
+              >
+              with details about the order. You can also track the order
+              <a
                 class="text-blue-500 hover:underline"
-                href="/account/orders/{order.id}">here</a
+                href="/account/orders/{placedOrder.id}{placedOrder.token
+                  ? `?token=${placedOrder.token}`
+                  : ''}">here</a
               >
             </p>
           </div>

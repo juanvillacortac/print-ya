@@ -6,7 +6,7 @@
 </script>
 
 {#if disabled}
-  <p class="text-xs">{value.value}</p>
+  <p class="text-xs">{value.value || 'N/A'}</p>
 {:else}
   <input
     type="text"

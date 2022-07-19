@@ -306,8 +306,7 @@
           {#each orders as o, idx}
             <button
               class="flex flex-col space-y-2 w-full p-2 text-gray-700 dark:text-gray-400"
-              on:click={() =>
-                goto(`${urlPrefix}/${o.id}`)}
+              on:click={() => goto(`${urlPrefix}/${o.id}`)}
             >
               <div class="flex w-full items-center justify-between">
                 <div class="flex space-x-2 items-center">
@@ -374,6 +373,14 @@
                   </p>
                   <p class="text-xs">{o.items?.length || 0} items</p>
                 </div>
+                {#if customerId}
+                  <p class="font-bold text-xs text-gray-800 dark:text-white">
+                    ${getTotal(o).toLocaleString('en', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                {:else}
                 <p class="text-xs">
                   Revenue: <span class="font-bold text-gray-800 dark:text-white"
                     >${Math.max(
@@ -385,6 +392,7 @@
                     })}</span
                   >
                 </p>
+                {/if}
               </div>
             </button>
           {/each}
@@ -532,7 +540,7 @@
                     <a
                       class="border-transparent rounded flex mx-auto border-2 p-1 duration-200 hover:border-gray-300 dark:hover:border-gray-500"
                       title="View order"
-                      href="/stores/{$page.stuff.store?.slug}/orders/{o.id}"
+                      href="{urlPrefix}/{o.id}"
                       use:tooltip
                       type="button"><Launch16 class="flex" /></a
                     >

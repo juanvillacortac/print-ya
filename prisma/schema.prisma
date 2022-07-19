@@ -203,6 +203,8 @@ model Order {
   items OrderItem[]
   fees  OrderFee[]
 
+  token String?
+
   status            OrderStatus       @default(pending)
   fulfillmentStatus FulfillmentStatus @default(unfulfilled)
   total             Float             @default(0)

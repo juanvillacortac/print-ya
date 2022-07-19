@@ -247,9 +247,7 @@
                         <p class="font-bold text-xs text-black dark:text-white">
                           Cost
                         </p>
-                        <p
-                          class="text-sm fontRob had a birthday yesterday as well?-bold"
-                        >
+                        <p class="font-bold text-sm">
                           ${p?.price.toLocaleString('en', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,

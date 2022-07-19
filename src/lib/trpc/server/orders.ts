@@ -5,6 +5,7 @@ import type { tRPCContext } from '.'
 import { get } from '$lib/api'
 import sendgrid from '@sendgrid/mail'
 import { getAbsoluteURL } from '$lib/utils/host'
+import type { Order } from '$lib/db'
 
 const orderStatus = z.enum(['paid', 'processing', 'pending'])
 const fulfillmentStatus = z.enum([
@@ -100,6 +101,7 @@ const mutations = trpc
         .optional(),
     }),
     resolve: async ({ input }) => {
+      let updated: Order
       if (input.status === 'paid') {
         sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
         const order = await db.getOrder(input.id)
@@ -111,11 +113,15 @@ const mutations = trpc
           return null
         }
         let recipient = order.billingData.email
+        const token = !order.customer
+          ? crypto.randomUUID().replace(new RegExp('-', 'g'), '').toLowerCase()
+          : undefined
         if (order.customer) {
           recipient = order.customer.email
         }
+        updated = (await db.updateOrder({ ...input, token }))!
         const orderUrl = getAbsoluteURL({
-          path: `/account/orders/${order.id}`,
+          path: `/account/orders/${order.id}${token ? `?token=${token}` : ''}`,
           subdomain: !store.customDomain ? store.slug : undefined,
           host: store.customDomain || undefined,
         })
@@ -132,7 +138,11 @@ const mutations = trpc
           order.id
         }</a></p>
 <p>To view the status of this order, visit <a href="${orderUrl}">the order page</a>.</p>
-<p>Manage your orders <a href="${ordersUrl}">here</a>.</p>`
+${
+  order.customer
+    ? `<p>Manage your orders <a href="${ordersUrl}">here</a>.</p>`
+    : ''
+}`
         const msg = {
           to: recipient,
           from: `${store.slug}@shackcart.com`,
@@ -140,8 +150,10 @@ const mutations = trpc
           html,
         }
         await sendgrid.send(msg)
+      } else {
+        updated = (await db.updateOrder(input))!
       }
-      return await db.updateOrder(input)
+      return updated
     },
   })
 
@@ -173,8 +185,9 @@ const queries = trpc
   .query('get', {
     input: z.object({
       orderId: z.string(),
+      token: z.string().optional(),
     }),
-    resolve: async ({ input }) => db.getOrder(input.orderId),
+    resolve: async ({ input }) => db.getOrder(input.orderId, input.token),
   })
 
 export default trpc.router<tRPCContext>().merge(mutations).merge(queries)

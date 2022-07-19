@@ -50,12 +50,9 @@ const logic: Handle = async ({ event, resolve }) => {
   console.log(event.locals.session.data)
 
   if (
-    (isAppPage &&
-      !event.locals.session?.data?.userId &&
-      event.url.pathname !== '/login') ||
-    (!isAppPage &&
-      !event.locals.session.data?.customerId &&
-      event.url.pathname.startsWith('/account'))
+    isAppPage &&
+    !event.locals.session?.data?.userId &&
+    event.url.pathname !== '/login'
   ) {
     return Response.redirect(
       `${getDefaultHost() === 'localhost:3000' ? 'http://' : 'https://'}${

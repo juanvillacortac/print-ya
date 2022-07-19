@@ -41,10 +41,14 @@ export type StrippedOrder = Overwrite<
   }
 >
 
-export const getOrder = (orderId: string): Promise<Order | null> =>
-  prisma.order.findUnique({
+export const getOrder = (
+  orderId: string,
+  token?: string
+): Promise<Order | null> =>
+  prisma.order.findFirst({
     where: {
       id: orderId,
+      token,
     },
     include: {
       customer: true,
@@ -141,7 +145,10 @@ export const createOrder = async ({
   storeId,
 }: {
   order: Overwrite<
-    Omit<Order, 'id' | 'createdAt' | 'storeId' | 'total' | 'customer'>,
+    Omit<
+      Order,
+      'id' | 'createdAt' | 'storeId' | 'total' | 'customer' | 'token'
+    >,
     {
       fulfillmentStatus?: Order['fulfillmentStatus']
       paymentMethods?: string[]
@@ -280,6 +287,7 @@ export const updateOrder = async (
     data: {
       paymentMethods: order.paymentMethods,
       status: order.status,
+      token: order.token,
       billingData: order.billingData
         ? {
             ...((original?.billingData as any) || {}),
