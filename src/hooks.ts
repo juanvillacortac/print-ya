@@ -108,6 +108,7 @@ const logic: Handle = async ({ event, resolve }) => {
   if (
     event.locals.layout === 'store' &&
     !event.url.pathname.startsWith('/account') &&
+    !event.url.pathname.startsWith('/bag') &&
     !trpc
   ) {
     response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
