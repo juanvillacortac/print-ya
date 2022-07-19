@@ -143,9 +143,16 @@ ${
     ? `<p>Manage your orders <a href="${ordersUrl}">here</a>.</p>`
     : ''
 }`
-        const msg = {
+        const msg: MailDataRequired = {
           to: recipient,
-          from: `${store.slug}@shackcart.com`,
+          from: {
+            name: store?.name!,
+            email: `${store.slug}@shackcart.com`,
+          },
+          headers: {
+            Priority: 'Urgent',
+            Importance: 'high',
+          },
           subject: `Order #${order.id} | Thanks for shopping with us!`,
           html,
         }
@@ -200,6 +207,10 @@ ${
         from: {
           name: store?.name!,
           email: `${store.slug}@shackcart.com`,
+        },
+        headers: {
+          Priority: 'Urgent',
+          Importance: 'high',
         },
         subject: `We noticed you left something in your bag :'(`,
         html,
