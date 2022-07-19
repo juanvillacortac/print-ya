@@ -392,7 +392,7 @@
                   on:click={setFulfillment}
                   >{fulfillmentMode ? 'Save' : 'Set'} fulfillment</button
                 >
-              {:else}
+              {:else if order.status !== 'paid'}
                 <button
                   class="rounded font-bold ml-auto border-2 border-orange-500 text-xs py-1 px-2 text-orange-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-orange-500 not-disabled:hover:text-white"
                   on:click={() => (restoreEmailDialog = true)}

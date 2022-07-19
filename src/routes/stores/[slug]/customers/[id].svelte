@@ -52,7 +52,11 @@
   </h3>
   <div class="w-full grid gap-4 grid-cols-1 lg:grid-cols-10">
     <div class="flex flex-col space-y-4 lg:col-span-7 <lg:row-start-2">
-      <OrdersList customerId={$page.params.id} small />
+      <OrdersList
+        urlPrefix="/stores/{$page.stuff.store?.slug}/orders"
+        customerId={$page.params.id}
+        small
+      />
     </div>
     <div class="flex flex-col h-full space-y-4 w-full relative lg:col-span-3">
       <div
