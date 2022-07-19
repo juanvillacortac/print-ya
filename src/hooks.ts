@@ -79,7 +79,9 @@ const logic: Handle = async ({ event, resolve }) => {
             !(
               p.includes('whoami') ||
               p.includes('login') ||
-              p.includes('register')
+              p.includes('register') ||
+              p.includes('orders') ||
+              p.includes('customer')
             )
         )
         console.log(isPublic)
