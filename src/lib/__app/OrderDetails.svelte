@@ -223,6 +223,18 @@
       closeDialog()
       return
     }
+    const items = order.items.map((item) => {
+      const product = products ? products[item.productId] : null
+      if (!product) {
+        throw new Error("Product can't be restored")
+      }
+      return {
+        product,
+        modifiers: item.modifiers,
+        quantity: item.quantity,
+      }
+    })
+    bag.restoreBag(items)
     goto(`/bag?checkout&order=${order.id}`)
   }
 </script>
