@@ -1,5 +1,8 @@
 /// <reference types="@sveltejs/kit" />
 
+declare const __LOCALHOST_HOST__: string
+declare const __VERCEL_URL__: string
+
 declare namespace App {
   interface Locals {
     layout: import('$lib/utils/layout').LayoutType

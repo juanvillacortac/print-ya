@@ -1,12 +1,16 @@
-export const getDefaultHost: any = () =>
-  import.meta.env.VITE_CANONICAL_HOST || process.env.LOCALHOST_HOST
+export function getDefaultHost(): string {
+  return import.meta.env.VITE_CANONICAL_HOST || __LOCALHOST_HOST__
+}
 
-export const isCanonical = (host?: string) =>
-  (host || window.location.host) === getDefaultHost() ||
-  (host || window.location.host) === process.env.VERCEL_URL ||
-  (host || window.location.host) === 'localhost:3000'
+export function isCanonical(host?: string) {
+  return (
+    (host || window.location.host) === getDefaultHost() ||
+    (host || window.location.host) === __VERCEL_URL__ ||
+    (host || window.location.host) === 'localhost:5173'
+  )
+}
 
-export const getAbsoluteURL = ({
+export function getAbsoluteURL({
   path = '',
   host = getDefaultHost().replace(
     import.meta.env.VITE_APP_HOST_SUBDOMAIN
@@ -15,7 +19,7 @@ export const getAbsoluteURL = ({
     ''
   ),
   subdomain = '',
-}: Partial<Record<'path' | 'host' | 'subdomain', string>> = {}) => {
+}: Partial<Record<'path' | 'host' | 'subdomain', string>> = {}) {
   const isGitpod = host.includes('gitpod.io')
   const hostWithSubdomain =
     subdomain && !isGitpod ? `${subdomain}.${host}` : host
@@ -35,8 +39,8 @@ export const getAbsoluteURL = ({
   }
 }
 
-export const isLocalhost = (host = getDefaultHost()) => {
-  return host?.includes(process.env.LOCALHOST_HOST)
+export function isLocalhost(host = getDefaultHost()) {
+  return host?.includes(__LOCALHOST_HOST__)
   // const splitedHost = host.split('.')
   // return splitedHost
   //   .slice(

@@ -55,7 +55,7 @@ const logic: Handle = async ({ event, resolve }) => {
     event.url.pathname !== '/login'
   ) {
     return Response.redirect(
-      `${getDefaultHost() === 'localhost:3000' ? 'http://' : 'https://'}${
+      `${getDefaultHost() === 'localhost:5173' ? 'http://' : 'https://'}${
         event.url.host
       }/login?callbackUrl=${encodeURIComponent(event.url.pathname)}`,
       303
