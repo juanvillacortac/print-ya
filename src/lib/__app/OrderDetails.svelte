@@ -12,12 +12,14 @@
     Add16,
     Checkmark16,
     Close16,
+    Close24,
     FaceDizzy32,
     Launch16,
     Map16,
     Pen16,
     Subtract16,
     View16,
+    Warning32,
   } from 'carbon-icons-svelte'
   import BagItemDetails from '$lib/__storefront/BagItemDetails.svelte'
   import type { BagItem } from '$lib'
@@ -29,6 +31,11 @@
   import { clamp } from '$lib/utils/math'
   import { pageSubtitle } from '$lib'
   import trpc from '$lib/trpc/client'
+  import { portal } from 'svelte-portal'
+  import { fade, scale } from 'svelte/transition'
+  import { expoOut } from 'svelte/easing'
+  import { bag } from '$lib/stores'
+  import { goto } from '$app/navigation'
 
   const countries = getCountries()
 
@@ -204,11 +211,114 @@
     paypal: PaypalLogo,
   }
 
-  $: console.log(order.items)
+  let restoreDialog = false
+  let restoreEmailDialog = false
+  const closeDialog = () => {
+    restoreDialog = false
+    restoreEmailDialog = false
+  }
+  const restoreOrder = () => {
+    if (restoreEmailDialog) {
+      trpc().mutation('orders:marketing:sendRestoreEmail', order.id)
+      closeDialog()
+      return
+    }
+    goto(`/bag?checkout&order=${order.id}`)
+  }
 </script>
 
 {#if $page.stuff.store}
   <BagItemDetails bind:item={details} store={$page.stuff.store} disabled />
+{/if}
+
+{#if restoreDialog}
+  <div
+    class="flex h-full w-full top-0 z-99 fixed items-center justify-center"
+    use:portal
+  >
+    <div
+      class="bg-black h-full w-full opacity-70 absolute"
+      transition:fade={{ duration: 400, easing: expoOut }}
+      on:click={closeDialog}
+    />
+    <div
+      class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 p-4 relative lg:max-w-4/10 dark:bg-gray-900"
+      style="will-change: transform"
+      transition:scale={{ start: 0.9, duration: 400, easing: expoOut }}
+    >
+      <div class="flex items-center justify-between">
+        <h4 class="font-bold text-xl text-black leading-thight dark:text-white">
+          Warning
+        </h4>
+        <button on:click={closeDialog}><Close24 /></button>
+      </div>
+      <div class="flex space-x-4 items-center">
+        <Warning32 class="h-48px text-red-500 w-48px" />
+        <div class="flex flex-col space-y-2">
+          <p class="font-bold">Do you want to restore this order?</p>
+          <p class="text-sm text-gray-500">Your actual bag may be lost</p>
+        </div>
+      </div>
+      <div class="flex space-x-2 items-center justify-end">
+        <button
+          class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+          on:click={closeDialog}>Cancel</button
+        >
+        <button
+          class="rounded font-bold ml-auto border-2 border-red-500 text-xs py-1 px-2 text-red-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-red-500 not-disabled:hover:text-white"
+          on:click={restoreOrder}>Restore</button
+        >
+      </div>
+    </div>
+  </div>
+{/if}
+
+{#if restoreEmailDialog}
+  <div
+    class="flex h-full w-full top-0 z-99 fixed items-center justify-center"
+    use:portal
+  >
+    <div
+      class="bg-black h-full w-full opacity-70 absolute"
+      transition:fade={{ duration: 400, easing: expoOut }}
+      on:click={closeDialog}
+    />
+    <div
+      class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 max-w-9/10 p-4 relative lg:max-w-4/10 dark:bg-gray-900"
+      style="will-change: transform"
+      transition:scale={{ start: 0.9, duration: 400, easing: expoOut }}
+    >
+      <div class="flex items-center justify-between">
+        <h4 class="font-bold text-xl text-black leading-thight dark:text-white">
+          Warning
+        </h4>
+        <button on:click={closeDialog}><Close24 /></button>
+      </div>
+      <div class="flex space-x-4 items-center">
+        <Warning32 class="min-h-48px max-w-48px text-blue-500" />
+        <div class="flex flex-col space-y-2">
+          <p class="font-bold">
+            Do you want to send a restoration email to the customer?
+          </p>
+          <p class="text-sm text-gray-500">
+            The email will be sended to <span class="font-bold"
+              >{order.customer?.email || order.billingData.email}</span
+            >
+          </p>
+        </div>
+      </div>
+      <div class="flex space-x-2 items-center justify-end">
+        <button
+          class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+          on:click={closeDialog}>Cancel</button
+        >
+        <button
+          class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+          on:click={restoreOrder}>Send email</button
+        >
+      </div>
+    </div>
+  </div>
 {/if}
 
 <div class="w-full grid gap-4 grid-cols-1 lg:grid-cols-10">
@@ -264,14 +374,25 @@
                 >
                   <Checkmark16 />
                 </button>
-              {:else if order.fulfillmentStatus !== 'fulfilled'}
+              {:else if order.fulfillmentStatus !== 'fulfilled' && order.status === 'paid'}
                 <button
                   class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
                   on:click={setFulfillment}
                   >{fulfillmentMode ? 'Save' : 'Set'} fulfillment</button
                 >
+              {:else}
+                <button
+                  class="rounded font-bold ml-auto border-2 border-orange-500 text-xs py-1 px-2 text-orange-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-orange-500 not-disabled:hover:text-white"
+                  on:click={() => (restoreEmailDialog = true)}
+                  >Send restoration email</button
+                >
               {/if}
             </div>
+          {:else if order.status === 'pending'}
+            <button
+              class="rounded font-bold ml-auto border-2 border-orange-500 text-xs py-1 px-2 text-orange-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-orange-500 not-disabled:hover:text-white"
+              on:click={() => (restoreDialog = true)}>Restore order</button
+            >
           {/if}
         </div>
         <div

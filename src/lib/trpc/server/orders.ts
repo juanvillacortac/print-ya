@@ -156,6 +156,55 @@ ${
       return updated
     },
   })
+  .mutation('marketing:sendRestoreEmail', {
+    input: z.string(),
+    resolve: async ({ input }) => {
+      sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+      const order = await db.getOrder(input)
+      if (!order) {
+        return { ok: false }
+      }
+      const store = await db.getStore({ id: order.storeId })
+      if (!store) {
+        return { ok: false }
+      }
+      let recipient = order.billingData.email
+      if (order.customer) {
+        recipient = order.customer.email
+      }
+      const orderUrl = getAbsoluteURL({
+        path: `/bag?checkout&order=${order.id}`,
+        subdomain: !store.customDomain ? store.slug : undefined,
+        host: store.customDomain || undefined,
+      })
+      const ordersUrl = getAbsoluteURL({
+        path: `/account/orders`,
+        subdomain: !store.customDomain ? store.slug : undefined,
+        host: store.customDomain || undefined,
+      })
+      const html = `<p><strong>Hello, ${
+        order.customer?.firstName || order.billingData.firstName
+      }</strong></p>
+<p><strong>We noticed you left something in your bag :'(</strong></p>
+<p>Would you like to complete your purchase? You can restore your order <strong>#${
+        order.id
+      }</strong> <a href="${orderUrl}">here</a></p>
+${
+  order.customer
+    ? `<p>To view the status of this order, visit <a href="${orderUrl}">the order page</a>.</p>
+<p>Manage your orders <a href="${ordersUrl}">here</a>.</p>`
+    : ''
+}`
+      const msg = {
+        to: recipient,
+        from: `${store.slug}@shackcart.com`,
+        subject: `We noticed you left something in your bag :'(`,
+        html,
+      }
+      await sendgrid.send(msg)
+      return { ok: true }
+    },
+  })
 
 const order = z.enum(['desc', 'asc'])
 

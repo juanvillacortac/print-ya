@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import { bag, preferences, type BagItem } from '$lib'
+  import { bag, currentOrder, preferences, type BagItem } from '$lib'
   import { tooltip } from '$lib/components/tooltip'
-  import type { Product } from '$lib/db'
+  import type { Order, Product } from '$lib/db'
   import {
     getCostFromProductModifiers,
     getTemplateFieldsFromModifiers,
@@ -14,7 +14,6 @@
     ArrowRight24,
     Subtract16,
     TrashCan16,
-    TrashCan24,
     View16,
   } from 'carbon-icons-svelte'
 
@@ -27,14 +26,44 @@
   import BagItemDetails from '$lib/__storefront/BagItemDetails.svelte'
   import type { Prisma } from '@prisma/client'
   import { writable } from 'svelte/store'
-
+  import Ufo from '$lib/components/__Ufo.svelte'
   let mounted = false
   onMount(() => {
     const unsuscribe = bag.subscribe((items) => {
       if (!$page.stuff.store) return
-      loadProducts(items)?.then(() => {
+      loadProducts(items)?.then(async () => {
         if (mounted) return
         const flag = $page.url.searchParams.get('checkout')
+        const orderId = $page.url.searchParams.get('order')
+        if (orderId) {
+          const customer = await trpc().query('customer:whoami')
+          const order = await trpc().query('orders:get', {
+            orderId,
+          })
+          if (order && customer && order?.customerId === customer?.id) {
+            $currentOrder = order
+            await loadProducts(
+              order.items.map((i) => ({
+                key: '',
+                productSlug: i.product.slug,
+                quantity: i.quantity,
+                modifiers: i.modifiers,
+              }))
+            )
+            const i = order.items.map((item) => {
+              const product = products ? products[item.product.slug] : null
+              if (!product) {
+                throw new Error("Product can't be restored")
+              }
+              return {
+                product,
+                modifiers: item.modifiers,
+                quantity: item.quantity,
+              }
+            })
+            bag.restoreBag(i)
+          }
+        }
         checkout = Boolean(flag === '' || flag)
         mounted = true
       })
@@ -152,6 +181,7 @@
 
 <CheckoutSidebar
   on:checkout={() => bag.clear()}
+  bind:order={$currentOrder}
   bind:open={checkout}
   dark={$preferences.darkMode}
   items={$bag}
@@ -176,7 +206,10 @@
         }}
         title="Clear bag"
         use:tooltip
-        on:click={bag.clear}
+        on:click={() => {
+          bag.clear()
+          $currentOrder = null
+        }}
         class="border rounded-full bg-red-500 border-gray-300 shadow text-white p-1 transform transition-transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] duration-200 absolute hover:translate-y-[-35%]"
       >
         <TrashCan16 class="h-20px w-20px" />
@@ -186,7 +219,7 @@
       {#if items?.length}
         <div
           class="flex-grow w-full overflow-x-auto relative"
-          transition:slide|local={{ duration: 400, easing: expoOut }}
+          in:slide|local={{ duration: 400, easing: expoOut }}
         >
           <div
             class="divide-y border rounded-lg flex flex-col w-full max-h-50vh relative overflow-x-auto dark:divide-gray-700 dark:border-gray-700"
@@ -385,9 +418,13 @@
         </div>
       {:else}
         <div
-          class="flex w-full text-gray-500 items-center justify-center dark:text-gray-400"
+          class="flex flex-col h-full mx-auto space-y-6 w-full py-8 items-center lg:w-8/10"
+          in:fly|local={{ y: 10, duration: 400, easing: expoOut }}
         >
-          <p class="font-bold text-center text-xl">Add items to bag first</p>
+          <div class="w-5/10 lg:w-2/10">
+            <Ufo class="h-auto w-full" />
+          </div>
+          <div class="font-bold font-title text-xl">Add items to bag first</div>
         </div>
       {/if}
     </div>

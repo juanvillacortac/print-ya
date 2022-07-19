@@ -2,7 +2,7 @@ import { derived, type Readable, type Writable } from 'svelte/store'
 import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
 import type { ModifiersMap } from './utils/modifiers'
-import type { Product } from './db'
+import type { Order, Product } from './db'
 import { flatMap, isObject, merge } from 'lodash-es'
 import type { Customer, Prisma } from '@prisma/client'
 import { page, session } from '$app/stores'
@@ -206,6 +206,13 @@ export type BagStore = Readable<BagItem[]> & {
   clear(): void
   delete(product: Product, modifiers: ModifiersMap | Prisma.JsonValue): void
   existInBag(product: Product, modifiers: ModifiersMap): boolean
+  restoreBag(
+    items: {
+      product: Product
+      modifiers: ModifiersMap | Prisma.JsonValue
+      quantity: number
+    }[]
+  ): void
   setItem(
     product: Product,
     modifiers: ModifiersMap | Prisma.JsonValue,
@@ -282,6 +289,22 @@ const createBag = (customerStore: CustomerStore): BagStore => {
     return JSON.stringify(obj, keys.sort())
   }
 
+  const restoreBag = (
+    items: {
+      product: Product
+      modifiers: ModifiersMap | Prisma.JsonValue
+      quantity: number
+    }[]
+  ) =>
+    getStore().update((store) => {
+      const newStore = new Map<string, number>()
+      for (const { product, modifiers, quantity } of items) {
+        const key = getKey(product, modifiers)
+        newStore.set(key, quantity)
+      }
+      return newStore
+    })
+
   const setItem = (
     product: Product,
     modifiers: ModifiersMap | Prisma.JsonValue,
@@ -313,6 +336,7 @@ const createBag = (customerStore: CustomerStore): BagStore => {
   return {
     ...items,
     setItem,
+    restoreBag,
     addToBag: (product, modifiers, quantity) =>
       setItem(
         product,
@@ -402,7 +426,6 @@ const createCustomerStore = (): CustomerStore => {
       trpc()
         .query('customer:whoami')
         .then((c) => {
-          console.log(c)
           set(c)
         })
     },
@@ -416,6 +439,37 @@ const createCustomerStore = (): CustomerStore => {
     },
   }
 }
+
+const createOrderStore = (
+  customerStore: CustomerStore
+): Writable<Order | null> => {
+  const store = persistentWritable<Order | null>('currentOrder', null)
+  const redis = redisWritable<Order | null>(null)
+
+  const readStore = derived([store, redis, customerStore], ([s, r, c]) =>
+    c ? r : s
+  )
+
+  const getStore = () => (get(customerStore) ? redis : store)
+
+  customerStore.subscribe((c) => {
+    if (c) {
+      redis.setKey(`currentOrder:${c.id}`)
+    }
+  })
+
+  const set = (value: Order | null) => getStore().set(value)
+
+  return {
+    ...readStore,
+    set,
+    update(cb: CallableFunction) {
+      set(cb(get(store)))
+    },
+  }
+}
+
 export const customer = createCustomerStore()
 export const bag = createBag(customer)
 export const favorites = createFavorites(customer)
+export const currentOrder = createOrderStore(customer)

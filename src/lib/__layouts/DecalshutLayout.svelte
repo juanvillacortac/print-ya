@@ -126,7 +126,13 @@
               class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
               title="Log in"
               href="/login?callbackUrl={encodeURIComponent(
-                $page.url.pathname === '/login' ? '/' : $page.url.pathname
+                $page.url.pathname === '/login'
+                  ? '/'
+                  : `${$page.url.pathname}${
+                      $page.url.searchParams.toString()
+                        ? `?${$page.url.searchParams.toString()}`
+                        : ''
+                    }`
               )}"
               use:tooltip
             >

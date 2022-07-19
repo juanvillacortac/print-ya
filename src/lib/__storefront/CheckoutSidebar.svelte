@@ -67,11 +67,32 @@
   export let open = false
   export let dark = false
 
+  function setOrderData() {
+    if (!order) return
+    completedSteps = {
+      billing: Boolean(order.billingData?.email),
+      shipping: Boolean(order.shippingData?.email),
+      payment: false,
+    }
+    billing = order.billingData
+    shipping = completedSteps.shipping ? order.shippingData : shipping
+    mergeAddress = !completedSteps.shipping
+    step = completedSteps.shipping
+      ? completedSteps.billing
+        ? 'payment'
+        : 'shipping'
+      : 'billing'
+  }
+
+  $: if (open) {
+    setOrderData()
+  }
+
   let payment = false
   let done: number | null | undefined
   export let products: Record<string, Product>
   export let items: BagItem[]
-  let order: Order | undefined
+  export let order: Order | null = null
   let placedOrder: Order | undefined
 
   let billing: Record<string, any> = {}
@@ -214,7 +235,7 @@
       id: order!.id,
       billingData,
       shippingData,
-      items: items.map((i) => ({
+      items: items.map((i, idx) => ({
         productId: products[i.productSlug].id,
         quantity: i.quantity,
         cost:
@@ -322,6 +343,15 @@
         id: order?.id,
         paymentMethods: [event.method],
         status: 'paid',
+        items: items.map((i, idx) => ({
+          productId: products[i.productSlug].id,
+          quantity: i.quantity,
+          cost:
+            getTotalFromProductModifiers(products[i.productSlug], i.modifiers) *
+            i.quantity,
+          basePrice: products[i.productSlug].price,
+          modifiers: i.modifiers,
+        })),
         fees:
           event.method === 'stripe'
             ? [
@@ -338,7 +368,7 @@
     } finally {
       waiting = false
     }
-    order = undefined
+    order = null
     dispatch('checkout', event)
   }
 
