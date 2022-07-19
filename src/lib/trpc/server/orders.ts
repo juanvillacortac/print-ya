@@ -3,7 +3,7 @@ import * as trpc from '@trpc/server'
 import { z } from 'zod'
 import type { tRPCContext } from '.'
 import { get } from '$lib/api'
-import sendgrid from '@sendgrid/mail'
+import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { getAbsoluteURL } from '$lib/utils/host'
 import type { Order } from '$lib/db'
 
@@ -195,9 +195,12 @@ ${
 <p>Manage your orders <a href="${ordersUrl}">here</a>.</p>`
     : ''
 }`
-      const msg = {
+      const msg: MailDataRequired = {
         to: recipient,
-        from: `${store.slug}@shackcart.com`,
+        from: {
+          name: store?.name!,
+          email: `${store.slug}@shackcart.com`,
+        },
         subject: `We noticed you left something in your bag :'(`,
         html,
       }
