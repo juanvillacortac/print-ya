@@ -108,7 +108,6 @@ specifiers:
   svelte2tsx: ^0.4.14
   three: ^0.135.0
   tozod: ^3.0.0
-  trpc-sveltekit: ^2.0.2
   trpc-transformer: ^2.0.2
   tslib: ^2.4.0
   typescript: ^4.7.4
@@ -206,7 +205,6 @@ dependencies:
   svelte-stripe: 0.0.17
   three: 0.135.0
   tozod: 3.0.0_zod@3.17.3
-  trpc-sveltekit: 2.0.2_f91b266a96205217fcdf5b67c8d46730
   trpc-transformer: 2.0.2
   typewriter-document: 0.6.50
   typewriter-editor: 0.7.9_svelte@3.49.0
@@ -8386,16 +8384,6 @@ packages:
 
   /traverse/0.3.9:
     resolution: {integrity: sha512-iawgk0hLP3SxGKDfnDJf8wTz4p2qImnyihM5Hh/sGvQ3K37dPi/w8sRhdNIxYA1TwFwc5mDhIJq+O0RsvXBKdQ==}
-    dev: false
-
-  /trpc-sveltekit/2.0.2_f91b266a96205217fcdf5b67c8d46730:
-    resolution: {integrity: sha512-OV9lBpLPERV5+T8vtsBuvmx1YrYqxBx1KGN5hXmAAkzYuJd3D0OFe/jXegu3abulyYfDKGBQmZfCDz4l5uKIwQ==}
-    peerDependencies:
-      '@sveltejs/kit': ^1.0.0-next
-      '@trpc/server': ^9.24.0
-    dependencies:
-      '@sveltejs/kit': 1.0.0-next.381_svelte@3.49.0+vite@3.0.2
-      '@trpc/server': 9.25.3
     dev: false
 
   /trpc-transformer/2.0.2:
