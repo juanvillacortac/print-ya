@@ -2,6 +2,7 @@ import { prisma, slugify } from './common'
 import type { Store as _Store, StoreCategory } from '@prisma/client'
 
 export type Store = _Store & {
+  contactData?: any
   categories?: (StoreCategory & {
     _count: {
       products: number
@@ -159,6 +160,7 @@ export const upsertStore = async (
         name: store.name,
         slug: slugify(store.slug!),
         customDomain: store.customDomain,
+        contactData: store.contactData || {},
       },
     })
   }
@@ -174,6 +176,10 @@ export const upsertStore = async (
       name: store.name,
       slug: store.slug!,
       customDomain: store.customDomain,
+      contactData: {
+        email: '',
+        phone: '',
+      },
     },
   })
 }
