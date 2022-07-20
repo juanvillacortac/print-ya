@@ -103,52 +103,59 @@ export default trpc
       message: z.string(),
     }),
     resolve: async ({ input }) => {
-      sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
-      const store = await db.getStore({ id: input.storeId })
-      if (!store) {
-        return { ok: false }
+      try {
+        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        const store = await db.getStore({ id: input.storeId })
+        if (!store) {
+          return { ok: false }
+        }
+        const redis = new Redis({
+          url: import.meta.env.VITE_UPSTASH_REDIS_URL,
+          token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+        })
+        let template =
+          (
+            await redis.get<{ json: string }>(
+              `contactEmailTemplate:${input.storeId}`
+            )
+          )?.json || ''
+
+        template = template.replace(new RegExp('{{email}}', 'g'), input.email)
+        template = template.replace(new RegExp('{{phone}}', 'g'), input.phone)
+        template = template.replace(new RegExp('{{name}}', 'g'), input.name)
+        template = template.replace(
+          new RegExp('{{message}}', 'g'),
+          input.message
+        )
+
+        const html = marked(template, {
+          sanitize: true,
+        })
+
+        let to = [(await db.getUser({ userId: store.userId }))!.email]
+        if (store.contactData && (store.contactData as any)?.email) {
+          to.push((store.contactData as any)?.email)
+        }
+
+        const msg: MailDataRequired = {
+          to: [...new Set(to)],
+          from: {
+            name: `${input.name} via ${store.name}`,
+            email: `${store.slug}@shackcart.com`,
+          },
+          replyTo: input.email,
+
+          headers: {
+            Priority: 'Urgent',
+            Importance: 'high',
+          },
+          subject: `[New contact form message] ${input.name}`,
+          html,
+        }
+        await sendgrid.send(msg)
+        return { ok: true }
+      } catch (err) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: err.message })
       }
-      const redis = new Redis({
-        url: import.meta.env.VITE_UPSTASH_REDIS_URL,
-        token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
-      })
-      let template =
-        (
-          await redis.get<{ json: string }>(
-            `contactEmailTemplate:${input.storeId}`
-          )
-        )?.json || ''
-
-      template = template.replace(new RegExp('{{email}}', 'g'), input.email)
-      template = template.replace(new RegExp('{{phone}}', 'g'), input.phone)
-      template = template.replace(new RegExp('{{name}}', 'g'), input.name)
-      template = template.replace(new RegExp('{{message}}', 'g'), input.message)
-
-      const html = marked(template, {
-        sanitize: true,
-      })
-
-      let to = [(await db.getUser({ userId: store.userId }))!.email]
-      if ((store.contactData as any)?.email) {
-        to.push((store.contactData as any)?.email)
-      }
-
-      const msg: MailDataRequired = {
-        to: [...new Set(to)],
-        from: {
-          name: `${input.name} via ${store.name}`,
-          email: `${store.slug}@shackcart.com`,
-        },
-        replyTo: input.email,
-
-        headers: {
-          Priority: 'Urgent',
-          Importance: 'high',
-        },
-        subject: `[New contact form message] ${input.name}`,
-        html,
-      }
-      await sendgrid.send(msg)
-      return { ok: true }
     },
   })
