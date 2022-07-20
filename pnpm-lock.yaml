@@ -24,9 +24,7 @@ specifiers:
   '@codemirror/view': ^0.19.48
   '@emmetio/codemirror-plugin': ^1.2.4
   '@emmetio/codemirror6-plugin': ^0.0.7
-  '@juanvillacortac/g-query': ^0.2.2
   '@leveluptuts/g-query': ^0.2.3
-  '@leveluptuts/svelte-toy': ^0.0.18
   '@paypal/paypal-js': ^5.0.6
   '@poppanator/sveltekit-svg': ^0.2.3
   '@prisma/client': ^3.12.0
@@ -143,9 +141,7 @@ dependencies:
   '@codemirror/view': 0.19.48
   '@emmetio/codemirror-plugin': 1.2.4
   '@emmetio/codemirror6-plugin': 0.0.7_aa88401c4261c89eabf272a42568dea7
-  '@juanvillacortac/g-query': 0.2.2_05d4188501830166cb314a89e655aab1
   '@leveluptuts/g-query': 0.2.3_encoding@0.1.13+typescript@4.7.4
-  '@leveluptuts/svelte-toy': 0.0.18
   '@paypal/paypal-js': 5.0.6
   '@prisma/client': 3.14.0_prisma@3.14.0
   '@rgossiaux/svelte-headlessui': 1.0.2_svelte@3.49.0
@@ -1623,34 +1619,6 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.13
     dev: false
 
-  /@juanvillacortac/g-query/0.2.2_05d4188501830166cb314a89e655aab1:
-    resolution: {integrity: sha512-foeMnWQhnGpSCaGEDM0yhAZ62qZqycbg+Pg6sGGObsg/UPYh0hpEr6i/eER6wM1N5XNl+LBtgJ8SWNgg5N0G1Q==}
-    peerDependencies:
-      vite: ^2.8.0
-    dependencies:
-      '@graphql-codegen/cli': 2.6.2_7da43ae7d6f4e9c3d2092d6cf63752f3
-      '@graphql-codegen/import-types-preset': 2.1.18_encoding@0.1.13+graphql@16.5.0
-      '@graphql-codegen/near-operation-file-preset': 2.2.12_encoding@0.1.13+graphql@16.5.0
-      '@graphql-codegen/plugin-helpers': 2.4.2_graphql@16.5.0
-      '@graphql-codegen/typescript-operations': 2.4.0_encoding@0.1.13+graphql@16.5.0
-      '@graphql-codegen/visitor-plugin-common': 2.8.0_encoding@0.1.13+graphql@16.5.0
-      camel-case: 4.1.2
-      execa: 6.1.0
-      graphql: 16.5.0
-      just-pascal-case: 3.0.1
-      pascal-case: 3.1.2
-      svelte: 3.49.0
-      vite: 3.0.2
-    transitivePeerDependencies:
-      - '@types/node'
-      - bufferutil
-      - encoding
-      - supports-color
-      - typescript
-      - utf-8-validate
-      - zen-observable
-    dev: false
-
   /@leveluptuts/g-query/0.2.3_encoding@0.1.13+typescript@4.7.4:
     resolution: {integrity: sha512-x+ybEFlhYSM+lgj5S8qMS5T9JRPARbKPdff49kztauplOAV3v9ByF1dOp6ViOsEG+3y65hdRMZYZvhnDuvgXsA==}
     dependencies:
@@ -1674,12 +1642,6 @@ packages:
       - typescript
       - utf-8-validate
       - zen-observable
-    dev: false
-
-  /@leveluptuts/svelte-toy/0.0.18:
-    resolution: {integrity: sha512-n4wqjzzrxxLJ3re4xUUPyMbyKxxk2IWcnYFGBYAl6lljXr2eBxdTApJn4nu54IPSn5jUdAP87llP5ctN1rk/FA==}
-    dependencies:
-      lodash.set: 4.3.2
     dev: false
 
   /@lezer/common/0.15.12:
@@ -5798,10 +5760,6 @@ packages:
 
   /lodash.once/4.1.1:
     resolution: {integrity: sha1-DdOXEhPHxW34gJd9UEyI+0cal6w=}
-    dev: false
-
-  /lodash.set/4.3.2:
-    resolution: {integrity: sha1-2HV7HagH3eJIFrDWqEvqGnYjCyM=}
     dev: false
 
   /lodash/4.17.21:
