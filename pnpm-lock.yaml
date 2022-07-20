@@ -41,7 +41,7 @@ specifiers:
   '@sveltejs/adapter-node': 1.0.0-next.82
   '@sveltejs/adapter-static': ^1.0.0-next.29
   '@sveltejs/adapter-vercel': 1.0.0-next.65
-  '@sveltejs/kit': 1.0.0-next.381
+  '@sveltejs/kit': 1.0.0-next.382
   '@sveltejs/svelte-virtual-list': ^3.0.1
   '@trpc/client': ^9.25.3
   '@trpc/server': ^9.25.3
@@ -113,7 +113,7 @@ specifiers:
   typescript: ^4.7.4
   typewriter-document: ^0.6.50
   typewriter-editor: ^0.7.8
-  vite: 3.0.0
+  vite: 3.0.2
   vite-imagetools: ^4.0.3
   vite-plugin-windicss: ^1.8.4
   windicss: ^3.5.1
@@ -143,7 +143,7 @@ dependencies:
   '@codemirror/view': 0.19.48
   '@emmetio/codemirror-plugin': 1.2.4
   '@emmetio/codemirror6-plugin': 0.0.7_aa88401c4261c89eabf272a42568dea7
-  '@juanvillacortac/g-query': 0.2.2_cdca352bf88a0db1eda15738f54ab498
+  '@juanvillacortac/g-query': 0.2.2_05d4188501830166cb314a89e655aab1
   '@leveluptuts/g-query': 0.2.3_encoding@0.1.13+typescript@4.7.4
   '@leveluptuts/svelte-toy': 0.0.18
   '@paypal/paypal-js': 5.0.6
@@ -219,7 +219,7 @@ devDependencies:
   '@sveltejs/adapter-node': 1.0.0-next.82
   '@sveltejs/adapter-static': 1.0.0-next.30
   '@sveltejs/adapter-vercel': 1.0.0-next.65_encoding@0.1.13
-  '@sveltejs/kit': 1.0.0-next.381_svelte@3.49.0+vite@3.0.0
+  '@sveltejs/kit': 1.0.0-next.382_svelte@3.49.0+vite@3.0.2
   '@types/bcrypt': 5.0.0
   '@types/geoip-lite': 1.4.1
   '@types/three': 0.135.0
@@ -236,9 +236,9 @@ devDependencies:
   svelte2tsx: 0.4.14_svelte@3.49.0+typescript@4.7.4
   tslib: 2.4.0
   typescript: 4.7.4
-  vite: 3.0.0
+  vite: 3.0.2
   vite-imagetools: 4.0.3
-  vite-plugin-windicss: 1.8.4_vite@3.0.0
+  vite-plugin-windicss: 1.8.4_vite@3.0.2
 
 packages:
 
@@ -1623,7 +1623,7 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.13
     dev: false
 
-  /@juanvillacortac/g-query/0.2.2_cdca352bf88a0db1eda15738f54ab498:
+  /@juanvillacortac/g-query/0.2.2_05d4188501830166cb314a89e655aab1:
     resolution: {integrity: sha512-foeMnWQhnGpSCaGEDM0yhAZ62qZqycbg+Pg6sGGObsg/UPYh0hpEr6i/eER6wM1N5XNl+LBtgJ8SWNgg5N0G1Q==}
     peerDependencies:
       vite: ^2.8.0
@@ -1640,7 +1640,7 @@ packages:
       just-pascal-case: 3.0.1
       pascal-case: 3.1.2
       svelte: 3.49.0
-      vite: 3.0.0
+      vite: 3.0.2
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -2078,19 +2078,19 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.381_svelte@3.49.0+vite@3.0.0:
-    resolution: {integrity: sha512-LdbHeoMaH8ahf7M1e1uqzKvKbROv+syCvw3Ruh65Z5WFY5VOYCVe+spI3awiuuH+j0m2RJjA8jA64UQmPQ01YQ==}
+  /@sveltejs/kit/1.0.0-next.382_svelte@3.49.0+vite@3.0.2:
+    resolution: {integrity: sha512-5r7BXqikKC+8/kLuOmpcXw7in1e/1k8PtTbFslY/JxutZUZyEKfcCaUf6EKo8Q6TVQslDmxtlc4GkXVb0397Eg==}
     engines: {node: '>=16.9'}
     hasBin: true
     peerDependencies:
       svelte: ^3.44.0
       vite: ^3.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 1.0.1_svelte@3.49.0+vite@3.0.0
+      '@sveltejs/vite-plugin-svelte': 1.0.1_svelte@3.49.0+vite@3.0.2
       chokidar: 3.5.3
       sade: 1.8.1
       svelte: 3.49.0
-      vite: 3.0.0
+      vite: 3.0.2
     transitivePeerDependencies:
       - diff-match-patch
       - supports-color
@@ -2100,7 +2100,7 @@ packages:
     resolution: {integrity: sha512-aF9TptS7NKKS7/TqpsxQBSDJ9Q0XBYzBehCeIC5DzdMEgrJZpIYao9LRLnyyo6SVodpapm2B7FE/Lj+FSA5/SQ==}
     dev: false
 
-  /@sveltejs/vite-plugin-svelte/1.0.1_svelte@3.49.0+vite@3.0.0:
+  /@sveltejs/vite-plugin-svelte/1.0.1_svelte@3.49.0+vite@3.0.2:
     resolution: {integrity: sha512-PorCgUounn0VXcpeJu+hOweZODKmGuLHsLomwqSj+p26IwjjGffmYQfVHtiTWq+NqaUuuHWWG7vPge6UFw4Aeg==}
     engines: {node: ^14.18.0 || >= 16}
     peerDependencies:
@@ -2118,7 +2118,7 @@ packages:
       magic-string: 0.26.2
       svelte: 3.49.0
       svelte-hmr: 0.14.12_svelte@3.49.0
-      vite: 3.0.0
+      vite: 3.0.2
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6875,15 +6875,6 @@ packages:
       util-deprecate: 1.0.2
     dev: true
 
-  /postcss/8.4.13:
-    resolution: {integrity: sha512-jtL6eTBrza5MPzy8oJLFuUscHDXTV5KcLlqAWHl5q5WYRfnNRGSmOZmOZ1T6Gy7A99mOZfqungmZMpMmCVJ8ZA==}
-    engines: {node: ^10 || ^12 || >=14}
-    dependencies:
-      nanoid: 3.3.4
-      picocolors: 1.0.0
-      source-map-js: 1.0.2
-    dev: true
-
   /postcss/8.4.14:
     resolution: {integrity: sha512-E398TUmfAYFPBSdzgeieK2Y1+1cpdxJx8yXbK/m57nRhKSmk1GB2tO4lbLBtlkfPQTDKfe4Xqv1ASWPpayPEig==}
     engines: {node: ^10 || ^12 || >=14}
@@ -7025,7 +7016,7 @@ packages:
     dependencies:
       commander: 8.3.0
       glob: 7.2.0
-      postcss: 8.4.13
+      postcss: 8.4.14
       postcss-selector-parser: 6.0.10
     dev: true
 
@@ -8439,7 +8430,7 @@ packages:
       magic-string: 0.25.9
     dev: true
 
-  /vite-plugin-windicss/1.8.4_vite@3.0.0:
+  /vite-plugin-windicss/1.8.4_vite@3.0.2:
     resolution: {integrity: sha512-LSZAO8BZn3x406GRbYX5t5ONXXJVdqiQtN1qrznLA/Dy5/NzZVhfcrL6N1qEYYO7HsCDT4pLAjTzObvDnM9Y8A==}
     peerDependencies:
       vite: ^2.0.1
@@ -8447,15 +8438,15 @@ packages:
       '@windicss/plugin-utils': 1.8.4
       debug: 4.3.4
       kolorist: 1.5.1
-      vite: 3.0.0
+      vite: 3.0.2
       windicss: 3.5.3
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite/3.0.0:
-    resolution: {integrity: sha512-M7phQhY3+fRZa0H+1WzI6N+/onruwPTBTMvaj7TzgZ0v2TE+N2sdLKxJOfOv9CckDWt5C4HmyQP81xB4dwRKzA==}
-    engines: {node: '>=14.18.0'}
+  /vite/3.0.2:
+    resolution: {integrity: sha512-TAqydxW/w0U5AoL5AsD9DApTvGb2iNbGs3sN4u2VdT1GFkQVUfgUldt+t08TZgi23uIauh1TUOQJALduo9GXqw==}
+    engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
       less: '*'
