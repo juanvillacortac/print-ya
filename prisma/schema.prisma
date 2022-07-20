@@ -87,6 +87,8 @@ model Store {
   paymentGateways PaymentGateway[]
   orders          Order[]
   customers       Customer[]
+
+  contactData Json?
 }
 
 model PaymentGateway {

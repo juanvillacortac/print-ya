@@ -72,3 +72,21 @@
   --black-cell: rgba(55, 65, 81, 0.5);
   background-color: rgba(80, 80, 80, 0.2);
 }
+
+.bytemd .markdown-body {
+  @apply prose-sm;
+}
+
+.bytemd {
+  @apply rounded-lg overflow-hidden;
+}
+.dark .bytemd, .dark .bytemd .CodeMirror, .dark .bytemd-toolbar, .dark
+    .bytemd-status, .dark .bytemd .CodeMirror-cursor {
+  @apply bg-gray-800 border-gray-600 text-white;
+  color: white;
+}
+
+.dark .bytemd-toolbar-icon:hover {
+  @apply bg-gray-700 border-gray-600;
+  color: white;
+}

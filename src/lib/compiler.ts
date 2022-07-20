@@ -1,10 +1,5 @@
-import ejs from 'ejs'
+import ejs from 'ejs4b/ejs-es'
 import { urlBuilder } from './components/caravaggio/urlBuilder'
-import {
-  useCaravaggio,
-  useCaravaggioBuilder,
-} from './components/caravaggio/useCaravaggio'
-// import hb from 'handlebars-esm'
 import { useWindiCSS } from './windicss'
 
 export type CompiledTemplate = {
@@ -27,14 +22,9 @@ export type TemplateSource = {
 
 export const compile = (source: TemplateSource): CompiledTemplate => {
   try {
+    console.log('pedo')
     let { html = '', css = '', fields = '' } = source
-    // if (fields?.trim()) {
     const payload = JSON.parse(fields || '{}')
-    // const script = `<script>\n${Object.entries(payload).map(([k, v]) => `  let ${k} = ${JSON.stringify(v)}`).join('\n')}\n</script>`
-    // const component = `${script}\n${data.html}`
-    // const { css, js } = compile(component, { generate: 'ssr', hydratable: false })
-    // console.log(js.code)
-    // const html = await jsx.render(`(props) => (${data.html})`, payload)
     let replacedHtml = replaceAll(replaceAll(html, '{{', '<%'), '}}', '%>')
     replacedHtml = replaceAll(
       replaceAll(replacedHtml, '<script>', '<%'),

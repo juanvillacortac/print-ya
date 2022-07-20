@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit'
 
-export const get: RequestHandler = ({ url }) => {
+export const GET: RequestHandler = ({ url }) => {
   const fontUrl = url.searchParams.get('src')
   const name = url.searchParams.get('name') || 'customFont'
 

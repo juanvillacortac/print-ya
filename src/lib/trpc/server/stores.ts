@@ -1,9 +1,12 @@
 import * as db from '$lib/db'
 import * as trpc from '@trpc/server'
+import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { TRPCError } from '@trpc/server'
 import Stripe from 'stripe'
 import { z } from 'zod'
 import type { tRPCContext } from '.'
+import { Redis } from '@upstash/redis'
+import { marked } from 'marked'
 
 const mutations = trpc
   .router<tRPCContext>()
@@ -32,7 +35,7 @@ const mutations = trpc
     },
   })
   .mutation('upsert', {
-    input: (input: db.Store) => input,
+    input: (input: Partial<db.Store>) => input,
     resolve: async ({ ctx, input }) => {
       const userId = (await db.getUserDetails(ctx.event)).userId!
       if (!userId) {
@@ -91,3 +94,61 @@ export default trpc
   .merge(mutations)
   .merge(queries)
   .merge('payment:', payment)
+  .mutation('marketing:sendContactEmail', {
+    input: z.object({
+      storeId: z.string().cuid(),
+      name: z.string(),
+      phone: z.string(),
+      email: z.string().email(),
+      message: z.string(),
+    }),
+    resolve: async ({ input }) => {
+      sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+      const store = await db.getStore({ id: input.storeId })
+      if (!store) {
+        return { ok: false }
+      }
+      const redis = new Redis({
+        url: import.meta.env.VITE_UPSTASH_REDIS_URL,
+        token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+      })
+      let template =
+        (
+          await redis.get<{ json: string }>(
+            `contactEmailTemplate:${input.storeId}`
+          )
+        )?.json || ''
+
+      template = template.replace(new RegExp('{{email}}', 'g'), input.email)
+      template = template.replace(new RegExp('{{phone}}', 'g'), input.phone)
+      template = template.replace(new RegExp('{{name}}', 'g'), input.name)
+      template = template.replace(new RegExp('{{message}}', 'g'), input.message)
+
+      const html = marked(template, {
+        sanitize: true,
+      })
+
+      let to = [(await db.getUser({ userId: store.userId }))!.email]
+      if ((store.contactData as any)?.email) {
+        to.push((store.contactData as any)?.email)
+      }
+
+      const msg: MailDataRequired = {
+        to: [...new Set(to)],
+        from: {
+          name: `${input.name} via ${store.name}`,
+          email: `${store.slug}@shackcart.com`,
+        },
+        replyTo: input.email,
+
+        headers: {
+          Priority: 'Urgent',
+          Importance: 'high',
+        },
+        subject: `[New contact form message] ${input.name}`,
+        html,
+      }
+      await sendgrid.send(msg)
+      return { ok: true }
+    },
+  })

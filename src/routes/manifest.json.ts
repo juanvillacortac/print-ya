@@ -1,9 +1,8 @@
 import type { RequestHandler } from '@sveltejs/kit'
 import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
-import { fetchLayoutData } from '$lib/utils/layout'
 import { getStore, type Store } from '$lib/db'
 
-export const get: RequestHandler = async (event) => {
+export const GET: RequestHandler = async (event) => {
   let layout = event.locals.layout
   const imageBuilder = useCaravaggioBuilder(
     event.url.protocol + '//' + event.url.host

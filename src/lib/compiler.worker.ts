@@ -9,6 +9,7 @@ if (browser) {
     try {
       postMessage(compile(data))
     } catch (err) {
+      console.log(err)
       throw new Error(err.message)
     }
   })

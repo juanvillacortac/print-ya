@@ -245,9 +245,10 @@
     <div class="bg-red-900 text-white text-base w-full <lg:hidden">
       <div class="flex mx-auto space-x-4 text-white p-4 py-2 lg:w-9/10">
         <a href="/">Home</a>
-        {#each store.categories?.slice(0, 8) || [] as category}
+        {#each store.categories?.slice(0, 7) || [] as category}
           <a href="/products?category={category.slug}">{category.name}</a>
         {/each}
+        <a href="/contact">Contact</a>
         <a href="/faq">FAQ</a>
       </div>
     </div>

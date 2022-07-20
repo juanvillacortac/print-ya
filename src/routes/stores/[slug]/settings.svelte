@@ -1,8 +1,9 @@
 <script lang="ts">
+  import 'bytemd/dist/index.css'
   import { goto } from '$app/navigation'
 
   import { page } from '$app/stores'
-  import { pageSubtitle } from '$lib'
+  import { pageSubtitle, redisWritable } from '$lib'
   import { squareratio } from '$lib/actions/aspectratio'
   import Image from '$lib/components/caravaggio/Image.svelte'
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
@@ -16,8 +17,19 @@
   import StripeLogo from '$lib/components/__StripeLogo.svelte'
   import PaypalLogo from '$lib/components/__PaypalLogo.svelte'
   import trpc, { invalidateQuery } from '$lib/trpc/client'
+  import { Editor } from 'bytemd'
 
   let store = $page.stuff.store as Store
+  const contactEmailTemplate = redisWritable(
+    `**You've got a new message from {{name}}, their email is [{{email}}](mailto:{{email}}) and their phone number is [{{phone}}](tel:{{phone}})**
+
+### Message:
+
+{{message}}`,
+    `contactEmailTemplate:${store.id}`
+  )
+  let email = (store.contactData as any)?.email || ''
+  let phone = (store.contactData as any)?.phone || ''
 
   const options: CaravaggioOptions = {
     progressive: true,
@@ -37,6 +49,30 @@
     saving = true
     try {
       const data = await trpc().mutation('stores:upsert', store)
+
+      if (data.slug !== $page.stuff.store!.slug) {
+        goto(`/stores/${data.slug}/settings`)
+      } else {
+        await invalidateQuery('stores:getBySlug')
+      }
+    } catch (err) {
+      console.log(err.message, err.error)
+    } finally {
+      saving = false
+    }
+  }
+
+  const submitContact = async () => {
+    saving = true
+    try {
+      const data = await trpc().mutation('stores:upsert', {
+        id: store.id,
+        slug: store.slug,
+        contactData: {
+          email,
+          phone,
+        },
+      })
 
       if (data.slug !== $page.stuff.store!.slug) {
         goto(`/stores/${data.slug}/settings`)
@@ -360,6 +396,54 @@
       </div>
     </div>
   </form>
+
+  <div
+    class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
+  >
+    <div class="flex w-full justify-between items-">
+      <h5 class="font-bold font-title text-sm">Contact information</h5>
+      <button
+        class="rounded font-bold ml-auto border-2 border-blue-500 text-xs py-1 px-2 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
+        on:click={submitContact}
+        disabled={saving}>{saving ? 'Saving...' : 'Save'}</button
+      >
+    </div>
+    <div
+      class="flex w-full items-center sm:space-x-2 <sm:flex-col <sm:space-y-2"
+    >
+      <div class="flex flex-col w-full">
+        <label class="flex flex-col font-bold space-y-2 text-xs">
+          <span>Email for contact</span>
+          <input
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            type="email"
+            placeholder="Ex. contact@{store.slug}.com"
+            bind:value={email}
+          />
+        </label>
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="flex flex-col font-bold space-y-2 text-xs">
+          <span>Phone number</span>
+          <input
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            type="tel"
+            placeholder="Ex. +1 23456789"
+            bind:value={phone}
+          />
+        </label>
+      </div>
+    </div>
+    <div class="flex flex-col w-full">
+      <div class="flex flex-col space-y-2 text-xs w-full">
+        <span class="font-bold text-xs"> Contact form email template </span>
+        <Editor
+          value={$contactEmailTemplate}
+          on:change={(e) => ($contactEmailTemplate = e.detail.value)}
+        />
+      </div>
+    </div>
+  </div>
 
   <div
     class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
