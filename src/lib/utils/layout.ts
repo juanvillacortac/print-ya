@@ -19,6 +19,7 @@ export const storeRoutes = [
   '/bag',
   '/favorites',
   '/contact',
+  '/faq',
   '/account',
 ]
 export const appRoutes = ['/stores', '/settings', '/app']
