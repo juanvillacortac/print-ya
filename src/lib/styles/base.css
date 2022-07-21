@@ -82,7 +82,7 @@
 }
 .dark .bytemd, .dark .bytemd .CodeMirror, .dark .bytemd-toolbar, .dark
     .bytemd-status, .dark .bytemd .CodeMirror-cursor {
-  @apply bg-gray-800 border-gray-600 text-white;
+  @apply bg-dark-900 border-gray-600 text-white;
   color: white;
 }
 

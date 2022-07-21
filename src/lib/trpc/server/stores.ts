@@ -118,15 +118,22 @@ export default trpc
             await redis.get<{ json: string }>(
               `contactEmailTemplate:${input.storeId}`
             )
-          )?.json || ''
+          )?.json ||
+          `**You've got a new message from {{name}}, their email is [{{email}}](mailto:{{email}}) and their phone number is [{{phone}}](tel:{{phone}})**
 
-        template = template.replace(new RegExp('{{email}}', 'g'), input.email)
-        template = template.replace(new RegExp('{{phone}}', 'g'), input.phone)
-        template = template.replace(new RegExp('{{name}}', 'g'), input.name)
-        template = template.replace(
-          new RegExp('{{message}}', 'g'),
-          input.message
-        )
+### Message:
+
+{{message}}`
+
+        if (template) {
+          template = template.replace(new RegExp('{{email}}', 'g'), input.email)
+          template = template.replace(new RegExp('{{phone}}', 'g'), input.phone)
+          template = template.replace(new RegExp('{{name}}', 'g'), input.name)
+          template = template.replace(
+            new RegExp('{{message}}', 'g'),
+            input.message
+          )
+        }
 
         const html = marked(template, {
           sanitize: true,
@@ -155,7 +162,10 @@ export default trpc
         await sendgrid.send(msg)
         return { ok: true }
       } catch (err) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: err.message })
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: err.message,
+        })
       }
     },
   })

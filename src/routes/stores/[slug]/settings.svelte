@@ -28,6 +28,9 @@
 {{message}}`,
     `contactEmailTemplate:${store.id}`
   )
+
+  const faqContent = redisWritable('', `storeFaq:${store.id}`)
+
   let email = (store.contactData as any)?.email || ''
   let phone = (store.contactData as any)?.phone || ''
 
@@ -440,6 +443,15 @@
         <Editor
           value={$contactEmailTemplate}
           on:change={(e) => ($contactEmailTemplate = e.detail.value)}
+        />
+      </div>
+    </div>
+    <div class="flex flex-col w-full">
+      <div class="flex flex-col space-y-2 text-xs w-full">
+        <span class="font-bold text-xs"> FAQ content </span>
+        <Editor
+          value={$faqContent}
+          on:change={(e) => ($faqContent = e.detail.value)}
         />
       </div>
     </div>

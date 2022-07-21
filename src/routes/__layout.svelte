@@ -27,6 +27,8 @@
   import '$lib/styles/base.css'
   import '$lib/styles/components.css'
 
+  import '$lib/__storefront/web-components'
+
   import NProgress from 'nprogress'
   import { navigating, page, session } from '$app/stores'
 
