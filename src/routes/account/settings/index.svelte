@@ -70,7 +70,7 @@
         {#if c}
           <input
             type="text"
-            placeholder="Ex. Gabriela"
+            placeholder="Enter your first name"
             required
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
             bind:value={c.firstName}
@@ -85,7 +85,7 @@
         {#if c}
           <input
             type="text"
-            placeholder="Ex. Ivanovich"
+            placeholder="Enter your last name"
             required
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
             bind:value={c.lastName}
@@ -102,7 +102,7 @@
         {#if c}
           <input
             type="email"
-            placeholder="Ex. gaby@gmail.com"
+            placeholder="Ex. example@domain.com"
             required
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
             bind:value={c.email}
@@ -117,7 +117,7 @@
         {#if c}
           <input
             type="tel"
-            placeholder="Ex. +1 2345678"
+            placeholder="Ex. +1 XXXXXX"
             required
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
             bind:value={c.phoneNumber}
