@@ -10,14 +10,35 @@
     const isRouteValid = validateLayoutRoute(input)
     const { notFound, response: stuff } = await fetchLayoutData(input)
 
+    let layout: any
+    switch (input.session.layout) {
+      case 'app':
+        layout = (await import('$lib/__layouts/AppLayout.svelte')).default
+        break
+      case 'store':
+        if (!stuff?.store) {
+          layout = (await import('$lib/__layouts/AppLayout.svelte')).default
+        } else {
+          layout = (await import('$lib/__layouts/DecalshutLayout.svelte'))
+            .default
+        }
+        break
+    }
+
     if (notFound || !isRouteValid) {
       return {
         status: 404,
         stuff,
+        props: {
+          layout,
+        },
       }
     }
     return {
       stuff,
+      props: {
+        layout,
+      },
     }
   }
 </script>
@@ -59,8 +80,6 @@
   import { browser } from '$app/env'
   import Toast from '$lib/components/Toast.svelte'
   import { onDestroy } from 'svelte'
-  import StoreLayout from '$lib/__layouts/DecalshutLayout.svelte'
-  import AppLayout from '$lib/__layouts/AppLayout.svelte'
   import type { InstantiableSvelteComponentTyped } from 'svelte-markdown'
 
   $: if (browser)
@@ -85,22 +104,13 @@
     <link rel="stylesheet" href=${fontsURL} />
   </noscript>`
 
-  $: storeNotFound = layout === 'store' && !$page.stuff.store
-
-  let layouts: Record<LayoutType, () => InstantiableSvelteComponentTyped>
-  $: layouts = {
-    app: () => AppLayout,
-    store: () => (storeNotFound ? AppLayout : StoreLayout),
-  }
-
+  export let layout: any
   const layoutProps: Record<LayoutType, () => any> = {
     app: () => ({}),
     store: () => ({
       store: $page.stuff.store,
     }),
   }
-
-  $: layout = $session.layout
 </script>
 
 <svelte:head>
@@ -108,7 +118,7 @@
   {@html fontsTag}
 </svelte:head>
 
-<svelte:component this={layouts[layout]()} {...layoutProps[layout]()}>
+<svelte:component this={layout} {...layoutProps[$session.layout]()}>
   <slot />
 </svelte:component>
 <Toast />
