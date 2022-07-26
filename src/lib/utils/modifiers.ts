@@ -133,9 +133,10 @@ export const DEFAULT_TEMPLATE_CSS = `{{ if (locals.font) { }}
   background-repeat: no-repeat;
 }`
 
-export function getBasicTemplate<
-  T extends Partial<Product> & Pick<Product, 'meta'>
->(product: T, modifiers?: ModifiersMap | Prisma.JsonValue): TemplateSource {
+export function getBasicTemplate<T extends Partial<Product>>(
+  product: T,
+  modifiers?: ModifiersMap | Prisma.JsonValue
+): TemplateSource {
   let customFields = ''
   if (modifiers && product.modifiers) {
     for (const modifier of product.modifiers) {

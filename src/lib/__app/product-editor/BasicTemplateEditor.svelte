@@ -165,6 +165,20 @@
         </div>
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId">
+            Image modifier
+          </label>
+          <select
+            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+            bind:value={product.meta.templateImageModifier}
+          >
+            <option value="">No modifier</option>
+            {#each modifiers.filter((m) => m.type === 'image') as { id, name }}
+              <option value={id}>{name}</option>
+            {/each}
+          </select>
+        </div>
+        <div class="flex flex-col w-full">
+          <label class="font-bold text-xs mb-2 block" for="fieldId">
             Color modifier
           </label>
           <select

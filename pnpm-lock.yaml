@@ -62,6 +62,7 @@ specifiers:
   cookie: ^0.5.0
   cross-env: ^7.0.3
   css-zero-beautify: ^2.0.5
+  csvtojson: ^2.0.10
   cuid: ^2.1.8
   currency-list: ^1.0.8
   ejs: ^3.1.7
@@ -167,6 +168,7 @@ dependencies:
   codemirror-theme-vars: 0.1.1
   cookie: 0.5.0
   css-zero-beautify: 2.0.5
+  csvtojson: 2.0.10
   cuid: 2.1.8
   currency-list: 1.0.8
   ejs: 3.1.8
@@ -2705,6 +2707,10 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.0
 
+  /bluebird/3.7.2:
+    resolution: {integrity: sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==}
+    dev: false
+
   /blurhash/1.1.5:
     resolution: {integrity: sha512-a+LO3A2DfxTaTztsmkbLYmUzUeApi0LZuKalwbNmqAHR6HhJGMt1qSV/R3wc+w4DL28holjqO3Bg74aUGavGjg==}
     dev: false
@@ -3366,6 +3372,16 @@ packages:
 
   /csv-parse/5.2.1:
     resolution: {integrity: sha512-6JA4UDz7Vvs66ZZWUxR0uD6BR6Oh07rRaKjsZpoqcI7vDdoNpCHgJ58QpAZ8si/y7yK2qTeqOK+ZhrVsR28icQ==}
+    dev: false
+
+  /csvtojson/2.0.10:
+    resolution: {integrity: sha512-lUWFxGKyhraKCW8Qghz6Z0f2l/PqB1W3AO0HKJzGIQ5JRSlR651ekJDiGJbBT4sRNNv5ddnSGVEnsxP9XRCVpQ==}
+    engines: {node: '>=4.0.0'}
+    hasBin: true
+    dependencies:
+      bluebird: 3.7.2
+      lodash: 4.17.21
+      strip-bom: 2.0.0
     dev: false
 
   /cuid/2.1.8:
@@ -5418,6 +5434,10 @@ packages:
     resolution: {integrity: sha512-44pxmxAvnnAOwBg4tHPnkfvgjPwbc5QIsSstNU+YcJ1ovxVzCWpSGosPJOZh/a1tdl81fbgnLc9LLv+x2ywbPQ==}
     dependencies:
       tslib: 2.4.0
+    dev: false
+
+  /is-utf8/0.2.1:
+    resolution: {integrity: sha512-rMYPYvCzsXywIsldgLaSoPlw5PfoB/ssr7hY4pLfcodrA5M/eArza1a9VmTiNIBNMjOGr1Ow9mTyU2o69U6U9Q==}
     dev: false
 
   /is-weakref/1.0.2:
@@ -7773,6 +7793,13 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       ansi-regex: 5.0.1
+
+  /strip-bom/2.0.0:
+    resolution: {integrity: sha512-kwrX1y7czp1E69n2ajbG65mIo9dqvJ+8aBQXOGVxqwvNbsXdFM6Lq37dLAY3mknUwru8CfcCbfOLL/gMo+fi3g==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      is-utf8: 0.2.1
+    dev: false
 
   /strip-final-newline/3.0.0:
     resolution: {integrity: sha512-dOESqjYr96iWYylGObzd39EuNTa5VJxyvVAEm5Jnh7KGo75V43Hk1odPQkNDyXNmUR6k+gEiDVXnjB8HJ3crXw==}

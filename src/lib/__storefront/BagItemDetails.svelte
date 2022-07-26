@@ -102,14 +102,11 @@
 
 {#if item && product}
   <div
-    class="flex h-full w-full top-0 z-99 fixed items-center justify-center"
+    class="flex h-full w-full top-0 z-99 fixed items-center justify-center backdrop-filter backdrop-blur-lg"
+    transition:fade={{ duration: 400, easing: expoOut }}
     use:portal
   >
-    <div
-      class="bg-black h-full w-full opacity-70 absolute"
-      on:click={close}
-      transition:fade={{ duration: 400, easing: expoOut }}
-    />
+    <div class="bg-black h-full w-full opacity-70 absolute" on:click={close} />
     <div
       class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 p-4 w-9/10 relative lg:w-8/10 dark:bg-gray-900"
       transition:scale={{ start: 0.9, duration: 400, easing: expoOut }}
