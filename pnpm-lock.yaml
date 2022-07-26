@@ -62,6 +62,7 @@ specifiers:
   cookie: ^0.5.0
   cross-env: ^7.0.3
   css-zero-beautify: ^2.0.5
+  cuid: ^2.1.8
   currency-list: ^1.0.8
   ejs: ^3.1.7
   ejs4b: ^3.1.62
@@ -166,6 +167,7 @@ dependencies:
   codemirror-theme-vars: 0.1.1
   cookie: 0.5.0
   css-zero-beautify: 2.0.5
+  cuid: 2.1.8
   currency-list: 1.0.8
   ejs: 3.1.8
   ejs4b: 3.1.62
@@ -3364,6 +3366,10 @@ packages:
 
   /csv-parse/5.2.1:
     resolution: {integrity: sha512-6JA4UDz7Vvs66ZZWUxR0uD6BR6Oh07rRaKjsZpoqcI7vDdoNpCHgJ58QpAZ8si/y7yK2qTeqOK+ZhrVsR28icQ==}
+    dev: false
+
+  /cuid/2.1.8:
+    resolution: {integrity: sha512-xiEMER6E7TlTPnDxrM4eRiC6TRgjNX9xzEZ5U/Se2YJKr7Mq4pJn/2XEHjl3STcSh96GmkHPcBXLES8M29wyyg==}
     dev: false
 
   /currency-list/1.0.8:

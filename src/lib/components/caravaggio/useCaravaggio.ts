@@ -17,7 +17,7 @@ export const useCaravaggio = (
   opt?: CaravaggioOptions
 ): string | undefined => {
   const context = useCaravaggioContext()
-  context.baseUrl = get(session)?.host
+  context.baseUrl = get(session)?.fullHost
   if (!imageUrl) return undefined
   return urlBuilder(context, imageUrl, opt)
 }
@@ -48,7 +48,7 @@ export const useCaravaggioIfAvailable = (
   opt?: CaravaggioOptions
 ): string | null | undefined => {
   const context = useCaravaggioContext()
-  context.baseUrl = get(session)?.host
+  context.baseUrl = get(session)?.fullHost
   if (!context || !imageUrl) {
     return imageUrl
   }

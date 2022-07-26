@@ -25,14 +25,18 @@
   import { getAbsoluteURL } from '$lib/utils/host'
   import trpc, { invalidateQuery } from '$lib/trpc/client'
   import Submenu from '$lib/components/Submenu.svelte'
+  import BasicTemplateEditor from './BasicTemplateEditor.svelte'
+  import { getBasicTemplate } from '$lib/utils/modifiers'
 
-  export let product: Partial<Product> = {
+  export let product: Partial<Product> & Pick<Product, 'meta' | 'modifiers'> = {
     price: 0.01,
     public: true,
     type: 'template',
+    meta: {},
+    modifiers: [],
   }
 
-  const editor = writable(
+  const template = writable(
     (product?.template as TemplateSource) || {
       name: 'Template test',
       html: '',
@@ -226,42 +230,12 @@
     <div
       class="flex justify-end items-end lg:space-x-2 lg:items-center <lg:flex-col <lg:space-y-4"
     >
-      <!-- <div class="flex space-x-4 items-center">
-        <input type="checkbox" id="published" bind:checked={product.public} />
-        <label class="font-bold text-xs block" for="published">
-          Published
-        </label>
-      </div> -->
-      <!-- {#if product.type === 'template' && product.id}
-        <a
-          class="rounded font-bold border-2 border-blue-500 text-xs text-center py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
-          href="/stores/{store.slug}/products/{product.slug}/ide"
-          >Edit template{JSON.stringify(product.templateDraft) !==
-          JSON.stringify(product.template)
-            ? ' (Draft)'
-            : ''}</a
-        >
-      {/if}
-      {#if product.id}
-        <button
-          class="rounded font-bold border-2 border-blue-500 text-xs py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
-          type="button"
-          on:click={duplicate}
-          disabled={saving}>Duplicate</button
-        >
-      {/if} -->
       {#if !product.archived}
         <Submenu title="Options">
           <div
             class="flex flex-col font-bold space-y-3 text-xs items-end"
             slot="body"
           >
-            <!-- <div
-            class="flex space-x-2 text-blue-500 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
-            disabled={saving}
-          >
-            <span>Save changes</span> <Save16 class="flex" /></button
-          > -->
             <button
               class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
               type="button"
@@ -275,7 +249,7 @@
                 class="flex"
               /></button
             >
-            {#if product.type === 'template' && product.id}
+            {#if product.type === 'template_pro' && product.id}
               <a
                 href="/stores/{store.slug}/products/{product.slug}/ide"
                 class="flex font-normal space-x-2 text-right items-center hover:underline"
@@ -329,80 +303,28 @@
   </div>
   <div
     class="w-full grid gap-6 grid-cols-1 items-start"
-    class:lg:grid-cols-3={product.template && product.type === 'template'}
+    class:lg:grid-cols-3={product.type?.startsWith('template')}
   >
     <div
       class="flex flex-col space-y-6 w-full"
-      class:lg:col-span-2={product.template && product.type === 'template'}
+      class:lg:col-span-2={product.type?.startsWith('template')}
     >
       <ProductMainFieldsEditor bind:product />
       {#if product.type === 'template'}
+        <BasicTemplateEditor bind:product {modifiers} />
+      {/if}
+      {#if product.type?.startsWith('template')}
         <ProductMockupImagesEditor bind:product />
       {/if}
       <ProductModifiersEditor bind:modifiers disabled={product.archived} />
     </div>
-    {#if product.template && product.type === 'template'}
-      <TemplatePreview mockups={product.meta?.mockups} template={$editor} />
+    {#if product.type?.startsWith('template')}
+      <TemplatePreview
+        mockups={product.meta?.mockups}
+        template={product.type === 'template'
+          ? getBasicTemplate(product)
+          : $template}
+      />
     {/if}
-    <!-- <div
-      class="flex justify-end items-end lg:space-x-6 lg:items-center lg:hidden <lg:flex-col <lg:space-y-4"
-    >
-      <div class="flex space-x-4 items-center">
-        <input type="checkbox" bind:checked={product.isTemplate} />
-        <label class="font-bold text-xs block" for="isTemplate">
-          Is a template
-        </label>
-      </div>
-      <div class="flex space-x-4 items-center">
-        <input type="checkbox" bind:checked={product.public} />
-        <label class="font-bold text-xs block" for="published">
-          Published
-        </label>
-      </div>
-      <button
-        class="rounded font-bold border-2 border-blue-500 text-xs py-2 px-4 text-blue-500 duration-200 <lg:w-full disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
-        >Save</button
-      >
-    </div> -->
   </div>
 </form>
-
-<style>
-  .preview-button {
-    @apply bg-white border-transparent rounded flex border-2 shadow p-1 transform transition-transform duration-200;
-  }
-
-  .preview-button:hover {
-    @apply -translate-y-px;
-  }
-
-  :global(.dark) .preview-button {
-    @apply border-transparent bg-gray-700 border-2  border-gray-300;
-  }
-
-  :global(.dark) .preview-button:hover {
-    @apply border-gray-300;
-  }
-
-  .checkerboard {
-    --black-cell: rgba(55, 65, 81, 0.2);
-    background-image: linear-gradient(
-        45deg,
-        var(--black-cell) 25%,
-        transparent 25%,
-        transparent 75%,
-        var(--black-cell) 75%,
-        var(--black-cell)
-      ),
-      linear-gradient(
-        45deg,
-        var(--black-cell) 25%,
-        transparent 25%,
-        transparent 75%,
-        var(--black-cell) 75%,
-        var(--black-cell)
-      );
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
-  }
-</style>

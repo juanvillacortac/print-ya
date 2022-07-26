@@ -31,6 +31,7 @@
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import Markdown from 'svelte-markdown'
   import {
+    getBasicTemplate,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
     type ModifiersMap,
@@ -53,10 +54,13 @@
 
   let modifiers: ModifiersMap
 
-  $: template = {
-    ...(product.template as any),
-    fields: getTemplateFieldsFromModifiers(product, modifiers),
-  }
+  $: template =
+    product.type === 'template'
+      ? getBasicTemplate(product, modifiers)
+      : {
+          ...(product.template as any),
+          fields: getTemplateFieldsFromModifiers(product, modifiers),
+        }
 
   $: total = getTotalFromProductModifiers(product, modifiers) * quantity
 

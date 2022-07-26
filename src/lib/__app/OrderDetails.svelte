@@ -4,6 +4,7 @@
   import { onMount } from 'svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import {
+    getBasicTemplate,
     getCostFromProductModifiers,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
@@ -430,13 +431,15 @@
                         <TemplatePreview
                           lazy
                           showFonts
-                          template={{
-                            ...(p?.template || {}),
-                            fields: getTemplateFieldsFromModifiers(
-                              p,
-                              item.modifiers
-                            ),
-                          }}
+                          template={p.type === 'template'
+                            ? getBasicTemplate(p, item.modifiers)
+                            : {
+                                ...(p?.template || {}),
+                                fields: getTemplateFieldsFromModifiers(
+                                  p,
+                                  item.modifiers
+                                ),
+                              }}
                           controls={false}
                         />
                       {/if}

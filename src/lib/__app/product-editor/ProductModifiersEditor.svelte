@@ -19,6 +19,7 @@
   import FontTable from './modifiers/FontTable.svelte'
   import UpsellEditor from './modifiers/UpsellEditor.svelte'
   import { writable } from 'svelte/store'
+  import cuid from 'cuid'
 
   type Unarray<T> = T extends Array<infer U> ? U : T
 
@@ -58,7 +59,7 @@
       ...modifiers,
       {
         internalId: newId,
-        id: '',
+        id: cuid(),
         productId: null,
         active: true,
         name: '',
@@ -183,7 +184,7 @@
 </script>
 
 <div
-  class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-700"
+  class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
 >
   <div class="flex w-full justify-between items-center">
     <div class="flex space-x-4 items-center">

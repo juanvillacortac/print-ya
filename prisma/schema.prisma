@@ -111,6 +111,7 @@ model StoreCategory {
 
 enum ProductType {
   template
+  template_pro
   generic
 }
 

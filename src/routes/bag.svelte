@@ -4,6 +4,7 @@
   import { tooltip } from '$lib/components/tooltip'
   import type { Order, Product } from '$lib/db'
   import {
+    getBasicTemplate,
     getCostFromProductModifiers,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
@@ -251,13 +252,15 @@
                             <TemplatePreview
                               lazy
                               showFonts
-                              template={{
-                                ...(p?.template || {}),
-                                fields: getTemplateFieldsFromModifiers(
-                                  p,
-                                  $bag[item.idx].modifiers
-                                ),
-                              }}
+                              template={p.type === 'template'
+                                ? getBasicTemplate(p, $bag[item.idx].modifiers)
+                                : {
+                                    ...(p?.template || {}),
+                                    fields: getTemplateFieldsFromModifiers(
+                                      p,
+                                      $bag[item.idx].modifiers
+                                    ),
+                                  }}
                               watermark
                               controls={false}
                             />

@@ -16,25 +16,18 @@
 </script>
 
 <script lang="ts">
-  import { browser } from '$app/env'
-  import { goto } from '$app/navigation'
-
   import { page } from '$app/stores'
   import { pageSubtitle } from '$lib'
-  import { squareratio } from '$lib/actions/aspectratio'
-  import Preview from '$lib/components/Preview.svelte'
   import type { Store, StripedProduct } from '$lib/db'
   import { search } from '$lib/utils/search'
-  import { flip } from 'svelte/animate'
   import { fly, slide } from 'svelte/transition'
   import { Redo16, View16, Warning32 } from 'carbon-icons-svelte'
   import Ufo from '$lib/components/__Ufo.svelte'
   import { expoOut } from 'svelte/easing'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
+  import { getBasicTemplate } from '$lib/utils/modifiers'
   const store = $page.stuff.store as Store | null
   export let products: StripedProduct[] = []
-
-  $: console.log(products)
 
   let textSearch = ''
   let categoryId = ''
@@ -114,11 +107,13 @@
               style="aspect-ratio: 1/1"
             >
               <div class="flex h-full w-full items-center justify-center">
-                {#if product.template}
+                {#if product.type.startsWith('template')}
                   <TemplatePreview
                     lazy
                     showFonts
-                    template={product.template}
+                    template={product.type === 'template'
+                      ? getBasicTemplate(product)
+                      : product.template}
                     controls={false}
                   />
                 {/if}

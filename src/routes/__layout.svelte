@@ -80,7 +80,6 @@
   import { browser } from '$app/env'
   import Toast from '$lib/components/Toast.svelte'
   import { onDestroy } from 'svelte'
-  import type { InstantiableSvelteComponentTyped } from 'svelte-markdown'
 
   $: if (browser)
     document.documentElement.classList.toggle('dark', $preferences.darkMode)

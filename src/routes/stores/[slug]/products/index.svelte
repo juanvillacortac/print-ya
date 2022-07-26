@@ -6,6 +6,7 @@
   import Ufo from '$lib/components/__Ufo.svelte'
   import type { Store, StripedProduct } from '$lib/db'
   import trpc, { invalidateQuery } from '$lib/trpc/client'
+  import { getBasicTemplate } from '$lib/utils/modifiers'
   import { search } from '$lib/utils/search'
   import {
     Add24,
@@ -128,11 +129,13 @@
               style="aspect-ratio: 1/1"
             >
               <div class="flex h-full w-full items-center justify-center">
-                {#if product.template}
+                {#if product.type.startsWith('template')}
                   <TemplatePreview
                     lazy
                     showFonts
-                    template={product.template}
+                    template={product.type === 'template'
+                      ? getBasicTemplate(product)
+                      : product.template}
                     controls={false}
                   />
                 {/if}

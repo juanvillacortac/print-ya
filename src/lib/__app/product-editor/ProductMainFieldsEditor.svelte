@@ -61,8 +61,9 @@
               class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
               bind:value={product.type}
             >
-              <option value={'template'}>Custom template</option>
               <option value={'generic'}>Static product</option>
+              <option value={'template'}>Custom design</option>
+              <option value={'template_pro'}>Custom design (advanced)</option>
             </select>
           </div>
         {/if}

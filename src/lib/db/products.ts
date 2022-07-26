@@ -239,7 +239,7 @@ export const upsertProduct = async (
           },
           create: {
             name: m.name,
-            id: undefined,
+            id: m.id,
             product: {
               connect: {
                 id: product.id,
@@ -366,6 +366,7 @@ export const upsertProduct = async (
         create: product
           .modifiers!.filter((m) => m.active)
           .map((m, idx) => ({
+            id: m.id,
             ordinal: idx,
             name: m.name,
             type: m.type,

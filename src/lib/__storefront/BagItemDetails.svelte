@@ -28,7 +28,7 @@
   export let disabled = false
 
   let compiler: Worker
-  let fields = ''
+  let template
 
   onMount(async () => {
     const ModifiersWorker = await import(
@@ -38,7 +38,7 @@
     compiler = new ModifiersWorker()
 
     compiler.onmessage = ({ data }: MessageEvent<string>) => {
-      fields = data
+      template = data
     }
   })
 
@@ -65,7 +65,7 @@
   $: if (product) {
     compiler?.postMessage({ product, modifiers: $modifiers })
   } else {
-    fields = ''
+    template = ''
   }
 
   $: setModifiers((item?.modifiers as ModifiersMap) || {})
@@ -95,7 +95,7 @@
     change(product, item?.modifiers, $modifiers)
     item = undefined
     product = undefined
-    fields = ''
+    template = ''
     $modifiers = {}
   }
 </script>
@@ -129,8 +129,7 @@
               <TemplatePreview
                 watermark
                 template={{
-                  ...(product?.template || {}),
-                  fields,
+                  ...(template || {}),
                 }}
                 mockups={product.meta?.mockups}
               />

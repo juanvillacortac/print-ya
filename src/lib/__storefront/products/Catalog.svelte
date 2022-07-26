@@ -8,6 +8,7 @@
 
   import type { StripedProduct } from '$lib/db'
   import { favorites } from '$lib/stores'
+  import { getBasicTemplate } from '$lib/utils/modifiers'
   import { search as s } from '$lib/utils/search'
   import AppLayout from '$lib/__layouts/AppLayout.svelte'
   import {
@@ -95,7 +96,7 @@
           style="will-change: transform"
           on:click={() => goto(`/products/${p.slug}`)}
         >
-          {#if p.template}
+          {#if p.type.startsWith('template')}
             <div
               class="flex h-full w-full pointer-events-none aspect-square"
               use:squareratio
@@ -104,7 +105,9 @@
                 lazy
                 watermark
                 showFonts
-                template={p.template}
+                template={p.type === 'template'
+                  ? getBasicTemplate(p)
+                  : p.template}
                 controls={false}
               />
             </div>
