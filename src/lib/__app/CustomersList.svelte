@@ -371,29 +371,6 @@
                   </div>
                 </div>
               </div>
-              <!-- <div class="flex w-full justify-between items-center">
-                <div class="flex space-x-2 items-center">
-                  <p
-                    class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-gray-600"
-                    class:!bg-green-500={c.fulfillmentStatus === 'fulfilled'}
-                    class:!text-white={c.fulfillmentStatus === 'fulfilled'}
-                  >
-                    {c.fulfillmentStatus.split('_').join(' ')}
-                  </p>
-                  <p class="text-xs">{c.items?.length || 0} items</p>
-                </div>
-                <p class="text-xs">
-                  Revenue: <span class="font-bold text-gray-800 dark:text-white"
-                    >${Math.max(
-                      0,
-                      getTotal(c) - totalFees(c.fees, getTotal(c))
-                    ).toLocaleString('en', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}</span
-                  >
-                </p>
-              </div> -->
             </button>
           {/each}
         </div>
