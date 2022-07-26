@@ -281,7 +281,7 @@
                     id: fontId,
                     name: 'Custom font',
                     active: true,
-                    type: 'image',
+                    type: 'font',
                     items: [
                       {
                         name: 'Macondo',
