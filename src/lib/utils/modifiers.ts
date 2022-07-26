@@ -102,7 +102,7 @@ export const DEFAULT_TEMPLATE_HTML = `<script>
   const textComponent = (text) => text ? \`<p class="\${image ? 'flex-grow !pb-10' : ''} text-center w-full text-6xl">\${text}</p>\`: ''
 </script>
 <div
-  class="overflow-hidden w-full h-full flex items-center {{= image ? 'justify-between pt-10' : 'justify-center' }} flex-col space-y-2 {{= locals.mirror ? 'mirror' : '' }}"
+  class="overflow-hidden w-full h-full flex items-center {{= image ? \`'justify-between \${text ? 'pt-10' : 'py-10'}\` : 'justify-center' }} flex-col space-y-2 {{= locals.mirror ? 'mirror' : '' }}"
   style="--image: url({{=imageUrl}})"
 >
   {{ if (image) { }}<div class="flex h-full bg-red-500 w-full image"></div>{{ } }}
