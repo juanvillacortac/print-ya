@@ -40,10 +40,10 @@
           path: '/shopify',
         })
         uploading = false
-        // trpc().mutation('utils:importShopifyProducts', {
-        //   storeId: store!.id,
-        //   supabasePath: path,
-        // })
+        trpc().mutation('utils:importShopifyProducts', {
+          storeId: store!.id,
+          supabasePath: path,
+        })
       }
     }
     reader.readAsText(input)
