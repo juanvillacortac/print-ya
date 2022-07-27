@@ -1,5 +1,6 @@
-import { prisma, slugify } from './common'
+import { prisma } from './common'
 import type { Store as _Store, StoreCategory } from '@prisma/client'
+import { slugify } from '$lib/utils/utils'
 
 export type Store = _Store & {
   contactData?: any

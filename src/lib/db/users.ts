@@ -1,7 +1,8 @@
-import { prisma, slugify } from './common'
+import { prisma } from './common'
 import bcrypt from 'bcryptjs'
 import type { RequestEvent } from '@sveltejs/kit/types/internal'
 import type { User } from '@prisma/client'
+import { slugify } from '$lib/utils/utils'
 
 export async function hashPassword(password: string): Promise<string> {
   const saltRounds = 15

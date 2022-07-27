@@ -1,4 +1,4 @@
-import { prisma, slugify } from './common'
+import { prisma } from './common'
 import type {
   Prisma,
   Product as _Product,
@@ -9,6 +9,7 @@ import type {
 } from '@prisma/client'
 import type { TemplateSource } from '$lib/compiler'
 import { nanoid } from 'nanoid'
+import { slugify } from '$lib/utils/utils'
 
 export type ProductModifierItem = Omit<_ProductModifierItem, 'ordinal'> & {
   meta: any

@@ -1,9 +1,10 @@
 <script context="module">
   /** @type {import('@sveltejs/kit').Load} */
   export function load({ error, status }) {
+    console.log(error)
     return {
       props: {
-        ...error,
+        error,
         status, // same as status: status
       },
     }
@@ -11,8 +12,7 @@
 </script>
 
 <script>
-  export let message
-  export let stack
+  export let error
   export let status
 </script>
 
@@ -20,8 +20,10 @@
   {status}
 </div>
 
-<p class="my-4">{message}</p>
+<p class="my-4">{error.name}</p>
 
-{#if stack}
-  <pre>{stack}</pre>
+<p class="my-4">{error.message}</p>
+
+{#if error.stack}
+  <pre>{error.stack}</pre>
 {/if}

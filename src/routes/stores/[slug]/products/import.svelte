@@ -8,11 +8,7 @@
   import type { Product, Store } from '$lib/db'
   import { uploadFile } from '$lib/supabase'
   import trpc from '$lib/trpc/client'
-  import {
-    generateDefaultModifiers,
-    getBasicTemplate,
-    parseShopifyProductsCSV,
-  } from '$lib/utils/modifiers'
+  import { getBasicTemplate } from '$lib/utils/modifiers'
   import {
     Category32,
     Checkmark24,
@@ -44,10 +40,10 @@
           path: '/shopify',
         })
         uploading = false
-        trpc().mutation('utils:importShopifyProducts', {
-          storeId: store!.id,
-          supabasePath: path,
-        })
+        // trpc().mutation('utils:importShopifyProducts', {
+        //   storeId: store!.id,
+        //   supabasePath: path,
+        // })
       }
     }
     reader.readAsText(input)

@@ -1,4 +1,4 @@
-import { slugify, type Product, type ProductModifier } from '$lib/db'
+import type { Product, ProductModifier } from '$lib/db'
 import { writable } from 'svelte/store'
 import type { Prisma } from '@prisma/client'
 import type { TemplateSource } from '$lib/compiler'
