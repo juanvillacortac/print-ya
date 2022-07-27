@@ -192,7 +192,7 @@ export async function parseShopifyProductsCSV(
     (p) => {
       const { meta, modifiers } = generateDefaultModifiers()
       const id = nanoid(6).toLocaleLowerCase()
-      let slug = `${slugify(p.name!)}-${id}`
+      let slug = `${slugify(p.Title)}-${id}`
       const product: Partial<Product> & { internalId: string } = {
         internalId: crypto.randomUUID(),
         name: p.Title,
