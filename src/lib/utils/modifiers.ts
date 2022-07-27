@@ -5,6 +5,7 @@ import type { TemplateSource } from '$lib/compiler'
 import cuid from 'cuid'
 import csvtojson from 'csvtojson'
 import { nanoid } from 'nanoid'
+import { slugify } from './utils'
 
 export type ModifierValue = {
   value?: any
