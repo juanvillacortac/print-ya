@@ -50,3 +50,14 @@ export const uploadFile = async ({
   }
   return { url: publicURL, path: filePath }
 }
+
+export const downloadFile = async ({
+  path,
+  bucket,
+}: Record<'path' | 'bucket', string>) => {
+  let { error, data } = await supabase.storage.from(bucket).download(path)
+  if (error) {
+    throw error
+  }
+  return data
+}
