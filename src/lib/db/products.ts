@@ -393,53 +393,50 @@ export const createProductsFromBatch = async (
   products: Partial<Product>[],
   storeId: string
 ) => {
-  const batch = products.map((product) => {
-    const id = nanoid(6).toLocaleLowerCase()
-    let slug = `${slugify(product.name!)}-${id}`
-    return prisma.product.create({
-      data: {
-        name: product.name!,
-        price: product.price!,
-        type: product.type,
-        public: product.public!,
-        description: product.description,
-        meta: product.meta,
-        store: {
-          connect: {
-            id: storeId,
-          },
-        },
-        storeCategory: {
-          connect: {
-            id: product.storeCategoryId!,
-          },
-        },
-        template: product.template,
-        templateDraft: product.template,
-        modifiers: {
-          create: product
-            .modifiers!.filter((m) => m.active)
-            .map((m, idx) => ({
-              id: m.id,
-              ordinal: idx,
-              name: m.name,
-              type: m.type,
-              defaultValue: m.defaultValue || undefined,
-              templateAccessor: m.templateAccessor || undefined,
-              items: {
-                create: m.items!.map((i, idx) => ({
-                  ordinal: idx,
-                  name: i.name,
-                  cost: i.cost,
-                  meta: i.meta,
-                  percentage: i.percentage,
-                })),
-              },
-            })),
-        },
-        slug,
+  const data = products.map((product) => ({
+    name: product.name!,
+    price: product.price!,
+    type: product.type,
+    public: product.public!,
+    description: product.description,
+    meta: product.meta,
+    slug: product.slug || '',
+    store: {
+      connect: {
+        id: storeId,
       },
-    })
+    },
+    storeCategory: {
+      connect: {
+        id: product.storeCategoryId!,
+      },
+    },
+    template: product.template,
+    templateDraft: product.template,
+    modifiers: {
+      create: product
+        .modifiers!.filter((m) => m.active)
+        .map((m, idx) => ({
+          id: m.id,
+          ordinal: idx,
+          name: m.name,
+          type: m.type,
+          defaultValue: m.defaultValue || undefined,
+          templateAccessor: m.templateAccessor || undefined,
+          items: {
+            create: m.items!.map((i, idx) => ({
+              ordinal: idx,
+              name: i.name,
+              cost: i.cost,
+              meta: i.meta,
+              percentage: i.percentage,
+            })),
+          },
+        })),
+    },
+  }))
+  const batch = await prisma.product.createMany({
+    data,
   })
-  return (await prisma.$transaction(batch)).length
+  return batch.count
 }

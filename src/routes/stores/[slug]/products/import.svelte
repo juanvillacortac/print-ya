@@ -37,17 +37,17 @@
 
     reader.onload = async () => {
       if (typeof reader.result === 'string') {
+        uploading = true
         const { path } = await uploadFile({
           file: input,
           bucket: 'assets',
           path: '/shopify',
         })
-        const data = await trpc().mutation('utils:importShopifyProducts', {
+        uploading = false
+        trpc().mutation('utils:importShopifyProducts', {
           storeId: store!.id,
           supabasePath: path,
         })
-        console.log(data)
-        // products = await parseShopifyProductsCSV({ body: reader.result })
       }
     }
     reader.readAsText(input)
@@ -196,7 +196,9 @@
       on:click={() => document.getElementById('csv-input')?.click()}
     >
       <CloudUpload32 class="text-gray-500" />
-      <div class="font-bold text-center text-gray-500">Upload CSV file</div>
+      <div class="font-bold text-center text-gray-500">
+        {uploading ? 'Uploading...' : 'Upload CSV file'}
+      </div>
     </button>
   </div>
 {:else}

@@ -1,9 +1,10 @@
-import type { Product, ProductModifier } from '$lib/db'
+import { slugify, type Product, type ProductModifier } from '$lib/db'
 import { writable } from 'svelte/store'
 import type { Prisma } from '@prisma/client'
 import type { TemplateSource } from '$lib/compiler'
 import cuid from 'cuid'
 import csvtojson from 'csvtojson'
+import { nanoid } from 'nanoid'
 
 export type ModifierValue = {
   value?: any
@@ -189,11 +190,13 @@ export async function parseShopifyProductsCSV(
   const products: (Partial<Product> & { internalId: string })[] = data.map(
     (p) => {
       const { meta, modifiers } = generateDefaultModifiers()
+      const id = nanoid(6).toLocaleLowerCase()
+      let slug = `${slugify(p.name!)}-${id}`
       const product: Partial<Product> & { internalId: string } = {
         internalId: crypto.randomUUID(),
         name: p.Title,
         type: 'template',
-        slug: p.Handle,
+        slug,
         meta: {
           mockups: [],
           templateImage: p['Image Src'],
@@ -207,6 +210,7 @@ export async function parseShopifyProductsCSV(
       return product
     }
   )
+
   return products
 }
 

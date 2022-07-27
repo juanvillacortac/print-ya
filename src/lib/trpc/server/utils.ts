@@ -2,9 +2,11 @@ import * as trpc from '@trpc/server'
 import { z } from 'zod'
 import type { tRPCContext } from '.'
 import { get } from '$lib/api'
+import * as db from '$lib/db'
 import { downloadFile } from '$lib/supabase'
-import { createWriteStream } from 'node:fs'
 import { parseShopifyProductsCSV } from '$lib/utils/modifiers'
+import { marked } from 'marked'
+import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 
 const coords = z.object({
   latitude: z.number(),
@@ -33,7 +35,9 @@ export default trpc
       supabasePath: z.string(),
       storeId: z.string().cuid(),
     }),
-    resolve: async ({ input }) => {
+    resolve: async ({ input, ctx }) => {
+      const { userId } = await db.getUserDetails(ctx.event)
+      if (!userId) return
       const start = Date.now()
       const blob = await downloadFile({
         bucket: 'assets',
@@ -42,25 +46,41 @@ export default trpc
       if (!blob) return
       const downloadedIn = Date.now() - start
       const body = await blob.text()
-      // const _ = await new Promise<void>((resolve, reject) => {
-      //   createWriteStream(filePath).write(Buffer.from(arrayBuffer), (err) => {
-      //     if (err) {
-      //       reject(err)
-      //       return
-      //     }
-      //     resolve()
-      //     return
-      //   })
-      // })
       const startParsing = Date.now()
       const products = await parseShopifyProductsCSV({ body })
       const totalElapsed = Date.now() - start
       const elapsedParsing = Date.now() - startParsing
-      return {
-        downloadedIn,
-        totalElapsed,
-        elapsedParsing,
-        count: products.length,
+
+      const count = await db.createProductsFromBatch(products, input.storeId)
+
+      const template = `You successfully imported ${count} products from **Shopify**`
+
+      const html = marked(template, {
+        sanitize: true,
+      })
+
+      let to = [(await db.getUser({ userId }))!.email]
+
+      const msg: MailDataRequired = {
+        to: [...new Set(to)],
+        from: {
+          name: `ShackCart`,
+          email: `contact@shackcart.com`,
+        },
+
+        headers: {
+          Priority: 'Urgent',
+          Importance: 'high',
+        },
+        subject: `Products imported`,
+        html,
       }
+      await sendgrid.send(msg)
+      // return {
+      //   downloadedIn,
+      //   totalElapsed,
+      //   elapsedParsing,
+      //   count: products.length,
+      // }
     },
   })
