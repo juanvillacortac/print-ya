@@ -34,48 +34,74 @@ export default trpc
     input: z.object({
       supabasePath: z.string(),
       storeId: z.string().cuid(),
+      categoryId: z.string().cuid().optional(),
     }),
     resolve: async ({ input, ctx }) => {
       const { userId } = await db.getUserDetails(ctx.event)
       if (!userId) return
-      const start = Date.now()
+      // const start = Date.now()
       const blob = await downloadFile({
         bucket: 'assets',
         path: input.supabasePath,
       })
       if (!blob) return
-      const downloadedIn = Date.now() - start
+      // const downloadedIn = Date.now() - start
       const body = await blob.text()
-      const startParsing = Date.now()
-      const products = await parseShopifyProductsCSV({ body })
-      const totalElapsed = Date.now() - start
-      const elapsedParsing = Date.now() - startParsing
+      // const startParsing = Date.now()
+      const products = await parseShopifyProductsCSV(
+        input.categoryId || undefined,
+        { body }
+      )
+      // const totalElapsed = Date.now() - start
+      // const elapsedParsing = Date.now() - startParsing
 
-      const count = await db.createProductsFromBatch(products, input.storeId)
+      try {
+        const count = await db.createProductsFromBatch(products, input.storeId)
 
-      const template = `You successfully imported ${count} products from **Shopify**`
+        const template = `You successfully imported ${count} products from **Shopify**`
 
-      const html = marked(template, {
-        sanitize: true,
-      })
+        const html = marked(template, {
+          sanitize: true,
+        })
 
-      let to = [(await db.getUser({ userId }))!.email]
+        let to = [(await db.getUser({ userId }))!.email]
 
-      const msg: MailDataRequired = {
-        to: [...new Set(to)],
-        from: {
-          name: `ShackCart`,
-          email: `contact@shackcart.com`,
-        },
+        const msg: MailDataRequired = {
+          to: [...new Set(to)],
+          from: {
+            name: `ShackCart`,
+            email: `contact@shackcart.com`,
+          },
 
-        headers: {
-          Priority: 'Urgent',
-          Importance: 'high',
-        },
-        subject: `Products imported`,
-        html,
+          headers: {
+            Priority: 'Urgent',
+            Importance: 'high',
+          },
+          subject: `Products imported`,
+          html,
+        }
+        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        await sendgrid.send(msg)
+      } catch (err) {
+        let to = [(await db.getUser({ userId }))!.email]
+
+        const msg: MailDataRequired = {
+          to: [...new Set(to)],
+          from: {
+            name: `ShackCart`,
+            email: `contact@shackcart.com`,
+          },
+
+          headers: {
+            Priority: 'Urgent',
+            Importance: 'high',
+          },
+          subject: `Error importing products`,
+          html: `<pre>${JSON.stringify(err, undefined, '  ')}</pre>`,
+        }
+        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        await sendgrid.send(msg)
       }
-      await sendgrid.send(msg)
       // return {
       //   downloadedIn,
       //   totalElapsed,

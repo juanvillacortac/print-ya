@@ -130,16 +130,27 @@
     }
   }
 
-  const submit = async () => {
+  $: submit = async () => {
     if (!validate()) {
       return
     }
     try {
       saving = true
+      console.log(product)
       const data = await trpc().mutation('products:upsert', {
         storeSlug: store.slug,
         data: {
-          ...product,
+          id: product.id,
+          slug: product.slug,
+          description: product.description,
+          meta: product.meta,
+          name: product.name,
+          price: product.price,
+          storeCategoryId: product.storeCategoryId,
+          type: product.type,
+          public: product.public,
+          minQuantity: product.minQuantity,
+          tags: product.tags,
           modifiers,
           storeId: store.id,
         },
@@ -153,6 +164,7 @@
         goto(`/stores/${store.slug}/products/${data?.slug}`)
         return
       }
+      console.log(data)
       title = data!.name
       modifiers = data!.modifiers!.map((m) => ({
         ...m,

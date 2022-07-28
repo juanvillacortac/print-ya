@@ -4,9 +4,8 @@
 
   export const load: Load = async ({ params, fetch, stuff }) => {
     const store = stuff.store!
-    const products = await trpc(fetch).query('products:list', {
+    const { products } = await trpc(fetch).query('products:list', {
       storeSlug: store.slug,
-      public: true,
     })
     return {
       stuff: { ...stuff, products },

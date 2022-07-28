@@ -89,6 +89,7 @@ model Store {
   customers       Customer[]
 
   contactData Json?
+  ProductTag  ProductTag[]
 }
 
 model PaymentGateway {
@@ -113,6 +114,17 @@ enum ProductType {
   template
   template_pro
   generic
+}
+
+model ProductTag {
+  id    String @id @default(cuid())
+  store Store  @relation(fields: [storeId], references: [id])
+  name  String
+
+  products TagsOnProducts[]
+  storeId  String
+
+  @@unique([name, storeId])
 }
 
 model Product {
@@ -149,6 +161,19 @@ model Product {
   storeCategoryId String?
 
   orderItems OrderItem[]
+
+  tags TagsOnProducts[]
+
+  @@unique([slug, storeId])
+}
+
+model TagsOnProducts {
+  product      Product    @relation(fields: [productId], references: [id])
+  tag          ProductTag @relation(fields: [productTagId], references: [id])
+  productId    String
+  productTagId String
+
+  @@id([productId, productTagId])
 }
 
 model ProductImage {

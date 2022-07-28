@@ -29,6 +29,8 @@
   import { fly, scale } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import trpc from '$lib/trpc/client'
+  import { writable } from 'svelte/store'
+  import { setContext } from 'svelte'
 
   $: path = $page.url.pathname
   $: store = $page.stuff.store
@@ -102,7 +104,9 @@
 
   let el: HTMLDivElement | undefined
   let gradientVisible = false
-  let navHeight = 0
+  const navHeight = writable(0)
+
+  setContext('navHeight', navHeight)
 
   $: if (el) {
     gradientVisible = el.clientWidth < el.scrollWidth
@@ -135,7 +139,7 @@
         <div
           class="w-full overflow-auto relative no-scrollbar"
           bind:this={el}
-          bind:clientHeight={navHeight}
+          bind:clientHeight={$navHeight}
           on:scroll={scroll}
         >
           <div class="flex space-x-4 m-4 w-full">
@@ -402,7 +406,7 @@
           </div>
         {/if}
         <Transition url={$page.url.pathname}>
-          <div class="<lg:pb-$nh" style:--nh="{navHeight}px">
+          <div class="<lg:pb-$nh" style:--nh="{$navHeight}px">
             <slot />
           </div>
         </Transition>

@@ -4,6 +4,8 @@
   export const load: Load = async ({ fetch, stuff }) => {
     const data = await trpc(fetch).query('products:list', {
       storeSlug: stuff.store?.slug || '',
+      page: 1,
+      pageSize: 4,
     })
     // const data = await get<StripedProduct[]>(
     //   `/api/stores/${stuff.store?.slug}/products`,
@@ -12,7 +14,7 @@
     return {
       props: {
         data: {
-          products: data?.filter((p) => p.public) || [],
+          products: data.products.filter((p) => p.public) || [],
         },
       },
     }

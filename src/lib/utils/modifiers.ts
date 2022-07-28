@@ -180,6 +180,7 @@ export function getBasicTemplate<T extends Partial<Product>>(
 }
 
 export async function parseShopifyProductsCSV(
+  categoryId: string | undefined,
   obj: { body: string } | { filePath: string } | never
 ): Promise<(Partial<Product> & { internalId: string })[]> {
   let data: any[]
@@ -197,12 +198,19 @@ export async function parseShopifyProductsCSV(
         internalId: crypto.randomUUID(),
         name: p.Title,
         type: 'template',
+        storeCategoryId: categoryId,
         slug,
         meta: {
           mockups: [],
           templateImage: p['Image Src'],
           ...meta,
         },
+        tags: String(p['Tags'])
+          .split(', ')
+          .map((t) => ({
+            name: t,
+            id: '',
+          })),
         description: p['Body (HTML)'],
         public: false,
         price: Number.parseFloat(p['Variant Price']),

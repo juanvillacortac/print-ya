@@ -1,25 +1,10 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit'
-  import trpc from '$lib/trpc/client'
-
-  export const load: Load = async ({ params, fetch, stuff }) => {
-    const store = stuff.store!
-    const products = await trpc(fetch).query('products:list', {
-      storeSlug: store.slug,
-      public: true,
-    })
-    return {
-      stuff: { ...stuff, products },
-    }
-  }
-</script>
-
 <script lang="ts">
   import Catalog from '$lib/__storefront/products/Catalog.svelte'
   import { page } from '$app/stores'
   import { createQueryStore, favorites } from '$lib'
   import { onMount } from 'svelte'
   import type { StripedProduct } from '$lib/db'
+  import trpc from '$lib/trpc/client'
 
   const search = createQueryStore('search')
   const category = createQueryStore('category')

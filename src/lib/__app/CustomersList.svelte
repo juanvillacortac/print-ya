@@ -168,31 +168,6 @@
         class="flex flex-col font-bold divide-y-1 divide-gray-300 text-xs text-gray-80 dark:divide-gray-600 dark:text-white"
         slot="body"
       >
-        <!-- <div class="flex flex-col space-y-3 pb-3">
-          <p class="font-bold">Order date</p>
-          <label class="flex font-normal space-x-2 text-xs">
-            <input
-              type="radio"
-              value={sorters.createdAt.asc}
-              bind:group={sortBy}
-            />
-            <div class="flex space-x-1 items-center">
-              <ChevronUp16 />
-              <span>Ascending</span>
-            </div>
-          </label>
-          <label class="flex font-normal space-x-2 text-xs">
-            <input
-              type="radio"
-              value={sorters.createdAt.desc}
-              bind:group={sortBy}
-            />
-            <div class="flex space-x-1 items-center">
-              <ChevronDown16 />
-              <span>Descending</span>
-            </div>
-          </label>
-        </div> -->
         <div class="flex flex-col space-y-3 pb-3">
           <p class="font-bold">First name</p>
           <label class="flex font-normal space-x-2 text-xs">

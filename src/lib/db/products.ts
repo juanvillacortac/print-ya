@@ -4,11 +4,11 @@ import type {
   Product as _Product,
   ProductModifier as _ProductModifier,
   ProductModifierItem as _ProductModifierItem,
+  ProductTag,
   Store as _Store,
   StoreCategory,
 } from '@prisma/client'
 import type { TemplateSource } from '$lib/compiler'
-import { nanoid } from 'nanoid'
 import { slugify } from '$lib/utils/utils'
 
 export type ProductModifierItem = Omit<_ProductModifierItem, 'ordinal'> & {
@@ -24,12 +24,34 @@ export type Product<T extends TemplateSource = any> = _Product & {
   template: T
   meta?: any
   storeCategory: StoreCategory | null
+  tags: Omit<ProductTag, 'storeId'>[]
   modifiers: ProductModifier[]
 }
 
-export type StripedProduct = Omit<_Product, 'templateDraft' | 'archived'> & {
+export type StripedProduct = Omit<_Product, 'templateDraft'> & {
   storeCategory: StoreCategory | null
 }
+
+export const getTags = ({
+  name,
+  storeId,
+}: {
+  name?: string
+  storeId: string
+}) =>
+  prisma.productTag.findMany({
+    where: {
+      name: name
+        ? {
+            contains: name,
+          }
+        : undefined,
+      storeId,
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  })
 
 export const getProductById = (id: string): Promise<Product | null> =>
   prisma.product
@@ -39,6 +61,11 @@ export const getProductById = (id: string): Promise<Product | null> =>
       },
       include: {
         storeCategory: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
         modifiers: {
           where: {
             active: true,
@@ -59,8 +86,10 @@ export const getProductById = (id: string): Promise<Product | null> =>
         },
       },
     })
-    .then((data: Product | null) => {
+    .then((data) => {
       if (data) {
+        // @ts-ignore
+        data.tags = data.tags?.map((t) => t.tag) || []
         data.modifiers = data!.modifiers!.map((m) => {
           // @ts-ignore
           delete m?.ordinal
@@ -72,7 +101,7 @@ export const getProductById = (id: string): Promise<Product | null> =>
           return m
         })
       }
-      return data
+      return data as Product | null
     })
 
 export const getProductBySlug = ({
@@ -83,13 +112,20 @@ export const getProductBySlug = ({
   storeId: string
 }): Promise<Product | null> =>
   prisma.product
-    .findFirst({
+    .findUnique({
       where: {
-        slug,
-        storeId,
+        slug_storeId: {
+          slug,
+          storeId,
+        },
       },
       include: {
         storeCategory: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
         modifiers: {
           where: {
             active: true,
@@ -110,8 +146,10 @@ export const getProductBySlug = ({
         },
       },
     })
-    .then((data: Product | null) => {
+    .then((data) => {
       if (data) {
+        // @ts-ignore
+        data.tags = data.tags?.map((t) => t.tag) || []
         data.modifiers = data!.modifiers!.map((m) => {
           // @ts-ignore
           delete m?.ordinal
@@ -123,7 +161,7 @@ export const getProductBySlug = ({
           return m
         })
       }
-      return data
+      return data as Product | null
     })
 
 const getLastDays = (days: number) =>
@@ -131,56 +169,121 @@ const getLastDays = (days: number) =>
 
 export const getProductsByStore = async ({
   storeId,
-  published,
-  archived,
+  filter,
+  orderBy = {
+    createdAt: 'desc',
+  },
+  page = 1,
+  pageSize = 20,
 }: {
   storeId: string
-  published?: boolean
-  archived?: boolean
-}): Promise<StripedProduct[]> =>
-  prisma.product.findMany({
-    where: {
-      storeId,
-      public: published,
-      archived: archived || false,
-      OR: archived
-        ? [
-            {
-              archivedAt: {
-                gte: getLastDays(30).toISOString(),
+  filter?: {
+    name?: string
+    public?: boolean
+    archived?: boolean
+    categoryId?: string | null
+  }
+  orderBy?: {
+    name?: 'desc' | 'asc'
+    price?: 'desc' | 'asc'
+    createdAt?: 'desc' | 'asc'
+  }
+  page?: number
+  pageSize?: number
+}): Promise<{
+  count: number
+  products: StripedProduct[]
+}> => {
+  let AND: Prisma.ProductWhereInput[] = []
+  if (filter?.name)
+    AND = [
+      ...AND,
+      {
+        OR: [
+          {
+            name: {
+              contains: filter?.name,
+            },
+          },
+          {
+            tags: {
+              some: {
+                tag: {
+                  storeId,
+                  name: {
+                    contains: filter?.name,
+                  },
+                },
               },
             },
-            {
-              archivedAt: {
-                equals: null,
-              },
+          },
+        ],
+      },
+    ]
+  if (filter?.archived)
+    AND = [
+      ...AND,
+      {
+        OR: [
+          {
+            archivedAt: {
+              gte: getLastDays(30).toISOString(),
             },
-          ]
-        : undefined,
-    },
-    select: {
-      id: true,
-      name: true,
-      createdAt: true,
-      price: true,
-      type: true,
-      public: true,
-      slug: true,
-      description: true,
-      store: true,
-      storeCategory: true,
-      storeCategoryId: true,
-      storeId: true,
-      updatedAt: true,
-      template: true,
-      minQuantity: true,
-      meta: true,
-      archivedAt: true,
-    },
-    orderBy: {
-      name: 'asc',
-    },
-  })
+          },
+          {
+            archivedAt: {
+              equals: null,
+            },
+          },
+        ],
+      },
+    ]
+  const where: Prisma.ProductWhereInput = {
+    storeId,
+    public: filter?.public,
+    archived: filter?.archived || false,
+    storeCategoryId: filter?.categoryId,
+    AND,
+  }
+  const [count, products] = await prisma.$transaction([
+    prisma.product.count({ where }),
+    prisma.product.findMany({
+      orderBy,
+      where,
+      take: pageSize,
+      skip: pageSize * Math.max(page - 1, 0),
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        price: true,
+        type: true,
+        public: true,
+        slug: true,
+        description: true,
+        store: true,
+        storeCategory: true,
+        storeCategoryId: true,
+        storeId: true,
+        updatedAt: true,
+        archived: true,
+        template: true,
+        minQuantity: true,
+        meta: true,
+        archivedAt: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+    }),
+  ])
+  return {
+    count,
+    products: products.map((p) => ({ ...p, tags: p.tags.map((t) => t.tag) })),
+  }
+}
 
 export const upsertProduct = async (
   product: Partial<Product>,
@@ -199,6 +302,15 @@ export const upsertProduct = async (
     if (!c) {
       throw new Error('not allowed')
     }
+
+    if (product.tags) {
+      await prisma.tagsOnProducts.deleteMany({
+        where: {
+          productId: product.id,
+        },
+      })
+    }
+
     await prisma.product.update({
       where: {
         id: c?.id,
@@ -218,15 +330,42 @@ export const upsertProduct = async (
               ? new Date()
               : null
             : undefined,
-        storeCategory: product.storeCategoryId
-          ? {
-              connect: {
-                id: product.storeCategoryId || undefined,
-              },
-            }
-          : undefined,
+        storeCategory:
+          product.storeCategoryId === null
+            ? {
+                disconnect: true,
+              }
+            : product.storeCategoryId
+            ? {
+                connect: {
+                  id: product.storeCategoryId || undefined,
+                },
+              }
+            : undefined,
         template: product.template,
         templateDraft: product.templateDraft as Prisma.InputJsonObject,
+        tags: {
+          create: product.tags
+            ? product.tags.map((t) => {
+                return {
+                  tag: {
+                    connectOrCreate: {
+                      create: {
+                        name: t.name,
+                        storeId: product.storeId || '',
+                      },
+                      where: {
+                        name_storeId: {
+                          name: t.name,
+                          storeId: product.storeId || '',
+                        },
+                      },
+                    },
+                  },
+                }
+              })
+            : [],
+        },
       },
     })
     if (product.modifiers) {
@@ -311,6 +450,7 @@ export const upsertProduct = async (
       storeId: product.storeId!,
       slug: product.slug!,
     })
+    console.log(final)
     return final
   }
   let slug = slugify(product.name!)
@@ -362,6 +502,28 @@ export const upsertProduct = async (
           id: product.storeCategoryId!,
         },
       },
+      tags: {
+        create: product.tags
+          ? product.tags.map((t) => {
+              return {
+                tag: {
+                  connectOrCreate: {
+                    create: {
+                      name: t.name,
+                      storeId: product.storeId || '',
+                    },
+                    where: {
+                      name_storeId: {
+                        name: t.name,
+                        storeId: product.storeId || '',
+                      },
+                    },
+                  },
+                },
+              }
+            })
+          : [],
+      },
       template: product.template || defaultTemplate,
       templateDraft: product.template || defaultTemplate,
       modifiers: {
@@ -394,7 +556,7 @@ export const createProductsFromBatch = async (
   products: Partial<Product>[],
   storeId: string
 ) => {
-  const data = products.map((product) => ({
+  const data: Prisma.ProductCreateInput[] = products.map((product) => ({
     name: product.name!,
     price: product.price!,
     type: product.type,
@@ -402,18 +564,32 @@ export const createProductsFromBatch = async (
     description: product.description,
     meta: product.meta,
     slug: product.slug || '',
-    store: {
-      connect: {
-        id: storeId,
-      },
-    },
-    storeCategory: {
-      connect: {
-        id: product.storeCategoryId!,
-      },
-    },
+    storeId,
+    storeCategoryId: product.storeCategoryId,
     template: product.template,
     templateDraft: product.template,
+    tags: {
+      create: product.tags
+        ? product.tags.map((t) => {
+            return {
+              tag: {
+                connectOrCreate: {
+                  create: {
+                    name: t.name,
+                    storeId,
+                  },
+                  where: {
+                    name_storeId: {
+                      name: t.name,
+                      storeId: storeId,
+                    },
+                  },
+                },
+              },
+            }
+          })
+        : [],
+    },
     modifiers: {
       create: product
         .modifiers!.filter((m) => m.active)
@@ -436,8 +612,18 @@ export const createProductsFromBatch = async (
         })),
     },
   }))
-  const batch = await prisma.product.createMany({
-    data,
-  })
-  return batch.count
+
+  try {
+    const batch = await prisma.$transaction(
+      data.map((p) =>
+        prisma.product.create({
+          data: p,
+        })
+      )
+    )
+    return batch.length
+  } catch (err) {
+    console.log(err)
+  }
+  return 0
 }

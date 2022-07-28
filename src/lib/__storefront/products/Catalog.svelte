@@ -119,11 +119,13 @@
                 class="font-bold text-sm <sm:text-xl hover:underline"
                 >{p.name}</a
               >
-              <a
-                href="/products?category={p.storeCategory?.slug}"
-                class="text-xs text-blue-500 hover:underline"
-                >{p.storeCategory?.name}</a
-              >
+              {#if p.storeCategory}
+                <a
+                  href="/products?category={p.storeCategory?.slug}"
+                  class="text-xs text-blue-500 hover:underline"
+                  >{p.storeCategory?.name}</a
+                >
+              {/if}
             </div>
             <div class="flex w-full justify-between items-end">
               <p class="font-bold self-end">
