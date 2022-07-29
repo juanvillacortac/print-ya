@@ -98,7 +98,7 @@
             class="bg-white border-b border-l-0 border-r-0 border-red-900  leading-tight py-2  px-3 w-10rem appearance-none <sm:hidden !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
             bind:value={category}
           >
-            <option value="">All categories</option>
+            <option value="">All products</option>
             {#each store.categories || [] as category}
               <option value={category.slug}>{category.name}</option>
             {/each}
@@ -244,13 +244,18 @@
     </form>
     <div class="bg-red-900 text-white text-base w-full <lg:hidden">
       <div class="flex mx-auto space-x-4 text-white p-4 py-2 lg:w-9/10">
-        <a href="/">Home</a>
+        <a href="/" class="hover:underline">Home</a>
         {#each store.categories?.slice(0, 7) || [] as category}
-          <a href="/products?category={category.slug}">{category.name}</a>
+          <a class="hover:underline" href="/products?category={category.slug}"
+            >{category.name}</a
+          >
         {/each}
-        <a href="/contact">Contact</a>
-        <a href="/faq">FAQ</a>
+        <a class="hover:underline" href="/contact">Contact</a>
+        <a class="hover:underline" href="/faq">FAQ</a>
       </div>
+    </div>
+    <div class="flex bg-[#00fff4] w-full p-4 py-2 items-center justify-center">
+      <div class="text-dark-900 <sm:text-xs">Create a Custom Text Decal</div>
     </div>
   </div>
 

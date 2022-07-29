@@ -1,28 +1,45 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit'
-  import trpc from '$lib/trpc/client'
+  import type { InferQueryOutput } from '$lib/trpc/client'
 
-  export const load: Load = async ({ params, fetch, stuff }) => {
+  export const load: Load = async ({ params, fetch, stuff, url }) => {
     const store = stuff.store!
-    const { products } = await trpc(fetch).query('products:list', {
-      storeSlug: store.slug,
-    })
+    const categories = store.categories
+    const categorySlug = url.searchParams.get('category')
+    const page = url.searchParams.get('page')
+
+    const props = await fetchProducts(
+      {
+        storeSlug: store.slug,
+        search: url.searchParams.get('search') || undefined,
+        page: !page || Number.isNaN(+page) ? undefined : +page,
+        categoryId: categorySlug
+          ? categories?.find((c) => c.slug === categorySlug)?.id
+          : undefined,
+      },
+      fetch
+    )
     return {
-      stuff: { ...stuff, products },
+      stuff,
+      props,
     }
   }
 </script>
 
 <script lang="ts">
   import Catalog from '$lib/__storefront/products/Catalog.svelte'
-  import { page } from '$app/stores'
+  import { page as page_ } from '$app/stores'
   import { createQueryStore } from '$lib'
+  import { fetchProducts } from '$lib/__storefront/ProductsWrapper.svelte'
 
-  $: products = $page.stuff.products || []
+  export let products: InferQueryOutput<'products:list'>['products']
+  export let count: InferQueryOutput<'products:list'>['count']
+
   const search = createQueryStore('search')
+  const page = createQueryStore('page')
   const category = createQueryStore('category')
 
-  $: categories = $page.stuff.store?.categories || []
+  $: categories = $page_.stuff.store?.categories || []
 </script>
 
 <div class="flex flex-col mx-auto space-y-4 w-full p-4 lg:w-[90%]">
@@ -35,5 +52,10 @@
       {$category ? categories.find((c) => c.slug === $category)?.name : 'All'}
     </p>
   </div>
-  <Catalog {products} bind:search={$search} bind:category={$category} />
+  <Catalog
+    page={!$page || Number.isNaN(+$page) ? 1 : +$page}
+    {count}
+    {products}
+    bind:search={$search}
+  />
 </div>

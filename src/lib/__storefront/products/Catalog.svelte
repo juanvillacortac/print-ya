@@ -9,34 +9,47 @@
   import type { StripedProduct } from '$lib/db'
   import { favorites } from '$lib/stores'
   import { getBasicTemplate } from '$lib/utils/modifiers'
-  import { search as s } from '$lib/utils/search'
-  import AppLayout from '$lib/__layouts/AppLayout.svelte'
   import {
     Categories16,
     Category16,
+    ChevronLeft24,
+    ChevronRight24,
     Favorite24,
-    Favorite32,
     FavoriteFilled24,
   } from 'carbon-icons-svelte'
-  import { flip } from 'svelte/animate'
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'
 
   $: store = $page.stuff.store!
 
-  export let products: StripedProduct[] = []
-  export let category: string = ''
+  export let products: StripedProduct[]
+  export let count: number
   export let search: string = ''
 
-  function getCategoryLink(slug: string) {
+  let pageNumber: number
+  export { pageNumber as page }
+
+  $: pages = Math.ceil(count / 20)
+
+  function getPageLink(pageNumber: number) {
     const query = new URLSearchParams($page.url.searchParams)
-    query.set('category', slug)
+    query.set('page', String(pageNumber))
     return `?${query.toString()}`
   }
 
-  $: filteredProducts = s(products, search || '', ['name']).filter((p) =>
-    category ? p.storeCategory?.slug === category : true
-  )
+  function getCategoryLink(slug: string) {
+    const query = new URLSearchParams($page.url.searchParams)
+    if (slug) {
+      query.set('category', slug)
+    } else {
+      query.delete('category')
+    }
+    return `?${query.toString()}`
+  }
+
+  // $: filteredProducts = s(products, search || '', ['name']).filter((p) =>
+  //   category ? p.storeCategory?.slug === category : true
+  // )
 </script>
 
 <div class="flex w-full lg:space-x-4 <lg:flex-col <lg:space-y-4">
@@ -54,7 +67,7 @@
         class="rounded-tl rounded-tr flex space-x-2  bg-red-900 text-white w-full p-2 items-center"
       >
         <Category16 />
-        <h3 class="font-bold text-xs">Categories</h3>
+        <h3 class="font-bold text-xs">Collections</h3>
       </div>
       <div
         class="border-b border-l border-r rounded-bl rounded-br flex flex-col h-full space-y-2 border-gray-300 p-2 dark:border-gray-600"
@@ -66,7 +79,7 @@
           class="flex space-x-2 text-xs hover:underline"
         >
           <Categories16 />
-          <span> All categories</span>
+          <span> All products</span>
         </a>
         {#each store?.categories || [] as category}
           <a
@@ -84,81 +97,123 @@
       </div>
     </div>
   </div>
-  {#if filteredProducts.length}
-    <div
-      class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:w-8/10 lg:grid-cols-4"
-      in:fly|local={{ y: 10, duration: 400 }}
-    >
-      {#each filteredProducts as p (p.id)}
-        <div
-          class="bg-white border rounded-lg cursor-pointer flex flex-col space-y-2 border-gray-300 p-2 transform transition-all relative dark:bg-gray-800 dark:border-gray-600 hover:shadow-lg hover:scale-102"
-          animate:flip={{ duration: 400, easing: expoOut }}
-          style="will-change: transform"
-          on:click={() => goto(`/products/${p.slug}`)}
-        >
-          {#if p.type.startsWith('template')}
-            <div
-              class="flex h-full w-full pointer-events-none aspect-square"
-              use:squareratio
+  {#if products?.length}
+    <div class="flex flex-col space-y-2 lg:w-8/10">
+      <div class="flex h-33px w-full items-center justify-between">
+        <span class="font-bold text-xs leading-0">
+          {count} products found
+        </span>
+        <div class="flex space-x-4 items-center">
+          <a
+            href={getPageLink(Math.max(pageNumber - 1, 1))}
+            disabled={pageNumber === 1}
+            title="Previous page"
+            sveltekit:prefetch
+            use:tooltip
+          >
+            <ChevronLeft24 />
+          </a>
+          <div class="flex font-bold space-x-2 text-xs text-gray-400 uppercase">
+            <!-- <select
+              bind:value={pageNumber}
+              class="bg-transparent font-bold !border-none !outline-none !appearance-none"
             >
-              <TemplatePreview
-                lazy
-                watermark
-                showFonts
-                template={p.type === 'template'
-                  ? getBasicTemplate(p)
-                  : p.template}
-                controls={false}
-              />
-            </div>
-          {/if}
-          <div class="flex flex-col flex-grow h-full space-y-1 justify-between">
-            <div class="flex flex-col space-y-1">
-              <a
-                href="/products/{p.slug}"
-                class="font-bold text-sm <sm:text-xl hover:underline"
-                >{p.name}</a
+              {#each Array.from({ length: pages })
+                .fill({})
+                .map((_, idx) => idx + 1) as n}
+                <option value={n}>{n}</option>
+              {/each}
+            </select> -->
+            <p>{pageNumber}</p>
+            <span>/</span>
+            <p>{pages}</p>
+          </div>
+          <a
+            href={getPageLink(Math.min(pageNumber + 1, pages))}
+            sveltekit:prefetch
+            title="Next page"
+            use:tooltip
+          >
+            <ChevronRight24 />
+          </a>
+        </div>
+      </div>
+      <div
+        class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+        in:fly|local={{ y: 10, duration: 400 }}
+      >
+        {#each products as p (p.id)}
+          <div
+            class="bg-white border rounded-lg cursor-pointer flex flex-col space-y-2 border-gray-300 w-full p-2 transform transition-all relative dark:bg-gray-800 dark:border-gray-600 hover:shadow-lg hover:scale-102"
+            style="will-change: transform"
+            on:click={() => goto(`/products/${p.slug}`)}
+          >
+            {#if p.type.startsWith('template')}
+              <div
+                class="flex w-full pointer-events-none aspect-square"
+                use:squareratio
               >
-              {#if p.storeCategory}
+                <TemplatePreview
+                  lazy
+                  watermark
+                  showFonts
+                  template={p.type === 'template'
+                    ? getBasicTemplate(p)
+                    : p.template}
+                  controls={false}
+                />
+              </div>
+            {/if}
+            <div
+              class="flex flex-col flex-grow h-full space-y-1 justify-between"
+            >
+              <div class="flex flex-col space-y-1">
                 <a
-                  href="/products?category={p.storeCategory?.slug}"
-                  class="text-xs text-blue-500 hover:underline"
-                  >{p.storeCategory?.name}</a
+                  href="/products/{p.slug}"
+                  class="font-bold text-sm <sm:text-xl hover:underline"
+                  >{p.name}</a
                 >
-              {/if}
-            </div>
-            <div class="flex w-full justify-between items-end">
-              <p class="font-bold self-end">
-                ${p.price.toLocaleString('en', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
-              {#if $favorites.existInFavorites(p.id)}
-                <button
-                  class="flex text-pink-500 relative hover:text-pink-400"
-                  title="Remove from favorites"
-                  on:click|preventDefault|stopPropagation={() =>
-                    favorites.delete(p.id)}
-                  use:tooltip
-                >
-                  <FavoriteFilled24 />
-                </button>
-              {:else}
-                <button
-                  class="flex text-gray-400 relative hover:text-pink-500"
-                  title="Add to favorites"
-                  on:click|preventDefault|stopPropagation={() =>
-                    favorites.addToFavorites(p.id)}
-                  use:tooltip
-                >
-                  <Favorite24 />
-                </button>
-              {/if}
+                {#if p.storeCategory}
+                  <a
+                    href="/products?category={p.storeCategory?.slug}"
+                    class="text-xs text-blue-500 hover:underline"
+                    >{p.storeCategory?.name}</a
+                  >
+                {/if}
+              </div>
+              <div class="flex w-full justify-between items-end">
+                <p class="font-bold self-end">
+                  ${p.price.toLocaleString('en', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
+                {#if $favorites.existInFavorites(p.id)}
+                  <button
+                    class="flex text-pink-500 relative hover:text-pink-400"
+                    title="Remove from favorites"
+                    on:click|preventDefault|stopPropagation={() =>
+                      favorites.delete(p.id)}
+                    use:tooltip
+                  >
+                    <FavoriteFilled24 />
+                  </button>
+                {:else}
+                  <button
+                    class="flex text-gray-400 relative hover:text-pink-500"
+                    title="Add to favorites"
+                    on:click|preventDefault|stopPropagation={() =>
+                      favorites.addToFavorites(p.id)}
+                    use:tooltip
+                  >
+                    <Favorite24 />
+                  </button>
+                {/if}
+              </div>
             </div>
           </div>
-        </div>
-      {/each}
+        {/each}
+      </div>
     </div>
   {:else}
     <div

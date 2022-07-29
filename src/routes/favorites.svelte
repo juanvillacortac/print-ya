@@ -5,8 +5,10 @@
   import { onMount } from 'svelte'
   import type { StripedProduct } from '$lib/db'
   import trpc from '$lib/trpc/client'
+  import { search as s } from '$lib/utils/search'
 
   const search = createQueryStore('search')
+  const pageNumber = createQueryStore('page')
   const category = createQueryStore('category')
 
   onMount(() => {
@@ -35,6 +37,15 @@
   }
 
   $: categories = $page.stuff.store?.categories || []
+
+  function paginate(array, page_size, page_number) {
+    // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
+    return array.slice((page_number - 1) * page_size, page_number * page_size)
+  }
+
+  $: filteredProducts = s(products, $search || '', ['name']).filter((p) =>
+    $category ? p.storeCategory?.slug === $category : true
+  )
 </script>
 
 <div class="flex flex-col mx-auto space-y-4 w-full p-4 lg:w-[90%]">
@@ -50,5 +61,14 @@
   <h3 class="font-bold font-title text-black text-3xl dark:text-white">
     Favorites
   </h3>
-  <Catalog {products} bind:search={$search} bind:category={$category} />
+  <Catalog
+    products={paginate(
+      filteredProducts,
+      20,
+      !$pageNumber || Number.isNaN(+$pageNumber) ? 1 : +$pageNumber
+    )}
+    count={filteredProducts.length}
+    page={1}
+    bind:search={$search}
+  />
 </div>

@@ -21,7 +21,7 @@
 </script>
 
 {#if $session.layout === 'store'}
-  <Page {data} />
+  <Page />
 {:else}
   <h2 class="font-bold font-title text-black text-3xl dark:text-white ">
     Dashboard

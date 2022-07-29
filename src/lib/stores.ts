@@ -1,5 +1,5 @@
 import { derived, type Readable, type Writable } from 'svelte/store'
-import { browser } from '$app/env'
+import { browser, server } from '$app/env'
 import { writable, get } from 'svelte/store'
 import type { ModifiersMap } from './utils/modifiers'
 import type { Order, Product } from './db'
@@ -61,10 +61,16 @@ export function watchMedia<Query extends Record<string, string>>(
 export function createQueryStore<T = any>(prop: string): Writable<T> {
   let query: Record<string, any> = {}
   const set = (v) => {
-    query[prop] = v
+    if (v) {
+      query[prop] = v
+    } else {
+      delete query[prop]
+    }
+    if (server) return
     const urlSearchParams = new URLSearchParams(query)
     const g = `?${urlSearchParams.toString()}`
-    goto(g, { keepfocus: true, replaceState: true, noscroll: true })
+    if (g !== window.location.search)
+      goto(g, { keepfocus: true, replaceState: true, noscroll: true })
   }
   return {
     subscribe: (h) => {

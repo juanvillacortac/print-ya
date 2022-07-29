@@ -97,6 +97,7 @@ specifiers:
   svelte-check: ^2.7.0
   svelte-datocms: ^0.6.3
   svelte-fullscreen: ^2.0.0
+  svelte-keyed: ^1.1.6
   svelte-kit-cookie-session: ^3.0.6
   svelte-markdown: ^0.2.2
   svelte-marquee-text-widget: ^1.1.0
@@ -199,6 +200,7 @@ dependencies:
   superjson: 1.9.1
   svelte-datocms: 0.6.3
   svelte-fullscreen: 2.0.0
+  svelte-keyed: 1.1.6_svelte@3.49.0
   svelte-kit-cookie-session: 3.0.6
   svelte-markdown: 0.2.2_svelte@3.49.0
   svelte-marquee-text-widget: 1.1.0
@@ -7923,6 +7925,14 @@ packages:
     dependencies:
       svelte: 3.49.0
     dev: true
+
+  /svelte-keyed/1.1.6_svelte@3.49.0:
+    resolution: {integrity: sha512-sd/7j3waSpOkeiQqATstlvNySbEpSs49aoaZ/nc09x/iEndnXQ/9Zy5PTD06+C7hlZk8KjZ4bhrktAQ791jWMQ==}
+    peerDependencies:
+      svelte: ^3.49.0
+    dependencies:
+      svelte: 3.49.0
+    dev: false
 
   /svelte-kit-cookie-session/3.0.6:
     resolution: {integrity: sha512-8HmnhTxLgf2nqNTW22FwzzXHepdN7gLXH5mBU1zhZX93JXyq/OOLsgbWhX9Hv9JNUlYknwq/ZE54iMrEFaH5BA==}
