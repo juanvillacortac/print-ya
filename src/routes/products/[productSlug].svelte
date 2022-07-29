@@ -83,8 +83,8 @@
   </div>
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
   <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-2">
-    {#if product.template && product.type === 'template'}
-      <TemplatePreview watermark {template} mockups={product.meta?.mockups} />
+    {#if product.type.startsWith('template')}
+      <TemplatePreview watermark mockups={product.meta?.mockups} {template} />
     {/if}
     <div class="flex flex-col space-y-4 w-full">
       <div class="flex flex-col space-y-2 items-start">
