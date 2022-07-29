@@ -1,7 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import { watchMedia } from '$lib'
-  import type { StrippedOrder } from '$lib/db'
   import trpc, {
     type InferQueryInput,
     type InferQueryOutput,
@@ -11,7 +9,6 @@
     ChevronDown16,
     ChevronSort16,
     ChevronUp16,
-    Launch16,
     Redo16,
     TrashCan16,
     View16,
