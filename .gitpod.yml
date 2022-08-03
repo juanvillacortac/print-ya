@@ -9,8 +9,8 @@ tasks:
     init: |
       pnpm install
     command: |
-      echo VITE_DATABASE_URL=mysql://root@127.0.0.1:3306/print-ya > .env
-      export VITE_DATABASE_URL=mysql://root@127.0.0.1:3306/print-ya
+      echo DATABASE_URL=mysql://root@127.0.0.1:3306/print-ya > .env
+      export DATABASE_URL=mysql://root@127.0.0.1:3306/print-ya
       pnpm run dev
   - name: Database
     command: |

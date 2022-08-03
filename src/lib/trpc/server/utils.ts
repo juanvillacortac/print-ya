@@ -7,6 +7,8 @@ import { downloadFile } from '$lib/supabase'
 import { parseShopifyProductsCSV } from '$lib/utils/modifiers'
 import { marked } from 'marked'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
+import { PUBLIC_GEOAPIFY_TOKEN } from '$env/static/public'
+import { SENDGRID_API_KEY } from '$env/static/private'
 
 const coords = z.object({
   latitude: z.number(),
@@ -17,9 +19,7 @@ type Coords = z.infer<typeof coords>
 
 const lookup = async (coords: Coords) => {
   const res = await get(
-    `https://api.geoapify.com/v1/geocode/reverse?lat=${coords.latitude}&lon=${
-      coords.longitude
-    }&apiKey=${import.meta.env.VITE_GEOAPIFY_TOKEN}`
+    `https://api.geoapify.com/v1/geocode/reverse?lat=${coords.latitude}&lon=${coords.longitude}&apiKey=${PUBLIC_GEOAPIFY_TOKEN}`
   )
   return res as any
 }
@@ -80,7 +80,7 @@ export default trpc
           subject: `Products imported`,
           html,
         }
-        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        sendgrid.setApiKey(SENDGRID_API_KEY)
         await sendgrid.send(msg)
       } catch (err) {
         let to = [(await db.getUser({ userId }))!.email]
@@ -99,7 +99,7 @@ export default trpc
           subject: `Error importing products`,
           html: `<pre>${JSON.stringify(err, undefined, '  ')}</pre>`,
         }
-        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        sendgrid.setApiKey(SENDGRID_API_KEY)
         await sendgrid.send(msg)
       }
       // return {

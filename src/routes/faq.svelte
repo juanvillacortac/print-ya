@@ -1,8 +1,12 @@
 <script lang="ts" context="module">
+  import {
+    PUBLIC_UPSTASH_REDIS_TOKEN,
+    PUBLIC_UPSTASH_REDIS_URL,
+  } from '$env/static/public'
   export const load = async ({ stuff }) => {
     const redis = new Redis({
-      url: import.meta.env.VITE_UPSTASH_REDIS_URL,
-      token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+      url: PUBLIC_UPSTASH_REDIS_URL,
+      token: PUBLIC_UPSTASH_REDIS_TOKEN,
     })
 
     const content =

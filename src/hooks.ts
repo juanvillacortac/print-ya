@@ -8,7 +8,7 @@ import { sequence } from '@sveltejs/kit/hooks'
 import { createTRPCHandle } from '$lib/trpc/handler'
 
 export const session = handleSession({
-  secret: process.env['VITE_PY_SECRET'] || 'secret',
+  secret: 'secret',
   expires: 30,
   cookie: {
     httpOnly: true,

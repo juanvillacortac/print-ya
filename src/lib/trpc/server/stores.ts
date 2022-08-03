@@ -7,6 +7,11 @@ import { z } from 'zod'
 import type { tRPCContext } from '.'
 import { Redis } from '@upstash/redis'
 import { marked } from 'marked'
+import {
+  PUBLIC_UPSTASH_REDIS_TOKEN,
+  PUBLIC_UPSTASH_REDIS_URL,
+} from '$env/static/public'
+import { SENDGRID_API_KEY } from '$env/static/private'
 
 const mutations = trpc
   .router<tRPCContext>()
@@ -35,7 +40,7 @@ const mutations = trpc
     },
   })
   .mutation('upsert', {
-    input: (input: Partial<db.Store>) => input,
+    input: (input: unknown) => input as Partial<db.Store>,
     resolve: async ({ ctx, input }) => {
       const userId = (await db.getUserDetails(ctx.event)).userId!
       if (!userId) {
@@ -104,14 +109,14 @@ export default trpc
     }),
     resolve: async ({ input }) => {
       try {
-        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        sendgrid.setApiKey(SENDGRID_API_KEY)
         const store = await db.getStore({ id: input.storeId })
         if (!store) {
           return { ok: false }
         }
         const redis = new Redis({
-          url: import.meta.env.VITE_UPSTASH_REDIS_URL,
-          token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+          url: PUBLIC_UPSTASH_REDIS_URL,
+          token: PUBLIC_UPSTASH_REDIS_TOKEN,
         })
         let template =
           (

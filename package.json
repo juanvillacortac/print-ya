@@ -22,9 +22,6 @@
     "package": "svelte-kit package",
     "gql:fetch": "gq https://graphql.datocms.com/ -H \"Authorization: Bearer $DATOCMS_API_KEY\" --introspect > src/lib/schema.graphql",
     "postbuild@comment": "cp node_modules/sharp/build .vercel_build_output/functions/node/render -r;cp node_modules/sharp/vendor/8.11.3/linux-x64/lib/libvips-cpp.so.42 .vercel_build_output/functions/node/render/;ls .vercel_build_output/functions/node/render/",
-    "vercel-build@comment": "ls node_modules/@prisma && prisma generate && cross-env VITE_DATABASE_URL=$MIGRATION_DB prisma migrate deploy && vite build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/",
-    "vercel-build@Caca": "prisma generate && vite build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/",
-    "vercel-build@2": "prisma generate && vite build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/",
     "vercel-build": "prisma generate && vite build"
   },
   "devDependencies": {
@@ -34,8 +31,8 @@
     "@sveltejs/adapter-netlify": "^1.0.0-next.55",
     "@sveltejs/adapter-node": "1.0.0-next.82",
     "@sveltejs/adapter-static": "^1.0.0-next.29",
-    "@sveltejs/adapter-vercel": "1.0.0-next.65",
-    "@sveltejs/kit": "1.0.0-next.382",
+    "@sveltejs/adapter-vercel": "1.0.0-next.66",
+    "@sveltejs/kit": "1.0.0-next.402",
     "@types/bcrypt": "^5.0.0",
     "@types/geoip-lite": "^1.4.1",
     "@types/three": "^0.135.0",

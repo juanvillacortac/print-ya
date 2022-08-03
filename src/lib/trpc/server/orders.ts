@@ -6,6 +6,7 @@ import { get } from '$lib/api'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { getAbsoluteURL } from '$lib/utils/host'
 import type { Order } from '$lib/db'
+import { SENDGRID_API_KEY } from '$env/static/private'
 
 const orderStatus = z.enum(['paid', 'processing', 'pending'])
 const fulfillmentStatus = z.enum([
@@ -103,7 +104,7 @@ const mutations = trpc
     resolve: async ({ input }) => {
       let updated: Order
       if (input.status === 'paid') {
-        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        sendgrid.setApiKey(SENDGRID_API_KEY)
         const order = await db.getOrder(input.id)
         if (!order) {
           return null
@@ -166,7 +167,7 @@ ${
   .mutation('marketing:sendRestoreEmail', {
     input: z.string(),
     resolve: async ({ input }) => {
-      sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+      sendgrid.setApiKey(SENDGRID_API_KEY)
       const order = await db.getOrder(input)
       if (!order) {
         return { ok: false }

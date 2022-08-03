@@ -1,5 +1,3 @@
-/// <reference types="@sveltejs/kit" />
-
 declare const __LOCALHOST_HOST__: string
 declare const __VERCEL_URL__: string
 
