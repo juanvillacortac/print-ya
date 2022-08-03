@@ -1,5 +1,5 @@
 import { derived, type Readable, type Writable } from 'svelte/store'
-import { browser, server } from '$app/env'
+import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
 import type { ModifiersMap } from './utils/modifiers'
 import type { Order, Product } from './db'
@@ -10,10 +10,14 @@ import { goto } from '$app/navigation'
 import * as sj from 'superjson'
 import trpc from './trpc/client'
 import { Redis } from '@upstash/redis'
+import {
+  PUBLIC_UPSTASH_REDIS_TOKEN,
+  PUBLIC_UPSTASH_REDIS_URL,
+} from '$env/static/public'
 
 const redis = new Redis({
-  url: import.meta.env.VITE_UPSTASH_REDIS_URL,
-  token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+  url: PUBLIC_UPSTASH_REDIS_URL,
+  token: PUBLIC_UPSTASH_REDIS_TOKEN,
 })
 
 type Media<Query extends Record<string, string> = Record<string, string>> = {
@@ -66,7 +70,7 @@ export function createQueryStore<T = any>(prop: string): Writable<T> {
     } else {
       delete query[prop]
     }
-    if (server) return
+    if (!browser) return
     const urlSearchParams = new URLSearchParams(query)
     const g = `?${urlSearchParams.toString()}`
     if (g !== window.location.search)
