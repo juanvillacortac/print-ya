@@ -26,7 +26,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href={getIcon(32)} />
   <link rel="icon" type="image/png" sizes="48x48" href={getIcon(48)} />
   <link rel="icon" type="image/png" sizes="228x228" href={getIcon(228)} />
-  <link rel="manifest" href="/manifest.json" />
+  <link rel="manifest" href="/web-manifest.json" />
   <meta name="mobile-web-app-capable" content="yes" />
   {#if themeColor}
     <meta name="theme-color" content={themeColor} />
