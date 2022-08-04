@@ -3,12 +3,13 @@ import type { tRPCRouter } from '$lib/trpc/server'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 import { createTRPCClient } from '@trpc/client'
 import trpcTransformer from 'trpc-transformer'
+import type { LoadEvent } from '@sveltejs/kit'
 
-const trpc = (loadFetch?: typeof fetch) => {
+const trpc = (loadFetch?: LoadEvent['fetch']) => {
   return createTRPCClient<tRPCRouter>({
     url: '/api/trpc',
     transformer: trpcTransformer,
-    ...(loadFetch && { fetch: loadFetch }),
+    ...(loadFetch && { fetch: loadFetch as any }),
   })
 }
 

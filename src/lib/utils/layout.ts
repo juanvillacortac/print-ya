@@ -51,12 +51,13 @@ export const fetchLayoutData = async ({
   session,
 }: LoadEvent): Promise<{ response?: LayoutData; notFound?: boolean }> => {
   const client = trpc(fetch)
+  let response: LayoutData = {
+    layout: session.layout,
+  }
   switch (session.layout) {
     case 'store':
       try {
-        let response: LayoutData = {
-          store: await client.query('stores:getByHost', url.host),
-        }
+        response.store = await client.query('stores:getByHost', url.host)
         if (!response.store) {
           let slug = url.searchParams.get('store')
           if (!slug && session.host) {
