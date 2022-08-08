@@ -27,6 +27,7 @@
 <div class="flex flex-col space-y-12 pb-12">
   <div class="flex-col flex mx-auto space-y-6 lg:px-4 lg:w-9/10">
     <Image
+      lazy
       src="https://cdn.shopify.com/s/files/1/0263/8249/9885/files/shop_2048x.progressive.jpg?v=1570913752-"
       width="1410"
       height="768"
@@ -71,6 +72,7 @@
       src="https://cdn.shopify.com/s/files/1/0263/8249/9885/files/Office-Wall-decal_1024x1024.jpg?v=1571321829"
       width="1410"
       height="768"
+      lazy
       class="rounded border-gray-300"
       options={{
         progressive: true,

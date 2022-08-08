@@ -117,6 +117,7 @@
     "lodash-es": "^4.17.21",
     "mapbox-geocoding": "^0.1.5",
     "marked": "^4.0.18",
+    "medium-zoom": "^1.0.6",
     "nanoid": "^4.0.0",
     "node-abort-controller": "^3.0.1",
     "nprogress": "^0.2.0",

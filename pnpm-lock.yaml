@@ -78,6 +78,7 @@ specifiers:
   lodash-es: ^4.17.21
   mapbox-geocoding: ^0.1.5
   marked: ^4.0.18
+  medium-zoom: ^1.0.6
   nanoid: ^4.0.0
   node-abort-controller: ^3.0.1
   nprogress: ^0.2.0
@@ -185,6 +186,7 @@ dependencies:
   lodash-es: 4.17.21
   mapbox-geocoding: 0.1.5
   marked: 4.0.18
+  medium-zoom: 1.0.6
   nanoid: 4.0.0
   node-abort-controller: 3.0.1
   nprogress: 0.2.0
@@ -6016,6 +6018,10 @@ packages:
   /mdn-data/2.0.14:
     resolution: {integrity: sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==}
     dev: true
+
+  /medium-zoom/1.0.6:
+    resolution: {integrity: sha512-UdiUWfvz9fZMg1pzf4dcuqA0W079o0mpqbTnOz5ip4VGYX96QjmbM+OgOU/0uOzAytxC0Ny4z+VcYQnhdifimg==}
+    dev: false
 
   /memory-pager/1.5.0:
     resolution: {integrity: sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg==}
