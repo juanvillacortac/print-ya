@@ -69,6 +69,8 @@
     )}
     count={filteredProducts.length}
     page={1}
-    bind:search={$search}
+    on:search={(e) => {
+      $search = e.detail
+    }}
   />
 </div>

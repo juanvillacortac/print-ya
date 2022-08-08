@@ -60,7 +60,7 @@
       categoryId?: string
       sortBy?: ProductSorter
     },
-    fetcher?: typeof fetch
+    fetcher?: LoadEvent['fetch']
   ) =>
     trpc(fetcher).query('products:list', {
       storeSlug,
@@ -84,6 +84,7 @@
   } from '$lib/trpc/client'
   import { tick } from 'svelte'
   import { browser } from '$app/env'
+  import type { Load, LoadEvent } from '@sveltejs/kit'
 
   export let products: InferQueryOutput<'products:list'>['products'] | undefined
   export let count: number | undefined

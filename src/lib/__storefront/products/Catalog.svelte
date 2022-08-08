@@ -16,15 +16,19 @@
     ChevronRight24,
     Favorite24,
     FavoriteFilled24,
+    Search16,
   } from 'carbon-icons-svelte'
+import { createEventDispatcher } from 'svelte';
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'
+
+  const dispatch = createEventDispatcher<{ search: string }>()
 
   $: store = $page.stuff.store!
 
   export let products: StripedProduct[]
   export let count: number
-  export let search: string = ''
+  let searchTerm = ''
 
   let pageNumber: number
   export { pageNumber as page }
@@ -46,22 +50,28 @@
     }
     return `?${query.toString()}`
   }
-
-  // $: filteredProducts = s(products, search || '', ['name']).filter((p) =>
-  //   category ? p.storeCategory?.slug === category : true
-  // )
 </script>
 
 <div class="flex w-full lg:space-x-4 <lg:flex-col <lg:space-y-4">
   <div
     class="flex-col flex h-full space-y-2 w-full lg:w-2/10 lg:overflow-hidden"
   >
-    <input
-      class="bg-white border border-red-900 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
-      type="text"
-      bind:value={search}
-      placeholder="Enter keywords to search..."
-    />
+    <form
+      on:submit|preventDefault|stopPropagation={() => {
+        dispatch('search', searchTerm)
+      }}
+      class="flex w-full"
+    >
+      <input
+        class="bg-white border border-red-900 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+        type="search"
+        bind:value={searchTerm}
+        placeholder="Enter keywords to search..."
+      />
+      <button class="flex bg-red-900  text-white p-2 items-center">
+        <Search16 class="m-auto" />
+      </button>
+    </form>
     <div class="flex flex-col">
       <div
         class="rounded-tl rounded-tr flex space-x-2  bg-red-900 text-white w-full p-2 items-center"

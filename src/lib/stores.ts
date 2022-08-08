@@ -65,11 +65,11 @@ export function watchMedia<Query extends Record<string, string>>(
 export function createQueryStore<T = any>(prop: string): Writable<T> {
   let query: Record<string, any> = {}
   const set = (v) => {
-    if (v) {
-      query[prop] = v
-    } else {
-      delete query[prop]
-    }
+    // if (v) {
+    query[prop] = v || ''
+    // } else {
+    //   delete query[prop]
+    // }
     if (!browser) return
     const urlSearchParams = new URLSearchParams(query)
     const g = `?${urlSearchParams.toString()}`
