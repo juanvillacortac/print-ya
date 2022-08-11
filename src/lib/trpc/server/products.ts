@@ -1,11 +1,10 @@
 import * as db from '$lib/db'
-import * as trpc from '@trpc/server'
 import { z } from 'zod'
-import type { tRPCContext } from '.'
+import { createServer } from '../shared'
 
 const order = z.enum(['desc', 'asc'])
 
-const mutations = trpc.router<tRPCContext>().mutation('upsert', {
+const mutations = createServer().mutation('upsert', {
   input: (input: unknown) =>
     input as { storeSlug: string; data: Partial<db.Product> },
   resolve: async ({ ctx, input }) => {
@@ -18,8 +17,7 @@ const mutations = trpc.router<tRPCContext>().mutation('upsert', {
   },
 })
 
-const queries = trpc
-  .router<tRPCContext>()
+const queries = createServer()
   .query('listTags', {
     input: z.object({
       name: z.string().optional(),
@@ -129,4 +127,4 @@ const queries = trpc
     },
   })
 
-export default trpc.router<tRPCContext>().merge(mutations).merge(queries)
+export default createServer().merge(mutations).merge(queries)

@@ -1,6 +1,4 @@
-import * as trpc from '@trpc/server'
 import { z } from 'zod'
-import type { tRPCContext } from '.'
 import { get } from '$lib/api'
 import * as db from '$lib/db'
 import { downloadFile } from '$lib/supabase'
@@ -9,6 +7,7 @@ import { marked } from 'marked'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { PUBLIC_GEOAPIFY_TOKEN } from '$env/static/public'
 import { SENDGRID_API_KEY } from '$env/static/private'
+import { createServer } from '../shared'
 
 const coords = z.object({
   latitude: z.number(),
@@ -24,8 +23,7 @@ const lookup = async (coords: Coords) => {
   return res as any
 }
 
-export default trpc
-  .router<tRPCContext>()
+export default createServer()
   .query('geocoding', {
     input: coords,
     resolve: ({ input }) => lookup(input),

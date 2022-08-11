@@ -2,10 +2,9 @@ import * as db from '$lib/db'
 import * as trpc from '@trpc/server'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import type { tRPCContext } from '.'
+import { createServer } from '../shared'
 
-export default trpc
-  .router<tRPCContext>()
+export default createServer()
   .mutation('logout', {
     resolve: async ({ ctx: { event } }) => {
       return await event.locals.session.destroy()

@@ -1,12 +1,12 @@
 import * as db from '$lib/db'
 import * as trpc from '@trpc/server'
 import { z } from 'zod'
-import type { tRPCContext } from '.'
 import { get } from '$lib/api'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { getAbsoluteURL } from '$lib/utils/host'
 import type { Order } from '$lib/db'
 import { SENDGRID_API_KEY } from '$env/static/private'
+import { createServer } from '../shared'
 
 const orderStatus = z.enum(['paid', 'processing', 'pending'])
 const fulfillmentStatus = z.enum([
@@ -18,8 +18,7 @@ const fulfillmentStatus = z.enum([
   'on_hold',
 ])
 
-const mutations = trpc
-  .router<tRPCContext>()
+const mutations = createServer()
   .mutation('create', {
     input: z.object({
       order: z.object({
@@ -223,8 +222,7 @@ ${
 
 const order = z.enum(['desc', 'asc'])
 
-const queries = trpc
-  .router<tRPCContext>()
+const queries = createServer()
   .query('list', {
     input: z.object({
       storeId: z.string().cuid(),
@@ -254,4 +252,4 @@ const queries = trpc
     resolve: async ({ input }) => db.getOrder(input.orderId, input.token),
   })
 
-export default trpc.router<tRPCContext>().merge(mutations).merge(queries)
+export default createServer().merge(mutations).merge(queries)

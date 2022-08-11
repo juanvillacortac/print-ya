@@ -15,7 +15,7 @@
   import { goto } from '$app/navigation'
 
   import { page } from '$app/stores'
-  import { Search16 } from 'carbon-icons-svelte'
+  import Searchbar from '$lib/__storefront/Searchbar.svelte'
 
   export let error: Error
   export let status: number
@@ -67,27 +67,7 @@
           </div>
           <p class="text-lg"><span class="font-bold">Search</span> for it...</p>
         </div>
-        <form class="flex !text-xs">
-          <input
-            class="bg-white border border-red-900  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
-            type="search"
-            name="q"
-            placeholder="Enter keywords to search..."
-            bind:value={search}
-          />
-          <select
-            class="bg-white border-b border-l-0 border-r-0 border-red-900  leading-tight py-2  px-3 w-14rem appearance-none !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={category}
-          >
-            <option value="">All categories</option>
-            {#each $page.stuff.store.categories || [] as category}
-              <option value={category.slug}>{category.name}</option>
-            {/each}
-          </select>
-          <button class="flex bg-red-900  text-white p-2 items-center">
-            <Search16 class="m-auto" />
-          </button>
-        </form>
+        <Searchbar />
       </div>
       <div class="flex flex-col space-y-4">
         <div class="flex space-x-4">

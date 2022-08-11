@@ -3,6 +3,7 @@
   import { pageSubtitle } from '$lib'
   import type { Store } from '$lib/db'
   import {
+    Analytics32,
     Category32,
     ColorPalette32,
     OrderDetails32,
@@ -33,6 +34,11 @@
       icon: UserAvatar32,
       title: 'Customers',
       href: `/stores/${store.slug}/customers`,
+    },
+    {
+      icon: Analytics32,
+      title: 'Analytics',
+      href: `/stores/${store.slug}/analytics`,
     },
     {
       icon: ColorPalette32,

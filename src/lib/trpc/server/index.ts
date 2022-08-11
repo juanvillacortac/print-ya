@@ -7,15 +7,11 @@ import stores from './stores'
 import trpcTransformer from 'trpc-transformer'
 import products from './products'
 import orders from './orders'
+import analytics from './analytics'
 import utils from './utils'
+import { createServer } from '../shared'
 
-export type tRPCContext = {
-  layout: LayoutType
-  event: RequestEvent
-}
-
-export const router = trpc
-  .router<tRPCContext>()
+export const router = createServer()
   .transformer(trpcTransformer)
   .merge('user:', users)
   .merge('stores:', stores)
@@ -23,5 +19,6 @@ export const router = trpc
   .merge('orders:', orders)
   .merge('utils:', utils)
   .merge('customer:', customers)
+  .merge('analytics:', analytics)
 
 export type tRPCRouter = typeof router

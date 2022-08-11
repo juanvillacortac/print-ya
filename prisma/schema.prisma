@@ -37,7 +37,8 @@ model Customer {
   store     Store?            @relation(fields: [storeId], references: [id])
   storeId   String?
 
-  createdAt DateTime @default(now())
+  createdAt     DateTime        @default(now())
+  SearchHistory SearchHistory[]
 }
 
 enum CustomerAddressType {
@@ -88,8 +89,9 @@ model Store {
   orders          Order[]
   customers       Customer[]
 
-  contactData Json?
-  ProductTag  ProductTag[]
+  contactData   Json?
+  ProductTag    ProductTag[]
+  SearchHistory SearchHistory[]
 }
 
 model PaymentGateway {
@@ -102,12 +104,15 @@ model PaymentGateway {
 }
 
 model StoreCategory {
-  id       String    @id @default(cuid())
-  slug     String
-  store    Store     @relation(fields: [storeId], references: [id])
-  storeId  String
-  name     String
-  products Product[]
+  id            String          @id @default(cuid())
+  slug          String
+  store         Store           @relation(fields: [storeId], references: [id])
+  storeId       String
+  name          String
+  products      Product[]
+  SearchHistory SearchHistory[]
+
+  @@unique([slug, storeId])
 }
 
 enum ProductType {
@@ -277,4 +282,20 @@ model OrderFee {
 
   order   Order?  @relation(fields: [orderId], references: [id])
   orderId String?
+}
+
+model SearchHistory {
+  id String @id @default(cuid())
+
+  searchTerm String
+  category   StoreCategory? @relation(fields: [storeCategoryId], references: [id])
+  customer   Customer?      @relation(fields: [customerId], references: [id])
+  ip         String
+
+  store           Store   @relation(fields: [storeId], references: [id])
+  storeCategoryId String?
+  customerId      String?
+  storeId         String
+
+  createdAt DateTime @default(now())
 }

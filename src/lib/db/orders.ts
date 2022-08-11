@@ -207,6 +207,7 @@ export const createOrder = async ({
             select: {
               id: true,
               name: true,
+              archived: true,
               createdAt: true,
               price: true,
               type: true,
@@ -348,6 +349,7 @@ export const updateOrder = async (
               createdAt: true,
               price: true,
               type: true,
+              archived: true,
               public: true,
               slug: true,
               description: true,

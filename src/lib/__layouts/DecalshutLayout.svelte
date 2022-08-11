@@ -22,6 +22,7 @@
   import Submenu from '$lib/components/Submenu.svelte'
   import trpc from '$lib/trpc/client'
   import { browser } from '$app/env'
+  import Searchbar from '$lib/__storefront/Searchbar.svelte'
 
   export let store: Store
 
@@ -83,30 +84,7 @@
             }}
           />
         </a>
-        <form
-          class="flex py-2 <sm:hidden !text-xs"
-          on:submit|preventDefault={submitSearch}
-        >
-          <input
-            class="bg-white border border-red-900  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
-            type="search"
-            name="q"
-            bind:value={search}
-            placeholder="Enter keywords to search..."
-          />
-          <select
-            class="bg-white border-b border-l-0 border-r-0 border-red-900  leading-tight py-2  px-3 w-10rem appearance-none <sm:hidden !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={category}
-          >
-            <option value="">All products</option>
-            {#each store.categories || [] as category}
-              <option value={category.slug}>{category.name}</option>
-            {/each}
-          </select>
-          <button class="flex bg-red-900  text-white p-2 items-center">
-            <Search16 class="m-auto" />
-          </button>
-        </form>
+        <Searchbar class="<lg:hidden" />
       </div>
       <div class="flex space-x-2 text-gray-400 items-center lg:space-x-4">
         <button
@@ -218,30 +196,7 @@
         </a>
       </div>
     </div>
-    <form
-      class="flex p-4 py-2 pb-4 sm:hidden !text-xs"
-      on:submit|preventDefault={submitSearch}
-    >
-      <input
-        class="bg-white border border-red-900  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
-        type="search"
-        name="q"
-        bind:value={search}
-        placeholder="Enter keywords to search..."
-      />
-      <select
-        class="bg-white border-b border-l-0 border-r-0 border-red-900  leading-tight py-2  px-3 w-14rem appearance-none !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-        bind:value={category}
-      >
-        <option value="">All categories</option>
-        {#each store.categories || [] as category}
-          <option value={category.slug}>{category.name}</option>
-        {/each}
-      </select>
-      <button class="flex bg-red-900  text-white p-2 items-center">
-        <Search16 class="m-auto" />
-      </button>
-    </form>
+    <Searchbar class="w-full px-4 pb-4 lg:hidden" />
     <div class="bg-red-900 text-white text-base w-full <lg:hidden">
       <div class="flex mx-auto space-x-4 text-white p-4 py-2 lg:w-9/10">
         <a href="/" class="hover:underline">Home</a>

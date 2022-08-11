@@ -1,10 +1,8 @@
 import * as db from '$lib/db'
-import * as trpc from '@trpc/server'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { TRPCError } from '@trpc/server'
 import Stripe from 'stripe'
 import { z } from 'zod'
-import type { tRPCContext } from '.'
 import { Redis } from '@upstash/redis'
 import { marked } from 'marked'
 import {
@@ -12,9 +10,9 @@ import {
   PUBLIC_UPSTASH_REDIS_URL,
 } from '$env/static/public'
 import { SENDGRID_API_KEY } from '$env/static/private'
+import { createServer } from '../shared'
 
-const mutations = trpc
-  .router<tRPCContext>()
+const mutations = createServer()
   .middleware(async ({ ctx, next }) => {
     const { userId } = await db.getUserDetails(ctx.event)
     if (!userId) {
@@ -51,8 +49,7 @@ const mutations = trpc
     },
   })
 
-const queries = trpc
-  .router<tRPCContext>()
+const queries = createServer()
   .query('getBySlug', {
     input: z.string(),
     resolve: ({ input }) => db.getStore({ slug: input }),
@@ -62,7 +59,7 @@ const queries = trpc
     resolve: ({ input }) => db.getStore({ host: input }),
   })
 
-const payment = trpc.router<tRPCContext>().mutation('createStripeIntent', {
+const payment = createServer().mutation('createStripeIntent', {
   input: z.object({
     currency: z.string().min(3).max(3),
     amount: z.number().min(0.5),
@@ -94,8 +91,7 @@ const payment = trpc.router<tRPCContext>().mutation('createStripeIntent', {
   },
 })
 
-export default trpc
-  .router<tRPCContext>()
+export default createServer()
   .merge(mutations)
   .merge(queries)
   .merge('payment:', payment)
