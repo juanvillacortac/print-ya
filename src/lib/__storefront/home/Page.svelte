@@ -110,8 +110,7 @@
         />
         <div class="flex flex-col space-y-8">
           <p class="font-light italic">
-            <span
-              class="font-serif font-bold text-5xl text-red-900 dark:text-red-400"
+            <span class="font-serif font-bold text-$sc-color-primary text-5xl"
               >&ldquo;</span
             >
             <span>
@@ -124,7 +123,7 @@
               >&ldquor;</span
             > -->
           </p>
-          <div class="text-red-900 dark:text-red-400">Bri the Jeep Guy</div>
+          <div class="text-$sc-color-primary">Bri the Jeep Guy</div>
         </div>
       </div>
       <div class="flex lg:space-x-2 <lg:flex-col <lg:space-y-2">
@@ -133,8 +132,7 @@
         />
         <div class="flex flex-col space-y-8">
           <p class="font-light italic">
-            <span
-              class="font-serif font-bold text-5xl text-red-900 dark:text-red-400"
+            <span class="font-serif font-bold text-$sc-color-primary text-5xl"
               >&ldquo;</span
             >
             <span>
@@ -148,7 +146,7 @@
               >&ldquor;</span
             > -->
           </p>
-          <div class="text-red-900 dark:text-red-400">NorthernCanuck</div>
+          <div class="text-$sc-color-primary">NorthernCanuck</div>
         </div>
       </div>
       <div class="flex lg:space-x-2 <lg:flex-col <lg:space-y-2">
@@ -157,8 +155,7 @@
         />
         <div class="flex flex-col space-y-8">
           <p class="font-light italic">
-            <span
-              class="font-serif font-bold text-5xl text-red-900 dark:text-red-400"
+            <span class="font-serif font-bold text-$sc-color-primary text-5xl"
               >&ldquo;</span
             >
             <span> Trè facile à l appliquer! </span>
@@ -166,7 +163,7 @@
               >&ldquor;</span
             > -->
           </p>
-          <div class="text-red-900 dark:text-red-400">Steve R.</div>
+          <div class="text-$sc-color-primary">Steve R.</div>
         </div>
       </div>
     </div>

@@ -18,11 +18,12 @@
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
   import { bag, customer, pageSubtitle, preferences } from '$lib/stores'
-  import { goto } from '$app/navigation'
   import Submenu from '$lib/components/Submenu.svelte'
   import trpc from '$lib/trpc/client'
   import { browser } from '$app/env'
   import Searchbar from '$lib/__storefront/Searchbar.svelte'
+  import { getContext } from 'svelte'
+  import { writable, type Writable } from 'svelte/store'
 
   export let store: Store
 
@@ -34,20 +35,39 @@
 
   $: pageTitle = (subtitle ? subtitle + ' | ' : '') + store.name
 
-  let search = ''
-  let category = ''
+  const customizable = getContext('customizable') || false
+  const layoutStore: Writable<{
+    theme: {
+      primary: string
+    }
+  }> = getContext('layout-store') || writable($page.stuff.storeData)
 
-  const submitSearch = async () => {
-    await goto(getSearchUrl())
-    search = ''
-    category = ''
+  function whiteForeground(hex: string) {
+    const rgb = hexToRgb(hex)
+    console.log(rgb)
+    const { r = 0, g = 0, b = 0 } = rgb ? rgb : {}
+    const L = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    console.log('L', L)
+    if (r * 0.299 + g * 0.587 + b * 0.114 > 186) return false
+    else return true
+    if (L > 0.179) return false
+    return true
   }
 
-  $: getSearchUrl = () => {
-    const query = new URLSearchParams()
-    query.set('search', search)
-    query.set('category', category)
-    return `/products?${query.toString()}`
+  function hexToRgb(hex: string) {
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i
+    hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+      return r + r + g + g + b + b
+    })
+
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : null
   }
 </script>
 
@@ -63,6 +83,13 @@
 
 <div
   class="flex flex-col min-h-screen top-0 left-0 text-gray-700 relative dark:text-white"
+  style:--sc-color-primary={$layoutStore.theme.primary}
+  style:--sc-auto-foreground={whiteForeground($layoutStore.theme.primary)
+    ? '#fff'
+    : '#000'}
+  style:--sc-auto-foreground-invert={whiteForeground($layoutStore.theme.primary)
+    ? '#000'
+    : '#fff'}
 >
   <div
     class="bg-white flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg <sm:border-b !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
@@ -98,81 +125,83 @@
             <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
           </div>
         </button>
-        {#if browser}
-          {#if $customer === null}
-            <a
-              class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
-              title="Log in"
-              href="/login?callbackUrl={encodeURIComponent(
-                $page.url.pathname === '/login'
-                  ? '/'
-                  : `${$page.url.pathname}${
-                      $page.url.searchParams.toString()
-                        ? `?${$page.url.searchParams.toString()}`
-                        : ''
-                    }`
-              )}"
-              use:tooltip
-            >
-              <UserAvatar24 />
-            </a>
-          {:else}
-            <Submenu>
-              <div class="content" slot="button">
-                {#if !$customer}
-                  <div class="rounded-full h-32px w-32px skeleton" />
-                {:else}
-                  <div
-                    class="bg-gradient-to-br border rounded-full cursor-pointer flex font-bold font-title from-green-300 to-pink-600 border-gray-200 h-32px text-white text-xs leading-[0] w-32px items-center justify-center uppercase dark:bg-gray-600 dark:from-green-400 dark:to-pink-700"
-                  >
-                    {$customer?.firstName[0]}
-                  </div>
-                {/if}
-              </div>
-              <div
-                class="flex flex-col font-bold space-y-3 text-xs text-gray-800 items-end dark:text-white"
-                slot="body"
+        {#if !customizable}
+          {#if browser}
+            {#if $customer === null}
+              <a
+                class="flex space-x-1 relative items-center hover:text-black dark:hover:text-white"
+                title="Log in"
+                href="/login?callbackUrl={encodeURIComponent(
+                  $page.url.pathname === '/login'
+                    ? '/'
+                    : `${$page.url.pathname}${
+                        $page.url.searchParams.toString()
+                          ? `?${$page.url.searchParams.toString()}`
+                          : ''
+                      }`
+                )}"
+                use:tooltip
               >
-                {#if !$customer}
-                  <p>Loading...</p>
-                {:else}
-                  <p>Hi, {$customer?.firstName}!</p>
-                {/if}
-                <a
-                  class="flex font-normal space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
-                  href="/account/orders"
+                <UserAvatar24 />
+              </a>
+            {:else}
+              <Submenu>
+                <div class="content" slot="button">
+                  {#if !$customer}
+                    <div class="rounded-full h-32px w-32px skeleton" />
+                  {:else}
+                    <div
+                      class="bg-gradient-to-br border rounded-full cursor-pointer flex font-bold font-title from-green-300 to-pink-600 border-gray-200 h-32px text-white text-xs leading-[0] w-32px items-center justify-center uppercase dark:bg-gray-600 dark:from-green-400 dark:to-pink-700"
+                    >
+                      {$customer?.firstName[0]}
+                    </div>
+                  {/if}
+                </div>
+                <div
+                  class="flex flex-col font-bold space-y-3 text-xs text-gray-800 items-end dark:text-white"
+                  slot="body"
                 >
-                  <span>Orders</span> <OrderDetails16 class="flex" /></a
-                >
-                <a
-                  class="flex font-normal space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
-                  href="/account/settings"
-                >
-                  <span>Settings</span> <Settings16 class="flex" /></a
-                >
-                <button
-                  class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
-                  on:click={() => {
-                    trpc()
-                      .mutation('customer:logout')
-                      .then((logout) => {
-                        if (!logout) return
-                        if ($page.url.pathname.startsWith('/account')) {
-                          window.location.replace('/login')
-                        } else {
-                          window.location.reload()
-                        }
-                      })
-                  }}
-                  type="button"
-                >
-                  <span>Log out</span> <Logout16 class="flex" /></button
-                >
-              </div>
-            </Submenu>
+                  {#if !$customer}
+                    <p>Loading...</p>
+                  {:else}
+                    <p>Hi, {$customer?.firstName}!</p>
+                  {/if}
+                  <a
+                    class="flex font-normal space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                    href="/account/orders"
+                  >
+                    <span>Orders</span> <OrderDetails16 class="flex" /></a
+                  >
+                  <a
+                    class="flex font-normal space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                    href="/account/settings"
+                  >
+                    <span>Settings</span> <Settings16 class="flex" /></a
+                  >
+                  <button
+                    class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                    on:click={() => {
+                      trpc()
+                        .mutation('customer:logout')
+                        .then((logout) => {
+                          if (!logout) return
+                          if ($page.url.pathname.startsWith('/account')) {
+                            window.location.replace('/login')
+                          } else {
+                            window.location.reload()
+                          }
+                        })
+                    }}
+                    type="button"
+                  >
+                    <span>Log out</span> <Logout16 class="flex" /></button
+                  >
+                </div>
+              </Submenu>
+            {/if}
+          {:else}
+            <div class="rounded-full h-32px w-32px skeleton" />
           {/if}
-        {:else}
-          <div class="rounded-full h-32px w-32px skeleton" />
         {/if}
         <a
           class="flex relative hover:text-pink-500"
@@ -197,16 +226,22 @@
       </div>
     </div>
     <Searchbar class="w-full px-4 pb-4 lg:hidden" />
-    <div class="bg-red-900 text-white text-base w-full <lg:hidden">
-      <div class="flex mx-auto space-x-4 text-white p-4 py-2 lg:w-9/10">
+    <div
+      class="bg-$sc-color-primary text-$sc-auto-foreground text-base w-full <lg:hidden"
+    >
+      <div class="flex mx-auto space-x-4 p-4 py-2 lg:w-9/10">
         <a href="/" class="hover:underline">Home</a>
         {#each store.categories?.slice(0, 7) || [] as category}
-          <a class="hover:underline" href="/products?category={category.slug}"
+          <a
+            class="hover:underline"
+            href={customizable ? '#' : `/products?category=${category.slug}`}
             >{category.name}</a
           >
         {/each}
-        <a class="hover:underline" href="/contact">Contact</a>
-        <a class="hover:underline" href="/faq">FAQ</a>
+        <a class="hover:underline" href={customizable ? '#' : '/contact'}
+          >Contact</a
+        >
+        <a class="hover:underline" href={customizable ? '#' : '/faq'}>FAQ</a>
       </div>
     </div>
     <div class="flex bg-[#00fff4] w-full p-4 py-2 items-center justify-center">
@@ -239,15 +274,15 @@
       </p>
     </div>
   </div>
-  <div class="bg-red-900 w-full">
+  <div class="bg-bg-$sc-color-primary w-full">
     <div
-      class="divide-white mx-auto text-white w-full grid grid-cols-1 lg:divide-x-1 lg:w-9/10 lg:grid-cols-4 <lg:divide-y-1"
+      class="divide-$sc-auto-foreground mx-auto text-$sc-auto-foreground w-full grid grid-cols-1 lg:divide-x-1 lg:w-9/10 lg:grid-cols-4 <lg:divide-y-1"
     >
       <div class="flex-col h-full space-y-4 p-4 justify-center items-center">
         <h4 class="font-bold font-title">Stay In The Loop</h4>
         <div class="flex items-center">
           <input
-            class="bg-white border-0 h-32px text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10"
+            class="bg-white border border-0 h-32px text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10"
             type="search"
             name="q"
             placeholder="Enter your email address"

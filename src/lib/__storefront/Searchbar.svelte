@@ -33,14 +33,14 @@
   on:submit|preventDefault={submitSearch}
 >
   <input
-    class="bg-white border border-red-900  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+    class="bg-white border border-$sc-color-primary  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
     type="search"
     name="q"
     bind:value={search}
     placeholder="Enter keywords to search..."
   />
   <select
-    class="bg-white border-b border-l-0 border-r-0 border-red-900  leading-tight w-full  py-2 px-3 appearance-none sm:w-10rem !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+    class="bg-white border-b border-$sc-color-primary border-l-0 border-r-0 leading-tight w-full  py-2 px-3 appearance-none sm:w-10rem !border-t dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
     bind:value={category}
   >
     <option value="">All products</option>
@@ -48,7 +48,7 @@
       <option value={category.slug}>{category.name}</option>
     {/each}
   </select>
-  <button class="flex bg-red-900  text-white p-2 items-center">
+  <button class="bg-$sc-color-primary flex  text-white p-2 items-center">
     <Search16 class="m-auto" />
   </button>
 </form>

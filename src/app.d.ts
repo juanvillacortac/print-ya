@@ -18,6 +18,7 @@ declare namespace App {
   }
   interface Stuff extends Record<string, unknown> {
     layout: import('$lib/utils/layout').LayoutType
+    storeData?: StoreData
     store?: import('$lib/db').Store | null
     product?: import('$lib/db').Product | null
     products?: import('$lib/db').StripedProduct[] | null
@@ -27,4 +28,8 @@ declare namespace App {
 interface SessionData {
   userId?: string | null
   customerId?: string | null
+}
+
+interface StoreData {
+  theme: Record<'primary', string>
 }

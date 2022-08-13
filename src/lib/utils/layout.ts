@@ -1,6 +1,11 @@
 import trpc from '$lib/trpc/client'
 import type { RequestEvent, LoadEvent } from '@sveltejs/kit'
 import { isCanonical } from './host'
+import {
+  PUBLIC_UPSTASH_REDIS_TOKEN,
+  PUBLIC_UPSTASH_REDIS_URL,
+} from '$env/static/public'
+import { Redis } from '@upstash/redis'
 
 export type LayoutType = 'app' | 'store'
 
@@ -40,6 +45,7 @@ export const validateLayoutRoute = (event: LoadEvent | RequestEvent) => {
 
 export type LayoutData = Partial<{
   layout: import('$lib/utils/layout').LayoutType
+  storeData?: StoreData
   store?: import('$lib/db').Store | null
   product?: import('$lib/db').Product | null
   products?: import('$lib/db').StripedProduct[] | null
@@ -65,6 +71,21 @@ export const fetchLayoutData = async ({
           }
           if (slug) {
             response.store = await client.query('stores:getBySlug', slug)
+          }
+          if (response.store) {
+            const redis = new Redis({
+              url: PUBLIC_UPSTASH_REDIS_URL,
+              token: PUBLIC_UPSTASH_REDIS_TOKEN,
+            })
+            response.storeData = (
+              await redis.get<{ json: StoreData }>(
+                `layout:${response.store.id}`
+              )
+            )?.json || {
+              theme: {
+                primary: '#000',
+              },
+            }
           }
         }
         return {
