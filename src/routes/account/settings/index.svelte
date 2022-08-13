@@ -128,7 +128,7 @@
       </label>
     </div>
     <button
-      class="rounded flex font-bold bg-red-900 text-center text-sm w-full py-2 px-6 transform-gpu duration-200 justify-center items-center !text-white hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px"
+      class="rounded flex font-bold bg-$sc-color-primary text-center text-sm w-full py-2 px-6 transform-gpu duration-200 justify-center items-center !text-white hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px"
       disabled={loading || !c}
       type="submit"
       >{loading ? 'Saving...' : c ? 'Save changes' : 'Loading...'}</button

@@ -78,7 +78,7 @@
   {:else}
     <div class="flex flex-col">
       <h3
-        class="flex font-bold font-title text-red-900 text-6xl items-center dark:text-white"
+        class="flex font-bold font-title text-$sc-color-primary text-6xl items-center dark:text-white"
       >
         Whoops!
       </h3>
@@ -86,7 +86,7 @@
         We can't find the page you requested (sorry)...
       </p>
     </div>
-    <p class="font-bold text-red-900 text-2xl dark:text-white">
+    <p class="font-bold text-$sc-color-primary text-2xl dark:text-white">
       Send us an email with what you're looking for and we'll add it in for you!
       <a
         href="/contact"
@@ -98,7 +98,7 @@
       <div class="flex flex-col space-y-4">
         <div class="flex space-x-4 items-center">
           <div
-            class="rounded-full flex font-bold font-title bg-red-900 h-12  text-white text-lg w-12 items-center justify-center"
+            class="rounded-full flex font-bold font-title bg-$sc-color-primary h-12  text-white text-lg w-12 items-center justify-center"
           >
             1
           </div>
@@ -111,7 +111,7 @@
       <div class="flex flex-col space-y-4">
         <div class="flex space-x-4">
           <div
-            class="rounded-full flex font-bold font-title bg-red-900 text-white  text-lg min-h-12 min-w-12 max-w-12 max-h-12 items-center justify-center"
+            class="rounded-full flex font-bold font-title bg-$sc-color-primary text-white  text-lg min-h-12 min-w-12 max-w-12 max-h-12 items-center justify-center"
           >
             2
           </div>
@@ -125,7 +125,7 @@
       <div class="flex flex-col space-y-4">
         <div class="flex space-x-4">
           <div
-            class="rounded-full flex font-bold font-title bg-red-900 text-white  text-lg min-h-12 min-w-12 max-w-12 max-h-12 items-center justify-center"
+            class="rounded-full flex font-bold font-title bg-$sc-color-primary text-white  text-lg min-h-12 min-w-12 max-w-12 max-h-12 items-center justify-center"
           >
             3
           </div>

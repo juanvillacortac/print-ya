@@ -140,7 +140,7 @@
             junk/spam folder.
           </p>
           <button
-            class="rounded flex font-bold space-x-2 bg-red-900 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+            class="rounded flex font-bold space-x-2 bg-$sc-color-primary shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
             style="will-change: transform"
           >
             Send message
@@ -161,7 +161,7 @@
           <ul class="space-y-2">
             {#if $page.stuff.store?.contactData?.phone}
               <li class="flex space-x-2 items-center">
-                <PhoneFilled24 class="text-red-900" />
+                <PhoneFilled24 class="text-$sc-color-primary" />
                 <a
                   href="tel:{$page.stuff.store.contactData.phone}"
                   class="font-bold text-sm hover:underline"
@@ -171,7 +171,7 @@
             {/if}
             {#if $page.stuff.store?.contactData?.email}
               <li class="flex space-x-2 items-center">
-                <Email24 class="text-red-900" />
+                <Email24 class="text-$sc-color-primary" />
                 <a
                   href="mailto:{$page.stuff.store.contactData.email}"
                   class="font-bold text-sm hover:underline"

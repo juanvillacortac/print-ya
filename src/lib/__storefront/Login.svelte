@@ -190,7 +190,7 @@
         {/if}
       </div>
       <button
-        class="rounded flex font-bold mr-auto bg-red-900 text-sm py-2 px-6 transform-gpu duration-200 !text-white hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px"
+        class="rounded flex font-bold mr-auto bg-$sc-color-primary text-sm py-2 px-6 transform-gpu duration-200 !text-white hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px"
         disabled={loading}
         type="submit"
         >{loading ? 'Loading...' : isLogin ? 'Log in' : 'Register'}</button
@@ -200,14 +200,14 @@
           <span>Don't have an account yet?</span>
           <a
             href="?register"
-            class="font-bold text-red-900 dark:text-red-500 hover:underline"
+            class="font-bold text-$sc-color-primary dark:text-red-500 hover:underline"
             >Create account</a
           >
         {:else}
           <span>Do you have an account?</span>
           <a
             href="/login"
-            class="font-bold text-red-900 dark:text-red-500 hover:underline"
+            class="font-bold text-$sc-color-primary dark:text-red-500 hover:underline"
             >Log in</a
           >
         {/if}

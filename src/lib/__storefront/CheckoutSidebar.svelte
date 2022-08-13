@@ -577,7 +577,7 @@
                   class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
                 />
                 <button
-                  class="rounded flex font-bold space-x-2 bg-red-900 shadow text-white text-xs py-2 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                  class="rounded flex font-bold space-x-2 bg-$sc-color-primary shadow text-white text-xs py-2 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
                   style="will-change: transform"
                   type="button"
                 >
@@ -637,7 +637,8 @@
                 class:!border-transparent={completedSteps.billing ||
                   step === 'billing'}
                 class:text-white={completedSteps.billing || step === 'billing'}
-                class:bg-red-900={completedSteps.billing || step === 'billing'}
+                class:bg-$sc-color-primary={completedSteps.billing ||
+                  step === 'billing'}
               >
                 1
               </div>
@@ -793,7 +794,7 @@
                   step === 'shipping'}
                 class:text-white={completedSteps.shipping ||
                   step === 'shipping'}
-                class:bg-red-900={completedSteps.shipping ||
+                class:bg-$sc-color-primary={completedSteps.shipping ||
                   step === 'shipping'}
               >
                 2
@@ -979,7 +980,8 @@
                 class:!border-transparent={completedSteps.payment ||
                   step === 'payment'}
                 class:text-white={completedSteps.payment || step === 'payment'}
-                class:bg-red-900={completedSteps.payment || step === 'payment'}
+                class:bg-$sc-color-primary={completedSteps.payment ||
+                  step === 'payment'}
               >
                 3
               </div>
@@ -1034,7 +1036,7 @@
                       style={{ base: { color: dark ? 'white' : undefined } }}
                     />
                     <button
-                      class="rounded flex font-bold ml-auto space-x-2 bg-red-900 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                      class="rounded flex font-bold ml-auto space-x-2 bg-$sc-color-primary shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
                       style="will-change: transform"
                     >
                       Pay
@@ -1064,7 +1066,7 @@
           </div>
           {#if step !== 'payment'}
             <button
-              class="rounded flex font-bold ml-auto space-x-2 bg-red-900 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+              class="rounded flex font-bold ml-auto space-x-2 bg-$sc-color-primary shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
               style="will-change: transform"
             >
               Next step

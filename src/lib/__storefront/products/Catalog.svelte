@@ -18,7 +18,7 @@
     FavoriteFilled24,
     Search16,
   } from 'carbon-icons-svelte'
-import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from 'svelte'
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'
 
@@ -63,18 +63,18 @@ import { createEventDispatcher } from 'svelte';
       class="flex w-full"
     >
       <input
-        class="bg-white border border-red-900 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
+        class="bg-white border border-$sc-color-primary text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline focus:z-10"
         type="search"
         bind:value={searchTerm}
         placeholder="Enter keywords to search..."
       />
-      <button class="flex bg-red-900  text-white p-2 items-center">
+      <button class="bg-$sc-color-primary flex  text-white p-2 items-center">
         <Search16 class="m-auto" />
       </button>
     </form>
     <div class="flex flex-col">
       <div
-        class="rounded-tl rounded-tr flex space-x-2  bg-red-900 text-white w-full p-2 items-center"
+        class="bg-$sc-color-primary rounded-tl rounded-tr flex  space-x-2 text-white w-full p-2 items-center"
       >
         <Category16 />
         <h3 class="font-bold text-xs">Collections</h3>

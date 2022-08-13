@@ -119,7 +119,7 @@
               to apply, the toughest part was deciding exactly where to put
               them. They look great on my Jeep.
             </span>
-            <!-- <span class="font-serif font-bold text-4xl text-red-900 inline-flex"
+            <!-- <span class="font-serif font-bold text-4xl text-$sc-color-primary inline-flex"
               >&ldquor;</span
             > -->
           </p>
@@ -142,7 +142,7 @@
               scrape it off if I wanted to. Waterproof So far and weather proof.
               Had it on up to +30°C above 0 and now it is -30°C below 0!
             </span>
-            <!-- <span class="font-serif font-bold text-4xl text-red-900 inline-flex"
+            <!-- <span class="font-serif font-bold text-4xl text-$sc-color-primary inline-flex"
               >&ldquor;</span
             > -->
           </p>
@@ -159,7 +159,7 @@
               >&ldquo;</span
             >
             <span> Trè facile à l appliquer! </span>
-            <!-- <span class="font-serif font-bold text-4xl text-red-900 inline-flex"
+            <!-- <span class="font-serif font-bold text-4xl text-$sc-color-primary inline-flex"
               >&ldquor;</span
             > -->
           </p>

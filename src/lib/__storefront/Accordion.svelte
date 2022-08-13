@@ -15,7 +15,7 @@
 <div class="rounded flex-col flex w-full overflow-hidden">
   <button
     title="View information"
-    class="flex font-bold font-title bg-red-900 shadow-sm text-white w-full p-2 z-20 justify-between items-center"
+    class="flex font-bold font-title bg-$sc-color-primary shadow-sm text-white w-full p-2 z-20 justify-between items-center"
     on:click={() => (open = !open)}
     use:tooltip
   >

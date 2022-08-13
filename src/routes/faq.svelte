@@ -87,7 +87,7 @@ If you have anymore questions, please [contact us](/contact)
   }
 
   .faq-content :global(a) {
-    @apply font-bold text-red-900;
+    @apply font-bold text-$sc-color-primary;
   }
   :global(.dark) .faq-content :global(a) {
     @apply text-red-500;

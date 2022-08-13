@@ -407,7 +407,7 @@
             </p>
           {/if}
           <button
-            class="rounded flex font-bold space-x-2 bg-red-900 shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:(cursor-not-allowed opacity-50) hover:not-disabled:scale-105 "
+            class="rounded flex font-bold space-x-2 bg-$sc-color-primary shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:(cursor-not-allowed opacity-50) hover:not-disabled:scale-105 "
             style="will-change: transform"
             disabled={!loaded}
             on:click={() => {
