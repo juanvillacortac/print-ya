@@ -72,20 +72,18 @@ export const fetchLayoutData = async ({
           if (slug) {
             response.store = await client.query('stores:getBySlug', slug)
           }
-          if (response.store) {
-            const redis = new Redis({
-              url: PUBLIC_UPSTASH_REDIS_URL,
-              token: PUBLIC_UPSTASH_REDIS_TOKEN,
-            })
-            response.storeData = (
-              await redis.get<{ json: StoreData }>(
-                `layout:${response.store.id}`
-              )
-            )?.json || {
-              theme: {
-                primary: '#000',
-              },
-            }
+        }
+        if (response.store) {
+          const redis = new Redis({
+            url: PUBLIC_UPSTASH_REDIS_URL,
+            token: PUBLIC_UPSTASH_REDIS_TOKEN,
+          })
+          response.storeData = (
+            await redis.get<{ json: StoreData }>(`layout:${response.store.id}`)
+          )?.json || {
+            theme: {
+              primary: '#000',
+            },
           }
         }
         console.log(response)
