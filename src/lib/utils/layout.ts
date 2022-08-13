@@ -88,6 +88,7 @@ export const fetchLayoutData = async ({
             }
           }
         }
+        console.log(response)
         return {
           notFound: !response.store,
           response,

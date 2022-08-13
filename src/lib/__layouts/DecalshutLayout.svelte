@@ -50,10 +50,8 @@
 
   function whiteForeground(hex: string) {
     const rgb = hexToRgb(hex)
-    console.log(rgb)
     const { r = 0, g = 0, b = 0 } = rgb ? rgb : {}
     const L = 0.2126 * r + 0.7152 * g + 0.0722 * b
-    console.log('L', L)
     if (r * 0.299 + g * 0.587 + b * 0.114 > 186) return false
     else return true
     if (L > 0.179) return false
