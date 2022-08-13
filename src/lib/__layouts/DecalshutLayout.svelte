@@ -42,11 +42,13 @@
     }
   }> =
     getContext('layout-store') ||
-    writable({
-      theme: {
-        primary: '#000',
-      },
-    })
+    writable(
+      $page.stuff.storeData || {
+        theme: {
+          primary: '#000',
+        },
+      }
+    )
 
   $: console.log($page.stuff.storeData)
 
