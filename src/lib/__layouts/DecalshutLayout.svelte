@@ -40,7 +40,11 @@
     theme: {
       primary: string
     }
-  }> = getContext('layout-store') || writable($page.stuff.storeData)
+  }> = getContext('layout-store') || writable($page.stuff.storeData || {
+    theme: {
+      primary: '#000'
+    }
+  })
 
   function whiteForeground(hex: string) {
     const rgb = hexToRgb(hex)
