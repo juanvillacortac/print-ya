@@ -32,4 +32,10 @@ interface SessionData {
 
 interface StoreData {
   theme: Record<'primary', string>
+  footer: {
+    submit: Record<'title' | 'text', string>
+    links: (Record<'title' | 'href', string> &
+      Partial<Record<'target', string>>)[]
+    appendix: Record<'title' | 'text' | 'img', string>
+  }
 }

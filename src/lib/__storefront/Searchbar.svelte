@@ -48,7 +48,9 @@
       <option value={category.slug}>{category.name}</option>
     {/each}
   </select>
-  <button class="bg-$sc-color-primary flex  text-white p-2 items-center">
+  <button
+    class="bg-$sc-color-primary flex  text-$sc-auto-foreground p-2 items-center"
+  >
     <Search16 class="m-auto" />
   </button>
 </form>

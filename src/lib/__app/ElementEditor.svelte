@@ -8,11 +8,12 @@
     Link16,
     Link32,
     Save16,
+    TrashCan16,
   } from 'carbon-icons-svelte'
 
   import { keyed } from 'svelte-keyed'
   import type { Writable } from 'svelte/store'
-  import { getContext, tick } from 'svelte'
+  import { getContext, createEventDispatcher } from 'svelte'
   import { tooltip } from '$lib/components/tooltip'
   import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
   import { uploadFile } from '$lib/supabase'
@@ -22,6 +23,9 @@
 
   export let root: Writable<Record<string, any>>
   export let keys: { text?: string; image?: string; href?: string }
+  export let removeButton = false
+
+  const dispatch = createEventDispatcher<{ remove: void }>()
 
   export let readOnly: boolean = getContext('readOnly') || false
   let editable = false
@@ -113,15 +117,6 @@
     outScreen = innerButtons ? true : rect.left + rect.width - 4 >= screenWidth
   }
 
-  const loadImage = (url: string) =>
-    new Promise((resolve) => {
-      const image = new Image()
-      image.addEventListener('load', () => {
-        resolve(image)
-      })
-      image.src = url
-    })
-
   let uploading = false
 
   let uploadImage: <
@@ -151,32 +146,11 @@
       })
 
       $imageStore = url || ''
-
-      // const optimizedUrl = urlBuilder(url || '', options)
-      // const optimizedUrl2 = urlBuilder(url || '', {
-      //   rs: {
-      //     s: '480x320',
-      //     m: 'scale',
-      //   },
-      // })
-      // const optimizedUrl3 = urlBuilder(url || '', {
-      //   rs: {
-      //     s: '200x200',
-      //     m: 'scale',
-      //   },
-      // })
-
-      // const _ = await Promise.all([
-      //   loadImage(optimizedUrl),
-      //   loadImage(optimizedUrl2),
-      //   loadImage(optimizedUrl3),
-      // ])
-
-      // images.update((img) => [...img, { path, url: url || '' }])
     } catch (error) {
       alert(error.message)
     } finally {
       uploading = false
+      inputRef.value = ''
     }
   }
 
@@ -260,14 +234,15 @@
     name=""
     class="h-0 opacity-0 top-0 w-0 hidden absolute"
     accept="image/*"
+    use:portal
     bind:this={inputRef}
     on:change={(e) => uploadImage(e)}
   />
   <div class="relative wrapper" use:clickOutside>
     <div
-      class="flex space-x-2 -top-5 -right-5 z-99 absolute items-center"
-      class:!top-5={innerButtons || outScreen}
-      class:!right-5={innerButtons || outScreen}
+      class="flex space-x-1 -top-5 -right-5 z-99 absolute items-center"
+      class:!top-0={innerButtons || outScreen}
+      class:!right-0={innerButtons || outScreen}
       bind:this={buttonsRef}
     >
       {#if !editable}
@@ -277,7 +252,7 @@
             on:click={() => (editable = true)}
             class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
             title="Edit content"
-            use:tooltip><Edit16 /></button
+            use:tooltip><Edit16 class="h-12px w-12px" /></button
           >
         {/if}
         {#if keys.href}
@@ -289,7 +264,7 @@
             }}
             class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
             title="Change url"
-            use:tooltip><Link16 /></button
+            use:tooltip><Link16 class="h-12px w-12px" /></button
           >
         {/if}
         {#if keys.image}
@@ -313,9 +288,18 @@
               on:click={() => inputRef?.click()}
               class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
               title="Change image"
-              use:tooltip><Image16 /></button
+              use:tooltip><Image16 class="h-12px w-12px" /></button
             >
           {/if}
+        {/if}
+        {#if removeButton}
+          <button
+            type="button"
+            on:click={() => dispatch('remove')}
+            class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
+            title="Remove element"
+            use:tooltip><TrashCan16 class="h-12px w-12px" /></button
+          >
         {/if}
       {:else}
         <button
@@ -323,14 +307,14 @@
           on:click={cancelText}
           class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
           title="Cancel"
-          use:tooltip><Close16 /></button
+          use:tooltip><Close16 class="h-12px w-12px" /></button
         >
         <button
           type="button"
           on:click={saveText}
           class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
           title="Save"
-          use:tooltip><Checkmark16 /></button
+          use:tooltip><Checkmark16 class="h-12px w-12px" /></button
         >
       {/if}
     </div>
@@ -352,16 +336,16 @@
   .lds-ring {
     display: flex;
     position: relative;
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     overflow: hidden;
   }
   .lds-ring div {
     box-sizing: border-box;
     display: block;
     position: absolute;
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     margin: 0px;
     border: 2px solid currentColor;
     border-radius: 50%;

@@ -14,6 +14,8 @@
     Logout16,
     Settings16,
     OrderDetails16,
+    Add16,
+    Link16,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
@@ -24,6 +26,9 @@
   import Searchbar from '$lib/__storefront/Searchbar.svelte'
   import { getContext } from 'svelte'
   import { writable, type Writable } from 'svelte/store'
+  import ElementEditor from '$lib/__app/ElementEditor.svelte'
+  import { flip } from 'svelte/animate'
+  import { expoOut } from 'svelte/easing'
 
   export let store: Store
 
@@ -36,21 +41,32 @@
   $: pageTitle = (subtitle ? subtitle + ' | ' : '') + store.name
 
   const customizable = getContext('customizable') || false
-  const layoutStore: Writable<{
-    theme: {
-      primary: string
-    }
-  }> =
+  const layoutStore: Writable<StoreData> =
     getContext('layout-store') ||
     writable(
       $page.stuff.storeData || {
         theme: {
-          primary: '#000',
+          primary: '#5D2847',
+        },
+        footer: {
+          submit: {
+            title: 'Stay In The Loop',
+            text: `Become a Decals Hut Insider and get 10% off your order today. Plus we'll keep you up-to-date with the latest designs.`,
+          },
+          links: [
+            {
+              title: 'Home',
+              href: '/',
+            },
+          ],
+          appendix: {
+            title: 'Secure Checkout',
+            text: 'We use encrypted SSL security to ensure that your credit card information is 100% protected.',
+            img: 'https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/ff-checkout-single.png?v=151997186021135005011631037864',
+          },
         },
       }
     )
-
-  $: console.log($page.stuff.storeData)
 
   function whiteForeground(hex: string) {
     const rgb = hexToRgb(hex)
@@ -287,53 +303,188 @@
       class="divide-$sc-auto-foreground mx-auto text-$sc-auto-foreground w-full grid grid-cols-1 lg:divide-x-1 lg:w-9/10 lg:grid-cols-4 <lg:divide-y-1"
     >
       <div class="flex-col h-full space-y-4 p-4 justify-center items-center">
-        <h4 class="font-bold font-title">Stay In The Loop</h4>
+        <ElementEditor
+          readOnly={!customizable}
+          innerButtons
+          root={layoutStore}
+          keys={{
+            text: `footer.submit.title`,
+          }}
+          let:text
+          let:contenteditable
+        >
+          <h4 class="!font-bold !font-title" use:contenteditable>
+            {@html text}
+          </h4>
+        </ElementEditor>
         <div class="flex items-center">
           <input
-            class="bg-white border border-0 h-32px text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10"
-            type="search"
-            name="q"
+            class="bg-white border border-$sc-auto-foreground rounded-l h-32px text-xs leading-tight w-full py-2 px-3 appearance-none !text-gray-800 lg:w-20rem focus:outline-none focus:shadow-outline focus:z-10 "
+            type="email"
             placeholder="Enter your email address"
           />
           <button
-            class="flex font-bold h-full bg-red-400 text-white text-xs p-2 items-center uppercase"
+            class="border-r border-t border-b border-$sc-auto-foreground rounded-r flex font-bold bg-red-400 text-white text-xs min-h-32px px-2 items-center uppercase "
           >
             Submit
           </button>
         </div>
-        <p class="font-light italic">
-          Become a Decals Hut Insider and get 10% off your order today. Plus
-          we'll keep you up-to-date with the latest designs.
-        </p>
+        <ElementEditor
+          innerButtons
+          readOnly={!customizable}
+          root={layoutStore}
+          keys={{
+            text: `footer.submit.text`,
+          }}
+          let:text
+          let:contenteditable
+        >
+          <p class="!font-light !italic" use:contenteditable>
+            {@html text}
+          </p>
+        </ElementEditor>
       </div>
-      <div class="grid p-4 grid-cols-2 grid-rows-4">
-        <a href="/">Home</a>
+      <div
+        class="grid p-4 grid-cols-2 grid-rows-4 relative items-start justify-start"
+      >
+        {#each $layoutStore.footer?.links || [] as _, idx}
+          <ElementEditor
+            readOnly={!customizable}
+            root={layoutStore}
+            keys={{
+              href: `footer.links[${idx}].href`,
+              text: `footer.links[${idx}].title`,
+            }}
+            removeButton
+            on:remove={() => {
+              const tmp = [...$layoutStore.footer.links]
+              tmp.splice(idx, 1)
+              $layoutStore.footer.links = [...tmp]
+            }}
+            let:href
+            let:text
+            let:editable
+            let:contenteditable
+          >
+            {#if href?.startsWith('/')}
+              <a
+                {href}
+                use:contenteditable
+                class:hover:underline={!editable}
+                sveltekit:prefetch>{@html text}</a
+              >
+            {:else}
+              <a
+                {href}
+                use:contenteditable
+                class:hover:underline={!editable}
+                target="_blank">{@html text}</a
+              >
+            {/if}
+          </ElementEditor>
+        {/each}
+        {#if customizable && $layoutStore.footer?.links?.length < 10}
+          <button
+            type="button"
+            on:click={() => {
+              $layoutStore.footer.links = [
+                ...$layoutStore.footer.links,
+                {
+                  title: `Link ${$layoutStore.footer.links.length + 1}`,
+                  href: '/',
+                },
+              ]
+            }}
+            class="rounded-full font-bold mr-auto mb-auto space-x-1 bg-gray-100 text-xs py-1 px-2 text-dark-900 inline-flex items-center justify-start hover:underline"
+            title="Add link"
+            use:tooltip
+            ><span>Add link</span>
+            <Link16 class="flex" /></button
+          >
+        {/if}
+        <!-- <a href="/">Home</a>
         {#each store.categories?.slice(0, 7) || [] as category}
           <a href="/products?category={category.slug}" class="hover:underline"
             >{category.name}</a
           >
         {/each}
         <a href="/products" class="hover:underline">More products</a>
-        <a href="/faq" class="hover:underline">FAQ</a>
+        <a href="/faq" class="hover:underline">FAQ</a> -->
       </div>
       <div class="w-full <lg:hidden" />
       <div
         class="flex-col flex h-full space-y-4 p-4 items-center justify-center "
       >
-        <h4 class="font-bold font-title text-center">Secure Checkout</h4>
-        <p class="text-center">
-          We use encrypted SSL security to ensure that your credit card
-          information is 100% protected.
-        </p>
-        <Image
-          src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/ff-checkout-single.png?v=151997186021135005011631037864"
-          class="mx-auto"
-          options={{
-            rs: {
-              s: '200x',
-            },
+        <ElementEditor
+          readOnly={!customizable}
+          root={layoutStore}
+          keys={{
+            text: `footer.appendix.title`,
           }}
-        />
+          let:text
+          let:contenteditable
+        >
+          <h4
+            class="flex w-full !font-bold !font-title !text-center"
+            use:contenteditable
+          >
+            {@html text}
+          </h4>
+        </ElementEditor>
+        <ElementEditor
+          innerButtons
+          readOnly={!customizable}
+          root={layoutStore}
+          keys={{
+            text: `footer.appendix.text`,
+          }}
+          let:text
+          let:contenteditable
+        >
+          <p class="!text-center" use:contenteditable>
+            {@html text}
+          </p>
+        </ElementEditor>
+        {#if customizable}
+          <ElementEditor
+            readOnly={!customizable}
+            root={layoutStore}
+            on:remove={() => ($layoutStore.footer.appendix.img = '')}
+            removeButton
+            keys={{
+              image: `footer.appendix.img`,
+            }}
+            let:image
+          >
+            {#if image}
+              <Image
+                src={image || ''}
+                class="mx-auto"
+                options={{
+                  rs: {
+                    s: '200x',
+                  },
+                }}
+              />
+            {:else}
+              <div
+                class="border-dashed border rounded font-bold font-title text-center text-xs p-2"
+              >
+                No image
+              </div>
+            {/if}
+          </ElementEditor>
+        {:else if $layoutStore.footer?.appendix?.img}
+          <Image
+            src={$layoutStore.footer?.appendix?.img}
+            class="mx-auto"
+            options={{
+              rs: {
+                s: '200x',
+              },
+            }}
+          />
+        {/if}
       </div>
     </div>
   </div>
