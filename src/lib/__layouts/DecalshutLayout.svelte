@@ -424,10 +424,7 @@
           let:text
           let:contenteditable
         >
-          <h4
-            class="flex w-full !font-bold !font-title !text-center"
-            use:contenteditable
-          >
+          <h4 class="!font-bold !font-title !text-center" use:contenteditable>
             {@html text}
           </h4>
         </ElementEditor>
