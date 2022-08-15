@@ -13,10 +13,10 @@
 </script>
 
 <script>
-  export let data
-
   $: if ($session.layout === 'app') {
     $pageSubtitle = 'Dashboard'
+  } else {
+    $pageSubtitle = ''
   }
 </script>
 
