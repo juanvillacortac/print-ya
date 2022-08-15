@@ -46,7 +46,7 @@
   export let store: Store
 
   let subtitle = ''
-  $: subtitle = $pageSubtitle ? $pageSubtitle : ''
+  $: subtitle = $pageSubtitle ? $pageSubtitle : subtitle
   $: if (!$navigating) {
     $pageSubtitle = ''
   }
