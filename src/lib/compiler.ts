@@ -22,7 +22,6 @@ export type TemplateSource = {
 
 export const compile = (source: TemplateSource): CompiledTemplate => {
   try {
-    console.log('pedo')
     let { html = '', css = '', fields = '' } = source
     const payload = JSON.parse(fields || '{}')
     let replacedHtml = replaceAll(replaceAll(html, '{{', '<%'), '}}', '%>')
@@ -53,7 +52,6 @@ export const compile = (source: TemplateSource): CompiledTemplate => {
       ...payload,
       ...helpers,
     })
-    console.log(html)
     css = ejs.render(replaceAll(replaceAll(css, '{{', '<%'), '}}', ' %>'), {
       ...payload,
       ...helpers,

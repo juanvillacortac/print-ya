@@ -224,7 +224,6 @@
 
   export const saveImage = () => {
     if (!containerEl) return
-    console.log(shadow.getElementById('inner'))
     innerEl?.classList.toggle('outlined', false)
     toPng(containerEl, { skipFonts: true })
       .then((dataUrl) => {

@@ -319,7 +319,6 @@
         error = result.error
         return
       }
-      console.log(order)
       if (order) {
         confirmPayment({
           amount: total,
@@ -371,8 +370,6 @@
     order = null
     dispatch('checkout', event)
   }
-
-  $: console.log(order)
 
   async function pay(e) {
     waiting = true
@@ -577,7 +574,7 @@
                   class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline "
                 />
                 <button
-                  class="rounded flex font-bold space-x-2 bg-$sc-color-primary shadow text-white text-xs py-2 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                  class="bg-$sc-color-primary rounded flex font-bold space-x-2 shadow text-white text-xs py-2 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
                   style="will-change: transform"
                   type="button"
                 >
@@ -1036,7 +1033,7 @@
                       style={{ base: { color: dark ? 'white' : undefined } }}
                     />
                     <button
-                      class="rounded flex font-bold ml-auto space-x-2 bg-$sc-color-primary shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                      class="bg-$sc-color-primary rounded flex font-bold ml-auto space-x-2 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
                       style="will-change: transform"
                     >
                       Pay
@@ -1066,7 +1063,7 @@
           </div>
           {#if step !== 'payment'}
             <button
-              class="rounded flex font-bold ml-auto space-x-2 bg-$sc-color-primary shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+              class="bg-$sc-color-primary rounded flex font-bold ml-auto space-x-2 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
               style="will-change: transform"
             >
               Next step

@@ -20,29 +20,8 @@
       token: PUBLIC_UPSTASH_REDIS_TOKEN,
     })
     const storeData = (
-      await redis.get<{ json: StoreData }>(`layout-v2:${store.id}`)
-    )?.json || {
-      theme: {
-        primary: '#5D2847',
-      },
-      footer: {
-        submit: {
-          title: 'Stay In The Loop',
-          text: `Become a Decals Hut Insider and get 10% off your order today. Plus we'll keep you up-to-date with the latest designs.`,
-        },
-        links: [
-          {
-            title: 'Home',
-            href: '/',
-          },
-        ],
-        appendix: {
-          title: 'Secure Checkout',
-          text: 'We use encrypted SSL security to ensure that your credit card information is 100% protected.',
-          img: 'https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/ff-checkout-single.png?v=151997186021135005011631037864',
-        },
-      },
-    }
+      await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+    )?.json
 
     if (!isRouteValid) {
       return {
@@ -95,7 +74,7 @@
     }
   })
 
-  import { preferences, redisWritable } from '$lib'
+  import { createLayoutStore, preferences, redisWritable } from '$lib'
   import { browser } from '$app/env'
   import Toast from '$lib/components/Toast.svelte'
   import { onDestroy, setContext } from 'svelte'
@@ -132,10 +111,11 @@
     <link rel="stylesheet" href=${fontsURL} />
   </noscript>`
 
-  const layoutStore = redisWritable(
-    $page.stuff.storeData,
-    `layout-v2:${$page.stuff.store?.id || '404'}`
-  )
+  const layoutStore = createLayoutStore({
+    editable: true,
+    initialState: $page.stuff.storeData,
+    store: $page.stuff.store!,
+  })
   // #5D2847
   // const layoutStore = writable({
   //   theme: {

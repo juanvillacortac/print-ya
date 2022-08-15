@@ -47,8 +47,6 @@ const logic: Handle = async ({ event, resolve }) => {
     (Boolean(appRoutes.find((url) => event.url.pathname.startsWith(url))) ||
       event.url.pathname === '/')
 
-  console.log(event.locals.session.data)
-
   if (
     isAppPage &&
     !event.locals.session?.data?.userId &&
@@ -73,7 +71,6 @@ const logic: Handle = async ({ event, resolve }) => {
         layout: event.locals.layout,
       }),
       responseMeta({ type, errors, ctx, paths }) {
-        console.log(paths)
         const isPublic = paths?.every(
           (p) =>
             !(
@@ -84,7 +81,6 @@ const logic: Handle = async ({ event, resolve }) => {
               p.includes('customer')
             )
         )
-        console.log(isPublic)
         if (
           type === 'query' &&
           errors.length === 0 &&

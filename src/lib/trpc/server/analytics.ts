@@ -10,7 +10,6 @@ const searchMutations = createServer().mutation('create', {
     categorySlug: z.string().optional(),
   }),
   resolve: async ({ input, ctx }) => {
-    console.log(input)
     const { customerId } = await db.getCustomerDetails(ctx.event)
     const customer = customerId ? await db.getCustomer({ customerId }) : null
     const entry = await db.prisma.searchHistory.create({

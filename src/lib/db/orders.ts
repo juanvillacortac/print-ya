@@ -368,6 +368,5 @@ export const updateOrder = async (
       },
     },
   })
-  console.log(updated)
   return updated as Order
 }

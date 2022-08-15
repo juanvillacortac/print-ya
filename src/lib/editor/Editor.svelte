@@ -75,8 +75,6 @@
     })
   })
 
-  $: console.log(output)
-
   onDestroy(() => {
     if (editor) {
       editor.destroy()

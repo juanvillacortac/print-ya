@@ -30,7 +30,6 @@ export function ErrorHandler(e: {
       error: truncatedError.error || truncatedError.message,
     },
   }
-  console.log(payload.body.error)
   if (truncatedError?.name === 'NotFoundError') {
     payload.status = 404
   }
@@ -41,6 +40,5 @@ export function ErrorHandler(e: {
       payload.body.message = 'Already exists. Choose another name.'
     }
   }
-  console.log(payload)
   return payload
 }

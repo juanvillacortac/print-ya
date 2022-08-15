@@ -107,7 +107,6 @@ export async function loginCustomer({
     },
     rejectOnNotFound: false,
   })
-  console.log(email, customerFound)
   if (!customerFound) {
     throw {
       error: 'Wrong password or email address.',

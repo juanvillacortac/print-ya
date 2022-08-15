@@ -450,7 +450,6 @@ export const upsertProduct = async (
       storeId: product.storeId!,
       slug: product.slug!,
     })
-    console.log(final)
     return final
   }
   let slug = slugify(product.name!)

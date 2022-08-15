@@ -156,7 +156,6 @@
 
   onMount(() => {
     const unsubscribe = editor.subscribe((editor) => {
-      console.log(editor, product.templateDraft)
       if (JSON.stringify(product?.templateDraft) !== JSON.stringify(editor)) {
         saved = false
         if (timeout) {

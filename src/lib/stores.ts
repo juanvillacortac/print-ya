@@ -2,10 +2,10 @@ import { derived, type Readable, type Writable } from 'svelte/store'
 import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
 import type { ModifiersMap } from './utils/modifiers'
-import type { Order, Product } from './db'
+import type { Order, Product, Store } from './db'
 import { flatMap, isObject, merge } from 'lodash-es'
 import type { Customer, Prisma } from '@prisma/client'
-import { page, session } from '$app/stores'
+import { page, getStores } from '$app/stores'
 import { goto } from '$app/navigation'
 import * as sj from 'superjson'
 import trpc from './trpc/client'
@@ -154,7 +154,6 @@ export function redisWritable<T>(
     const k = key || get(keyStore)
     if (k) {
       redis.get(k).then((d) => {
-        console.log(d)
         if (!d) return
         store.set(sj.parse(JSON.stringify(d as string)))
       })
@@ -483,3 +482,85 @@ export const customer = createCustomerStore()
 export const bag = createBag(customer)
 export const favorites = createFavorites(customer)
 export const currentOrder = createOrderStore(customer)
+
+export const createLayoutStore = ({
+  initialState,
+  editable,
+  store: s,
+}: {
+  initialState?: Partial<StoreData>
+  editable?: boolean
+  store?: Store
+}): Writable<StoreData> => {
+  const defaultData: StoreData = {
+    header: {
+      links: [],
+    },
+    announcementBar: {
+      background: '#00FFF4',
+      text: 'Create a Custom Text Decal',
+      href: '/products',
+      visible: true,
+    },
+    theme: {
+      primary: '#5D2847',
+    },
+    footer: {
+      submit: {
+        title: 'Stay In The Loop',
+        text: `Become a Decals Hut Insider and get 10% off your order today. Plus we'll keep you up-to-date with the latest designs.`,
+      },
+      links: [
+        {
+          title: 'Home',
+          href: '/',
+        },
+      ],
+      appendix: {
+        title: 'Secure Checkout',
+        text: 'We use encrypted SSL security to ensure that your credit card information is 100% protected.',
+        img: 'https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/ff-checkout-single.png?v=151997186021135005011631037864',
+      },
+    },
+  }
+  const store = writable<StoreData>({
+    header: {
+      ...(defaultData.header || {}),
+      ...(initialState?.header || {}),
+    },
+    announcementBar: {
+      ...(defaultData.announcementBar || {}),
+      ...(initialState?.announcementBar || {}),
+    },
+    theme: {
+      ...defaultData.theme,
+      ...(initialState?.theme || {}),
+    },
+    footer: {
+      ...defaultData.footer,
+      ...(initialState?.footer || {}),
+      appendix: {
+        ...defaultData.footer.appendix,
+        ...(initialState?.footer?.appendix || {}),
+      },
+      submit: {
+        ...defaultData.footer.submit,
+        ...(initialState?.footer?.submit || {}),
+      },
+    },
+  })
+  const set = (value: StoreData) => {
+    store.set(value)
+    if (!browser) return
+    if (editable && s) {
+      redis.set(`storeData:${s.id}`, sj.stringify(value))
+    }
+  }
+  return {
+    ...store,
+    set,
+    update: (cb) => {
+      set(cb(get(store)))
+    },
+  }
+}

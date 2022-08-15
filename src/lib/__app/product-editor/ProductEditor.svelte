@@ -136,7 +136,6 @@
     }
     try {
       saving = true
-      console.log(product)
       const data = await trpc().mutation('products:upsert', {
         storeSlug: store.slug,
         data: {
@@ -164,7 +163,6 @@
         goto(`/stores/${store.slug}/products/${data?.slug}`)
         return
       }
-      console.log(data)
       title = data!.name
       modifiers = data!.modifiers!.map((m) => ({
         ...m,

@@ -8,7 +8,6 @@ const mutations = createServer().mutation('upsert', {
   input: (input: unknown) =>
     input as { storeSlug: string; data: Partial<db.Product> },
   resolve: async ({ ctx, input }) => {
-    console.log(input)
     const { userId } = await db.getUserDetails(ctx.event)
     if (!userId) {
       throw new Error('not allowed')

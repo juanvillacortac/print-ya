@@ -16,19 +16,32 @@
     OrderDetails16,
     Add16,
     Link16,
+    View16,
+    ViewOff16,
+    ColorPalette16,
+    Close24,
+    OverflowMenuVertical24,
+    Menu24,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Store } from '$lib/db'
-  import { bag, customer, pageSubtitle, preferences } from '$lib/stores'
+  import {
+    bag,
+    createLayoutStore,
+    customer,
+    pageSubtitle,
+    preferences,
+  } from '$lib/stores'
   import Submenu from '$lib/components/Submenu.svelte'
   import trpc from '$lib/trpc/client'
   import { browser } from '$app/env'
   import Searchbar from '$lib/__storefront/Searchbar.svelte'
   import { getContext } from 'svelte'
-  import { writable, type Writable } from 'svelte/store'
   import ElementEditor from '$lib/__app/ElementEditor.svelte'
-  import { flip } from 'svelte/animate'
+  import type { Writable } from 'svelte/store'
+  import { fly } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
+  import { portal } from 'svelte-portal'
 
   export let store: Store
 
@@ -43,36 +56,15 @@
   const customizable = getContext('customizable') || false
   const layoutStore: Writable<StoreData> =
     getContext('layout-store') ||
-    writable(
-      $page.stuff.storeData || {
-        theme: {
-          primary: '#5D2847',
-        },
-        footer: {
-          submit: {
-            title: 'Stay In The Loop',
-            text: `Become a Decals Hut Insider and get 10% off your order today. Plus we'll keep you up-to-date with the latest designs.`,
-          },
-          links: [
-            {
-              title: 'Home',
-              href: '/',
-            },
-          ],
-          appendix: {
-            title: 'Secure Checkout',
-            text: 'We use encrypted SSL security to ensure that your credit card information is 100% protected.',
-            img: 'https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/ff-checkout-single.png?v=151997186021135005011631037864',
-          },
-        },
-      }
-    )
+    createLayoutStore({
+      initialState: $page.stuff.storeData,
+    })
 
   function whiteForeground(hex: string) {
     const rgb = hexToRgb(hex)
     const { r = 0, g = 0, b = 0 } = rgb ? rgb : {}
     const L = 0.2126 * r + 0.7152 * g + 0.0722 * b
-    if (r * 0.299 + g * 0.587 + b * 0.114 > 186) return false
+    if (r * 0.299 + g * 0.587 + b * 0.114 > 150) return false
     else return true
     if (L > 0.179) return false
     return true
@@ -93,6 +85,8 @@
         }
       : null
   }
+
+  let open = false
 </script>
 
 <svelte:head>
@@ -115,27 +109,114 @@
     ? '#000'
     : '#fff'}
 >
+  {#if open}
+    <div
+      class="flex h-full bg-dark-900 w-full inset-0 text-gray-100 z-99 fixed"
+      use:portal
+      transition:fly={{ duration: 400, y: -25, easing: expoOut }}
+    >
+      <div
+        class="flex flex-col font-bold font-title mx-auto space-y-6 text-lg w-full p-4 items-end lg:w-9/10"
+      >
+        <div class="flex h-28px items-center">
+          <button on:click={() => (open = false)} type="button">
+            <Close24 class="flex" />
+          </button>
+        </div>
+        {#each $layoutStore.header.links as _, idx}
+          <ElementEditor
+            readOnly={!customizable}
+            root={layoutStore}
+            keys={{
+              href: `header.links[${idx}].href`,
+              text: `header.links[${idx}].title`,
+            }}
+            removeButton
+            compactButtons
+            on:remove={() => {
+              const tmp = [...$layoutStore.header.links]
+              tmp.splice(idx, 1)
+              $layoutStore.header.links = [...tmp]
+            }}
+            let:href
+            let:text
+            let:editable
+            let:contenteditable
+          >
+            {#if href?.startsWith('/')}
+              <a
+                {href}
+                use:contenteditable
+                class:hover:underline={!editable}
+                sveltekit:prefetch>{@html text}</a
+              >
+            {:else}
+              <a
+                {href}
+                use:contenteditable
+                class:hover:underline={!editable}
+                target="_blank">{@html text}</a
+              >
+            {/if}
+          </ElementEditor>
+        {/each}
+        {#if customizable && $layoutStore.header?.links?.length < 10}
+          <button
+            type="button"
+            on:click={() => {
+              $layoutStore.header.links = [
+                ...$layoutStore.header.links,
+                {
+                  title: `Link ${$layoutStore.header.links.length + 1}`,
+                  href: '/',
+                },
+              ]
+            }}
+            class="rounded-full font-bold ml-auto space-x-1 bg-gray-100 text-xs py-1 px-2 text-dark-900 inline-flex items-center justify-start hover:underline"
+            title="Add link"
+            use:tooltip
+            ><span>Add link</span>
+            <Link16 class="flex" /></button
+          >
+        {/if}
+      </div>
+    </div>
+  {/if}
   <div
     class="bg-white flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg <sm:border-b !bg-opacity-90 dark:bg-gray-800 dark:border-gray-600"
+    class:!border-b={!customizable &&
+      !$layoutStore.header.links.length &&
+      !$layoutStore.announcementBar.visible}
   >
     <div
       class="flex mx-auto w-full p-4 py-2 justify-between items-center lg:w-9/10"
     >
-      <div class="flex space-x-4 items-center">
-        <a href="/" class="flex">
-          <Image
-            src={store.logo || ''}
-            class="rounded-sm p-px h-2rem lg:h-3rem dark:bg-white dark:bg-opacity-20"
-            options={{
-              o: 'png',
-              rs: {
-                s: 'x48',
-                m: 'scale',
-              },
-            }}
-          />
-        </a>
-        <Searchbar class="<lg:hidden" />
+      <div class="flex items-center">
+        {#if customizable || $layoutStore.header.links.length}
+          <button
+            class="pr-2 text-dark-900 lg:hidden dark:text-gray-100"
+            on:click={() => (open = true)}
+            type="button"
+          >
+            <Menu24 />
+          </button>
+        {/if}
+        <div class="flex space-x-4 items-center">
+          <a href="/" class="flex">
+            <Image
+              src={store.logo || ''}
+              class="rounded-sm p-px h-2rem lg:h-3rem dark:bg-white dark:bg-opacity-20"
+              options={{
+                o: 'png',
+                rs: {
+                  s: 'x48',
+                  m: 'scale',
+                },
+              }}
+            />
+          </a>
+          <Searchbar class="<lg:hidden" />
+        </div>
       </div>
       <div class="flex space-x-2 text-gray-400 items-center lg:space-x-4">
         <button
@@ -250,27 +331,180 @@
       </div>
     </div>
     <Searchbar class="w-full px-4 pb-4 lg:hidden" />
-    <div
-      class="bg-$sc-color-primary text-$sc-auto-foreground text-base w-full <lg:hidden"
-    >
-      <div class="flex mx-auto space-x-4 p-4 py-2 lg:w-9/10">
-        <a href="/" class="hover:underline">Home</a>
-        {#each store.categories?.slice(0, 7) || [] as category}
-          <a
-            class="hover:underline"
-            href={customizable ? '#' : `/products?category=${category.slug}`}
-            >{category.name}</a
+    {#if customizable || $layoutStore.header.links.length}
+      <div
+        class="bg-$sc-color-primary text-$sc-auto-foreground text-base w-full <lg:hidden"
+      >
+        <div class="flex mx-auto space-x-4 p-4 py-2 itms-center lg:w-9/10">
+          <!-- <a href="/" class="hover:underline">Home</a>
+          {#each store.categories?.slice(0, 7) || [] as category}
+            <a
+              class="hover:underline"
+              href={customizable ? '#' : `/products?category=${category.slug}`}
+              >{category.name}</a
+            >
+          {/each}
+          <a class="hover:underline" href={customizable ? '#' : '/contact'}
+            >Contact</a
           >
-        {/each}
-        <a class="hover:underline" href={customizable ? '#' : '/contact'}
-          >Contact</a
-        >
-        <a class="hover:underline" href={customizable ? '#' : '/faq'}>FAQ</a>
+          <a class="hover:underline" href={customizable ? '#' : '/faq'}>FAQ</a> -->
+          {#each $layoutStore.header.links as _, idx}
+            <ElementEditor
+              readOnly={!customizable}
+              root={layoutStore}
+              keys={{
+                href: `header.links[${idx}].href`,
+                text: `header.links[${idx}].title`,
+              }}
+              removeButton
+              compactButtons
+              on:remove={() => {
+                const tmp = [...$layoutStore.header.links]
+                tmp.splice(idx, 1)
+                $layoutStore.header.links = [...tmp]
+              }}
+              let:href
+              let:text
+              let:editable
+              let:contenteditable
+            >
+              {#if href?.startsWith('/')}
+                <a
+                  {href}
+                  use:contenteditable
+                  class:hover:underline={!editable}
+                  sveltekit:prefetch>{@html text}</a
+                >
+              {:else}
+                <a
+                  {href}
+                  use:contenteditable
+                  class:hover:underline={!editable}
+                  target="_blank">{@html text}</a
+                >
+              {/if}
+            </ElementEditor>
+          {/each}
+          {#if customizable && $layoutStore.header?.links?.length < 10}
+            <button
+              type="button"
+              on:click={() => {
+                $layoutStore.header.links = [
+                  ...$layoutStore.header.links,
+                  {
+                    title: `Link ${$layoutStore.header.links.length + 1}`,
+                    href: '/',
+                  },
+                ]
+              }}
+              class="rounded-full font-bold mr-auto mb-auto space-x-1 bg-gray-100 text-xs py-1 px-2 text-dark-900 inline-flex items-center justify-start hover:underline"
+              title="Add link"
+              use:tooltip
+              ><span>Add link</span>
+              <Link16 class="flex" /></button
+            >
+          {/if}
+        </div>
       </div>
-    </div>
-    <div class="flex bg-[#00fff4] w-full p-4 py-2 items-center justify-center">
-      <div class="text-dark-900 <sm:text-xs">Create a Custom Text Decal</div>
-    </div>
+    {/if}
+    {#if customizable || $layoutStore.announcementBar.visible}
+      <div class="w-full relative">
+        {#if customizable}
+          <div
+            class="flex h-full space-x-1 top-0 right-2 z-99 absolute items-center"
+          >
+            <button
+              type="button"
+              on:click={() =>
+                document.getElementById(`announcement-bg`)?.click()}
+              class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 relative dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
+              title="Change background color"
+              use:tooltip
+            >
+              <input
+                id="announcement-bg"
+                type="color"
+                bind:value={$layoutStore.announcementBar.background}
+                class="h-0 opacity-0 w-0 overflow-hidden absolute"
+              />
+              <ColorPalette16 class="h-12px w-12px" />
+            </button>
+            {#if $layoutStore.announcementBar.visible}
+              <button
+                type="button"
+                on:click={() => ($layoutStore.announcementBar.visible = false)}
+                class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
+                title="Hide announcement bar"
+                use:tooltip><ViewOff16 class="h-12px w-12px" /></button
+              >
+            {:else}
+              <button
+                type="button"
+                on:click={() => ($layoutStore.announcementBar.visible = true)}
+                class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
+                title="Show announcement bar"
+                use:tooltip><View16 class="h-12px w-12px" /></button
+              >
+            {/if}
+          </div>
+        {/if}
+        <div
+          class="flex w-full p-4 py-2 items-center justify-center relative"
+          class:opacity-25={!$layoutStore.announcementBar.visible}
+          class:pointer-events-none={!$layoutStore.announcementBar.visible}
+          style="background-color: {$layoutStore.announcementBar
+            .background}; color: {whiteForeground(
+            $layoutStore.announcementBar.background
+          )
+            ? 'white'
+            : 'black'}"
+        >
+          {#if customizable}
+            <ElementEditor
+              readOnly={!$layoutStore.announcementBar.visible}
+              root={layoutStore}
+              keys={{
+                text: `announcementBar.text`,
+                href: `announcementBar.href`,
+              }}
+              optionalHref
+              let:text
+              let:href
+              let:contenteditable
+            >
+              <p
+                class="<sm:text-xs"
+                use:contenteditable
+                class:hover:underline={href}
+                class:hover:cursor-pointer={href}
+              >
+                {@html text}
+              </p>
+            </ElementEditor>
+          {:else if $layoutStore.announcementBar.href}
+            {#if $layoutStore.announcementBar.href.startsWith('/')}
+              <a
+                href={$layoutStore.announcementBar.href}
+                sveltekit:prefetch
+                class="<sm:text-xs hover:underline"
+                >{@html $layoutStore.announcementBar.text}</a
+              >
+            {:else}
+              <a
+                href={$layoutStore.announcementBar.href}
+                target="_blank"
+                class="<sm:text-xs hover:underline"
+                >{@html $layoutStore.announcementBar.text}</a
+              >
+            {/if}
+          {:else}
+            <p class="<sm:text-xs">
+              {@html $layoutStore.announcementBar.text}
+            </p>
+          {/if}
+        </div>
+      </div>
+    {/if}
   </div>
 
   <div class="flex-grow">
@@ -402,14 +636,6 @@
             <Link16 class="flex" /></button
           >
         {/if}
-        <!-- <a href="/">Home</a>
-        {#each store.categories?.slice(0, 7) || [] as category}
-          <a href="/products?category={category.slug}" class="hover:underline"
-            >{category.name}</a
-          >
-        {/each}
-        <a href="/products" class="hover:underline">More products</a>
-        <a href="/faq" class="hover:underline">FAQ</a> -->
       </div>
       <div class="w-full <lg:hidden" />
       <div

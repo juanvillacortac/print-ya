@@ -7,6 +7,7 @@
     Image16,
     Link16,
     Link32,
+    OverflowMenuVertical16,
     Save16,
     TrashCan16,
   } from 'carbon-icons-svelte'
@@ -20,10 +21,13 @@
   import { portal } from 'svelte-portal'
   import { fade, fly } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
+  import Submenu from '$lib/components/Submenu.svelte'
 
   export let root: Writable<Record<string, any>>
   export let keys: { text?: string; image?: string; href?: string }
   export let removeButton = false
+  export let optionalHref = false
+  export let compactButtons = false
 
   const dispatch = createEventDispatcher<{ remove: void }>()
 
@@ -204,7 +208,7 @@
             bind:value={href}
             aria-autocomplete="none"
             placeholder="Ex. /contact"
-            required
+            required={!optionalHref}
           />
         </div>
       </div>
@@ -246,43 +250,97 @@
       bind:this={buttonsRef}
     >
       {#if !editable}
-        {#if keys.text}
+        {#if uploading}
           <button
             type="button"
-            on:click={() => (editable = true)}
-            class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
-            title="Edit content"
-            use:tooltip><Edit16 class="h-12px w-12px" /></button
+            class="rounded-full cursor-wait bg-dark-900 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) "
+            title="Uploading image"
+            use:tooltip
           >
-        {/if}
-        {#if keys.href}
-          <button
-            type="button"
-            on:click={() => {
-              href = $hrefStore || ''
-              hrefDialog = true
-            }}
-            class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
-            title="Change url"
-            use:tooltip><Link16 class="h-12px w-12px" /></button
+            <div class="lds-ring">
+              <div />
+              <div />
+              <div />
+              <div />
+            </div></button
           >
-        {/if}
-        {#if keys.image}
-          {#if uploading}
+        {:else if compactButtons}
+          <Submenu>
+            <button
+              slot="button"
+              type="button"
+              class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
+              ><OverflowMenuVertical16 class="h-12px w-12px" /></button
+            >
+            <div
+              class="flex flex-col font-bold space-y-3 text-xs items-end"
+              slot="body"
+            >
+              {#if keys.text}
+                <button
+                  class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                  type="button"
+                  on:click={() => (editable = true)}
+                >
+                  <span>Edit content</span> <Edit16 class="flex" /></button
+                >
+              {/if}
+              {#if keys.href}
+                <button
+                  class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                  type="button"
+                  on:click={() => {
+                    href = $hrefStore || ''
+                    hrefDialog = true
+                  }}
+                >
+                  <span>Change url</span> <Link16 class="flex" /></button
+                >
+              {/if}
+              {#if keys.image}
+                <button
+                  class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                  type="button"
+                  on:click={() => inputRef?.click()}
+                >
+                  <span>Change image</span> <Image16 class="flex" /></button
+                >
+              {/if}
+              {#if removeButton}
+                <button
+                  class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
+                  type="button"
+                  on:click={() => dispatch('remove')}
+                >
+                  <span>Remove element</span>
+                  <TrashCan16 class="flex" /></button
+                >
+              {/if}
+            </div>
+          </Submenu>
+        {:else}
+          {#if keys.text}
             <button
               type="button"
-              class="rounded-full cursor-wait bg-dark-900 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) "
-              title="Uploading image"
-              use:tooltip
+              on:click={() => (editable = true)}
+              class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
+              title="Edit content"
+              use:tooltip><Edit16 class="h-12px w-12px" /></button
             >
-              <div class="lds-ring">
-                <div />
-                <div />
-                <div />
-                <div />
-              </div></button
+          {/if}
+          {#if keys.href}
+            <button
+              type="button"
+              on:click={() => {
+                href = $hrefStore || ''
+                hrefDialog = true
+              }}
+              class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
+              title="Change url"
+              use:tooltip><Link16 class="h-12px w-12px" /></button
             >
-          {:else}
+          {/if}
+          {#if keys.image}
             <button
               type="button"
               on:click={() => inputRef?.click()}
@@ -291,15 +349,15 @@
               use:tooltip><Image16 class="h-12px w-12px" /></button
             >
           {/if}
-        {/if}
-        {#if removeButton}
-          <button
-            type="button"
-            on:click={() => dispatch('remove')}
-            class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
-            title="Remove element"
-            use:tooltip><TrashCan16 class="h-12px w-12px" /></button
-          >
+          {#if removeButton}
+            <button
+              type="button"
+              on:click={() => dispatch('remove')}
+              class="rounded-full bg-dark-900 opacity-50 p-2 transform text-gray-100 duration-200 dark:(text-gray-900 bg-gray-100) hover:opacity-100 hover:scale-105 "
+              title="Remove element"
+              use:tooltip><TrashCan16 class="h-12px w-12px" /></button
+            >
+          {/if}
         {/if}
       {:else}
         <button
