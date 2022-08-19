@@ -109,8 +109,8 @@ export default createServer()
   })
   .query('whoami', {
     resolve: async ({ ctx }) => {
-      const { customerId } = await db.getCustomerDetails(ctx.event)
+      const customerId = await db.getCustomerDetails(ctx.event)
       if (!customerId) return null
-      return await db.getCustomer({ customerId: customerId })
+      return await db.getCustomer({ customerId })
     },
   })

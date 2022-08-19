@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores'
-
   import { squareratio } from '$lib/actions/aspectratio'
 
   import Image from '$lib/components/caravaggio/Image.svelte'
@@ -10,6 +8,7 @@
 
   import { tooltip } from '$lib/components/tooltip'
   import type { Product, ProductModifier } from '$lib/db'
+  import { layoutData } from '$lib/stores'
   import { uploadFile } from '$lib/supabase'
   import { ChevronRight16, Close24, Image32 } from 'carbon-icons-svelte'
   import { expoOut } from 'svelte/easing'
@@ -60,7 +59,7 @@
       const { url } = await uploadFile({
         file,
         bucket: 'assets',
-        path: `${$page.stuff.store!.slug}/products/`,
+        path: `${$layoutData.store!.slug}/products/`,
       })
 
       const optimizedUrl = urlBuilder(url!, options)

@@ -105,7 +105,7 @@
         tick()
       }, 100)
       const filtered = await fetchProducts({
-        storeSlug: $page.stuff.store!.slug,
+        storeSlug: $page.data.store!.slug,
         search: search || undefined,
         categoryId: categoryId || undefined,
         sortBy,

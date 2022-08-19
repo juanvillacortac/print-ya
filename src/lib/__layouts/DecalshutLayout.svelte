@@ -1,10 +1,9 @@
 <script lang="ts">
   import Favicons from '$lib/components/Favicons.svelte'
-  import { navigating, page, session } from '$app/stores'
+  import { navigating, page } from '$app/stores'
   import Image from '$lib/components/caravaggio/Image.svelte'
   import {
     Moon24,
-    Search16,
     Sun24,
     ShoppingBag24,
     Favorite24,
@@ -14,24 +13,21 @@
     Logout16,
     Settings16,
     OrderDetails16,
-    Add16,
     Link16,
     View16,
     ViewOff16,
     ColorPalette16,
     Close24,
-    OverflowMenuVertical24,
     Menu24,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
-  import type { Store } from '$lib/db'
   import {
     bag,
     createLayoutStore,
     customer,
-    pageSubtitle,
+    layoutData,
     preferences,
-  } from '$lib/stores'
+  } from '$lib'
   import Submenu from '$lib/components/Submenu.svelte'
   import trpc from '$lib/trpc/client'
   import { browser } from '$app/env'
@@ -43,21 +39,15 @@
   import { expoOut } from 'svelte/easing'
   import { portal } from 'svelte-portal'
 
-  export let store: Store
-
-  let subtitle = ''
-  $: subtitle = $pageSubtitle ? $pageSubtitle : subtitle
-  $: if (!$navigating) {
-    $pageSubtitle = ''
-  }
-
-  $: pageTitle = (subtitle ? subtitle + ' | ' : '') + store.name
+  $: pageTitle =
+    ($page.data.title ? $page.data.title + ' | ' : '') +
+      $layoutData.store?.name || 'ShackCart'
 
   const customizable = getContext('customizable') || false
   const layoutStore: Writable<StoreData> =
     getContext('layout-store') ||
     createLayoutStore({
-      initialState: $page.stuff.storeData,
+      initialState: $layoutData.storeData,
     })
 
   function whiteForeground(hex: string) {
@@ -94,9 +84,9 @@
 </svelte:head>
 
 <Favicons
-  favicon={store.favicon || ''}
+  favicon={$layoutData.store?.favicon || ''}
   themeColor="#000"
-  titleName={store.name || ''}
+  titleName={$layoutData.store?.name || 'ShackCart'}
 />
 
 <div
@@ -204,7 +194,7 @@
         <div class="flex space-x-4 items-center">
           <a href="/" class="flex">
             <Image
-              src={store.logo || ''}
+              src={$layoutData.store?.logo || ''}
               class="rounded-sm p-px h-2rem lg:h-3rem dark:bg-white dark:bg-opacity-20"
               options={{
                 o: 'png',
@@ -516,7 +506,7 @@
       class="flex flex-col m-auto space-y-3 w-full p-4 items-center lg:w-8/10"
     >
       <Image
-        src={$page.stuff.store?.favicon || ''}
+        src={$layoutData.store?.favicon || ''}
         class="w-32px"
         options={{
           rs: {
@@ -717,7 +707,7 @@
     >
       <p>
         &copy; {new Date().getFullYear()}
-        {$page.stuff.store?.name}. All rights reserved.
+        {$layoutData.store?.name}. All rights reserved.
       </p>
       <div class="flex space-x-4 items-center">
         <a

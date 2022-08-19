@@ -21,6 +21,7 @@
   import Ufo from '$lib/components/__Ufo.svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import { getBasicTemplate } from '$lib/utils/modifiers'
+  import { layoutData } from '$lib/stores'
 
   export let archived = false
   export let products:
@@ -41,7 +42,7 @@
         tick()
       }, 100)
       const filtered = await trpc().query('products:list', {
-        storeSlug: $page.stuff.store!.slug,
+        storeSlug: $layoutData.store!.slug,
         filter: {
           name: nameSearch || undefined,
           categoryId: categoryId || undefined,
@@ -127,7 +128,7 @@
   const deleteProduct = async (id: string) => {
     const archived = !products?.find((p) => p.id === id)?.archived
     await trpc().mutation('products:upsert', {
-      storeSlug: $page.stuff.store!.slug,
+      storeSlug: $layoutData.store!.slug,
       data: {
         id,
         archived,
@@ -162,7 +163,7 @@
           bind:value={categoryId}
         >
           <option value="">All categories</option>
-          {#each $page.stuff.store?.categories || [] as category}
+          {#each $layoutData.store?.categories || [] as category}
             <option value={category.id}>{category.name}</option>
           {/each}
         </select>

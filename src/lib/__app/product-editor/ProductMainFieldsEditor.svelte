@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/stores'
   import { tooltip } from '$lib/components/tooltip'
 
   import type { Product } from '$lib/db'
+  import { layoutData } from '$lib/stores'
   import type { InferQueryOutput } from '$lib/trpc/client'
   import trpc from '$lib/trpc/client'
   import { Editor } from 'bytemd'
@@ -10,7 +10,6 @@
     Add16,
     ChevronRight16,
     Close16,
-    CloseOutline16,
     Information16,
   } from 'carbon-icons-svelte'
   import cuid from 'cuid'
@@ -19,7 +18,7 @@
   import { fly, scale, slide } from 'svelte/transition'
 
   export let product: Partial<Product>
-  $: store = $page.stuff.store
+  $: store = $layoutData.store
   let showing = false
   let tagInput = ''
 
@@ -32,7 +31,7 @@
       tags = (
         await trpc().query('products:listTags', {
           name: tagInput || undefined,
-          storeId: $page.stuff.store?.id || '',
+          storeId: store?.id || '',
         })
       ).filter((t) => !product.tags?.some((pt) => pt.id === t.id))
       findingTags = false

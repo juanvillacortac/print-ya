@@ -1,37 +1,37 @@
 <script lang="ts">
-  let className = "";
-  export let style = "";
-  export { className as class };
-  export let intersecting = false;
-  export let oneWay = false;
-  export let threshold = 0;
+  let className = ''
+  export let style = ''
+  export { className as class }
+  export let intersecting = false
+  export let oneWay = false
+  export let threshold = 0
 
-  import { session } from "$app/stores";
+  import { page } from '$app/stores'
 
-  $: bot = !!$session?.userAgent?.match(
-    "Lighthouse|Google Page Speed Insights|Googlebot"
-  );
+  $: bot = !!$page.data?.userAgent?.match(
+    'Lighthouse|Google Page Speed Insights|Googlebot'
+  )
 
   const viewport = (node: HTMLDivElement) => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (oneWay && entries[0].boundingClientRect.y < 0) {
           if (!intersecting) {
-            intersecting = true;
+            intersecting = true
           }
-          return;
+          return
         }
-        intersecting = entries[0].isIntersecting;
+        intersecting = entries[0].isIntersecting
       },
       { threshold }
-    );
-    observer.observe(node);
+    )
+    observer.observe(node)
     return {
       destroy: () => {
-        observer.unobserve(node);
+        observer.unobserve(node)
       },
-    };
-  };
+    }
+  }
 </script>
 
 <div class={className} use:viewport class:intersecting class:bot {style}>

@@ -9,9 +9,7 @@ import { Redis } from '@upstash/redis'
 
 export type LayoutType = 'app' | 'store'
 
-export const getLayoutType = ({
-  url,
-}: LoadEvent | RequestEvent): LayoutType => {
+export function getLayoutType<T extends { url: URL }>({ url }: T): LayoutType {
   if (url.searchParams.get('store')) return 'store'
   if (!isCanonical(url.host)) {
     return 'store'
@@ -29,9 +27,11 @@ export const storeRoutes = [
 ]
 export const appRoutes = ['/stores', '/settings', '/app']
 
-export const validateLayoutRoute = (event: LoadEvent | RequestEvent) => {
-  const layout = getLayoutType(event)
-  switch (layout) {
+export function validateLayoutRoute<T extends { url: URL }>(
+  event: T,
+  layoutType?: LayoutType
+) {
+  switch (layoutType || getLayoutType(event)) {
     case 'store':
       return !Boolean(
         appRoutes.find((url) => event.url.pathname.startsWith(url))
@@ -43,57 +43,59 @@ export const validateLayoutRoute = (event: LoadEvent | RequestEvent) => {
   }
 }
 
-export type LayoutData = Partial<{
-  layout: import('$lib/utils/layout').LayoutType
-  storeData?: StoreData
+export type LayoutData = {
+  layout: LayoutType
   store?: import('$lib/db').Store | null
-  product?: import('$lib/db').Product | null
-  products?: import('$lib/db').StripedProduct[] | null
-}>
+  storeData?: StoreData
+}
 
-export const fetchLayoutData = async ({
-  url,
-  fetch,
-  session,
-}: LoadEvent): Promise<{ response?: LayoutData; notFound?: boolean }> => {
+export async function fetchLayoutData<
+  T extends Pick<LoadEvent, 'url' | 'fetch'>
+>(
+  { url, fetch }: T,
+  layoutType: LayoutType
+): Promise<{ layoutData: LayoutData; notFound?: boolean }> {
   const client = trpc(fetch)
-  let response: LayoutData = {
-    layout: session.layout,
+  let layoutData: LayoutData = {
+    layout: layoutType,
   }
-  switch (session.layout) {
+  const isRouteValid = validateLayoutRoute({ url })
+
+  switch (layoutData.layout) {
     case 'store':
       try {
-        response.store = await client.query('stores:getByHost', url.host)
-        if (!response.store) {
+        layoutData.store = await client.query('stores:getByHost', url.host)
+        if (!layoutData.store) {
           let slug = url.searchParams.get('store')
-          if (!slug && session.host) {
-            slug = session.host.split('.')[0]
+          if (!slug && url.host) {
+            slug = url.host.split('.')[0]
           }
           if (slug) {
-            response.store = await client.query('stores:getBySlug', slug)
+            layoutData.store = await client.query('stores:getBySlug', slug)
           }
         }
-        if (response.store) {
-          const redis = new Redis({
-            url: PUBLIC_UPSTASH_REDIS_URL,
-            token: PUBLIC_UPSTASH_REDIS_TOKEN,
-          })
-          response.storeData = (
-            await redis.get<{ json: StoreData }>(
-              `storeData:${response.store.id}`
-            )
-          )?.json
+        if (layoutData.store) {
+          // const redis = new Redis({
+          //   url: PUBLIC_UPSTASH_REDIS_URL,
+          //   token: PUBLIC_UPSTASH_REDIS_TOKEN,
+          // })
+          // layoutData.storeData = (
+          //   await redis.get<{ json: StoreData }>(
+          //     `storeData:${layoutData.store.id}`
+          //   )
+          // )?.json
         }
         return {
-          notFound: !response.store,
-          response,
+          notFound: !layoutData.store || !isRouteValid,
+          layoutData,
         }
       } catch (err) {
         console.log(err)
       }
     default:
       return {
-        response: {},
+        notFound: !isRouteValid,
+        layoutData,
       }
   }
 }

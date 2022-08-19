@@ -1,15 +1,11 @@
 <script lang="ts">
   import 'bytemd/dist/index.css'
-  import { page, session } from '$app/stores'
   import type { Product, ProductModifier, Store } from '$lib/db'
-  const store = $page.stuff.store as Store
   import { notifications } from '$lib/components/notifications'
   import { goto } from '$app/navigation'
   import {
-    Archive16,
     Copy16,
     Launch16,
-    Save16,
     Template16,
     TrashCan16,
     View16,
@@ -27,6 +23,10 @@
   import Submenu from '$lib/components/Submenu.svelte'
   import BasicTemplateEditor from './BasicTemplateEditor.svelte'
   import { getBasicTemplate } from '$lib/utils/modifiers'
+  import { layoutData } from '$lib/stores'
+  import { page } from '$app/stores'
+
+  $: store = $layoutData.store!
 
   export let product: Partial<Product> & Pick<Product, 'meta' | 'modifiers'> = {
     price: 0.01,
@@ -172,6 +172,7 @@
           internalId: (Math.random() + 1).toString(36).substring(7),
         })),
       }))
+      invalidateQuery('products:getBySlug')
     } catch (err) {
       console.log(err.message, err.error)
     } finally {

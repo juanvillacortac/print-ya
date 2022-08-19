@@ -8,7 +8,6 @@
     Link16,
     Link32,
     OverflowMenuVertical16,
-    Save16,
     TrashCan16,
   } from 'carbon-icons-svelte'
 

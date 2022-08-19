@@ -261,22 +261,10 @@ export async function modifyCustomer({
 
 export const getCustomerDetails = async (
   event: RequestEvent
-): Promise<{
-  customerId: string | null
-  status: number
-  body: { message: string }
-}> => {
+): Promise<string | null> => {
   const customerId = event?.locals?.session?.data?.customerId || null
 
-  const payload = {
-    customerId,
-    status: 200,
-    body: {
-      message: 'OK',
-    },
-  }
-
-  return payload
+  return customerId
 }
 
 export async function getCustomer({

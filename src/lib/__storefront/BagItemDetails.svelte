@@ -2,7 +2,7 @@
   import { browser } from '$app/env'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import type { Product, Store } from '$lib/db'
-  import type { BagItem } from '$lib/stores'
+  import { layoutData, type BagItem } from '$lib/stores'
   import trpc from '$lib/trpc/client'
   import {
     createModifiersMapStore,
@@ -22,7 +22,6 @@
         cost?: number
       })
     | undefined
-  export let store: Store
 
   let product: Product | undefined
   export let disabled = false
@@ -50,7 +49,7 @@
     trpc()
       .query('products:getBySlug', {
         productSlug: item.productSlug,
-        storeSlug: store.slug,
+        storeSlug: $layoutData.store?.slug || '',
       })
       .then((p) => {
         if (p) product = p

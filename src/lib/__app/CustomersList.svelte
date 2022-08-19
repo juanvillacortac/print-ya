@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { watchMedia } from '$lib'
-  import type { OrderFee, StrippedOrder } from '$lib/db'
+  import type { StrippedOrder } from '$lib/db'
   import trpc, {
     type InferMutationOutput,
     type InferQueryInput,
@@ -21,6 +21,7 @@
   import { expoOut } from 'svelte/easing'
   import Ufo from '$lib/components/__Ufo.svelte'
   import { goto } from '$app/navigation'
+  import { layoutData } from '$lib/stores'
 
   export let customers:
     | InferQueryOutput<'customer:list'>['customers']
@@ -38,7 +39,7 @@
         tick()
       }, 100)
       const filtered = await trpc().query('customer:list', {
-        storeId: $page.stuff.store!.id,
+        storeId: $layoutData.store!.id,
         filter: {
           name: nameSearch || undefined,
         },
@@ -295,7 +296,7 @@
             <button
               class="flex flex-col space-y-2 w-full p-2 text-gray-700 dark:text-gray-400"
               on:click={() =>
-                goto(`/stores/${$page.stuff.store?.slug}/customers/${c.id}`)}
+                goto(`/stores/${$layoutData.store?.slug}/customers/${c.id}`)}
             >
               <div class="flex w-full items-center justify-between">
                 <div class="flex space-x-2 items-center">
@@ -309,14 +310,6 @@
                       {c.id}
                     </p>
                   </div>
-                  <!-- <p
-                    class="rounded font-normal text-xs text-white p-1 whitespace-nowrap overflow-ellipsis uppercase"
-                    class:bg-green-500={c.status === 'paid'}
-                    class:bg-orange-500={c.status === 'pending'}
-                    class:bg-purple-500={c.status === 'processing'}
-                  >
-                    {c.status}
-                  </p> -->
                 </div>
                 <p class="text-xs">
                   {c.createdAt.toLocaleString()}
@@ -434,19 +427,12 @@
                     </p>
                   </div>
                 </td>
-                <!-- <td class="text-center">
-                  <div class="flex py-4 px-6">
-                    <p class="font-bold text-xs text-center w-full">
-                      {o.items?.length}
-                    </p>
-                  </div>
-                </td> -->
                 <td class="text-right py-4 px-6">
                   <div class="flex">
                     <a
                       class="border-transparent rounded flex mx-auto border-2 p-1 duration-200 hover:border-gray-300 dark:hover:border-gray-500"
                       title="View customer"
-                      href="/stores/{$page.stuff.store?.slug}/customers/{c.id}"
+                      href="/stores/{$layoutData.store?.slug}/customers/{c.id}"
                       use:tooltip
                       type="button"><Launch16 class="flex" /></a
                     >

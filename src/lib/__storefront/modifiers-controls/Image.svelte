@@ -41,7 +41,7 @@
       const { url } = await uploadFile({
         file,
         bucket: 'client-assets',
-        path: `${$page.stuff.store!.slug}/products/${
+        path: `${$page.data.layoutData.store!.slug}/products/${
           product.slug
         }/template-assets`,
       })

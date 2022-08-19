@@ -18,7 +18,7 @@
   import { fly } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import Ufo from '$lib/components/__Ufo.svelte'
-  import { watchMedia } from '$lib/stores'
+  import { layoutData, watchMedia } from '$lib/stores'
   import { tooltip } from '$lib/components/tooltip'
   import { clamp } from '$lib/utils/math'
 
@@ -34,7 +34,6 @@
   let waitTimeout: NodeJS.Timeout
   let nameSearch = ''
   let categorySlug = ''
-  let visible: boolean | '' = ''
   const search = (..._deps: any[]) => {
     const find = async () => {
       waitTimeout = setTimeout(() => {
@@ -43,7 +42,7 @@
         tick()
       }, 100)
       const filtered = await trpc().query('analytics:searchHistory:list', {
-        storeId: $page.stuff.store!.id,
+        storeId: $layoutData.store!.id,
         filter: {
           searchTerm: nameSearch,
           categorySlug,
@@ -156,7 +155,7 @@
           bind:value={categorySlug}
         >
           <option value="">All categories</option>
-          {#each $page.stuff.store?.categories || [] as category}
+          {#each $layoutData.store?.categories || [] as category}
             <option value={category.slug}>{category.name}</option>
           {/each}
         </select>
@@ -329,7 +328,7 @@
               {/if}
               {#if e.customer}
                 <a
-                  href="/stores/{$page.stuff.store?.slug}/customers/{e.customer
+                  href="/stores/{$layoutData.store?.slug}/customers/{e.customer
                     .id}"
                   class="font-bold space-x-2 text-gray-800 inline-flex items-center !text-xs dark:text-white hover:underline"
                 >
@@ -379,7 +378,7 @@
                   <div class="flex w-full py-4 px-6">
                     {#if e.customer}
                       <a
-                        href="/stores/{$page.stuff.store?.slug}/customers/{e
+                        href="/stores/{$layoutData.store?.slug}/customers/{e
                           .customer.id}"
                         class="font-bold space-x-2 text-xs text-gray-800 inline-flex items-center dark:text-white hover:underline"
                       >

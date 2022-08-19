@@ -29,5 +29,5 @@ export type InferMutationOutput<RouteKey extends MutationKey> =
 export type InferMutationInput<RouteKey extends MutationKey> =
   inferProcedureInput<tRPCRouter['_def']['mutations'][RouteKey]>
 
-export const invalidateQuery = (...keys: QueryKey[]) =>
+export const invalidateQuery = (...keys: Exclude<QueryKey, 'symbol'>[]) =>
   invalidate((href) => keys.some((key) => href.includes(`/api/trpc/${key}`)))

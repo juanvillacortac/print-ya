@@ -1,4 +1,4 @@
-import { session } from '$app/stores'
+import { page } from '$app/stores'
 import { get } from 'svelte/store'
 import type { CaravaggioContext, CaravaggioOptions } from './urlBuilder'
 import { urlBuilder } from './urlBuilder'
@@ -17,7 +17,7 @@ export const useCaravaggio = (
   opt?: CaravaggioOptions
 ): string | undefined => {
   const context = useCaravaggioContext()
-  context.baseUrl = get(session)?.fullHost
+  context.baseUrl = get(page)?.data.fullHost
   if (!imageUrl) return undefined
   return urlBuilder(context, imageUrl, opt)
 }
@@ -48,7 +48,7 @@ export const useCaravaggioIfAvailable = (
   opt?: CaravaggioOptions
 ): string | null | undefined => {
   const context = useCaravaggioContext()
-  context.baseUrl = get(session)?.fullHost
+  context.baseUrl = get(page)?.data.fullHost
   if (!context || !imageUrl) {
     return imageUrl
   }
@@ -61,7 +61,7 @@ type CaravaggioBuilder = (imageUrl: string, opt?: CaravaggioOptions) => string
  */
 export const useCaravaggioBuilder = (baseUrl?: string): CaravaggioBuilder => {
   const context = useCaravaggioContext()
-  context.baseUrl = baseUrl || get(session)?.fullHost
+  context.baseUrl = baseUrl || get(page)?.data.fullHost
   const builder: CaravaggioBuilder = (imageUrl, opt) => {
     return urlBuilder(context, imageUrl, opt)
   }
