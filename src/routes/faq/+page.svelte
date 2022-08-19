@@ -3,7 +3,6 @@
   import SvelteMarkdown from 'svelte-markdown'
   import { browser } from '$app/env'
   import type { PageData } from './$types'
-  import { Redis } from '@upstash/redis'
 
   $: $pageSubtitle = `FAQ`
 
