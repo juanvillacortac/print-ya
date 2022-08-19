@@ -25,7 +25,12 @@ const lookup = async (coords: Coords) => {
 
 export default createServer()
   .query('kit-locals', {
-    resolve: ({ ctx }) => ctx.event.locals,
+    resolve: ({ ctx }) => {
+      const locals = JSON.parse(JSON.stringify(ctx.event.locals))
+      delete locals.cookies
+      delete locals.session
+      return locals as Omit<App.Locals, 'cookies' | 'session'>
+    },
   })
   .query('geocoding', {
     input: coords,
