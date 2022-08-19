@@ -7,6 +7,7 @@
 
   export let src: string
   export let href = ''
+  export let alt = ''
   export let options: CaravaggioOptions
   export let showOriginal: string = ''
   export let lazy = false
@@ -65,7 +66,13 @@
           </div>
         {/if}
         <!-- svelte-ignore a11y-missing-attribute -->
-        <img use:load src={url} {...$$restProps} class:opacity-0={!loaded} />
+        <img
+          use:load
+          src={url}
+          {...$$restProps}
+          class:opacity-0={!loaded}
+          {alt}
+        />
       </div>
     </a>
   {:else}
@@ -79,15 +86,21 @@
         </div>
       {/if}
       <!-- svelte-ignore a11y-missing-attribute -->
-      <img use:load src={url} {...$$restProps} class:opacity-0={!loaded} />
+      <img
+        use:load
+        src={url}
+        {...$$restProps}
+        class:opacity-0={!loaded}
+        {alt}
+      />
     </div>
   {/if}
 {:else if href}
   <a {href} target="__blank">
     <!-- svelte-ignore a11y-missing-attribute -->
-    <img src={url} {...$$restProps} class:opacity-0={!loaded} />
+    <img src={url} {...$$restProps} class:opacity-0={!loaded} {alt} />
   </a>
 {:else}
   <!-- svelte-ignore a11y-missing-attribute -->
-  <img use:load src={url} {...$$restProps} class:opacity-0={!loaded} />
+  <img use:load src={url} {...$$restProps} class:opacity-0={!loaded} {alt} />
 {/if}

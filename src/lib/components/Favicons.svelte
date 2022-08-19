@@ -4,6 +4,7 @@
   export let favicon: string
   export let themeColor: string = ''
   export let titleName: string = ''
+  export let description: string = ''
 
   const imageBuilder = useCaravaggioBuilder()
 
@@ -45,4 +46,5 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content={titleName} />
+  <meta name="description" content={description || titleName} />
 </svelte:head>
