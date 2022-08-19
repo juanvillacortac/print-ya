@@ -1,14 +1,15 @@
+import { browser } from '$app/env'
 import trpc from '$lib/trpc/client'
 import { fetchLayoutData } from '$lib/utils/layout'
 import type { SvelteComponent } from 'svelte/internal'
 import type { LayoutLoad } from './$types'
 
-export const load: LayoutLoad = async ({ url, fetch }) => {
+export const load: LayoutLoad = async ({ url, fetch, params }) => {
   const { fullHost, host, userAgent, layoutType } = await trpc(fetch).query(
     'utils:kit-locals'
   )
   const { notFound, layoutData } = await fetchLayoutData(
-    { url, fetch },
+    { url, fetch, params },
     layoutType
   )
   const user = await trpc(fetch).query('user:whoami')

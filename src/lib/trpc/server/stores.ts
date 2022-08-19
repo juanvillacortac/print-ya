@@ -11,6 +11,7 @@ import {
 } from '$env/static/public'
 import { SENDGRID_API_KEY } from '$env/static/private'
 import { createServer } from '../shared'
+import { dev } from '$app/env'
 
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {
@@ -52,11 +53,43 @@ const mutations = createServer()
 const queries = createServer()
   .query('getBySlug', {
     input: z.string(),
-    resolve: ({ input }) => db.getStore({ slug: input }),
+    resolve: async ({ input }) => {
+      const store = await db.getStore({ slug: input })
+      const redis = new Redis({
+        url: PUBLIC_UPSTASH_REDIS_URL,
+        token: PUBLIC_UPSTASH_REDIS_TOKEN,
+      })
+      const storeData =
+        store && !dev
+          ? await (
+              await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+            )?.json
+          : undefined
+      return {
+        store,
+        storeData,
+      }
+    },
   })
   .query('getByHost', {
     input: z.string(),
-    resolve: ({ input }) => db.getStore({ host: input }),
+    resolve: async ({ input }) => {
+      const store = await db.getStore({ host: input })
+      const redis = new Redis({
+        url: PUBLIC_UPSTASH_REDIS_URL,
+        token: PUBLIC_UPSTASH_REDIS_TOKEN,
+      })
+      const storeData =
+        store && !dev
+          ? await (
+              await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+            )?.json
+          : undefined
+      return {
+        store,
+        storeData,
+      }
+    },
   })
 
 const payment = createServer().mutation('createStripeIntent', {

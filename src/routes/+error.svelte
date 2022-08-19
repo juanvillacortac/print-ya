@@ -91,7 +91,7 @@
     class:lg:-m-6={$layoutData.layout === 'app'}
   >
     <div class="font-bold text-6xl leading-[0.7]">
-      {$page.status}
+      {$page.error.status || $page.status}
     </div>
 
     <p class="font-bold my-4">{$page.error.name}</p>

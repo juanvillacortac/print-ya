@@ -50,40 +50,35 @@ export type LayoutData = {
 }
 
 export async function fetchLayoutData<
-  T extends Pick<LoadEvent, 'url' | 'fetch'>
+  T extends Pick<LoadEvent, 'url' | 'fetch' | 'params'>
 >(
-  { url, fetch }: T,
+  { url, fetch, params }: T,
   layoutType: LayoutType
 ): Promise<{ layoutData: LayoutData; notFound?: boolean }> {
   const client = trpc(fetch)
   let layoutData: LayoutData = {
     layout: layoutType,
   }
-  const isRouteValid = validateLayoutRoute({ url })
+  let isRouteValid = validateLayoutRoute({ url })
 
   switch (layoutData.layout) {
     case 'store':
       try {
-        layoutData.store = await client.query('stores:getByHost', url.host)
+        layoutData = {
+          ...layoutData,
+          ...(await client.query('stores:getByHost', url.host)),
+        }
         if (!layoutData.store) {
           let slug = url.searchParams.get('store')
           if (!slug && url.host) {
             slug = url.host.split('.')[0]
           }
           if (slug) {
-            layoutData.store = await client.query('stores:getBySlug', slug)
+            layoutData = {
+              ...layoutData,
+              ...(await client.query('stores:getBySlug', slug)),
+            }
           }
-        }
-        if (layoutData.store) {
-          const redis = new Redis({
-            url: PUBLIC_UPSTASH_REDIS_URL,
-            token: PUBLIC_UPSTASH_REDIS_TOKEN,
-          })
-          layoutData.storeData = (
-            await redis.get<{ json: StoreData }>(
-              `storeData:${layoutData.store.id}`
-            )
-          )?.json
         }
         return {
           notFound: !layoutData.store || !isRouteValid,
@@ -93,6 +88,19 @@ export async function fetchLayoutData<
         console.log(err)
       }
     default:
+      if (params.slug) {
+        const { store, storeData } = await client.query(
+          'stores:getBySlug',
+          params.slug
+        )
+        const user = await client.query('user:whoami')
+        if (store && store.userId === user?.id) {
+          layoutData.store = store
+          layoutData.storeData = storeData
+        } else {
+          isRouteValid = false
+        }
+      }
       return {
         notFound: !isRouteValid,
         layoutData,
