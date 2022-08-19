@@ -75,15 +75,15 @@ export async function fetchLayoutData<
           }
         }
         if (layoutData.store) {
-          // const redis = new Redis({
-          //   url: PUBLIC_UPSTASH_REDIS_URL,
-          //   token: PUBLIC_UPSTASH_REDIS_TOKEN,
-          // })
-          // layoutData.storeData = (
-          //   await redis.get<{ json: StoreData }>(
-          //     `storeData:${layoutData.store.id}`
-          //   )
-          // )?.json
+          const redis = new Redis({
+            url: PUBLIC_UPSTASH_REDIS_URL,
+            token: PUBLIC_UPSTASH_REDIS_TOKEN,
+          })
+          layoutData.storeData = (
+            await redis.get<{ json: StoreData }>(
+              `storeData:${layoutData.store.id}`
+            )
+          )?.json
         }
         return {
           notFound: !layoutData.store || !isRouteValid,

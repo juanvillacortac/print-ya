@@ -25,9 +25,9 @@ export const load: LayoutLoad.customization = async ({
     url: PUBLIC_UPSTASH_REDIS_URL,
     token: PUBLIC_UPSTASH_REDIS_TOKEN,
   })
-  // const storeData = (
-  //   await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-  // )?.json
+  const storeData = (
+    await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+  )?.json
 
   return {
     fullHost,
@@ -37,7 +37,7 @@ export const load: LayoutLoad.customization = async ({
     layoutData: {
       layout: layoutType,
       store,
-      // storeData,
+      storeData,
     },
   }
 }
