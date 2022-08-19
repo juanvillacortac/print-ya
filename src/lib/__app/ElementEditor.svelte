@@ -272,7 +272,7 @@
               ><OverflowMenuVertical16 class="h-12px w-12px" /></button
             >
             <div
-              class="flex flex-col font-bold space-y-3 text-xs items-end"
+              class="flex flex-col font-bold space-y-3 text-xs text-dark-900 items-end dark:text-gray-100"
               slot="body"
             >
               {#if keys.text}

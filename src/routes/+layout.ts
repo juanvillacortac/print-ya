@@ -1,4 +1,3 @@
-import { browser } from '$app/env'
 import trpc from '$lib/trpc/client'
 import { fetchLayoutData } from '$lib/utils/layout'
 import type { SvelteComponent } from 'svelte/internal'
