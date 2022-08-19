@@ -192,7 +192,7 @@
           </button>
         {/if}
         <div class="flex space-x-4 items-center">
-          <a href="/" class="flex">
+          <a href="/" class="flex" sveltekit:prefetch>
             <Image
               src={$layoutData.store?.logo || ''}
               class="rounded-sm p-px h-2rem lg:h-3rem dark:bg-white dark:bg-opacity-20"
