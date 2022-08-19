@@ -7,7 +7,7 @@
   import Ufo from '$lib/components/__Ufo.svelte'
 
   import type { StripedProduct } from '$lib/db'
-  import { favorites } from '$lib/stores'
+  import { favorites, layoutData } from '$lib/stores'
   import { getBasicTemplate } from '$lib/utils/modifiers'
   import {
     Categories16,
@@ -24,7 +24,7 @@
 
   const dispatch = createEventDispatcher<{ search: string }>()
 
-  $: store = $page.stuff.store!
+  $: store = $layoutData.store!
 
   export let products: StripedProduct[]
   export let count: number

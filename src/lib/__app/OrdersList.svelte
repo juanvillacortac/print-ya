@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores'
-  import { watchMedia } from '$lib'
+  import { layoutData, watchMedia } from '$lib'
   import type { OrderFee, StrippedOrder } from '$lib/db'
   import trpc, { type InferQueryInput } from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
@@ -40,7 +39,7 @@
         tick()
       }, 100)
       const filtered = await trpc().query('orders:list', {
-        storeId: $page.stuff.store!.id,
+        storeId: $layoutData.store!.id,
         filter: {
           ...filter,
           customerId,
@@ -335,7 +334,7 @@
                 <div class="flex w-full justify-between items-center">
                   {#if o.customer}
                     <a
-                      href="/stores/{$page.stuff.store?.slug}/customers/{o
+                      href="/stores/{$layoutData.store?.slug}/customers/{o
                         .customer.id}"
                       class="font-bold space-x-2 text-sm text-gray-800 inline-flex items-center dark:text-white hover:underline"
                     >
@@ -381,17 +380,18 @@
                     })}
                   </p>
                 {:else}
-                <p class="text-xs">
-                  Revenue: <span class="font-bold text-gray-800 dark:text-white"
-                    >${Math.max(
-                      0,
-                      getTotal(o) - totalFees(o.fees, getTotal(o))
-                    ).toLocaleString('en', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}</span
-                  >
-                </p>
+                  <p class="text-xs">
+                    Revenue: <span
+                      class="font-bold text-gray-800 dark:text-white"
+                      >${Math.max(
+                        0,
+                        getTotal(o) - totalFees(o.fees, getTotal(o))
+                      ).toLocaleString('en', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}</span
+                    >
+                  </p>
                 {/if}
               </div>
             </button>
@@ -470,7 +470,7 @@
                     <div class="flex w-full py-4 px-6">
                       {#if o.customer}
                         <a
-                          href="/stores/{$page.stuff.store?.slug}/customers/{o
+                          href="/stores/{$layoutData.store?.slug}/customers/{o
                             .customer.id}"
                           class="font-bold space-x-2 text-xs text-gray-800 inline-flex items-center dark:text-white hover:underline"
                         >

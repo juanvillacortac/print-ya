@@ -5,7 +5,7 @@ import type { ModifiersMap } from './utils/modifiers'
 import type { Order, Product, Store } from './db'
 import { flatMap, isObject, merge } from 'lodash-es'
 import type { Customer, Prisma } from '@prisma/client'
-import { page, getStores } from '$app/stores'
+import { page } from '$app/stores'
 import { goto } from '$app/navigation'
 import * as sj from 'superjson'
 import trpc from './trpc/client'
@@ -14,6 +14,7 @@ import {
   PUBLIC_UPSTASH_REDIS_TOKEN,
   PUBLIC_UPSTASH_REDIS_URL,
 } from '$env/static/public'
+import type { LayoutData } from './utils/layout'
 
 const redis = new Redis({
   url: PUBLIC_UPSTASH_REDIS_URL,
@@ -564,3 +565,12 @@ export const createLayoutStore = ({
     },
   }
 }
+
+export const layoutData = derived([page], ([page]): LayoutData => {
+  const layoutData: LayoutData | undefined = page.data.layoutData
+  return {
+    layout: layoutData?.layout || 'app',
+    store: layoutData?.store,
+    storeData: layoutData?.storeData,
+  }
+})

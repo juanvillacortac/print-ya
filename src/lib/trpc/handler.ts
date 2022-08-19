@@ -29,7 +29,7 @@ type resolveHandler = Parameters<Handle>[0]['resolve']
  * A function that creates a tRPC handle.
  * @see https://kit.svelte.dev/docs/hooks
  */
-export async function createTRPCHandle<Router extends AnyRouter>(
+export async function createTRPCHandler<Router extends AnyRouter>(
   {
     url = '/trpc',
     router,

@@ -334,7 +334,7 @@
           <div
             class="bg-repeat-space flex h-full w-full opacity-12 inset-0 absolute"
             style="background-image: url({useCaravaggio(
-              $page.stuff.store?.logo || '',
+              $page.data.layoutData.store?.logo || '',
               {
                 o: 'png',
                 rotate: {

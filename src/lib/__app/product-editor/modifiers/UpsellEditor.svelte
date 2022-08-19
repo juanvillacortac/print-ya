@@ -1,15 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores'
-
   import { squareratio } from '$lib/actions/aspectratio'
-
   import Image from '$lib/components/caravaggio/Image.svelte'
-
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
   import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
-
   import { tooltip } from '$lib/components/tooltip'
   import type { ProductModifier } from '$lib/db'
+  import { layoutData } from '$lib/stores'
   import { uploadFile } from '$lib/supabase'
   import {
     ChevronRight16,
@@ -128,7 +124,7 @@
       const { url, path } = await uploadFile({
         file,
         bucket: 'assets',
-        path: `${$page.stuff.store!.slug}/upselling`,
+        path: `${$layoutData.store!.slug}/upselling`,
       })
 
       const optimizedUrl = urlBuilder(url!, options)

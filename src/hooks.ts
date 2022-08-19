@@ -1,11 +1,11 @@
-import type { GetSession, Handle } from '@sveltejs/kit'
+import type { Handle } from '@sveltejs/kit'
 import { handleSession } from 'svelte-kit-cookie-session'
 import { appRoutes, getLayoutType } from '$lib/utils/layout'
 import { getDefaultHost } from '$lib/utils/host'
 
 import { router, type tRPCRouter } from '$lib/trpc/server'
 import { sequence } from '@sveltejs/kit/hooks'
-import { createTRPCHandle } from '$lib/trpc/handler'
+import { createTRPCHandler } from '$lib/trpc/handler'
 
 export const session = handleSession({
   secret: 'secret',
@@ -19,31 +19,17 @@ export const session = handleSession({
 const logic: Handle = async ({ event, resolve }) => {
   let response: Response
 
-  event.locals.layout = getLayoutType(event)
-
-  // Set default locale if user preferred locale does not match
-  // try {
-  //   if (event.locals.cookies) {
-  //     if (event.locals.cookies['kit.session']) {
-  //       const { userId } = await getUserDetails(event)
-  //       const { customerId } = await getCustomerDetails(event)
-  //       const newSession = {
-  //         userId,
-  //         customerId,
-  //         expires: event.locals.session.data.expires,
-  //       }
-
-  //       if (
-  //         JSON.stringify(event.locals.session.data) !==
-  //         JSON.stringify(newSession)
-  //       ) {
-  //         event.locals.session.data = { ...newSession }
-  //       }
-  //     }
-  //   }
+  event.locals = {
+    ...event.locals,
+    layoutType: getLayoutType(event),
+    userAgent: event.request.headers.get('user-agent') || '',
+    host: event.url.host,
+    fullHost: `${event.url.protocol}//${event.url.host}`,
+    userId: event.locals.session.data.userId || undefined,
+  }
 
   const isAppPage =
-    event.locals.layout === 'app' &&
+    event.locals.layoutType === 'app' &&
     (Boolean(appRoutes.find((url) => event.url.pathname.startsWith(url))) ||
       event.url.pathname === '/')
 
@@ -60,7 +46,7 @@ const logic: Handle = async ({ event, resolve }) => {
     )
   }
 
-  const { response: trpcResponse, trpc } = await createTRPCHandle<tRPCRouter>(
+  const { response: trpcResponse, trpc } = await createTRPCHandler<tRPCRouter>(
     {
       url: '/api/trpc',
       router,
@@ -68,7 +54,7 @@ const logic: Handle = async ({ event, resolve }) => {
       resolve,
       createContext: async () => ({
         event,
-        layout: event.locals.layout,
+        layout: event.locals.layoutType,
       }),
       responseMeta({ type, errors, ctx, paths }) {
         const isPublic = paths?.every(
@@ -84,7 +70,7 @@ const logic: Handle = async ({ event, resolve }) => {
         if (
           type === 'query' &&
           errors.length === 0 &&
-          ctx?.layout === 'store' &&
+          ctx?.event.locals.layoutType === 'store' &&
           isPublic
         ) {
           return {
@@ -97,42 +83,30 @@ const logic: Handle = async ({ event, resolve }) => {
       },
     },
     {
-      ssr: event.locals.layout !== 'app',
+      ssr: event.locals.layoutType !== 'app',
     }
   )
 
   response = trpcResponse
 
   if (
-    event.locals.layout === 'store' &&
+    event.locals.layoutType === 'store' &&
     !event.url.pathname.startsWith('/account') &&
     !event.url.pathname.startsWith('/bag') &&
     !trpc
   ) {
     response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
   }
-  // } catch (error) {
-  //   response = await resolve(event, {
-  //     ssr: event.locals.layout !== 'app',
-  //   })
-  //   response.headers.append(
-  //     'Set-Cookie',
-  //     cookie.serialize('kit.session', '', {
-  //       path: '/',
-  //       expires: new Date('Thu, 01 Jan 1970 00:00:01 GMT'),
-  //     })
-  //   )
-  // }
 
   return response
 }
 
 export const handle = sequence(session, logic)
 
-export const getSession: GetSession = (event) => ({
-  layout: event.locals.layout,
-  userAgent: event.request.headers.get('user-agent') || '',
-  host: event.url.host,
-  fullHost: `${event.url.protocol}//${event.url.host}`,
-  userId: event.locals.session.data.userId || undefined,
-})
+// export const getSession: GetSession = (event) => ({
+//   layout: event.locals.layout,
+//   userAgent: event.request.headers.get('user-agent') || '',
+//   host: event.url.host,
+//   fullHost: `${event.url.protocol}//${event.url.host}`,
+//   userId: event.locals.session.data.userId || undefined,
+// })

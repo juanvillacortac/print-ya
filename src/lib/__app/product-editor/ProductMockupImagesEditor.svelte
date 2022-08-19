@@ -8,20 +8,17 @@
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Product } from '$lib/db'
-  import { fade, slide } from 'svelte/transition'
+  import { slide } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
-  import { removeFiles, uploadFile } from '$lib/supabase'
-  import { page } from '$app/stores'
+  import { uploadFile } from '$lib/supabase'
   import { writable } from 'svelte/store'
   import { scale, fly } from 'svelte/transition'
   import { flip } from 'svelte/animate'
   import Img from '$lib/components/caravaggio/Image.svelte'
-  import {
-    useCaravaggio,
-    useCaravaggioBuilder,
-  } from '$lib/components/caravaggio/useCaravaggio'
+  import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
   import { squareratio } from '$lib/actions/aspectratio'
+  import { layoutData } from '$lib/stores'
 
   export let product: Partial<Product>
 
@@ -74,7 +71,7 @@
       const { url, path } = await uploadFile({
         file,
         bucket: 'assets',
-        path: `${$page.stuff.store!.slug}/products/${product.slug}/mockups`,
+        path: `${$layoutData.store!.slug}/products/${product.slug}/mockups`,
       })
 
       const optimizedUrl = urlBuilder(url || '', options)

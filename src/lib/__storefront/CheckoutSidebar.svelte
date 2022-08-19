@@ -8,12 +8,7 @@
 </script>
 
 <script lang="ts">
-  import {
-    CheckmarkFilled32,
-    ChevronLeft24,
-    Close24,
-    Hourglass32,
-  } from 'carbon-icons-svelte'
+  import { CheckmarkFilled32, Close24, Hourglass32 } from 'carbon-icons-svelte'
   import { elasticOut, expoOut } from 'svelte/easing'
   import { loadStripe, type Stripe, type StripeError } from '@stripe/stripe-js'
   import { createEventDispatcher, onMount, tick } from 'svelte'
@@ -38,7 +33,7 @@
   import type { BagItem } from '$lib'
   import { getTotalFromProductModifiers } from '$lib/utils/modifiers'
   import { page } from '$app/stores'
-  import { customer, redisWritable } from '$lib/stores'
+  import { customer, layoutData, redisWritable } from '$lib/stores'
 
   const countries = getCountries()
 
@@ -47,11 +42,11 @@
 
   const stripeKey = redisWritable<string | undefined>(
     undefined,
-    `stripe:public-key:${$page.stuff.store?.id}`
+    `stripe:public-key:${$layoutData.store?.id}`
   )
   const paypalKey = redisWritable<string | undefined>(
     undefined,
-    `paypal:client-id:${$page.stuff.store?.id}`
+    `paypal:client-id:${$layoutData.store?.id}`
   )
 
   onMount(async () => {
@@ -256,7 +251,7 @@
       } else {
         waiting = true
         order = await trpc().mutation('orders:create', {
-          storeId: $page.stuff.store!.id,
+          storeId: $layoutData.store!.id,
           order: {
             customerId: $customer?.id || undefined,
             status: 'pending',

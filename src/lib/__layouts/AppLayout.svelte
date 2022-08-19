@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { page, session } from '$app/stores'
-  import { preferences } from '$lib'
+  import { page } from '$app/stores'
+  import { preferences, layoutData } from '$lib'
   import { notifications } from '$lib/components/notifications'
   import { tooltip } from '$lib/components/tooltip'
   import {
@@ -34,7 +34,7 @@
   import { setContext } from 'svelte'
 
   $: path = $page.url.pathname
-  $: store = $page.stuff.store
+  $: store = $layoutData.store
 
   $: pages = {
     none: [
@@ -98,13 +98,8 @@
     ],
   }
 
-  let subtitle = ''
-  $: subtitle = $pageSubtitle ? $pageSubtitle : subtitle
-  beforeNavigate(() => {
-    $pageSubtitle = ''
-  })
-
-  $: pageTitle = (subtitle ? subtitle + ' | ' : '') + 'ShackCart'
+  $: pageTitle =
+    ($page.data.title ? $page.data.title + ' | ' : '') + 'ShackCart'
 
   let sidebar = false
 
@@ -130,7 +125,7 @@
 
 <Favicons favicon="/images/logo.svg" themeColor="#000" titleName="ShackCart" />
 
-{#if $session.userId}
+{#if $page.data.user && !$page.data.hideLayout}
   <div class="flex flex-col h-screen w-full overflow-hidden">
     <div class="flex h-full w-full">
       <div
@@ -348,8 +343,7 @@
       <div
         class="h-full bg-light-500 w-full p-4 overflow-auto lg:p-6 dark:bg-gray-900"
       >
-        {#if $page.stuff.store}
-          {@const store = $page.stuff.store}
+        {#if store}
           <div
             class="flex mb-6 items-center sm:space-x-4"
             in:fly={{ y: -5, duration: 600, easing: expoOut }}
@@ -412,7 +406,7 @@
           </div>
         {/if}
         <Transition url={$page.url.pathname}>
-          <div class="<lg:pb-$nh" style:--nh="{$navHeight}px">
+          <div class="flex-grow <lg:pb-$nh" style:--nh="{$navHeight}px">
             <slot />
           </div>
         </Transition>

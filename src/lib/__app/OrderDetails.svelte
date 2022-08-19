@@ -30,12 +30,11 @@
   import { getCountries } from '$lib/utils/countries'
   import { tooltip } from '$lib/components/tooltip'
   import { clamp } from '$lib/utils/math'
-  import { pageSubtitle } from '$lib'
   import trpc from '$lib/trpc/client'
   import { portal } from 'svelte-portal'
   import { fade, scale } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
-  import { bag } from '$lib/stores'
+  import { bag, layoutData } from '$lib/stores'
   import { goto } from '$app/navigation'
 
   const countries = getCountries()
@@ -51,7 +50,7 @@
     mounted = true
   })
   let products: Record<string, Product>
-  $: if (mounted && $page.stuff.store && order.items) {
+  $: if (mounted && $layoutData.store && order.items) {
     loadProducts()
   }
 
@@ -239,9 +238,7 @@
   }
 </script>
 
-{#if $page.stuff.store}
-  <BagItemDetails bind:item={details} store={$page.stuff.store} disabled />
-{/if}
+<BagItemDetails bind:item={details} disabled />
 
 {#if restoreDialog}
   <div
@@ -459,7 +456,7 @@
                       <a
                         href="{mode === 'customer'
                           ? ''
-                          : `/stores/${$page.stuff.store?.slug}`}/products/{p?.slug}"
+                          : `/stores/${$layoutData.store?.slug}`}/products/{p?.slug}"
                         target="__blank"
                         class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
                       >
@@ -1089,7 +1086,7 @@
             <div class="flex space-x-2 items-center">
               <a
                 class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                href="/stores/{$page.stuff.store
+                href="/stores/{$layoutData.store
                   ?.slug}/customers/{order.customerId}"
                 title="Go to customer page"
                 use:tooltip

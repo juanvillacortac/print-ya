@@ -24,6 +24,9 @@ const lookup = async (coords: Coords) => {
 }
 
 export default createServer()
+  .query('kit-locals', {
+    resolve: ({ ctx }) => ctx.event.locals,
+  })
   .query('geocoding', {
     input: coords,
     resolve: ({ input }) => lookup(input),

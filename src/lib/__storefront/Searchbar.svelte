@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { page } from '$app/stores'
+  import { layoutData } from '$lib/stores'
   import trpc from '$lib/trpc/client'
   import { Search16 } from 'carbon-icons-svelte'
 
@@ -10,15 +10,13 @@
   async function submitSearch() {
     await goto(getSearchUrl())
     trpc().mutation('analytics:searchHistory:create', {
-      storeId: $page.stuff.store!.id,
+      storeId: $layoutData.store!.id,
       searchTerm: search,
       categorySlug: category || undefined,
     })
     search = ''
     category = ''
   }
-
-  $: store = $page.stuff.store
 
   $: getSearchUrl = () => {
     const query = new URLSearchParams()
@@ -44,7 +42,7 @@
     bind:value={category}
   >
     <option value="">All products</option>
-    {#each store?.categories || [] as category}
+    {#each $layoutData.store?.categories || [] as category}
       <option value={category.slug}>{category.name}</option>
     {/each}
   </select>

@@ -12,7 +12,7 @@
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { ProductModifier } from '$lib/db'
-  import { fly, slide, crossfade } from 'svelte/transition'
+  import { fly, slide } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import SelectionTable from './modifiers/SelectionTable.svelte'
   import ColorTable from './modifiers/ColorTable.svelte'
