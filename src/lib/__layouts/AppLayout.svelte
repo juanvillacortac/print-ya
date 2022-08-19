@@ -123,7 +123,12 @@
   <title>{pageTitle}</title>
 </svelte:head>
 
-<Favicons favicon="/images/logo.svg" themeColor="#000" titleName="ShackCart" />
+<Favicons
+  favicon="/images/logo.svg"
+  themeColor="#000"
+  titleName="ShackCart"
+  description={$page.data.description}
+/>
 
 {#if $page.data.user && !$page.data.hideLayout}
   <div class="flex flex-col h-screen w-full overflow-hidden">

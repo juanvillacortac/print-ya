@@ -85,6 +85,7 @@
 
 <Favicons
   favicon={$layoutData.store?.favicon || ''}
+  description={$page.data.description}
   themeColor="#000"
   titleName={$layoutData.store?.name || 'ShackCart'}
 />
