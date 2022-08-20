@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "dist/**",
+        ".svelte-kit/**",
+        ".vercel_build_output/**",
+        ".vercel/output/**"
+      ],
+      "outputMode": "new-only"
+    },
+    "dev": {
+      "cache": false,
+      "outputMode": "new-only"
+    },
+    "db:push": {
+      "dependsOn": ["^db:push"]
+    },
+    "generate": {
+      "dependsOn": ["^generate"]
+    },
+    "lint": {
+      "outputs": []
+    }
+  },
+  "globalDependencies": [".eslintrc.json", ".prettierrc", "tsconfig.json"]
+}

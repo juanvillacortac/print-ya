@@ -1,0 +1,34 @@
+{
+  "name": "@shackcart/db",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "prisma generate && tsup",
+    "dev": "tsup --watch",
+    "format": "prisma format",
+    "generate": "prisma generate",
+    "db:push": "prisma db push",
+    "lint": "eslint ./src --fix",
+    "prebuild": "pnpm run generate",
+    "predev": "pnpm run generate",
+    "studio": "prisma studio"
+  },
+  "devDependencies": {
+    "@shackcart/tsconfig": "workspace:*",
+    "prisma": "^3.12.0",
+    "tsup": "^6.2.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.12.0",
+    "@shackcart/shared": "workspace:*",
+    "@types/bcrypt": "^5.0.0",
+    "bcryptjs": "^2.4.3",
+    "nanoid": "^4.0.0",
+    "typescript": "^4.7.4"
+  }
+}
