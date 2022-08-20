@@ -5,7 +5,7 @@ import node from '@sveltejs/adapter-node'
 import vercel from '@sveltejs/adapter-vercel'
 
 const adapter = () => {
-  switch (process.env.ADAPTER?.toLowerCase() || 'node') {
+  switch (process.env.ADAPTER?.toLowerCase() || 'vercel') {
     case 'node':
       return node()
     case 'vercel':
