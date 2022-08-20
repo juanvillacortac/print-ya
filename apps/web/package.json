@@ -10,8 +10,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "package": "svelte-kit package",
-    "sync": "svelte-kit sync",
-    "vercel-build": "prisma generate && vite build"
+    "sync": "svelte-kit sync"
   },
   "devDependencies": {
     "@poppanator/sveltekit-svg": "^0.2.3",
