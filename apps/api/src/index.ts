@@ -57,6 +57,17 @@ const app = async () => {
       port: +import.meta.env.VITE_PORT || 3000,
       host: '0.0.0.0',
     })
+
+    app.ready((err: Error) => {
+      if (err) {
+        app.log.error(err)
+        process.exit(1)
+      }
+
+      app.log.info(
+        `Server listening on port ${+import.meta.env.VITE_PORT || 3000}`
+      )
+    })
   }
 
   return app
