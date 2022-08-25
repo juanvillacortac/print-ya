@@ -1,0 +1,8 @@
+{
+  "extends": "@shackcart/tsconfig/node16.json",
+  "include": ["src/**/*.ts", "node_modules/"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "types": ["vite/client"]
+  }
+}

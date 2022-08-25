@@ -4,14 +4,19 @@
     "apps/*",
     "packages/*"
   ],
+  "packageManager": "^pnpm@7.9.4",
   "prisma": {
     "schema": "packages/db/prisma/schema.prisma"
   },
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "dev:web": "pnpm run dev --filter web",
-    "dev:libs": "turbo run dev --filter @shackcart/* --parallel",
+    "build:api": "turbo run build --scope=api",
+    "build:web": "turbo run build --scope=web",
+    "build:lib": "turbo run build --filter='./packages/*'",
+    "dev": "turbo run dev --continue --filter=./apps/*",
+    "dev:api": "turbo run dev --continue --scope=api",
+    "dev:web": "turbo run dev --continue --scope=web",
+    "dev:lib": "turbo run dev --filter='./packages/*' --parallel",
     "generate": "turbo run generate",
     "db:push": "turbo run generate",
     "start:node": "pnpm run start:node --filter web"

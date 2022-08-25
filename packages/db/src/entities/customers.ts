@@ -1,8 +1,6 @@
-import { prisma } from './common'
+import { Prisma, prisma } from 'src/prisma.js'
 import bcrypt from 'bcryptjs'
-import type { Customer as _Customer, Prisma } from '@prisma/client'
-
-export type Customer = _Customer
+import type { Customer } from 'src/types.js'
 
 async function hashPassword(password: string): Promise<string> {
   const saltRounds = 15

@@ -10,7 +10,7 @@ const adapter = () => {
       return node()
     case 'vercel':
       return vercel({
-        external: ['@shackcart/db']
+        external: ['@shackcart/db'],
       })
     default:
       return auto()
@@ -25,6 +25,9 @@ const config = {
     prerender: {
       default: false,
       enabled: false,
+    },
+    env: {
+      dir: '../../',
     },
     methodOverride: {
       parameter: '_method',

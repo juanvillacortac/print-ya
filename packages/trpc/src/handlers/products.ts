@@ -1,18 +1,27 @@
 import * as db from '@shackcart/db'
+import {
+  getProductById,
+  getProductBySlug,
+  getProductsByStore,
+  getStore,
+  getTags,
+  Product,
+  upsertProduct,
+} from '@shackcart/db'
 import { z } from 'zod'
-import { createServer } from '../shared'
+import { createServer } from '../shared.js'
 
 const order = z.enum(['desc', 'asc'])
 
 const mutations = createServer().mutation('upsert', {
   input: (input: unknown) =>
-    input as { storeSlug: string; data: Partial<db.Product> },
+    input as { storeSlug: string; data: Partial<Product> },
   resolve: async ({ ctx, input }) => {
-    const { userId } = ctx.event.locals
+    const { userId } = ctx.session
     if (!userId) {
       throw new Error('not allowed')
     }
-    return await db.upsertProduct(input.data, userId)
+    return await upsertProduct(input.data, userId)
   },
 })
 
@@ -22,7 +31,7 @@ const queries = createServer()
       name: z.string().optional(),
       storeId: z.string().cuid(),
     }),
-    resolve: ({ input }) => db.getTags(input),
+    resolve: ({ input }) => getTags(input),
   })
   .query('list', {
     input: z.object({
@@ -46,14 +55,14 @@ const queries = createServer()
       pageSize: z.number().int().min(1).optional().default(20),
     }),
     resolve: async ({ input }) => {
-      const store = await db.getStore({ slug: input.storeSlug })
+      const store = await getStore({ slug: input.storeSlug })
       if (!store) {
         return {
           count: 0,
           products: [],
         }
       }
-      return await db.getProductsByStore({
+      return await getProductsByStore({
         storeId: store.id,
         filter: {
           ...input.filter,
@@ -84,7 +93,7 @@ const queries = createServer()
       pageSize: z.number().int().min(1).optional().default(20),
     }),
     resolve: async ({ input }) => {
-      const store = await db.getStore({ slug: input.storeSlug })
+      const store = await getStore({ slug: input.storeSlug })
       if (!store) {
         return {
           count: 0,
@@ -106,7 +115,7 @@ const queries = createServer()
   .query('getById', {
     input: z.string().cuid(),
     resolve: async ({ input }) => {
-      return await db.getProductById(input)
+      return await getProductById(input)
     },
   })
   .query('getBySlug', {
@@ -115,11 +124,11 @@ const queries = createServer()
       productSlug: z.string(),
     }),
     resolve: async ({ input }) => {
-      const store = await db.getStore({ slug: input.storeSlug })
+      const store = await getStore({ slug: input.storeSlug })
       if (!store) {
         return null
       }
-      return await db.getProductBySlug({
+      return await getProductBySlug({
         slug: input.productSlug,
         storeId: store.id,
       })

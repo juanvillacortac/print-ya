@@ -1,13 +1,14 @@
 {
   "extends": "@shackcart/tsconfig/node16.json",
   "include": ["src/**/*.ts", "tsup.config.ts"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "outDir": "./dist",
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {
-      "@shackcart/shared": ["./dist/index"]
-    }
+      "@shackcart/trpc": ["./dist/index"]
+    },
+    "esModuleInterop": true
   }
 }

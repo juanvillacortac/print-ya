@@ -1,12 +1,9 @@
 import * as db from '@shackcart/db'
-import * as trpc from '@trpc/server'
 import { z } from 'zod'
-import { get } from '$lib/api'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
-import { getAbsoluteURL } from '$lib/utils/host'
 import type { Order } from '@shackcart/db'
-import { SENDGRID_API_KEY } from '$env/static/private'
-import { createServer } from '../shared'
+import { createServer } from '../shared.js'
+import { api, utils } from '@shackcart/shared'
 
 const orderStatus = z.enum(['paid', 'processing', 'pending'])
 const fulfillmentStatus = z.enum([
@@ -49,7 +46,7 @@ const mutations = createServer()
     resolve: async ({ input, ctx }) => {
       let coords: any
       if (!input.order.billingData?.coords) {
-        const geo = await get(`https://ipwho.is/${ctx.event.clientAddress}`)
+        const geo = await api.get(`https://ipwho.is/${ctx.ip}`)
         if (geo) {
           coords = {
             latitude: geo.latitude,
@@ -61,7 +58,7 @@ const mutations = createServer()
         order: {
           ...input.order,
           billingData: {
-            ip: ctx.event.clientAddress,
+            ip: ctx.ip,
             ...input.order.billingData,
             coords: coords ? coords : input.order.billingData?.coords,
           },
@@ -103,7 +100,7 @@ const mutations = createServer()
     resolve: async ({ input }) => {
       let updated: Order
       if (input.status === 'paid') {
-        sendgrid.setApiKey(SENDGRID_API_KEY)
+        sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
         const order = await db.getOrder(input.id)
         if (!order) {
           return null
@@ -120,12 +117,12 @@ const mutations = createServer()
           recipient = order.customer.email
         }
         updated = (await db.updateOrder({ ...input, token }))!
-        const orderUrl = getAbsoluteURL({
+        const orderUrl = utils.getAbsoluteURL({
           path: `/account/orders/${order.id}${token ? `?token=${token}` : ''}`,
           subdomain: !store.customDomain ? store.slug : undefined,
           host: store.customDomain || undefined,
         })
-        const ordersUrl = getAbsoluteURL({
+        const ordersUrl = utils.getAbsoluteURL({
           path: `/account/orders`,
           subdomain: !store.customDomain ? store.slug : undefined,
           host: store.customDomain || undefined,
@@ -166,7 +163,7 @@ ${
   .mutation('marketing:sendRestoreEmail', {
     input: z.string(),
     resolve: async ({ input }) => {
-      sendgrid.setApiKey(SENDGRID_API_KEY)
+      sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
       const order = await db.getOrder(input)
       if (!order) {
         return { ok: false }
@@ -179,12 +176,12 @@ ${
       if (order.customer) {
         recipient = order.customer.email
       }
-      const orderUrl = getAbsoluteURL({
+      const orderUrl = utils.getAbsoluteURL({
         path: `/bag?checkout&order=${order.id}`,
         subdomain: !store.customDomain ? store.slug : undefined,
         host: store.customDomain || undefined,
       })
-      const ordersUrl = getAbsoluteURL({
+      const ordersUrl = utils.getAbsoluteURL({
         path: `/account/orders`,
         subdomain: !store.customDomain ? store.slug : undefined,
         host: store.customDomain || undefined,

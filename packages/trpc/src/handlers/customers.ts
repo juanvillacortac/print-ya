@@ -1,14 +1,14 @@
 import * as db from '@shackcart/db'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { createServer } from '../shared'
+import { createServer } from '../shared.js'
 
 const order = z.enum(['desc', 'asc'])
 
 export default createServer()
   .mutation('logout', {
-    resolve: async ({ ctx: { event } }) => {
-      return await event.locals.session.destroy()
+    resolve: async ({ ctx }) => {
+      return await ctx.session.destroy()
     },
   })
   .mutation('register', {
@@ -23,9 +23,7 @@ export default createServer()
     resolve: async ({ ctx, input }) => {
       try {
         const { body } = await db.registerCustomer(input)
-        await ctx.event.locals.session.set({
-          customerId: body.customerId,
-        })
+        await ctx.session.setCustomer(body.customerId)
       } catch (err) {
         console.error(err.message)
         throw new TRPCError({
@@ -46,7 +44,7 @@ export default createServer()
     resolve: async ({ ctx, input }) => {
       try {
         const customer = await db.modifyCustomer(input)
-        await ctx.event.locals.session.refresh()
+        ctx.session.refresh()
       } catch (err) {
         console.error(err.message)
         throw new TRPCError({
@@ -69,9 +67,7 @@ export default createServer()
           password,
           storeId,
         })
-        await ctx.event.locals.session.set({
-          customerId: body.customerId,
-        })
+        await ctx.session.setCustomer(body.customerId)
       } catch (err) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
@@ -109,7 +105,7 @@ export default createServer()
   })
   .query('whoami', {
     resolve: async ({ ctx }) => {
-      const customerId = ctx.event.locals.customerId
+      const customerId = ctx.session.customerId
       if (!customerId) return null
       return await db.getCustomer({ customerId })
     },

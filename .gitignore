@@ -8,3 +8,5 @@ package/
 .env
 .vercel_build_output
 .vercel
+vite.config.ts.timestamp-*
+vite.config.js.timestamp-*

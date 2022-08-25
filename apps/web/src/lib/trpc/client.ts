@@ -1,5 +1,5 @@
 import { invalidate } from '$app/navigation'
-import type { tRPCRouter } from '$lib/trpc/server'
+import type { tRPCRouter } from '@shackcart/trpc'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 import { createTRPCClient } from '@trpc/client'
 import trpcTransformer from 'trpc-transformer'

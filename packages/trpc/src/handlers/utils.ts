@@ -1,13 +1,10 @@
 import { z } from 'zod'
-import { get } from '$lib/api'
 import * as db from '@shackcart/db'
-import { downloadFile } from '$lib/supabase'
-import { parseShopifyProductsCSV } from '$lib/utils/modifiers'
+import { parseShopifyProductsCSV } from '@shackcart/db/utils'
 import { marked } from 'marked'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
-import { PUBLIC_GEOAPIFY_TOKEN } from '$env/static/public'
-import { SENDGRID_API_KEY } from '$env/static/private'
-import { createServer } from '../shared'
+import { createServer } from 'src/shared.js'
+import { api, supabase } from '@shackcart/shared'
 
 const coords = z.object({
   latitude: z.number(),
@@ -17,22 +14,13 @@ const coords = z.object({
 type Coords = z.infer<typeof coords>
 
 const lookup = async (coords: Coords) => {
-  const res = await get(
-    `https://api.geoapify.com/v1/geocode/reverse?lat=${coords.latitude}&lon=${coords.longitude}&apiKey=${PUBLIC_GEOAPIFY_TOKEN}`
+  const res = await api.get(
+    `https://api.geoapify.com/v1/geocode/reverse?lat=${coords.latitude}&lon=${coords.longitude}&apiKey=${process.env.PUBLIC_GEOAPIFY_TOKEN}`
   )
   return res as any
 }
 
 export default createServer()
-  .query('kit-locals', {
-    resolve: ({ ctx }) => {
-      const locals = JSON.parse(JSON.stringify(ctx.event.locals))
-      delete locals.cookies
-      delete locals.session
-      delete locals.customerId
-      return locals as Omit<App.Locals, 'cookies' | 'session' | 'customerId'>
-    },
-  })
   .query('geocoding', {
     input: coords,
     resolve: ({ input }) => lookup(input),
@@ -44,10 +32,10 @@ export default createServer()
       categoryId: z.string().cuid().optional(),
     }),
     resolve: async ({ input, ctx }) => {
-      const { userId } = ctx.event.locals
+      const { userId } = ctx.session
       if (!userId) return
       // const start = Date.now()
-      const blob = await downloadFile({
+      const blob = await supabase.downloadFile({
         bucket: 'assets',
         path: input.supabasePath,
       })
@@ -61,6 +49,8 @@ export default createServer()
       )
       // const totalElapsed = Date.now() - start
       // const elapsedParsing = Date.now() - startParsing
+
+      sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
 
       try {
         const count = await db.createProductsFromBatch(products, input.storeId)
@@ -87,7 +77,6 @@ export default createServer()
           subject: `Products imported`,
           html,
         }
-        sendgrid.setApiKey(SENDGRID_API_KEY)
         await sendgrid.send(msg)
       } catch (err) {
         let to = [(await db.getUser({ userId }))!.email]
@@ -106,7 +95,6 @@ export default createServer()
           subject: `Error importing products`,
           html: `<pre>${JSON.stringify(err, undefined, '  ')}</pre>`,
         }
-        sendgrid.setApiKey(SENDGRID_API_KEY)
         await sendgrid.send(msg)
       }
       // return {

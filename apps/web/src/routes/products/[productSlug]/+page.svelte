@@ -8,8 +8,7 @@
     getBasicTemplate,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
-    type ModifiersMap,
-  } from '$lib/utils/modifiers'
+  } from '@shackcart/db/utils'
   import { browser } from '$app/env'
   import trpc from '$lib/trpc/client'
   import {

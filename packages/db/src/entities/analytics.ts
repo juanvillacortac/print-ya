@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client'
-import { prisma } from './common'
+import { Prisma, prisma } from '../prisma.js'
+import type { SearchHistory } from 'src/types.js'
 
 export const createSearchEntry = async ({
   ip,
@@ -14,7 +14,7 @@ export const createSearchEntry = async ({
   categorySlug?: string
   customerId?: string
 }) => {
-  const entry = await prisma.searchHistory.create({
+  const entry: SearchHistory = await prisma.searchHistory.create({
     data: {
       ip,
       searchTerm,
@@ -60,7 +60,10 @@ export const listSearchEntries = async ({
   page: number
   pageSize: number
   orderBy?: Prisma.SearchHistoryFindManyArgs['orderBy'] | undefined
-}) => {
+}): Promise<{
+  count: number
+  entries: SearchHistory[]
+}> => {
   let AND: Prisma.SearchHistoryWhereInput[] = []
   if (filter?.searchTerm)
     AND = [

@@ -1,33 +1,54 @@
 {
   "name": "@shackcart/db",
   "version": "1.0.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "files": [
-    "dist/**"
+    "./dist/**/*"
   ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./utils": {
+      "require": "./dist/utils/index.cjs",
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    }
+  },
+  "type": "module",
   "scripts": {
-    "build": "prisma generate && tsup",
+    "build": "prisma generate --schema=./schema/schema.prisma && tsup",
     "dev": "tsup --watch",
+    "declarations": "tsc --emitDeclarationOnly --declaration",
     "format": "prisma format",
-    "generate": "prisma generate",
+    "generate": "prisma generate --schema=./schema/schema.prisma",
     "db:push": "prisma db push",
     "lint": "eslint ./src --fix",
     "prebuild": "pnpm run generate",
-    "predev": "pnpm run generate",
+    "predev": "tsup",
     "studio": "prisma studio"
   },
   "devDependencies": {
     "@shackcart/tsconfig": "workspace:*",
-    "prisma": "^3.12.0",
-    "tsup": "^6.2.2"
+    "prisma": "^4.2.1",
+    "tsup": "^6.2.2",
+    "vite": "3.0.8",
+    "vite-dts": "^1.0.4",
+    "vite-plugin-dts": "^1.4.1"
   },
   "dependencies": {
-    "@prisma/client": "^3.12.0",
+    "@peculiar/webcrypto": "^1.4.0",
+    "@prisma/client": "^4.2.1",
     "@shackcart/shared": "workspace:*",
     "@types/bcrypt": "^5.0.0",
     "bcryptjs": "^2.4.3",
+    "csvtojson": "^2.0.10",
+    "cuid": "^2.1.8",
     "nanoid": "^4.0.0",
     "typescript": "^4.7.4"
   }

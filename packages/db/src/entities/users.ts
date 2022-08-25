@@ -1,7 +1,7 @@
-import { prisma } from './common'
+import { prisma } from 'src/prisma.js'
 import bcrypt from 'bcryptjs'
-import type { User } from '@prisma/client'
 import { utils } from '@shackcart/shared'
+import type { User } from 'src/types.js'
 
 export async function hashPassword(password: string): Promise<string> {
   const saltRounds = 15
@@ -97,7 +97,7 @@ export async function getUser({
   userId,
 }: {
   userId: string
-}): Promise<Omit<User, 'password'> | null> {
+}): Promise<User | null> {
   return await prisma.user.findUnique({
     where: { id: userId },
     select: {

@@ -5,6 +5,7 @@
       "dependsOn": ["^build"],
       "outputs": [
         "dist/**",
+        "build/**",
         ".svelte-kit/**",
         ".vercel_build_output/**",
         ".vercel/output/**"
@@ -12,6 +13,7 @@
       "outputMode": "new-only"
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "outputMode": "new-only"
     },
@@ -25,5 +27,10 @@
       "outputs": []
     }
   },
-  "globalDependencies": [".eslintrc.json", ".prettierrc", "tsconfig.json"]
+  "globalDependencies": [
+    ".eslintrc.json",
+    ".prettierrc",
+    "tsconfig.json",
+    ".env"
+  ]
 }

@@ -1,35 +1,11 @@
-import { prisma } from './common'
-import type {
-  Prisma,
-  Product as _Product,
-  ProductModifier as _ProductModifier,
-  ProductModifierItem as _ProductModifierItem,
-  ProductTag,
-  Store as _Store,
-  StoreCategory,
-} from '@prisma/client'
 import { utils } from '@shackcart/shared'
-
-export type ProductModifierItem = Omit<_ProductModifierItem, 'ordinal'> & {
-  meta: any
-}
-
-export type ProductModifier = Omit<_ProductModifier, 'ordinal'> & {
-  meta?: any
-  items: ProductModifierItem[]
-}
-
-export type Product = _Product & {
-  template: any
-  meta?: any
-  storeCategory: StoreCategory | null
-  tags: Omit<ProductTag, 'storeId'>[]
-  modifiers: ProductModifier[]
-}
-
-export type StripedProduct = Omit<_Product, 'templateDraft'> & {
-  storeCategory: StoreCategory | null
-}
+import { Prisma, prisma } from 'src/prisma.js'
+import type {
+  Product,
+  StripedProduct,
+  ProductTag,
+  _Product,
+} from 'src/types.js'
 
 export const getTags = ({
   name,
@@ -37,7 +13,7 @@ export const getTags = ({
 }: {
   name?: string
   storeId: string
-}) =>
+}): Promise<ProductTag[]> =>
   prisma.productTag.findMany({
     where: {
       name: name

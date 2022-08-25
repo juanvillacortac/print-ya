@@ -5,17 +5,12 @@ import Stripe from 'stripe'
 import { z } from 'zod'
 import { Redis } from '@upstash/redis'
 import { marked } from 'marked'
-import {
-  PUBLIC_UPSTASH_REDIS_TOKEN,
-  PUBLIC_UPSTASH_REDIS_URL,
-} from '$env/static/public'
-import { SENDGRID_API_KEY } from '$env/static/private'
-import { createServer } from '../shared'
-import { dev } from '$app/env'
+import { createServer } from '../shared.js'
+import type { StoreData } from '@shackcart/db'
 
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {
-    const { userId } = ctx.event.locals
+    const { userId } = ctx.session
     if (!userId) {
       throw new TRPCError({ code: 'UNAUTHORIZED' })
     }
@@ -28,7 +23,7 @@ const mutations = createServer()
       storeId: z.string().cuid(),
     }),
     resolve: async ({ ctx, input }) => {
-      const userId = ctx.event.locals.userId!
+      const userId = ctx.session.userId!
       const store = await (
         await db.getUserStores({ userId })
       ).find((s) => s.id === input.storeId)
@@ -41,7 +36,7 @@ const mutations = createServer()
   .mutation('upsert', {
     input: (input: unknown) => input as Partial<db.Store>,
     resolve: async ({ ctx, input }) => {
-      const userId = ctx.event.locals.userId
+      const userId = ctx.session.userId
       if (!userId) {
         throw new Error('not allowed')
       }
@@ -56,15 +51,14 @@ const queries = createServer()
     resolve: async ({ input }) => {
       const store = await db.getStore({ slug: input })
       const redis = new Redis({
-        url: PUBLIC_UPSTASH_REDIS_URL,
-        token: PUBLIC_UPSTASH_REDIS_TOKEN,
+        url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+        token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
       })
-      const storeData =
-        store && !dev
-          ? await (
-              await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-            )?.json
-          : undefined
+      const storeData = store
+        ? await (
+            await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+          )?.json
+        : undefined
       return {
         store,
         storeData,
@@ -76,15 +70,14 @@ const queries = createServer()
     resolve: async ({ input }) => {
       const store = await db.getStore({ host: input })
       const redis = new Redis({
-        url: PUBLIC_UPSTASH_REDIS_URL,
-        token: PUBLIC_UPSTASH_REDIS_TOKEN,
+        url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+        token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
       })
-      const storeData =
-        store && !dev
-          ? await (
-              await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-            )?.json
-          : undefined
+      const storeData = store
+        ? await (
+            await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+          )?.json
+        : undefined
       return {
         store,
         storeData,
@@ -138,14 +131,14 @@ export default createServer()
     }),
     resolve: async ({ input }) => {
       try {
-        sendgrid.setApiKey(SENDGRID_API_KEY)
+        sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
         const store = await db.getStore({ id: input.storeId })
         if (!store) {
           return { ok: false }
         }
         const redis = new Redis({
-          url: PUBLIC_UPSTASH_REDIS_URL,
-          token: PUBLIC_UPSTASH_REDIS_TOKEN,
+          url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+          token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
         })
         let template =
           (

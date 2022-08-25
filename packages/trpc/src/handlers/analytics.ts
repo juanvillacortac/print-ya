@@ -1,6 +1,6 @@
 import * as db from '@shackcart/db'
 import { z } from 'zod'
-import { createServer } from '../shared'
+import { createServer } from '../shared.js'
 
 const searchMutations = createServer().mutation('create', {
   input: z.object({
@@ -9,10 +9,10 @@ const searchMutations = createServer().mutation('create', {
     categorySlug: z.string().optional(),
   }),
   resolve: async ({ input, ctx }) => {
-    const customerId = await ctx.event.locals.customerId
+    const customerId = ctx.session.customerId!
     const customer = customerId ? await db.getCustomer({ customerId }) : null
     const entry = await db.createSearchEntry({
-      ip: ctx.event.clientAddress,
+      ip: ctx.ip,
       searchTerm: input.searchTerm,
       categorySlug: input.categorySlug,
       storeId: input.storeId,

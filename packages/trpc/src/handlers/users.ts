@@ -1,12 +1,12 @@
 import * as db from '@shackcart/db'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { createServer } from '../shared'
+import { createServer } from '../shared.js'
 
 export default createServer()
   .mutation('logout', {
-    resolve: async ({ ctx: { event } }) => {
-      return await event.locals.session.destroy()
+    resolve: async ({ ctx }) => {
+      return await ctx.session.destroy()
     },
   })
   .mutation('register', {
@@ -21,9 +21,7 @@ export default createServer()
           password,
           isLogin: false,
         })
-        await ctx.event.locals.session.set({
-          userId: body.userId,
-        })
+        await ctx.session.setUser(body.userId)
       } catch (err) {
         console.error(err.message)
         throw new TRPCError({
@@ -45,9 +43,7 @@ export default createServer()
           password,
           isLogin: true,
         })
-        await ctx.event.locals.session.set({
-          userId: body.userId,
-        })
+        await ctx.session.setUser(body.userId)
       } catch (err) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
@@ -58,15 +54,14 @@ export default createServer()
   })
   .query('whoami', {
     resolve: async ({ ctx }) => {
-      const { userId } = ctx.event.locals
+      const { userId } = ctx.session
       if (!userId) return null
       return await db.getUser({ userId: userId || '' })
     },
   })
   .query('stores', {
     resolve: async ({ ctx }) => {
-      const { userId } = ctx.event.locals
-      await ctx.event.locals.session.refresh()
+      const { userId } = ctx.session
       if (!userId) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',

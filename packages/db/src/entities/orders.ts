@@ -1,44 +1,6 @@
-import { prisma } from './common'
-import type {
-  Customer,
-  Order as _Order,
-  OrderFee as _OrderFee,
-  OrderItem as _OrderItem,
-  Product as _Product,
-  ProductModifier as _ProductModifier,
-  ProductModifierItem as _ProductModifierItem,
-} from '@prisma/client'
-import type { StripedProduct } from './products'
+import { prisma } from 'src/prisma.js'
 import { nanoid } from 'nanoid'
-
-type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
-
-export type OrderItem = _OrderItem & {
-  product: StripedProduct
-}
-
-export type OrderFee = Omit<_OrderFee, 'id' | 'orderId'>
-
-export type Order = Overwrite<
-  _Order,
-  {
-    customerId?: string
-    customer: Customer | null
-    billingData?: any
-    shippingData?: any
-    paymentMethods: string[]
-    fees: OrderFee[]
-    items: OrderItem[]
-  }
->
-
-export type StrippedOrder = Overwrite<
-  Order,
-  {
-    customer: Customer | null
-    items: _OrderItem[]
-  }
->
+import type { Order, Overwrite, StrippedOrder } from 'src/types.js'
 
 export const getOrder = (
   orderId: string,

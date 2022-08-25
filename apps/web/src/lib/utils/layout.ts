@@ -1,13 +1,6 @@
 import trpc from '$lib/trpc/client'
 import type { RequestEvent, LoadEvent } from '@sveltejs/kit'
 import { isCanonical } from './host'
-import {
-  PUBLIC_UPSTASH_REDIS_TOKEN,
-  PUBLIC_UPSTASH_REDIS_URL,
-} from '$env/static/public'
-import { Redis } from '@upstash/redis'
-
-export type LayoutType = 'app' | 'store'
 
 export function getLayoutType<T extends { url: URL }>({ url }: T): LayoutType {
   if (url.searchParams.get('store')) return 'store'

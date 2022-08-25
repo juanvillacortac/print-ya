@@ -1,19 +1,6 @@
-import { prisma } from './common'
-import type {
-  Store as _Store,
-  StoreCategory as _StoreCategory,
-} from '@prisma/client'
 import { utils } from '@shackcart/shared'
-
-export type StoreCategory = _StoreCategory
-export type Store = _Store & {
-  contactData?: any
-  categories?: (StoreCategory & {
-    _count: {
-      products: number
-    }
-  })[]
-}
+import { prisma } from 'src/prisma.js'
+import type { Store, StoreCategory } from 'src/types.js'
 
 export const getUserStores = ({
   userId,

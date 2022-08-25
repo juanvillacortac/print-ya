@@ -1,4 +1,5 @@
-export type Fetch = (info: RequestInfo, init?: RequestInit) => Promise<Response>
+import { fetch as fetch_ } from 'fetch-undici'
+import type { fetch as Fetch } from 'undici'
 
 async function send({
   method,
@@ -6,7 +7,7 @@ async function send({
   data = {},
   headers = {},
   timeout = 120000,
-  fetch: fetcher = fetch as Fetch,
+  fetch: fetcher = fetch_ as typeof Fetch,
 }): Promise<Record<string, any>> {
   const abortController =
     typeof AbortController !== 'undefined'
@@ -46,7 +47,7 @@ async function send({
 
   const contentType = response.headers.get('content-type')
 
-  let responseData = {}
+  let responseData: any = {}
   if (contentType) {
     if (contentType?.indexOf('application/json') !== -1) {
       responseData = await response.json()
@@ -67,7 +68,7 @@ export function get<T = Record<string, unknown>>(
   path: string,
   options?: {
     headers?: Record<string, unknown>
-    fetch?: Fetch
+    fetch?: typeof Fetch
   }
 ): Promise<T> {
   return send({ method: 'GET', path, ...options }) as Promise<T>
