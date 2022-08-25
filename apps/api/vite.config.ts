@@ -3,7 +3,7 @@ import { VitePluginNode } from 'vite-plugin-node'
 
 export default defineConfig({
   server: {
-    port: 3000,
+    port: 5000,
   },
   optimizeDeps: {
     include: ['@shackcart/db'],

@@ -52,7 +52,7 @@ const app = async () => {
 
   if (import.meta.env.PROD) {
     app.listen({
-      port: import.meta.env.PORT,
+      port: import.meta.env.PORT || 5000,
     })
   }
 
