@@ -55,6 +55,7 @@ const app = async () => {
   if (import.meta.env.PROD) {
     app.listen({
       port: +import.meta.env.VITE_PORT || 3000,
+      host: '0.0.0.0',
     })
   }
 
