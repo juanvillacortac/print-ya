@@ -36,7 +36,9 @@ async function createContext({
 export type Context = inferAsyncReturnType<typeof createContext>
 
 const app = async () => {
-  const app = fastify()
+  const app = fastify({
+    logger: true,
+  })
   app.register(cookie)
   app.register(session.default, {
     secret: 'bJwDioi1uvqNTPdxC0/RLryHet0+65nNjQibylnkM3S3kavfzp7gPg==',
@@ -52,7 +54,7 @@ const app = async () => {
 
   if (import.meta.env.PROD) {
     app.listen({
-      port: import.meta.env.PORT || 5000,
+      port: +import.meta.env.VITE_PORT || 3000,
     })
   }
 
