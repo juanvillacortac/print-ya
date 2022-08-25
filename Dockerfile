@@ -7,7 +7,7 @@ COPY . .
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM node:alpine AS installer
-RUN apk update
+RUN apk update && apk add git
 WORKDIR /app
 RUN npm i -g turbo@canary pnpm
 # COPY --from=builder /app/out/json/ .
@@ -17,7 +17,7 @@ COPY . .
 # COPY turbo.json turbo.json
 
 RUN pnpm install
-RUN pnpx turbo run build --filter=server...
+RUN pnpx turbo run build --filter=api...
 
 FROM node:alpine AS runner
 WORKDIR /app
