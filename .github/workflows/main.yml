@@ -9,4 +9,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - run: flyctl deploy --remote-only --build-arg SENDGRID_API_KEY="${{ secrets.SENDGRID_API_KEY }}" --build-arg PUBLIC_UPSTASH_REDIS_URL="${{ secrets.PUBLIC_UPSTASH_REDIS_URL }}" --build-arg PUBLIC_UPSTASH_REDIS_TOKEN="${{ secrets.PUBLIC_UPSTASH_REDIS_TOKEN }}" --build-arg PUBLIC_GEOAPIFY_TOKEN="${{ secrets.PUBLIC_GEOAPIFY_TOKEN }}" --build-arg DATABASE_URL="${{ secrets.DATABASE_URL }}" --build-arg PUBLIC_SUPABASE_URL="${{ secrets.PUBLIC_SUPABASE_URL }}" --build-arg PUBLIC_SUPABASE_ANON_KEY="${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}"
