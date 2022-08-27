@@ -8,14 +8,7 @@
     type BagItem,
   } from '$lib'
   import { tooltip } from '$lib/components/tooltip'
-  import type { Product } from '@shackcart/db'
-  import {
-    getBasicTemplate,
-    getCostFromProductModifiers,
-    getTemplateFieldsFromModifiers,
-    getTotalFromProductModifiers,
-    type ModifiersMap,
-  } from '$lib/utils/modifiers'
+  import type { ModifiersMap, Product } from '@shackcart/db'
   import {
     Add16,
     ArrowRight24,
@@ -33,6 +26,12 @@
   import BagItemDetails from '$lib/__storefront/BagItemDetails.svelte'
   import { writable } from 'svelte/store'
   import Ufo from '$lib/components/__Ufo.svelte'
+  import {
+    getBasicTemplate,
+    getCostFromProductModifiers,
+    getTemplateFieldsFromModifiers,
+    getTotalFromProductModifiers,
+  } from '@shackcart/db/dist/utils'
   let mounted = false
   onMount(() => {
     const unsuscribe = bag.subscribe((items) => {
