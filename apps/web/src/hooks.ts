@@ -45,13 +45,13 @@ const logic: Handle = async ({ event, resolve }) => {
     ssr: event.locals.layoutType !== 'app',
   })
 
-  // if (
-  //   event.locals.layoutType === 'store' &&
-  //   !event.url.pathname.startsWith('/account') &&
-  //   !event.url.pathname.startsWith('/bag')
-  // ) {
-  //   response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
-  // }
+  if (
+    event.locals.layoutType === 'store' &&
+    !event.url.pathname.startsWith('/account') &&
+    !event.url.pathname.startsWith('/bag')
+  ) {
+    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
+  }
 
   return response
 }
