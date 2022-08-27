@@ -1,4 +1,4 @@
-import type { Product, ModifiersMap } from '@shackcart/db'
+import type { Product, ModifiersMap, ProductModifier } from '@shackcart/db'
 import { writable } from 'svelte/store'
 
 export const createModifiersMap = (product?: Product): ModifiersMap =>
@@ -7,43 +7,43 @@ export const createModifiersMap = (product?: Product): ModifiersMap =>
 export const createModifiersMapStore = (product?: Product) =>
   writable<ModifiersMap>(createModifiersMap(product))
 
-// export const getTemplateFieldsFromModifiers = (
-//   product: Product,
-//   modifiers: ModifiersMap
-// ) => {
-//   let fields = ''
-//   const mappedModifiers = Object.entries(modifiers || {}).map(
-//     ([mId, mValue]) =>
-//       [
-//         mValue.modifier || product.modifiers?.find((m) => m.id === mId),
-//         mValue,
-//       ] as [ProductModifier, { value?: string; itemId?: string }]
-//   )
-//   const items = mappedModifiers
-//     .filter(
-//       ([m]) =>
-//         (m.type === 'select' ||
-//           m.type === 'color' ||
-//           m.type === 'font' ||
-//           m.type === 'image' ||
-//           m.type === 'text' ||
-//           m.type === 'numeric' ||
-//           m.type === 'toggle') &&
-//         m.templateAccessor
-//     )
-//     .filter(([_, item]) => item)
-//     .map(([m, item]) => ({
-//       value: item.value,
-//       key: m.templateAccessor,
-//     }))
-//   const f = items.reduce((a, b) => ({ ...a, [b.key!]: b.value }), {})
-//   if (Object.keys(f).length) {
-//     fields = JSON.stringify(f)
-//   } else {
-//     fields = ''
-//   }
-//   return fields
-// }
+export const getTemplateFieldsFromModifiers = (
+  product: Product,
+  modifiers: ModifiersMap
+) => {
+  let fields = ''
+  const mappedModifiers = Object.entries(modifiers || {}).map(
+    ([mId, mValue]) =>
+      [
+        mValue.modifier || product.modifiers?.find((m) => m.id === mId),
+        mValue,
+      ] as [ProductModifier, { value?: string; itemId?: string }]
+  )
+  const items = mappedModifiers
+    .filter(
+      ([m]) =>
+        (m.type === 'select' ||
+          m.type === 'color' ||
+          m.type === 'font' ||
+          m.type === 'image' ||
+          m.type === 'text' ||
+          m.type === 'numeric' ||
+          m.type === 'toggle') &&
+        m.templateAccessor
+    )
+    .filter(([_, item]) => item)
+    .map(([m, item]) => ({
+      value: item.value,
+      key: m.templateAccessor,
+    }))
+  const f = items.reduce((a, b) => ({ ...a, [b.key!]: b.value }), {})
+  if (Object.keys(f).length) {
+    fields = JSON.stringify(f)
+  } else {
+    fields = ''
+  }
+  return fields
+}
 
 // export const getCostFromProductModifiers = (
 //   product: Product,
