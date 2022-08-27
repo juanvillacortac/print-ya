@@ -11,7 +11,7 @@ export const load: PageLoad = async ({ fetch, params, parent }) => {
     orderId: params.id,
   })
 
-  if (!order || order.storeId != store.id) {
+  if (!order || order.storeId != store!.id) {
     throw error(404)
   }
   return {

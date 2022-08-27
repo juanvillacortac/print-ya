@@ -8,7 +8,6 @@
 
   import type { StripedProduct } from '@shackcart/db'
   import { favorites, layoutData } from '$lib/stores'
-  import { getBasicTemplate } from '$lib/utils/modifiers'
   import {
     Categories16,
     Category16,
@@ -21,6 +20,7 @@
   import { createEventDispatcher } from 'svelte'
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'
+  import { getBasicTemplate } from '@shackcart/db/dist/utils'
 
   const dispatch = createEventDispatcher<{ search: string }>()
 

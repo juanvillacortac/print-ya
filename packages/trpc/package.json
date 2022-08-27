@@ -33,8 +33,10 @@
     "@shackcart/db": "workspace:*",
     "@shackcart/shared": "workspace:^1.0.0",
     "@upstash/redis": "^1.6.1",
+    "fetch-undici": "^3.0.1",
     "marked": "^4.0.18",
     "nanoid": "^4.0.0",
-    "stripe": "^9.8.0"
+    "stripe": "^9.8.0",
+    "undici": "^5.10.0"
   }
 }

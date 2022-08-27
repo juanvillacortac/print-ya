@@ -10,11 +10,16 @@ import type { StoreData } from '@shackcart/db'
 
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {
-    const { userId } = ctx.session
+    const { userId } = await ctx.session.auth({ verify: true })
     if (!userId) {
       throw new TRPCError({ code: 'UNAUTHORIZED' })
     }
-    return next()
+    return next({
+      ctx: {
+        ...ctx,
+        userId,
+      },
+    })
   })
   .mutation('upsertCategory', {
     input: z.object({
@@ -23,7 +28,7 @@ const mutations = createServer()
       storeId: z.string().cuid(),
     }),
     resolve: async ({ ctx, input }) => {
-      const userId = ctx.session.userId!
+      const { userId } = ctx
       const store = await (
         await db.getUserStores({ userId })
       ).find((s) => s.id === input.storeId)
@@ -36,10 +41,7 @@ const mutations = createServer()
   .mutation('upsert', {
     input: (input: unknown) => input as Partial<db.Store>,
     resolve: async ({ ctx, input }) => {
-      const userId = ctx.session.userId
-      if (!userId) {
-        throw new Error('not allowed')
-      }
+      const { userId } = ctx
       const store = await db.upsertStore(input, userId)
       return store
     },

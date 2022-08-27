@@ -8,7 +8,7 @@
     getBasicTemplate,
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
-  } from '@shackcart/db/utils'
+  } from '@shackcart/db/dist/utils'
   import { browser } from '$app/env'
   import trpc from '$lib/trpc/client'
   import {
@@ -19,6 +19,7 @@
   } from 'carbon-icons-svelte'
   import ModifiersControls from '$lib/__storefront/ModifiersControls.svelte'
   import type { PageData } from './$types'
+  import type { ModifiersMap } from '@shackcart/db'
 
   export let data: PageData
   $: product = data.product

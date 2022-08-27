@@ -11,6 +11,7 @@ const adapter = () => {
     case 'vercel':
       return vercel({
         external: ['@shackcart/db'],
+        edge: true,
       })
     default:
       return auto()

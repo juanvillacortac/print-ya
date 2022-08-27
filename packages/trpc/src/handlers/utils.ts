@@ -32,7 +32,7 @@ export default createServer()
       categoryId: z.string().cuid().optional(),
     }),
     resolve: async ({ input, ctx }) => {
-      const { userId } = ctx.session
+      const { userId } = await ctx.session.auth({ verify: true })
       if (!userId) return
       // const start = Date.now()
       const blob = await supabase.downloadFile({
@@ -47,8 +47,6 @@ export default createServer()
         input.categoryId || undefined,
         { body }
       )
-      // const totalElapsed = Date.now() - start
-      // const elapsedParsing = Date.now() - startParsing
 
       sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
 
@@ -97,11 +95,5 @@ export default createServer()
         }
         await sendgrid.send(msg)
       }
-      // return {
-      //   downloadedIn,
-      //   totalElapsed,
-      //   elapsedParsing,
-      //   count: products.length,
-      // }
     },
   })

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { layoutData } from '$lib'
   import { tooltip } from '$lib/components/tooltip'
-  import { uploadFile } from '$lib/supabase'
   import trpc from '$lib/trpc/client'
   import {
     Add24,
@@ -18,11 +17,12 @@
   import { fade, fly, scale } from 'svelte/transition'
   import ProductsList from '$lib/__app/ProductsList.svelte'
   import { squareratio } from '$lib/actions/aspectratio'
+  import { supabase } from '@shackcart/shared'
 
   async function upload() {
     if (!csv) return
     uploading = true
-    const { path } = await uploadFile({
+    const { path } = await supabase.uploadFile({
       file: csv,
       bucket: 'assets',
       path: '/shopify',

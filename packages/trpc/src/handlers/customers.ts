@@ -6,11 +6,6 @@ import { createServer } from '../shared.js'
 const order = z.enum(['desc', 'asc'])
 
 export default createServer()
-  .mutation('logout', {
-    resolve: async ({ ctx }) => {
-      return await ctx.session.destroy()
-    },
-  })
   .mutation('register', {
     input: z.object({
       firstName: z.string(),
@@ -23,7 +18,7 @@ export default createServer()
     resolve: async ({ ctx, input }) => {
       try {
         const { body } = await db.registerCustomer(input)
-        await ctx.session.setCustomer(body.customerId)
+        return ctx.session.setCustomer(body.customerId)
       } catch (err) {
         console.error(err.message)
         throw new TRPCError({
@@ -44,7 +39,7 @@ export default createServer()
     resolve: async ({ ctx, input }) => {
       try {
         const customer = await db.modifyCustomer(input)
-        ctx.session.refresh()
+        return ctx.session.setCustomer(customer.id)
       } catch (err) {
         console.error(err.message)
         throw new TRPCError({
@@ -67,7 +62,7 @@ export default createServer()
           password,
           storeId,
         })
-        await ctx.session.setCustomer(body.customerId)
+        return ctx.session.setCustomer(body.customerId)
       } catch (err) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
@@ -105,7 +100,7 @@ export default createServer()
   })
   .query('whoami', {
     resolve: async ({ ctx }) => {
-      const customerId = ctx.session.customerId
+      const { customerId } = await ctx.session.auth()
       if (!customerId) return null
       return await db.getCustomer({ customerId })
     },

@@ -3,7 +3,7 @@ declare const __VERCEL_URL__: string
 
 declare namespace App {
   interface Locals extends SessionData {
-    layoutType: import('$lib/utils/layout').LayoutType
+    layoutType: import('@shackcart/db').LayoutType
 
     session: import('svelte-kit-cookie-session').Session<SessionData>
     cookies: Record<string, string>
@@ -12,26 +12,10 @@ declare namespace App {
     fullHost?: string
     userAgent?: string
   }
-  interface Platform {}
-  // interface Session extends Pick<SessionData, 'userId'> {
-  //   layout: import('$lib/utils/layout').LayoutType
-  //   host?: string
-  //   fullHost?: string
-  //   userAgent?: string
-  //   subtitle?: string
-  // }
-  // interface Stuff extends Record<string, unknown> {
-  //   layout: import('$lib/utils/layout').LayoutType
-  //   storeData?: StoreData
-  //   store?: import('@shackcart/db').Store | null
-  //   product?: import('@shackcart/db').Product | null
-  //   products?: import('@shackcart/db').StripedProduct[] | null
-  // }
 }
 
 interface SessionData {
-  userId?: string | null
-  customerId?: string | null
+  token?: string
 }
 
 interface StoreData {

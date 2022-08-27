@@ -1,20 +1,17 @@
 <script lang="ts">
   import { browser } from '$app/env'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
-  import type { Product, Store } from '@shackcart/db'
+  import type { ModifiersMap, Product, Store } from '@shackcart/db'
   import { layoutData, type BagItem } from '$lib/stores'
   import trpc from '$lib/trpc/client'
-  import {
-    createModifiersMapStore,
-    getTotalFromProductModifiers,
-    type ModifiersMap,
-  } from '$lib/utils/modifiers'
+  import { createModifiersMapStore } from '$lib/utils/modifiers'
   import { Close24 } from 'carbon-icons-svelte'
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import { portal } from 'svelte-portal'
   import { expoOut } from 'svelte/easing'
   import { fade, scale } from 'svelte/transition'
   import ModifiersControls from './ModifiersControls.svelte'
+  import { getTotalFromProductModifiers } from '@shackcart/db/dist/utils'
 
   export let item:
     | (BagItem & {

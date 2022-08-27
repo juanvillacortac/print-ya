@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { toPng, toSvg } from 'html-to-image'
   import { preferences } from '$lib'
-  import type { CompiledTemplate, TemplateSource } from '$lib/compiler'
+  import type { CompiledTemplate, TemplateSource } from '@shackcart/db'
 
   let parent: HTMLDivElement
   let element: HTMLDivElement

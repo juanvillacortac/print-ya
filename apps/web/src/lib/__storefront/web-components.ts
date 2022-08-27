@@ -12,7 +12,7 @@ const init = () => {
     'store-accordion',
     class StoreAccordion extends HTMLElement {
       _element: SvelteComponent
-      _shadowRoot: ShadowRoot
+      _shadowRoot: ShadowRoot = new ShadowRoot()
       _inner: string
 
       constructor() {

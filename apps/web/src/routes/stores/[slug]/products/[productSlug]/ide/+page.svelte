@@ -33,6 +33,7 @@
   import { onMount } from 'svelte'
   import trpc from '$lib/trpc/client'
   import type { PageData } from './$types'
+  import { api } from '@shackcart/shared'
 
   export let data: PageData
 
@@ -319,12 +320,14 @@
           </button>
           <button
             on:click={() => {
-              trpc()
-                .mutation('user:logout')
-                .then(() => {
-                  notifications.send('Log out successfully', 'default', 1000)
-                  goto('/login')
-                })
+              api.del('/login', {}).then(() => {
+                // if (!logout) return
+                if ($page.url.pathname.startsWith('/account')) {
+                  window.location.replace('/login')
+                } else {
+                  window.location.reload()
+                }
+              })
             }}
             class="flex relative justify-self-end self-end hover:text-black dark:hover:text-white"
             title="Log out"

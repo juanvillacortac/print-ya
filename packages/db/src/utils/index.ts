@@ -2,7 +2,6 @@ import cuid from 'cuid'
 import csvtojson from 'csvtojson'
 import { nanoid } from 'nanoid'
 import { utils } from '@shackcart/shared'
-import { Crypto } from '@peculiar/webcrypto'
 import type {
   ModifiersMap,
   Product,
@@ -177,14 +176,16 @@ export async function parseShopifyProductsCSV(
   } else {
     data = await csvtojson().fromFile(obj.filePath)
   }
+  const crypto_ = globalThis.crypto
+    ? crypto
+    : await import('@peculiar/webcrypto').then((m) => new m.Crypto())
   const products: (Partial<Product> & { internalId: string })[] = data.map(
     (p) => {
-      const crypto = new Crypto()
       const { meta, modifiers } = generateDefaultModifiers()
       const id = nanoid(6).toLocaleLowerCase()
       let slug = `${utils.slugify(p.Title)}-${id}`
       const product: Partial<Product> & { internalId: string } = {
-        internalId: crypto.randomUUID(),
+        internalId: crypto_.randomUUID(),
         name: p.Title,
         type: 'template',
         storeCategoryId: categoryId,

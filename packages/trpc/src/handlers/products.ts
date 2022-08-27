@@ -8,22 +8,36 @@ import {
   Product,
   upsertProduct,
 } from '@shackcart/db'
+import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createServer } from '../shared.js'
 
 const order = z.enum(['desc', 'asc'])
 
-const mutations = createServer().mutation('upsert', {
-  input: (input: unknown) =>
-    input as { storeSlug: string; data: Partial<Product> },
-  resolve: async ({ ctx, input }) => {
-    const { userId } = ctx.session
+const mutations = createServer()
+  .middleware(async ({ ctx, next }) => {
+    const { userId } = await ctx.session.auth({ verify: true })
     if (!userId) {
-      throw new Error('not allowed')
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
     }
-    return await upsertProduct(input.data, userId)
-  },
-})
+    return next({
+      ctx: {
+        ...ctx,
+        userId,
+      },
+    })
+  })
+  .mutation('upsert', {
+    input: (input: unknown) =>
+      input as { storeSlug: string; data: Partial<Product> },
+    resolve: async ({ ctx, input }) => {
+      const { userId } = ctx
+      if (!userId) {
+        throw new Error('not allowed')
+      }
+      return await upsertProduct(input.data, userId)
+    },
+  })
 
 const queries = createServer()
   .query('listTags', {

@@ -32,6 +32,7 @@
   import trpc from '$lib/trpc/client'
   import { writable } from 'svelte/store'
   import { setContext } from 'svelte'
+  import { api } from '@shackcart/shared'
 
   $: path = $page.url.pathname
   $: store = $layoutData.store
@@ -221,12 +222,14 @@
             </button>
             <button
               on:click={() => {
-                trpc()
-                  .mutation('user:logout')
-                  .then(() => {
-                    notifications.send('Log out successfully', 'default', 1000)
+                api.del('/login', {}).then(() => {
+                  // if (!logout) return
+                  if ($page.url.pathname.startsWith('/account')) {
                     window.location.replace('/login')
-                  })
+                  } else {
+                    window.location.reload()
+                  }
+                })
               }}
               class="flex relative hover:text-black dark:hover:text-white"
               title="Log out"
@@ -329,12 +332,14 @@
           </button>
           <button
             on:click={() => {
-              trpc()
-                .mutation('user:logout')
-                .then(() => {
-                  notifications.send('Log out successfully', 'default', 1000)
+              api.del('/login', {}).then(() => {
+                // if (!logout) return
+                if ($page.url.pathname.startsWith('/account')) {
                   window.location.replace('/login')
-                })
+                } else {
+                  window.location.reload()
+                }
+              })
             }}
             class="flex relative items-end justify-end hover:text-black dark:hover:text-white"
             title="Log out"

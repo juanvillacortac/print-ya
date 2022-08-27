@@ -1,12 +1,11 @@
 self.window = self
 
 import { browser } from '$app/env'
-import type { Product } from '@shackcart/db'
+import type { ModifiersMap, Product } from '@shackcart/db'
 import {
   getBasicTemplate,
   getTemplateFieldsFromModifiers,
-  type ModifiersMap,
-} from './modifiers'
+} from '@shackcart/db/dist/utils'
 
 if (browser) {
   self.window = self

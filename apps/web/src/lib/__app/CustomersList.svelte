@@ -1,12 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores'
   import { watchMedia } from '$lib'
   import type { StrippedOrder } from '@shackcart/db'
-  import trpc, {
-    type InferMutationOutput,
-    type InferQueryInput,
-    type InferQueryOutput,
-  } from '$lib/trpc/client'
+  import trpc from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
   import { tick } from 'svelte'
   import {
@@ -22,6 +17,7 @@
   import Ufo from '$lib/components/__Ufo.svelte'
   import { goto } from '$app/navigation'
   import { layoutData } from '$lib/stores'
+  import type { InferQueryInput, InferQueryOutput } from '@shackcart/trpc'
 
   export let customers:
     | InferQueryOutput<'customer:list'>['customers']

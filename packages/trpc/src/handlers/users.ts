@@ -4,11 +4,6 @@ import { z } from 'zod'
 import { createServer } from '../shared.js'
 
 export default createServer()
-  .mutation('logout', {
-    resolve: async ({ ctx }) => {
-      return await ctx.session.destroy()
-    },
-  })
   .mutation('register', {
     input: z.object({
       email: z.string().email(),
@@ -43,7 +38,7 @@ export default createServer()
           password,
           isLogin: true,
         })
-        await ctx.session.setUser(body.userId)
+        return await ctx.session.setUser(body.userId)
       } catch (err) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
@@ -54,14 +49,13 @@ export default createServer()
   })
   .query('whoami', {
     resolve: async ({ ctx }) => {
-      const { userId } = ctx.session
-      if (!userId) return null
+      const { userId } = await ctx.session.auth()
       return await db.getUser({ userId: userId || '' })
     },
   })
   .query('stores', {
     resolve: async ({ ctx }) => {
-      const { userId } = ctx.session
+      const { userId } = await ctx.session.auth()
       if (!userId) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',

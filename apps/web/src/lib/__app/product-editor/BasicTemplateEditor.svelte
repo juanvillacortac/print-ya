@@ -9,10 +9,10 @@
   import { tooltip } from '$lib/components/tooltip'
   import type { Product, ProductModifier } from '@shackcart/db'
   import { layoutData } from '$lib/stores'
-  import { uploadFile } from '$lib/supabase'
   import { ChevronRight16, Close24, Image32 } from 'carbon-icons-svelte'
   import { expoOut } from 'svelte/easing'
   import { slide } from 'svelte/transition'
+  import { supabase } from '@shackcart/shared'
 
   export let product: Partial<Product>
   export let disabled = false
@@ -56,7 +56,7 @@
       }
       uploading = true
       const file = event.currentTarget.files[0]
-      const { url } = await uploadFile({
+      const { url } = await supabase.uploadFile({
         file,
         bucket: 'assets',
         path: `${$layoutData.store!.slug}/products/`,

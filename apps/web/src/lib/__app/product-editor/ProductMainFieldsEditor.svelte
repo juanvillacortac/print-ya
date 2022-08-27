@@ -3,7 +3,6 @@
 
   import type { Product } from '@shackcart/db'
   import { layoutData } from '$lib/stores'
-  import type { InferQueryOutput } from '$lib/trpc/client'
   import trpc from '$lib/trpc/client'
   import { Editor } from 'bytemd'
   import {
@@ -16,6 +15,7 @@
   import { flip } from 'svelte/animate'
   import { expoOut } from 'svelte/easing'
   import { fly, scale, slide } from 'svelte/transition'
+  import type { InferQueryOutput } from '@shackcart/trpc'
 
   export let product: Partial<Product>
   $: store = $layoutData.store

@@ -78,13 +78,11 @@
 
 <script lang="ts">
   import { page } from '$app/stores'
-  import trpc, {
-    type InferQueryInput,
-    type InferQueryOutput,
-  } from '$lib/trpc/client'
+  import trpc from '$lib/trpc/client'
   import { tick } from 'svelte'
   import { browser } from '$app/env'
-  import type { Load, LoadEvent } from '@sveltejs/kit'
+  import type { LoadEvent } from '@sveltejs/kit'
+  import type { InferQueryInput, InferQueryOutput } from '@shackcart/trpc'
 
   export let products: InferQueryOutput<'products:list'>['products'] | undefined
   export let count: number | undefined

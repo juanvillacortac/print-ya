@@ -1,6 +1,11 @@
 <script lang="ts">
   import 'bytemd/dist/index.css'
-  import type { Product, ProductModifier, Store } from '@shackcart/db'
+  import type {
+    Product,
+    ProductModifier,
+    Store,
+    TemplateSource,
+  } from '@shackcart/db'
   import { notifications } from '$lib/components/notifications'
   import { goto } from '$app/navigation'
   import {
@@ -14,7 +19,6 @@
   import { tooltip } from '$lib/components/tooltip'
   import { writable } from 'svelte/store'
   import ProductModifiersEditor from './ProductModifiersEditor.svelte'
-  import type { TemplateSource } from '$lib/compiler'
   import ProductMainFieldsEditor from './ProductMainFieldsEditor.svelte'
   import ProductMockupImagesEditor from './ProductMockupImagesEditor.svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
@@ -22,9 +26,9 @@
   import trpc, { invalidateQuery } from '$lib/trpc/client'
   import Submenu from '$lib/components/Submenu.svelte'
   import BasicTemplateEditor from './BasicTemplateEditor.svelte'
-  import { getBasicTemplate } from '$lib/utils/modifiers'
   import { layoutData } from '$lib/stores'
   import { page } from '$app/stores'
+  import { getBasicTemplate } from '@shackcart/db/dist/utils'
 
   $: store = $layoutData.store!
 

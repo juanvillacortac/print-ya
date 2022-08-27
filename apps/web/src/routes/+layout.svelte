@@ -60,8 +60,6 @@
   <noscript>
     <link rel="stylesheet" href=${fontsURL} />
   </noscript>`
-
-  $: console.log($page.data)
 </script>
 
 <svelte:head>

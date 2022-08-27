@@ -28,7 +28,6 @@
           password,
         }
       )
-      notifications.send('Log in successfull', 'default', 1000)
       const callbackUrl = decodeURIComponent(
         $page.url.searchParams.get('callbackUrl') || encodeURIComponent('/')
       )

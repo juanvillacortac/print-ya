@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { layoutData, pageSubtitle } from '$lib'
+  import { layoutData } from '$lib'
   import OrdersList from '$lib/__app/OrdersList.svelte'
   import { page } from '$app/stores'
   import { tooltip } from '$lib/components/tooltip'

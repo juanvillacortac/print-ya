@@ -1,8 +1,7 @@
 <script lang="ts">
   import Image from '$lib/components/caravaggio/Image.svelte'
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
-  import type { ProductModifierItem } from '@shackcart/db'
-  import type { ModifierValue } from '$lib/utils/modifiers'
+  import type { ModifierValue, ProductModifierItem } from '@shackcart/db'
   import { Close24 } from 'carbon-icons-svelte'
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'

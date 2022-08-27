@@ -17,7 +17,7 @@ import type {
   PaymentGateway,
   ProductImage,
   ProductType,
-  SearchHistory,
+  SearchHistory as _SearchHistory,
   TagsOnProducts,
   ProductTag,
 } from '@prisma/client'
@@ -33,6 +33,7 @@ export {
   _OrderFee,
   _OrderItem,
   _Product,
+  _SearchHistory,
   Account,
   CustomerAddress,
   CustomerAddressType,
@@ -41,7 +42,6 @@ export {
   PaymentGateway,
   ProductImage,
   ProductType,
-  SearchHistory,
   TagsOnProducts,
   ProductTag,
 }
@@ -81,10 +81,12 @@ export type Product = _Product & {
 }
 
 export type StripedProduct = Omit<_Product, 'templateDraft'> & {
+  template: any
   storeCategory: StoreCategory | null
 }
 
 export type OrderItem = _OrderItem & {
+  modifiers: ModifiersMap
   product: StripedProduct
 }
 
@@ -111,8 +113,16 @@ export type StrippedOrder = Overwrite<
   }
 >
 
+export type SearchHistory = Overwrite<
+  _SearchHistory,
+  {
+    customer: Customer | null
+    category: StoreCategory | null
+  }
+>
+
 export type LayoutType = 'app' | 'store'
-export interface StoreData {
+export type StoreData = {
   theme: Record<'primary', string>
   header: {
     links: Record<'title' | 'href', string>[]
@@ -124,6 +134,12 @@ export interface StoreData {
     links: Record<'title' | 'href', string>[]
     appendix: Record<'title' | 'text' | 'img', string>
   }
+}
+
+export type LayoutData = {
+  layout: LayoutType
+  store?: Store | null
+  storeData?: StoreData
 }
 
 export type ModifierValue = {

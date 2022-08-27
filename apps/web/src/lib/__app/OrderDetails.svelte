@@ -2,12 +2,6 @@
   import type { Order, OrderItem, Product } from '@shackcart/db'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import {
-    getBasicTemplate,
-    getCostFromProductModifiers,
-    getTemplateFieldsFromModifiers,
-    getTotalFromProductModifiers,
-  } from '$lib/utils/modifiers'
-  import {
     Add16,
     Checkmark16,
     Close16,
@@ -35,6 +29,7 @@
   import { bag, layoutData } from '$lib/stores'
   import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
+import { getBasicTemplate, getCostFromProductModifiers, getTemplateFieldsFromModifiers, getTotalFromProductModifiers } from '@shackcart/db/dist/utils';
 
   const countries = getCountries()
 

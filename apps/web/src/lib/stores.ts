@@ -1,8 +1,14 @@
 import { derived, type Readable, type Writable } from 'svelte/store'
 import { browser } from '$app/env'
 import { writable, get } from 'svelte/store'
-import type { ModifiersMap } from './utils/modifiers'
-import type { Order, Product, Store, Customer } from '@shackcart/db'
+import type {
+  Order,
+  Product,
+  Store,
+  Customer,
+  ModifiersMap,
+  LayoutData,
+} from '@shackcart/db'
 import { flatMap, isObject, merge } from 'lodash-es'
 import { page } from '$app/stores'
 import { goto } from '$app/navigation'
@@ -13,7 +19,6 @@ import {
   PUBLIC_UPSTASH_REDIS_TOKEN,
   PUBLIC_UPSTASH_REDIS_URL,
 } from '$env/static/public'
-import type { LayoutData } from './utils/layout'
 
 const redis = new Redis({
   url: PUBLIC_UPSTASH_REDIS_URL,

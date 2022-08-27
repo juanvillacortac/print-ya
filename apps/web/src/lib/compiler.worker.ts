@@ -1,7 +1,8 @@
 self.window = self
 
 import { browser } from '$app/env'
-import { compile, type TemplateSource } from './compiler'
+import { compile } from './compiler'
+import type { TemplateSource } from '@shackcart/db'
 
 if (browser) {
   self.window = self

@@ -9,7 +9,6 @@
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
   import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
   import { tooltip } from '$lib/components/tooltip'
-  import { uploadFile } from '$lib/supabase'
   import { Close24, Image32 } from 'carbon-icons-svelte'
   import { expoOut } from 'svelte/easing'
   import { fade, scale } from 'svelte/transition'
@@ -17,6 +16,7 @@
   import PaypalLogo from '$lib/components/__PaypalLogo.svelte'
   import trpc, { invalidateQuery } from '$lib/trpc/client'
   import { Editor } from 'bytemd'
+  import { supabase } from '@shackcart/shared'
 
   let store = { ...$layoutData.store! }
   const contactEmailTemplate = redisWritable(
@@ -100,7 +100,7 @@
   const urlBuilder = useCaravaggioBuilder()
 
   const uploadImage = async ({ file }: { file: File }) => {
-    const { url } = await uploadFile({
+    const { url } = await supabase.uploadFile({
       file,
       bucket: 'assets',
       path: `${store.slug}`,

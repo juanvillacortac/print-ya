@@ -1,9 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import trpc, {
-    type InferQueryInput,
-    type InferQueryOutput,
-  } from '$lib/trpc/client'
+  import trpc from '$lib/trpc/client'
   import { tick } from 'svelte'
   import {
     ChevronDown16,
@@ -20,8 +17,9 @@
   import { expoOut } from 'svelte/easing'
   import Ufo from '$lib/components/__Ufo.svelte'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
-  import { getBasicTemplate } from '$lib/utils/modifiers'
   import { layoutData } from '$lib/stores'
+  import { getBasicTemplate } from '@shackcart/db/dist/utils'
+  import type { InferQueryInput, InferQueryOutput } from '@shackcart/trpc'
 
   export let archived = false
   export let products:

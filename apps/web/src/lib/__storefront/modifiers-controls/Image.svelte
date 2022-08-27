@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { Product, ProductModifier } from '@shackcart/db'
-  import type { ModifierValue } from '$lib/utils/modifiers'
-  import { uploadFile } from '$lib/supabase'
+  import type { ModifierValue, Product, ProductModifier } from '@shackcart/db'
+  import { supabase } from '@shackcart/shared'
   import { tooltip } from '$lib/components/tooltip'
   import { page } from '$app/stores'
   import { Close24, Image32 } from 'carbon-icons-svelte'
@@ -38,7 +37,7 @@
       }
       uploadingImage = true
       const file = event.currentTarget.files[0]
-      const { url } = await uploadFile({
+      const { url } = await supabase.uploadFile({
         file,
         bucket: 'client-assets',
         path: `${$page.data.layoutData.store!.slug}/products/${

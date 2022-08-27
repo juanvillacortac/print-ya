@@ -1,14 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-
-  import { page } from '$app/stores'
-  import { layoutData, pageSubtitle } from '$lib'
+  import { layoutData } from '$lib'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import { tooltip } from '$lib/components/tooltip'
   import type { Product, Store } from '@shackcart/db'
-  import { uploadFile } from '$lib/supabase'
   import trpc from '$lib/trpc/client'
-  import { getBasicTemplate } from '$lib/utils/modifiers'
   import {
     Category32,
     Checkmark24,
@@ -18,10 +14,10 @@
   import Portal, { portal } from 'svelte-portal'
   import { expoOut } from 'svelte/easing'
   import { fade, fly } from 'svelte/transition'
+  import { supabase } from '@shackcart/shared'
+  import { getBasicTemplate } from '@shackcart/db/dist/utils'
 
   const store = $layoutData.store
-
-  $pageSubtitle = 'Import products from Shopify'
 
   let products: (Partial<Product> & { internalId: string })[] | undefined
   let toImport: string[] = []
@@ -34,7 +30,7 @@
     reader.onload = async () => {
       if (typeof reader.result === 'string') {
         uploading = true
-        const { path } = await uploadFile({
+        const { path } = await supabase.uploadFile({
           file: input,
           bucket: 'assets',
           path: '/shopify',

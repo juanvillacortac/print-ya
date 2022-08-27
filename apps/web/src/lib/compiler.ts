@@ -1,24 +1,7 @@
+import type { CompiledTemplate, TemplateSource } from '@shackcart/db'
 import ejs from 'ejs4b/ejs-es'
 import { urlBuilder } from './components/caravaggio/urlBuilder'
 import { useWindiCSS } from './windicss'
-
-export type CompiledTemplate = {
-  html: string
-  css: string
-  width?: string
-  height?: string
-}
-
-export type TemplateSource = {
-  name?: string
-  html: string
-  css: string
-  fields?: string
-  windi?: boolean
-  width?: number
-  height?: number
-  sizeUnit?: string
-}
 
 export const compile = (source: TemplateSource): CompiledTemplate => {
   try {

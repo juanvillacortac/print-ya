@@ -1,5 +1,7 @@
 import trpc from '$lib/trpc/client'
-import type { RequestEvent, LoadEvent } from '@sveltejs/kit'
+import type { LayoutType } from '@shackcart/db'
+import type { LoadEvent } from '@sveltejs/kit'
+import type { LayoutData } from '@shackcart/db'
 import { isCanonical } from './host'
 
 export function getLayoutType<T extends { url: URL }>({ url }: T): LayoutType {
@@ -34,12 +36,6 @@ export function validateLayoutRoute<T extends { url: URL }>(
         storeRoutes.find((url) => event.url.pathname.startsWith(url))
       )
   }
-}
-
-export type LayoutData = {
-  layout: LayoutType
-  store?: import('@shackcart/db').Store | null
-  storeData?: StoreData
 }
 
 export async function fetchLayoutData<

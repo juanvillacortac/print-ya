@@ -3,6 +3,7 @@
   import { notifications } from '$lib/components/notifications'
   import { layoutData } from '$lib/stores'
   import trpc from '$lib/trpc/client'
+  import { api } from '@shackcart/shared'
   import { onMount } from 'svelte'
   import { expoOut } from 'svelte/easing'
   import { derived } from 'svelte/store'
@@ -41,6 +42,11 @@
     }
     try {
       if ($isLogin) {
+        // await api.post('/api/auth/login', {
+        //   email: email?.toLocaleLowerCase(),
+        //   password,
+        //   layoutData: $layoutData,
+        // })
         await trpc().mutation('customer:login', {
           email: email?.toLocaleLowerCase(),
           password,
@@ -56,7 +62,6 @@
           storeId: $layoutData.store?.id!,
         })
       }
-      notifications.send('Log in successfull', 'default', 1000)
       const callbackUrl = decodeURI(
         $page.url.searchParams.get('callbackUrl') || encodeURI('/')
       )

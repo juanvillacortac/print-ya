@@ -1,7 +1,7 @@
 import { browser } from '$app/env'
-import type { TemplateSource } from '$lib/compiler'
 import Preview from '$lib/components/Preview.svelte'
 import Shared from '$lib/components/Shared.svelte'
+import type { TemplateSource } from '@shackcart/db'
 import type { SvelteComponent } from 'svelte'
 
 const template: TemplateSource = {

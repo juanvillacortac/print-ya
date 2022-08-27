@@ -1,7 +1,7 @@
 <script lang="ts">
   import { layoutData, watchMedia } from '$lib'
   import type { OrderFee, StrippedOrder } from '@shackcart/db'
-  import trpc, { type InferQueryInput } from '$lib/trpc/client'
+  import trpc from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
   import { tick } from 'svelte'
   import {
@@ -16,6 +16,7 @@
   import { expoOut } from 'svelte/easing'
   import Ufo from '$lib/components/__Ufo.svelte'
   import { goto } from '$app/navigation'
+  import type { InferQueryInput } from '@shackcart/trpc'
 
   export let orders: StrippedOrder[] | undefined = undefined
   export let customerId: string | undefined = undefined

@@ -10,6 +10,7 @@ import trpcTransformer from 'trpc-transformer'
 import { createServer } from './shared.js'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 
+import './fetch-polyfill.js'
 export * from './shared.js'
 
 export const router = createServer()

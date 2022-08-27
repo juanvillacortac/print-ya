@@ -31,9 +31,8 @@
   } from 'svelte-stripe'
   import type { Order, Product } from '@shackcart/db'
   import type { BagItem } from '$lib'
-  import { getTotalFromProductModifiers } from '$lib/utils/modifiers'
-  import { page } from '$app/stores'
   import { customer, layoutData, redisWritable } from '$lib/stores'
+  import { getTotalFromProductModifiers } from '@shackcart/db/dist/utils'
 
   const countries = getCountries()
 

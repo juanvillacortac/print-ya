@@ -13,8 +13,8 @@ export const createSearchEntry = async ({
   storeId: string
   categorySlug?: string
   customerId?: string
-}) => {
-  const entry: SearchHistory = await prisma.searchHistory.create({
+}): Promise<SearchHistory> => {
+  return await prisma.searchHistory.create({
     data: {
       ip,
       searchTerm,
@@ -40,6 +40,10 @@ export const createSearchEntry = async ({
             },
           }
         : undefined,
+    },
+    include: {
+      category: true,
+      customer: true,
     },
   })
 }

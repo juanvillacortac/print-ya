@@ -10,7 +10,6 @@
   import type { Product } from '@shackcart/db'
   import { slide } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
-  import { uploadFile } from '$lib/supabase'
   import { writable } from 'svelte/store'
   import { scale, fly } from 'svelte/transition'
   import { flip } from 'svelte/animate'
@@ -19,6 +18,7 @@
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
   import { squareratio } from '$lib/actions/aspectratio'
   import { layoutData } from '$lib/stores'
+  import { supabase } from '@shackcart/shared'
 
   export let product: Partial<Product>
 
@@ -68,7 +68,7 @@
       }
       const file = event.currentTarget.files[0]
       uploading = true
-      const { url, path } = await uploadFile({
+      const { url, path } = await supabase.uploadFile({
         file,
         bucket: 'assets',
         path: `${$layoutData.store!.slug}/products/${product.slug}/mockups`,

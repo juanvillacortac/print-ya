@@ -9,7 +9,7 @@ const searchMutations = createServer().mutation('create', {
     categorySlug: z.string().optional(),
   }),
   resolve: async ({ input, ctx }) => {
-    const customerId = ctx.session.customerId!
+    const { customerId } = await ctx.session.auth()
     const customer = customerId ? await db.getCustomer({ customerId }) : null
     const entry = await db.createSearchEntry({
       ip: ctx.ip,

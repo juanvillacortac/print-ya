@@ -6,7 +6,6 @@
   import { tooltip } from '$lib/components/tooltip'
   import type { ProductModifier } from '@shackcart/db'
   import { layoutData } from '$lib/stores'
-  import { uploadFile } from '$lib/supabase'
   import {
     ChevronRight16,
     Close24,
@@ -17,6 +16,7 @@
   import { expoOut } from 'svelte/easing'
   import { writable } from 'svelte/store'
   import { slide } from 'svelte/transition'
+  import { supabase } from '@shackcart/shared'
 
   let open: Record<string, boolean> = {}
 
@@ -121,7 +121,7 @@
       }
       uploading[i.internalId] = true
       const file = event.currentTarget.files[0]
-      const { url, path } = await uploadFile({
+      const { url, path } = await supabase.uploadFile({
         file,
         bucket: 'assets',
         path: `${$layoutData.store!.slug}/upselling`,

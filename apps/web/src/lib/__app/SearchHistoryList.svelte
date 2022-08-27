@@ -1,9 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores'
-  import trpc, {
-    type InferQueryInput,
-    type InferQueryOutput,
-  } from '$lib/trpc/client'
+  import trpc from '$lib/trpc/client'
   import { tick } from 'svelte'
   import {
     ChevronDown16,
@@ -21,6 +17,7 @@
   import { layoutData, watchMedia } from '$lib/stores'
   import { tooltip } from '$lib/components/tooltip'
   import { clamp } from '$lib/utils/math'
+  import type { InferQueryInput, InferQueryOutput } from '@shackcart/trpc'
 
   export let entries:
     | InferQueryOutput<'analytics:searchHistory:list'>['entries']

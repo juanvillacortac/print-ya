@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TemplateSource } from '$lib/compiler'
+  import type { TemplateSource } from '@shackcart/db'
 
   import { Settings24 } from 'carbon-icons-svelte'
   let titleHeight = 0

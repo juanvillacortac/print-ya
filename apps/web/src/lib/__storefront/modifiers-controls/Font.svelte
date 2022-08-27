@@ -1,9 +1,8 @@
 <script lang="ts">
   import { tooltip } from '$lib/components/tooltip'
 
-  import type { ProductModifierItem } from '@shackcart/db'
+  import type { ModifierValue, ProductModifierItem } from '@shackcart/db'
 
-  import type { ModifierValue } from '$lib/utils/modifiers'
   import { CloseOutline24 } from 'carbon-icons-svelte'
 
   export let value: ModifierValue

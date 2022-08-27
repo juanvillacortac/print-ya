@@ -16,11 +16,11 @@
   import { getContext, createEventDispatcher } from 'svelte'
   import { tooltip } from '$lib/components/tooltip'
   import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
-  import { uploadFile } from '$lib/supabase'
   import { portal } from 'svelte-portal'
   import { fade, fly } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import Submenu from '$lib/components/Submenu.svelte'
+  import { supabase } from '@shackcart/shared'
 
   export let root: Writable<Record<string, any>>
   export let keys: { text?: string; image?: string; href?: string }
@@ -142,7 +142,7 @@
       }
       const file = event.currentTarget.files[0]
       uploading = true
-      const { url, path } = await uploadFile({
+      const { url, path } = await supabase.uploadFile({
         file,
         bucket: 'assets',
         path: `/element-assets/images`,

@@ -1,8 +1,7 @@
 <script lang="ts">
   import { squareratio } from '$lib/actions/aspectratio'
   import { tooltip } from '$lib/components/tooltip'
-  import type { ProductModifierItem } from '@shackcart/db'
-  import type { ModifierValue } from '$lib/utils/modifiers'
+  import type { ModifierValue, ProductModifierItem } from '@shackcart/db'
 
   export let value: ModifierValue
   export let items: ProductModifierItem[]

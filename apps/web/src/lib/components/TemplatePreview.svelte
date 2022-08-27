@@ -29,7 +29,7 @@
    * }[]} */
   export let mockups = []
 
-  /** @type {import('$lib/compiler').TemplateSource} */
+  /** @type {import('@shackcart/db').TemplateSource} */
   export let template
   export let watermark = false
 

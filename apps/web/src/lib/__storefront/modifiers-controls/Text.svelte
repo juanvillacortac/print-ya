@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ModifierValue } from '$lib/utils/modifiers'
+  import type { ModifierValue } from '@shackcart/db'
 
   export let value: ModifierValue
   export let disabled = false

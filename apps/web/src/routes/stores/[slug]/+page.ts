@@ -5,6 +5,6 @@ export const load: PageLoad = async ({ parent }) => {
     layoutData: { store },
   } = await parent()
   return {
-    title: store.name,
+    title: store!.name,
   }
 }

@@ -38,6 +38,7 @@
   import { fly } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import { portal } from 'svelte-portal'
+  import { api } from '@shackcart/shared'
 
   $: pageTitle =
     ($page.data.title ? $page.data.title + ' | ' : '') +
@@ -277,16 +278,14 @@
                   <button
                     class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
                     on:click={() => {
-                      trpc()
-                        .mutation('customer:logout')
-                        .then((logout) => {
-                          if (!logout) return
-                          if ($page.url.pathname.startsWith('/account')) {
-                            window.location.replace('/login')
-                          } else {
-                            window.location.reload()
-                          }
-                        })
+                      api.del('/login', {}).then(() => {
+                        // if (!logout) return
+                        if ($page.url.pathname.startsWith('/account')) {
+                          window.location.replace('/login')
+                        } else {
+                          window.location.reload()
+                        }
+                      })
                     }}
                     type="button"
                   >
