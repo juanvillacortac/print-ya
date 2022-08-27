@@ -9,10 +9,7 @@ const adapter = () => {
     case 'node':
       return node()
     case 'vercel':
-      return vercel({
-        external: ['@shackcart/db'],
-        edge: true,
-      })
+      return vercel()
     default:
       return auto()
   }
