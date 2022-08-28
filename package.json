@@ -14,7 +14,7 @@
     "build:web": "turbo run build --scope=web",
     "build:lib": "turbo run build --filter='./packages/*'",
     "dev": "turbo run dev --continue --filter=./apps/*",
-    "dev:api": "turbo run dev --continue --filter='./apps/api' --filter='./packages/trpc'",
+    "dev:api": "turbo run dev --continue --filter='./apps/api'",
     "dev:web": "turbo run dev --continue --scope=web",
     "dev:lib": "turbo run dev --filter='./packages/*' --parallel",
     "generate": "turbo run generate",

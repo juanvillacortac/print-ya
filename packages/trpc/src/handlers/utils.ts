@@ -5,6 +5,8 @@ import { marked } from 'marked'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { createServer } from 'src/shared.js'
 import { api, supabase } from '@shackcart/shared'
+import { Queue } from 'bullmq'
+import { importProducts } from 'src/workers/shopify-import.js'
 
 const coords = z.object({
   latitude: z.number(),
@@ -32,68 +34,15 @@ export default createServer()
       categoryId: z.string().cuid().optional(),
     }),
     resolve: async ({ input, ctx }) => {
+      const { categoryId, storeId, supabasePath } = input
       const { userId } = await ctx.session.auth({ verify: true })
       if (!userId) return
-      // const start = Date.now()
-      const blob = await supabase.downloadFile({
-        bucket: 'assets',
-        path: input.supabasePath,
+
+      await importProducts({
+        supabasePath,
+        categoryId,
+        userId,
+        storeId,
       })
-      if (!blob) return
-      // const downloadedIn = Date.now() - start
-      const body = await blob.text()
-      // const startParsing = Date.now()
-      const products = await parseShopifyProductsCSV(
-        input.categoryId || undefined,
-        { body }
-      )
-
-      sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
-
-      try {
-        const count = await db.createProductsFromBatch(products, input.storeId)
-
-        const template = `You successfully imported ${count} products from **Shopify**`
-
-        const html = marked(template, {
-          sanitize: true,
-        })
-
-        let to = [(await db.getUser({ userId }))!.email]
-
-        const msg: MailDataRequired = {
-          to: [...new Set(to)],
-          from: {
-            name: `ShackCart`,
-            email: `contact@shackcart.com`,
-          },
-
-          headers: {
-            Priority: 'Urgent',
-            Importance: 'high',
-          },
-          subject: `Products imported`,
-          html,
-        }
-        await sendgrid.send(msg)
-      } catch (err) {
-        let to = [(await db.getUser({ userId }))!.email]
-
-        const msg: MailDataRequired = {
-          to: [...new Set(to)],
-          from: {
-            name: `ShackCart`,
-            email: `contact@shackcart.com`,
-          },
-
-          headers: {
-            Priority: 'Urgent',
-            Importance: 'high',
-          },
-          subject: `Error importing products`,
-          html: `<pre>${JSON.stringify(err, undefined, '  ')}</pre>`,
-        }
-        await sendgrid.send(msg)
-      }
     },
   })

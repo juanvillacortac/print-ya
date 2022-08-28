@@ -33,9 +33,13 @@
     "@shackcart/db": "workspace:*",
     "@shackcart/shared": "workspace:^1.0.0",
     "@upstash/redis": "^1.6.1",
+    "bee-queue": "^1.4.0",
+    "bullmq": "^1.89.2",
     "fetch-undici": "^3.0.1",
+    "ioredis": "^5.2.3",
     "marked": "^4.0.18",
     "nanoid": "^4.0.0",
+    "redis": "^4.2.0",
     "stripe": "^9.8.0",
     "undici": "^5.10.0"
   }

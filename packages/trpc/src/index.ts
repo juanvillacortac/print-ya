@@ -11,6 +11,7 @@ import { createServer } from './shared.js'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 
 import './fetch-polyfill.js'
+import { testQueue } from './workers/test.js'
 export * from './shared.js'
 
 export const router = createServer()
@@ -22,6 +23,11 @@ export const router = createServer()
   .merge('analytics:', analytics)
   .merge('products:', products)
   .merge('utils:', utils)
+  .query('queue:test', {
+    resolve: async () => {
+      return await testQueue()
+    },
+  })
 
 export type tRPCRouter = typeof router
 

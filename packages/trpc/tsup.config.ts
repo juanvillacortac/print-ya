@@ -16,6 +16,7 @@ export default defineConfig({
     PUBLIC_GEOAPIFY_TOKEN: process.env.PUBLIC_GEOAPIFY_TOKEN || '',
     PUBLIC_UPSTASH_REDIS_URL: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
     PUBLIC_UPSTASH_REDIS_TOKEN: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
+    REDIS_URL: process.env.REDIS_URL || '',
   },
   format: ['esm', 'cjs'],
   minify: isProduction,
