@@ -1,7 +1,8 @@
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from '@sveltejs/kit'
 import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
-import { getStore, type Store } from '@shackcart/db'
+import type { Store } from '@shackcart/db'
+import trpc from '$lib/trpc/client'
 
 export const GET: RequestHandler = async (event) => {
   let layout = event.locals.layoutType
@@ -10,13 +11,14 @@ export const GET: RequestHandler = async (event) => {
   )
   let store: Store | null = null
   if (layout === 'store') {
-    store = await getStore({ host: event.url.host })
+    store = (await trpc(fetch, true).query('stores:getByHost', event.url.host))
+      .store
     if (!store) {
       let slug = event.url.searchParams.get('store')
       if (!slug) {
         slug = event.url.host.split('.')[0]
       }
-      store = await getStore({ slug })
+      store = (await trpc(fetch, true).query('stores:getBySlug', slug)).store
     }
   }
   const icon = store?.favicon || '/images/logo.svg'

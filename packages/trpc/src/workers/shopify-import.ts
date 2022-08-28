@@ -53,6 +53,8 @@ export const importProducts = async (input: ImportInput) => {
     sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
     await sendgrid.send(msg)
   } catch (err) {
+    console.error('Error importing products')
+    console.error(err)
     let to = [(await getUser({ userId }))!.email]
 
     const msg: MailDataRequired = {
