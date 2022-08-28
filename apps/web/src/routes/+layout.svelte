@@ -64,6 +64,7 @@
 
 <svelte:head>
   <link rel="preconnect" href="https://caravaggio-cdn.vercel.app" />
+  {@html fontsTag}
 </svelte:head>
 
 <svelte:component this={data.layoutComponent}>
