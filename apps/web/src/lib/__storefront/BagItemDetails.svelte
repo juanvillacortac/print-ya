@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import TemplatePreview from '$lib/components/TemplatePreview.svelte'
   import type { ModifiersMap, Product, Store } from '@shackcart/db'
   import { layoutData, type BagItem } from '$lib/stores'

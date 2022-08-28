@@ -1,7 +1,7 @@
 <script lang="ts">
   import { pageSubtitle } from '$lib'
   import SvelteMarkdown from 'svelte-markdown'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import type { PageData } from './$types'
 
   $: $pageSubtitle = `FAQ`

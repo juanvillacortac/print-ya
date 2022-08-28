@@ -101,8 +101,8 @@ importers:
       '@sveltejs/adapter-netlify': ^1.0.0-next.55
       '@sveltejs/adapter-node': 1.0.0-next.82
       '@sveltejs/adapter-static': ^1.0.0-next.29
-      '@sveltejs/adapter-vercel': 1.0.0-next.68
-      '@sveltejs/kit': 1.0.0-next.444
+      '@sveltejs/adapter-vercel': 1.0.0-next.69
+      '@sveltejs/kit': 1.0.0-next.445
       '@sveltejs/svelte-virtual-list': ^3.0.1
       '@tiptap/core': ^2.0.0-beta.182
       '@tiptap/extension-bullet-list': ^2.0.0-beta.29
@@ -293,7 +293,6 @@ importers:
       trpc-transformer: 2.1.0
       typewriter-document: 0.6.50
       typewriter-editor: 0.7.12_svelte@3.49.0
-      vite-plugin-webfont-dl: 3.1.1_vite@3.0.8
       windicss: 3.5.6
       zod: 3.18.0
     devDependencies:
@@ -303,8 +302,8 @@ importers:
       '@sveltejs/adapter-netlify': 1.0.0-next.71
       '@sveltejs/adapter-node': 1.0.0-next.82
       '@sveltejs/adapter-static': 1.0.0-next.39
-      '@sveltejs/adapter-vercel': 1.0.0-next.68_encoding@0.1.13
-      '@sveltejs/kit': 1.0.0-next.444_svelte@3.49.0+vite@3.0.8
+      '@sveltejs/adapter-vercel': 1.0.0-next.69_encoding@0.1.13
+      '@sveltejs/kit': 1.0.0-next.445_svelte@3.49.0+vite@3.0.8
       '@types/bcrypt': 5.0.0
       '@types/geoip-lite': 1.4.1
       '@types/three': 0.135.0
@@ -322,6 +321,7 @@ importers:
       typescript: 4.7.4
       vite: 3.0.8
       vite-imagetools: 4.0.4
+      vite-plugin-webfont-dl: 3.1.1_vite@3.0.8
       vite-plugin-windicss: 1.8.7_vite@3.0.8
 
   packages/db:
@@ -2587,18 +2587,18 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/adapter-vercel/1.0.0-next.68_encoding@0.1.13:
-    resolution: {integrity: sha512-ImM+fDwGkVaf920Wzh284nfAfu/WoPXCpMwog0kveIODVgCozbpJY55fO860LccqdS0YDyeFqOUrZJCqcYNx4w==}
+  /@sveltejs/adapter-vercel/1.0.0-next.69_encoding@0.1.13:
+    resolution: {integrity: sha512-E5mSkD3x3zYuJU5hPRmoqblrKZtEj2lRwhObnXf4OSFsMej2VUzoogbhaXHcVt57j0Ja5HgO07u7v9VUGOhi+w==}
     dependencies:
-      '@vercel/nft': 0.21.0_encoding@0.1.13
+      '@vercel/nft': 0.22.0_encoding@0.1.13
       esbuild: 0.14.54
     transitivePeerDependencies:
       - encoding
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.444_svelte@3.49.0+vite@3.0.8:
-    resolution: {integrity: sha512-B9ekUK5r/3IODxyXjAmEWFC1ytxRlsnApgF8qV/2IJWvWXvj62PjB8qK7UBvMM9A1codfx94RMvj9r6wTKRIAA==}
+  /@sveltejs/kit/1.0.0-next.445_svelte@3.49.0+vite@3.0.8:
+    resolution: {integrity: sha512-E/d6lhJ+4cSGJmAk8JnlrBwJfa6xYeCZ1zBc8kTdrO/vNiFpMDRJM9pgT8DGlXYA7kI+OBud/p3Eipl5m5jntw==}
     engines: {node: '>=16.9'}
     hasBin: true
     requiresBuild: true
@@ -3140,8 +3140,8 @@ packages:
       - supports-color
     dev: true
 
-  /@vercel/nft/0.21.0_encoding@0.1.13:
-    resolution: {integrity: sha512-hFCAETfI5cG8l5iAiLhMC2bReC5K7SIybzrxGorv+eGspIbIFsVw7Vg85GovXm/LxA08pIDrAlrhR6GN36XB/Q==}
+  /@vercel/nft/0.22.0_encoding@0.1.13:
+    resolution: {integrity: sha512-hB80/093PPiCefN2gVbqv6J93MH+63Zr7uDCwkiS/U4W07DXkLoftbnkBmZoS0Q84LiTSl9DRVSHU4XYCX+sJA==}
     hasBin: true
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.9_encoding@0.1.13
@@ -3521,7 +3521,7 @@ packages:
       follow-redirects: 1.15.1
     transitivePeerDependencies:
       - debug
-    dev: false
+    dev: true
 
   /axios/0.26.1:
     resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
@@ -5767,7 +5767,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: false
 
   /follow-redirects/1.5.10:
     resolution: {integrity: sha512-0V5l4Cizzvqt5D44aTXbFZz+FtyXV1vrDN6qrelxtfYQKW0KO0W2T/hkE8xvGa/540LkZlkaUjO4ailYTFtHVQ==}
@@ -11268,7 +11267,7 @@ packages:
       vite: 3.0.8
     transitivePeerDependencies:
       - debug
-    dev: false
+    dev: true
 
   /vite-plugin-windicss/1.8.7_vite@3.0.8:
     resolution: {integrity: sha512-/zwQ8+RV+MSkbG0IGqsEma6r2R01NzN/aNpNjJD7VVAkxAptNznqDXOObFTskkWfZ+9m6KJZCOuCPgAFtQIzEA==}

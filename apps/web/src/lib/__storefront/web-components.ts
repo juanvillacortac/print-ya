@@ -1,6 +1,6 @@
 import Accordion from './Accordion.svelte'
 import type { SvelteComponent } from 'svelte'
-import { browser } from '$app/env'
+import { browser } from '$app/environment'
 
 const init = () => {
   if (!browser) return

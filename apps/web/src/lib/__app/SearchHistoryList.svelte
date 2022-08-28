@@ -9,7 +9,7 @@
     ChevronUp16,
     Launch16,
   } from 'carbon-icons-svelte'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import Submenu from '$lib/components/Submenu.svelte'
   import { fly } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'

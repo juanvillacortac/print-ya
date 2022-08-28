@@ -30,7 +30,7 @@
   } from '$lib'
   import Submenu from '$lib/components/Submenu.svelte'
   import trpc from '$lib/trpc/client'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import Searchbar from '$lib/__storefront/Searchbar.svelte'
   import { getContext } from 'svelte'
   import ElementEditor from '$lib/__app/ElementEditor.svelte'

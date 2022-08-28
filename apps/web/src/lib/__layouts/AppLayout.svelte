@@ -179,11 +179,6 @@
                   fill="#312ECB"
                 />
               </svg>
-              <!-- <h1
-              class="font-logo font-black text-transparent text-center text-2xl select-none pointer-events-none rainbow-bg relative !bg-clip-text"
-            >
-              PY!
-            </h1> -->
             </a>
             {#each store ? pages['stores'] : pages['none'] as p (p.href)}
               {@const current =
@@ -287,11 +282,6 @@
                 fill="#312ECB"
               />
             </svg>
-            <!-- <h1
-              class="font-logo font-black text-transparent text-center text-2xl select-none pointer-events-none rainbow-bg relative !bg-clip-text"
-            >
-              PY!
-            </h1> -->
           </a>
           {#each store ? pages['stores'] : pages['none'] as p (p.href)}
             {@const current =

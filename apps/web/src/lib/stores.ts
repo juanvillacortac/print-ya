@@ -1,5 +1,5 @@
 import { derived, type Readable, type Writable } from 'svelte/store'
-import { browser } from '$app/env'
+import { browser } from '$app/environment'
 import { writable, get } from 'svelte/store'
 import type {
   Order,

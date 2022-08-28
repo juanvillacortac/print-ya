@@ -29,7 +29,7 @@
   import Fullscreen from '$lib/components/Fullscreen.svelte'
   import Windi from 'windicss'
   import { notifications } from './notifications'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
 
   export let language: 'html' | 'css' | 'json'
 

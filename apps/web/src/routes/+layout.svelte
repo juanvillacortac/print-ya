@@ -35,7 +35,7 @@
   })
 
   import { preferences } from '$lib'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import Toast from '$lib/components/Toast.svelte'
   import { onDestroy } from 'svelte'
 
@@ -64,7 +64,6 @@
 
 <svelte:head>
   <link rel="preconnect" href="https://caravaggio-cdn.vercel.app" />
-  {@html fontsTag}
 </svelte:head>
 
 <svelte:component this={data.layoutComponent}>

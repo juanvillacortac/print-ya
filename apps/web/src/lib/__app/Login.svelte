@@ -61,11 +61,6 @@
         fill="#312ECB"
       />
     </svg>
-    <!-- <h1
-      class="font-logo font-bold text-transparent p-4 text-8xl rainbow-bg !bg-clip-text"
-    >
-      ShackCart
-    </h1> -->
     <form
       on:submit|preventDefault|stopPropagation={handleSubmit}
       class="flex flex-col space-y-4 transition-opacity duration-400"

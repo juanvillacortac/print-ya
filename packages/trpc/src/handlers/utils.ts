@@ -1,11 +1,6 @@
 import { z } from 'zod'
-import * as db from '@shackcart/db'
-import { parseShopifyProductsCSV } from '@shackcart/db/utils'
-import { marked } from 'marked'
-import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { createServer } from 'src/shared.js'
-import { api, supabase } from '@shackcart/shared'
-import { Queue } from 'bullmq'
+import { api } from '@shackcart/shared'
 import { importProducts } from 'src/workers/shopify-import.js'
 
 const coords = z.object({
@@ -22,6 +17,24 @@ const lookup = async (coords: Coords) => {
   return res as any
 }
 
+const importRouter = createServer().mutation('importFromShopify', {
+  input: z.object({
+    supabasePath: z.string(),
+    storeId: z.string().cuid(),
+    categoryId: z.string().cuid().optional(),
+    userId: z.string().cuid(),
+  }),
+  resolve: async ({ input, ctx }) => {
+    const { categoryId, storeId, supabasePath, userId } = input
+    await importProducts({
+      supabasePath,
+      categoryId,
+      userId,
+      storeId,
+    })
+  },
+})
+
 export default createServer()
   .query('geocoding', {
     input: coords,
@@ -34,15 +47,17 @@ export default createServer()
       categoryId: z.string().cuid().optional(),
     }),
     resolve: async ({ input, ctx }) => {
-      const { categoryId, storeId, supabasePath } = input
       const { userId } = await ctx.session.auth({ verify: true })
-      if (!userId) return
+      if (!userId)
+        return {
+          ok: false,
+        }
 
-      await importProducts({
-        supabasePath,
-        categoryId,
-        userId,
-        storeId,
-      })
+      const caller = importRouter.createCaller(ctx)
+
+      caller.mutation('importFromShopify', { ...input, userId })
+      return {
+        ok: true,
+      }
     },
   })

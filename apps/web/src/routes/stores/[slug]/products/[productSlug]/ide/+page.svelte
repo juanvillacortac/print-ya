@@ -17,7 +17,7 @@
     ArrowLeft20,
     Redo24,
   } from 'carbon-icons-svelte'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import { layoutData, preferences } from '$lib'
   import { fade } from 'svelte/transition'
   import Preview from '$lib/components/Preview.svelte'
@@ -271,11 +271,6 @@
                 fill="#312ECB"
               />
             </svg>
-            <!-- <h1
-              class="font-logo font-black text-transparent text-center text-2xl select-none pointer-events-none rainbow-bg relative !bg-clip-text"
-            >
-              PY!
-            </h1> -->
           </a>
           {#each modes as m}
             <button

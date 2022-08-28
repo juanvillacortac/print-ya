@@ -80,7 +80,7 @@
   import { page } from '$app/stores'
   import trpc from '$lib/trpc/client'
   import { tick } from 'svelte'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import type { LoadEvent } from '@sveltejs/kit'
   import type { InferQueryInput, InferQueryOutput } from '@shackcart/trpc'
 

@@ -9,7 +9,7 @@
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
   } from '@shackcart/db/dist/utils'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import trpc from '$lib/trpc/client'
   import {
     Add16,

@@ -1,6 +1,6 @@
 self.window = self
 
-import { browser } from '$app/env'
+import { browser } from '$app/environment'
 import { compile } from './compiler'
 import type { TemplateSource } from '@shackcart/db'
 

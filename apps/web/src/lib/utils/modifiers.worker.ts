@@ -1,6 +1,6 @@
 self.window = self
 
-import { browser } from '$app/env'
+import { browser } from '$app/environment'
 import type { ModifiersMap, Product, TemplateSource } from '@shackcart/db'
 import { getTemplateFieldsFromModifiers } from './modifiers'
 

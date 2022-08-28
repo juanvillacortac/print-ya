@@ -1,7 +1,10 @@
 import { sveltekit } from '@sveltejs/kit/vite'
 import svg from '@poppanator/sveltekit-svg'
 import WindiCSS from 'vite-plugin-windicss'
+import * as wf from 'vite-plugin-webfont-dl'
 import { defineConfig } from 'vite'
+
+console.log(wf)
 
 export default defineConfig({
   plugins: [
@@ -9,6 +12,7 @@ export default defineConfig({
     WindiCSS({
       config: './windi.config.js',
     }),
+    wf.webfontDl(),
     svg(),
     // imagetools(),
   ],

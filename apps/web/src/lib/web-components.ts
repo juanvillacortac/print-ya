@@ -1,4 +1,4 @@
-import { browser } from '$app/env'
+import { browser } from '$app/environment'
 import Preview from '$lib/components/Preview.svelte'
 import Shared from '$lib/components/Shared.svelte'
 import type { TemplateSource } from '@shackcart/db'

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import { clamp } from '$lib/utils/math'
 
   import { onMount } from 'svelte'

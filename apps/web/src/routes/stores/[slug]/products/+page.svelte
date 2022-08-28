@@ -27,12 +27,12 @@
       bucket: 'assets',
       path: '/shopify',
     })
-    uploading = false
-    trpc().mutation('utils:importShopifyProducts', {
+    await trpc().mutation('utils:importShopifyProducts', {
       categoryId: category || undefined,
       storeId: $layoutData.store!.id,
       supabasePath: path,
     })
+    uploading = false
     done = true
   }
 
