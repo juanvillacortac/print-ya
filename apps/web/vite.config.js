@@ -3,8 +3,6 @@ import svg from '@poppanator/sveltekit-svg'
 import WindiCSS from 'vite-plugin-windicss'
 import { defineConfig } from 'vite'
 
-console.log(wf)
-
 export default defineConfig({
   plugins: [
     sveltekit(),
