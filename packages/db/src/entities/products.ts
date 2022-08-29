@@ -623,7 +623,7 @@ export const createProductsFromBatch = async (
       data: data.map(({ product }) => ({
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: product.price || 0.1,
         slug: product.slug,
         meta: product.meta,
         type: product.type,
