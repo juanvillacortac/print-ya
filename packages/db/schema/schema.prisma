@@ -93,6 +93,7 @@ model Store {
   contactData   Json?
   ProductTag    ProductTag[]
   SearchHistory SearchHistory[]
+  // ShopifyImport ShopifyImport[]
 }
 
 model PaymentGateway {
@@ -132,6 +133,12 @@ model ProductTag {
 
   @@unique([name, storeId])
 }
+
+// model ShopifyImport {
+//   id      String @id @default(cuid())
+//   store   Store  @relation(fields: [storeId], references: [id])
+//   storeId String
+// }
 
 model Product {
   id   String @id @default(cuid())
