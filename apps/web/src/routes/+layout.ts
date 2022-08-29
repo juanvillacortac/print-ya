@@ -5,7 +5,7 @@ import { redirect } from '@sveltejs/kit'
 import type { SvelteComponent } from 'svelte/internal'
 import type { LayoutLoad } from './$types'
 
-export const load: LayoutLoad = async ({ url, fetch, params, routeId }) => {
+export const load: LayoutLoad = async ({ url, fetch, params }) => {
   const { fullHost, host, userAgent, layoutType } = await api.get<App.Locals>(
     '/api/kit-locals',
     {
