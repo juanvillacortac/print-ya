@@ -1,3 +1,5 @@
+import './fetch-polyfill.js'
+
 import * as _db from '@shackcart/db'
 import users from './handlers/users.js'
 import customers from './handlers/customers.js'
@@ -10,7 +12,6 @@ import trpcTransformer from 'trpc-transformer'
 import { createServer } from './shared.js'
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server'
 
-import './fetch-polyfill.js'
 export * from './shared.js'
 
 export const router = createServer()

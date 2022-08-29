@@ -4,6 +4,8 @@ import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { marked } from 'marked'
 import { createProductsFromBatch, getUser } from '@shackcart/db'
 
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
+
 export type ImportInput = {
   supabasePath: string
   categoryId?: string
@@ -13,7 +15,6 @@ export type ImportInput = {
 
 export const importProducts = async (input: ImportInput) => {
   const { supabasePath, categoryId, storeId, userId } = input
-  sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
   try {
     const blob = await supabase.downloadFile({
       bucket: 'assets',
