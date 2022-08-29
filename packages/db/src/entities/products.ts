@@ -618,63 +618,58 @@ export const createProductsFromBatch = async (
     return { product, tags, modifiers, items }
   })
 
-  try {
-    const batch = await prisma.$transaction(async ($prisma) => {
-      const products = await $prisma.product.createMany({
-        data: data.map(({ product }) => ({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          slug: product.slug,
-          meta: product.meta,
-          type: product.type,
-          storeId: product.storeId,
-          template: product.template,
-          templateDraft: product.templateDraft,
-          storeCategoryId: product.storeCategoryId,
-          description: product.description,
-          public: product.public,
-        })),
-        skipDuplicates: true,
-      })
-      const modifiers = await $prisma.productModifier.createMany({
-        data: data
-          .flatMap(({ modifiers }) => modifiers)
-          .map((m) => ({
-            id: m.id,
-            ordinal: m.ordinal,
-            productId: m.productId,
-            name: m.name,
-            type: m.type,
-            defaultValue: m.defaultValue || undefined,
-            templateAccessor: m.templateAccessor || undefined,
-          })),
-        skipDuplicates: true,
-      })
-      const items = await $prisma.productModifierItem.createMany({
-        data: data
-          .flatMap(({ items }) => items)
-          .map((i) => ({
-            productModifierId: i.modifierId,
-            ordinal: i.ordinal,
-            name: i.name,
-            cost: i.cost,
-            meta: i.meta,
-            percentage: i.percentage,
-          })),
-      })
+  const batch = await prisma.$transaction(async ($prisma) => {
+    const products = await $prisma.product.createMany({
+      data: data.map(({ product }) => ({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        slug: product.slug,
+        meta: product.meta,
+        type: product.type,
+        storeId: product.storeId,
+        template: product.template,
+        templateDraft: product.templateDraft,
+        storeCategoryId: product.storeCategoryId,
+        description: product.description,
+        public: product.public,
+      })),
+      skipDuplicates: true,
     })
-    // const
-    // const batch = await prisma.$transaction(
-    //   data.map((p) =>
-    //     prisma.product.create({
-    //       data: p,
-    //     })
-    //   )
-    // )
-    return products.length
-  } catch (err) {
-    console.log(err)
-  }
-  return 0
+    const modifiers = await $prisma.productModifier.createMany({
+      data: data
+        .flatMap(({ modifiers }) => modifiers)
+        .map((m) => ({
+          id: m.id,
+          ordinal: m.ordinal,
+          productId: m.productId,
+          name: m.name,
+          type: m.type,
+          defaultValue: m.defaultValue || undefined,
+          templateAccessor: m.templateAccessor || undefined,
+        })),
+      skipDuplicates: true,
+    })
+    const items = await $prisma.productModifierItem.createMany({
+      data: data
+        .flatMap(({ items }) => items)
+        .map((i) => ({
+          productModifierId: i.modifierId,
+          ordinal: i.ordinal,
+          name: i.name,
+          cost: i.cost,
+          meta: i.meta,
+          percentage: i.percentage,
+        })),
+    })
+  })
+  // const
+  // const batch = await prisma.$transaction(
+  //   data.map((p) =>
+  //     prisma.product.create({
+  //       data: p,
+  //     })
+  //   )
+  // )
+  return products.length
 }
