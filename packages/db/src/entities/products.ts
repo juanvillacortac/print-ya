@@ -655,7 +655,7 @@ export const createProductsFromBatch = async (
         data: data
           .flatMap(({ items }) => items)
           .map((i) => ({
-            modifierId: i.modifierId,
+            productModifierId: i.modifierId,
             ordinal: i.ordinal,
             name: i.name,
             cost: i.cost,
