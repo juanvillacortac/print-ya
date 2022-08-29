@@ -28,50 +28,50 @@ export const importProducts = async (input: ImportInput) => {
 
     const count = await createProductsFromBatch(products, storeId)
 
-    const template = `You successfully imported ${count} products from **Shopify**`
+    // const template = `You successfully imported ${count} products from **Shopify**`
 
-    const html = marked(template, {
-      sanitize: true,
-    })
-    let to = [(await getUser({ userId }))!.email]
+    // const html = marked(template, {
+    //   sanitize: true,
+    // })
+    // let to = [(await getUser({ userId }))!.email]
 
-    const msg: MailDataRequired = {
-      to: [...new Set(to)],
-      from: {
-        name: `ShackCart`,
-        email: `contact@shackcart.com`,
-      },
+    // const msg: MailDataRequired = {
+    //   to: [...new Set(to)],
+    //   from: {
+    //     name: `ShackCart`,
+    //     email: `contact@shackcart.com`,
+    //   },
 
-      headers: {
-        Priority: 'Urgent',
-        Importance: 'high',
-      },
-      subject: `Products imported`,
-      html,
-    }
+    //   headers: {
+    //     Priority: 'Urgent',
+    //     Importance: 'high',
+    //   },
+    //   subject: `Products imported`,
+    //   html,
+    // }
 
-    sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
-    await sendgrid.send(msg)
+    // sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
+    // await sendgrid.send(msg)
   } catch (err) {
     console.error('Error importing products')
     console.error(err)
-    let to = [(await getUser({ userId }))!.email]
+    // let to = [(await getUser({ userId }))!.email]
 
-    const msg: MailDataRequired = {
-      to: [...new Set(to)],
-      from: {
-        name: `ShackCart`,
-        email: `contact@shackcart.com`,
-      },
+    // const msg: MailDataRequired = {
+    //   to: [...new Set(to)],
+    //   from: {
+    //     name: `ShackCart`,
+    //     email: `contact@shackcart.com`,
+    //   },
 
-      headers: {
-        Priority: 'Urgent',
-        Importance: 'high',
-      },
-      subject: `Error importing products`,
-      html: `<pre>${JSON.stringify(err, undefined, '  ')}</pre>`,
-    }
-    sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
-    await sendgrid.send(msg)
+    //   headers: {
+    //     Priority: 'Urgent',
+    //     Importance: 'high',
+    //   },
+    //   subject: `Error importing products`,
+    //   html: `<pre>${JSON.stringify(err, undefined, '  ')}</pre>`,
+    // }
+    // sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
+    // await sendgrid.send(msg)
   }
 }
