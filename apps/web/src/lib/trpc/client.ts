@@ -1,9 +1,13 @@
+if (typeof global === 'undefined') {
+  globalThis.global = typeof window !== 'undefined' ? window : globalThis
+}
+
 import { invalidate } from '$app/navigation'
 import type { QueryKey, tRPCRouter } from '@shackcart/trpc'
-import { createTRPCClient } from '@trpc/client'
 import trpcTransformer from 'trpc-transformer'
 import type { LoadEvent } from '@sveltejs/kit'
 import { PUBLIC_API_URL } from '$env/static/public'
+import { createTRPCClient } from '@trpc/client'
 
 const trpc = (fetch?: LoadEvent['fetch'], server?: boolean, token?: string) => {
   return createTRPCClient<tRPCRouter>({

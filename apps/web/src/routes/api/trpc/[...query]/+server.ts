@@ -1,4 +1,5 @@
 import { PUBLIC_API_URL } from '$env/static/public'
+import type { QueryKey } from '@shackcart/trpc'
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
@@ -26,26 +27,23 @@ export const GET: RequestHandler = async ({
       token: xtoken,
     })
   }
-  // const isPublic = paths?.every(
-  //   (p) =>
-  //     !(
-  //       p.includes('whoami') ||
-  //       p.includes('login') ||
-  //       p.includes('register') ||
-  //       p.includes('orders') ||
-  //       p.includes('customer')
-  //     )
-  // )
-  // if (
-  //   layoutType === 'store' &&
-  //   isPublic
-  // ) {
-  //   return {
-  //     headers: {
-  //       'cache-control': `s-maxage=1, stale-while-revalidate`,
-  //     },
-  //   }
-  // }
+
+  const privatePaths: QueryKey[] = [
+    'user:whoami',
+    'customer:whoami',
+    'orders:get',
+    'orders:list',
+    'customer:get',
+    'customer:list',
+    'customer:whoami',
+  ]
+
+  const isPublic = !privatePaths.some((path) => params.query.startsWith(path))
+  if (layoutType === 'store' && isPublic) {
+    setHeaders({
+      'cache-control': `s-maxage=1, stale-while-revalidate`,
+    })
+  }
   return json(await response.json())
 }
 

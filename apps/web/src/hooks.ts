@@ -48,7 +48,8 @@ const logic: Handle = async ({ event, resolve }) => {
   if (
     event.locals.layoutType === 'store' &&
     !event.url.pathname.startsWith('/account') &&
-    !event.url.pathname.startsWith('/bag')
+    !event.url.pathname.startsWith('/bag') &&
+    !event.url.pathname.startsWith('/api/trpc')
   ) {
     response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
   }
