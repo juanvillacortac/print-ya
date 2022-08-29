@@ -4,14 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <script>
+      if (global === undefined) {
+        var global = window
+      }
+    </script>
     %sveltekit.head%
   </head>
 
   <body>
-    <script>
-      // Fix `global is not defined` error
-      global = window
-    </script>
     %sveltekit.body%
   </body>
 </html>
