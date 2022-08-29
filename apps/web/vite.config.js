@@ -13,7 +13,7 @@ export default defineConfig({
     // imagetools(),
   ],
   define: {
-    global: {},
+    global: '{}',
     __LOCALHOST_HOST__: JSON.stringify(
       process.env.GITPOD_WORKSPACE_URL
         ? process.env.GITPOD_WORKSPACE_URL.replace('https://', '5173-')
