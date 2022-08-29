@@ -1,4 +1,5 @@
 import { utils } from '@shackcart/shared'
+import scuid from 'scuid'
 import { Prisma, prisma } from 'src/prisma.js'
 import type {
   Product,
@@ -530,80 +531,137 @@ export const createProductsFromBatch = async (
   products: Partial<Product>[],
   storeId: string
 ) => {
-  const data = products.map((product) => ({
-    name: product.name!,
-    price: product.price!,
-    type: product.type,
-    public: product.public!,
-    description: product.description,
-    meta: product.meta,
-    slug: product.slug || '',
-    storeId,
-    storeCategoryId: product.storeCategoryId,
-    template: product.template,
-    templateDraft: product.template,
-    tags: {
-      create: product.tags
-        ? product.tags.map((t) => {
-            return {
-              tag: {
-                connectOrCreate: {
-                  create: {
-                    name: t.name,
-                    storeId,
-                  },
-                  where: {
-                    name_storeId: {
-                      name: t.name,
-                      storeId: storeId,
-                    },
-                  },
-                },
-              },
-            }
-          })
-        : [],
-    },
-    modifiers: {
-      create: product
-        .modifiers!.filter((m) => m.active)
-        .map((m, idx) => ({
-          id: m.id,
+  const data = products.map((p) => {
+    const product = {
+      id: scuid(),
+      name: p.name!,
+      price: p.price!,
+      type: p.type,
+      public: p.public!,
+      description: p.description,
+      meta: p.meta,
+      slug: p.slug || '',
+      storeId,
+      storeCategoryId: p.storeCategoryId,
+      template: p.template,
+      templateDraft: p.template,
+    }
+    const tags =
+      p.tags?.map((t) => ({
+        name: t.name,
+        productId: product.id,
+        storeId: storeId,
+      })) || []
+    const modifiers =
+      p.modifiers?.map((m, idx) => ({
+        id: m.id,
+        productId: product.id,
+        ordinal: idx,
+        name: m.name,
+        type: m.type,
+        defaultValue: m.defaultValue || undefined,
+        templateAccessor: m.templateAccessor || undefined,
+      })) || []
+    const items =
+      p.modifiers?.flatMap(({ id, items }) =>
+        items.map((i, idx) => ({
+          modifierId: id,
           ordinal: idx,
-          name: m.name,
-          type: m.type,
-          defaultValue: m.defaultValue || undefined,
-          templateAccessor: m.templateAccessor || undefined,
-          items: {
-            create: m.items!.map((i, idx) => ({
-              ordinal: idx,
-              name: i.name,
-              cost: i.cost,
-              meta: i.meta,
-              percentage: i.percentage,
-            })),
-          },
-        })),
-    },
-  }))
+          name: i.name,
+          cost: i.cost,
+          meta: i.meta,
+          percentage: i.percentage,
+        }))
+      ) || []
+    // tags: {
+    //   create: product.tags
+    //     ? product.tags.map((t) => {
+    //         return {
+    //           tag: {
+    //             connectOrCreate: {
+    //               create: {
+    //                 name: t.name,
+    //                 storeId,
+    //               },
+    //               where: {
+    //                 name_storeId: {
+    //                   name: t.name,
+    //                   storeId: storeId,
+    //                 },
+    //               },
+    //             },
+    //           },
+    //         }
+    //       })
+    //     : [],
+    // },
+    // modifiers: {
+    //   create: product
+    //     .modifiers!.filter((m) => m.active)
+    //     .map((m, idx) => ({
+    //       id: m.id,
+    //       ordinal: idx,
+    //       name: m.name,
+    //       type: m.type,
+    //       defaultValue: m.defaultValue || undefined,
+    //       templateAccessor: m.templateAccessor || undefined,
+    //       items: {
+    //         create: m.items!.map((i, idx) => ({
+    //           ordinal: idx,
+    //           name: i.name,
+    //           cost: i.cost,
+    //           meta: i.meta,
+    //           percentage: i.percentage,
+    //         })),
+    //       },
+    //     })),
+    return { product, tags, modifiers, items }
+  })
 
   try {
     const batch = await prisma.$transaction(async ($prisma) => {
       const products = await $prisma.product.createMany({
-        data: data.map((p) => ({
-          name: p.name,
-          price: p.price,
-          slug: p.slug,
-          meta: p.meta,
-          type: p.type,
-          storeId: p.storeId,
-          template: p.template,
-          templateDraft: p.templateDraft,
-          storeCategoryId: p.storeCategoryId,
-          description: p.description,
-          public: p.public,
+        data: data.map(({ product }) => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          slug: product.slug,
+          meta: product.meta,
+          type: product.type,
+          storeId: product.storeId,
+          template: product.template,
+          templateDraft: product.templateDraft,
+          storeCategoryId: product.storeCategoryId,
+          description: product.description,
+          public: product.public,
         })),
         skipDuplicates: true,
+      })
+      const modifiers = await $prisma.productModifier.createMany({
+        data: data
+          .flatMap(({ modifiers }) => modifiers)
+          .map((m) => ({
+            id: m.id,
+            ordinal: m.ordinal,
+            productId: m.productId,
+            name: m.name,
+            type: m.type,
+            defaultValue: m.defaultValue || undefined,
+            templateAccessor: m.templateAccessor || undefined,
+          })),
+        skipDuplicates: true,
+      })
+      const items = await $prisma.productModifierItem.createMany({
+        data: data
+          .flatMap(({ items }) => items)
+          .map((i) => ({
+            modifierId: i.modifierId,
+            ordinal: i.ordinal,
+            name: i.name,
+            cost: i.cost,
+            meta: i.meta,
+            percentage: i.percentage,
+          })),
       })
     })
     // const
