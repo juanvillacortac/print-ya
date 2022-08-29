@@ -13,6 +13,7 @@ export type ImportInput = {
 
 export const importProducts = async (input: ImportInput) => {
   const { supabasePath, categoryId, storeId, userId } = input
+  sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
   try {
     const blob = await supabase.downloadFile({
       bucket: 'assets',
@@ -50,7 +51,6 @@ export const importProducts = async (input: ImportInput) => {
       html,
     }
 
-    sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
     await sendgrid.send(msg)
   } catch (err) {
     console.error('Error importing products')
@@ -71,7 +71,6 @@ export const importProducts = async (input: ImportInput) => {
       subject: `Error importing products`,
       html: `<pre>${JSON.stringify(err, undefined, '  ')}</pre>`,
     }
-    sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
     await sendgrid.send(msg)
   }
 }
