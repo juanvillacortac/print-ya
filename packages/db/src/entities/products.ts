@@ -530,7 +530,7 @@ export const createProductsFromBatch = async (
   products: Partial<Product>[],
   storeId: string
 ) => {
-  const data: Prisma.ProductCreateInput[] = products.map((product) => ({
+  const data = products.map((product) => ({
     name: product.name!,
     price: product.price!,
     type: product.type,
@@ -588,14 +588,33 @@ export const createProductsFromBatch = async (
   }))
 
   try {
-    const batch = await prisma.$transaction(
-      data.map((p) =>
-        prisma.product.create({
-          data: p,
-        })
-      )
-    )
-    return batch.length
+    const batch = await prisma.$transaction(async ($prisma) => {
+      const products = await $prisma.product.createMany({
+        data: data.map((p) => ({
+          name: p.name,
+          price: p.price,
+          slug: p.slug,
+          meta: p.meta,
+          type: p.type,
+          storeId: p.storeId,
+          template: p.template,
+          templateDraft: p.templateDraft,
+          storeCategoryId: p.storeCategoryId,
+          description: p.description,
+          public: p.public,
+        })),
+        skipDuplicates: true,
+      })
+    })
+    // const
+    // const batch = await prisma.$transaction(
+    //   data.map((p) =>
+    //     prisma.product.create({
+    //       data: p,
+    //     })
+    //   )
+    // )
+    return products.length
   } catch (err) {
     console.log(err)
   }
