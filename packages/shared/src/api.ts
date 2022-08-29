@@ -1,13 +1,10 @@
-import { fetch as fetch_ } from 'fetch-undici'
-import type { fetch as Fetch } from 'undici'
-
 async function send({
   method,
   path,
   data = {},
   headers = {},
   timeout = 120000,
-  fetch: fetcher = fetch_ as typeof Fetch,
+  fetch: fetcher = fetch,
 }): Promise<Record<string, any>> {
   const abortController =
     typeof AbortController !== 'undefined'
@@ -68,7 +65,7 @@ export function get<T = Record<string, unknown>>(
   path: string,
   options?: {
     headers?: Record<string, unknown>
-    fetch?: typeof Fetch
+    fetch?: typeof fetch
   }
 ): Promise<T> {
   return send({ method: 'GET', path, ...options }) as Promise<T>
