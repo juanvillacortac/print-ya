@@ -1,7 +1,4 @@
 import cuid from 'cuid'
-import csvtojson from 'csvtojson'
-import { nanoid } from 'nanoid'
-import { utils } from '@shackcart/shared'
 import type {
   ModifiersMap,
   Product,
@@ -164,53 +161,6 @@ export function getBasicTemplate<T extends Partial<Product>>(
     height: 13,
     sizeUnit: 'cm',
   }
-}
-
-export async function parseShopifyProductsCSV(
-  categoryId: string | undefined,
-  obj: { body: string } | { filePath: string } | never
-): Promise<(Partial<Product> & { internalId: string })[]> {
-  let data: any[]
-  if ('body' in obj) {
-    data = await csvtojson().fromString(obj.body)
-  } else {
-    data = await csvtojson().fromFile(obj.filePath)
-  }
-  const crypto_ = globalThis.crypto
-    ? crypto
-    : await import('@peculiar/webcrypto').then((m) => new m.Crypto())
-  const products: (Partial<Product> & { internalId: string })[] = data.map(
-    (p) => {
-      const { meta, modifiers } = generateDefaultModifiers()
-      const id = nanoid(6).toLocaleLowerCase()
-      let slug = `${utils.slugify(p.Title)}-${id}`
-      const product: Partial<Product> & { internalId: string } = {
-        internalId: crypto_.randomUUID(),
-        name: p.Title,
-        type: 'template',
-        storeCategoryId: categoryId,
-        slug,
-        meta: {
-          mockups: [],
-          templateImage: p['Image Src'],
-          ...meta,
-        },
-        tags: String(p['Tags'])
-          .split(', ')
-          .map((t) => ({
-            name: t,
-            id: '',
-          })),
-        description: p['Body (HTML)'],
-        public: false,
-        price: Number.parseFloat(p['Variant Price']),
-        modifiers,
-      }
-      return product
-    }
-  )
-
-  return products
 }
 
 export const generateDefaultModifiers = () => {

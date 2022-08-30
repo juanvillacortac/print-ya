@@ -1,8 +1,10 @@
-import { parseShopifyProductsCSV } from '@shackcart/db/utils'
-import { supabase } from '@shackcart/shared'
+import { generateDefaultModifiers } from '@shackcart/db/utils'
+import { supabase, utils } from '@shackcart/shared'
 import sendgrid, { type MailDataRequired } from '@sendgrid/mail'
 import { marked } from 'marked'
-import { createProductsFromBatch, getUser } from '@shackcart/db'
+import csvtojson from 'csvtojson'
+import { createProductsFromBatch, getUser, Product } from '@shackcart/db'
+import { nanoid } from 'nanoid'
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
 
@@ -74,4 +76,50 @@ export const importProducts = async (input: ImportInput) => {
     }
     await sendgrid.send(msg)
   }
+}
+
+export async function parseShopifyProductsCSV(
+  categoryId: string | undefined,
+  obj: { body: string } | { filePath: string } | never
+): Promise<(Partial<Product> & { internalId: string })[]> {
+  let data: any[]
+  if ('body' in obj) {
+    data = await csvtojson().fromString(obj.body)
+  } else {
+    data = await csvtojson().fromFile(obj.filePath)
+  }
+  const crypto_ = globalThis.crypto
+    ? crypto
+    : await import('@peculiar/webcrypto').then((m) => new m.Crypto())
+  const products: (Partial<Product> & { internalId: string })[] = data.map(
+    (p) => {
+      const { meta, modifiers } = generateDefaultModifiers()
+      const id = nanoid(6).toLocaleLowerCase()
+      let slug = `${utils.slugify(p.Title)}-${id}`
+      const product: Partial<Product> & { internalId: string } = {
+        internalId: crypto_.randomUUID(),
+        name: p.Title,
+        type: 'template',
+        storeCategoryId: categoryId,
+        slug,
+        meta: {
+          mockups: [],
+          templateImage: p['Image Src'],
+          ...meta,
+        },
+        tags: String(p['Tags'])
+          .split(', ')
+          .map((t) => ({
+            name: t,
+            id: '',
+          })),
+        description: p['Body (HTML)'],
+        public: false,
+        price: Number.parseFloat(p['Variant Price']),
+        modifiers,
+      }
+      return product
+    }
+  )
+  return products
 }
