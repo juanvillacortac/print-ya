@@ -42,7 +42,8 @@ const logic: Handle = async ({ event, resolve }) => {
   }
 
   response = await resolve(event, {
-    ssr: event.locals.layoutType !== 'app',
+    // ssr: event.locals.layoutType !== 'app',
+    ssr: false,
   })
 
   if (
