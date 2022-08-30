@@ -1,5 +1,10 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  '@sveltejs/adapter-vercel@1.0.0-next.71':
+    hash: e5kzcnbbtmzxgnipf65gg6lm5u
+    path: patches/@sveltejs__adapter-vercel@1.0.0-next.71.patch
+
 importers:
 
   .:
@@ -300,7 +305,7 @@ importers:
       '@sveltejs/adapter-netlify': 1.0.0-next.71
       '@sveltejs/adapter-node': 1.0.0-next.82
       '@sveltejs/adapter-static': 1.0.0-next.39
-      '@sveltejs/adapter-vercel': 1.0.0-next.71_encoding@0.1.13
+      '@sveltejs/adapter-vercel': 1.0.0-next.71_e5kzcnbbtmzxgnipf65gg6lm5u_encoding@0.1.13
       '@sveltejs/kit': 1.0.0-next.448_fhgkwirxvgjw2igda6zmhiisma
       '@types/bcrypt': 5.0.0
       '@types/geoip-lite': 1.4.1
@@ -1745,7 +1750,7 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/adapter-vercel/1.0.0-next.71_encoding@0.1.13:
+  /@sveltejs/adapter-vercel/1.0.0-next.71_e5kzcnbbtmzxgnipf65gg6lm5u_encoding@0.1.13:
     resolution: {integrity: sha512-Tj8za7fMXheaiB6hNqv61jr/AmAUm+G8huoY1cIvtSqqBHzGmiZH+GFK1Tq/e8e0XR2Xb/ZpZCQSyrFLU2grIQ==}
     dependencies:
       '@vercel/nft': 0.22.0_encoding@0.1.13
@@ -1754,6 +1759,7 @@ packages:
       - encoding
       - supports-color
     dev: true
+    patched: true
 
   /@sveltejs/kit/1.0.0-next.448_fhgkwirxvgjw2igda6zmhiisma:
     resolution: {integrity: sha512-x1ufQj04uP2eidZMJXubWLQXF3UvDnFUrugNwKZBkuoSekv7kWb3cRop2Q24/QpSrqYVV4aMeeZ2OoHcASsxGQ==}
