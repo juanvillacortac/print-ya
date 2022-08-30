@@ -67,7 +67,6 @@
     "@emmetio/codemirror-plugin": "^1.2.4",
     "@emmetio/codemirror6-plugin": "^0.0.7",
     "@fastify/websocket": "^7.0.0",
-    "@leveluptuts/g-query": "^0.2.3",
     "@paypal/paypal-js": "^5.0.6",
     "@rgossiaux/svelte-headlessui": "^1.0.2",
     "@sendgrid/mail": "^7.7.0",

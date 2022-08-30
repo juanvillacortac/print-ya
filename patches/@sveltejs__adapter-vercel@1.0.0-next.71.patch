@@ -1,11 +1,25 @@
-diff --git a/files/edge.js b/files/edge.js
-index 7549ae15022d46b2bb2cd7c3674ffb5122c5e0df..79283d832e6184d21d56940c20723e161c601833 100644
---- a/files/edge.js
-+++ b/files/edge.js
-@@ -1,3 +1,6 @@
-+if (typeof global === 'undefined') {
-+	globalThis.global = typeof window !== 'undefined' ? window : globalThis
-+}
- import { Server } from 'SERVER';
- import { manifest } from 'MANIFEST';
+diff --git a/index.js b/index.js
+index 0d0ba443385ca92344ed22fe8d77bf8c617273ce..19689d89dcc28f4e1ba2b3e6124f04fdf2386229 100644
+--- a/index.js
++++ b/index.js
+@@ -4,6 +4,10 @@ import { fileURLToPath } from 'url';
+ import { nodeFileTrace } from '@vercel/nft';
+ import esbuild from 'esbuild';
  
++const EDGE_GLOBAL_VAR_PATH = `if (typeof global == 'undefined') {
++	globalThis.global = typeof window != 'undefined' ? window : globalThis
++}`
++
+ // rules for clean URLs and trailing slash handling,
+ // generated with @vercel/routing-utils
+ const redirects = {
+@@ -189,7 +193,8 @@ export default function ({ external = [], edge, split } = {}) {
+ 					platform: 'browser',
+ 					format: 'esm',
+ 					external,
+-					sourcemap: 'linked'
++					sourcemap: 'linked',
++					banner: { js: EDGE_GLOBAL_VAR_PATH },
+ 				});
+ 
+ 				write(

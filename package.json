@@ -24,5 +24,10 @@
   "devDependencies": {
     "patch-package": "^6.4.7",
     "turbo": "^1.4.3"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@sveltejs/adapter-vercel@1.0.0-next.71": "patches/@sveltejs__adapter-vercel@1.0.0-next.71.patch"
+    }
   }
 }
