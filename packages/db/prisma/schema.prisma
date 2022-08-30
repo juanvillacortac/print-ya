@@ -94,6 +94,7 @@ model Store {
   ProductTag    ProductTag[]
   SearchHistory SearchHistory[]
   // ShopifyImport ShopifyImport[]
+  ShopifyImport ShopifyImport[]
 }
 
 model PaymentGateway {
@@ -134,11 +135,22 @@ model ProductTag {
   @@unique([name, storeId])
 }
 
-// model ShopifyImport {
-//   id      String @id @default(cuid())
-//   store   Store  @relation(fields: [storeId], references: [id])
-//   storeId String
-// }
+enum ShopifyImportStatus {
+  pending
+  in_review
+  imported
+}
+
+model ShopifyImport {
+  id      String @id @default(cuid())
+  store   Store  @relation(fields: [storeId], references: [id])
+  storeId String
+
+  status    ShopifyImportStatus @default(pending)
+  createdAt DateTime            @default(now())
+
+  products Product[]
+}
 
 model Product {
   id   String @id @default(cuid())
@@ -176,6 +188,9 @@ model Product {
   orderItems OrderItem[]
 
   tags TagsOnProducts[]
+
+  shopifyImport   ShopifyImport? @relation(fields: [shopifyImportId], references: [id])
+  shopifyImportId String?
 
   @@unique([slug, storeId])
 }

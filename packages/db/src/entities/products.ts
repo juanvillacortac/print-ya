@@ -6,6 +6,8 @@ import type {
   StripedProduct,
   ProductTag,
   _Product,
+  ShopifyImportStatus,
+  ShopifyImport,
 } from 'src/types.js'
 
 export const getTags = ({
@@ -143,6 +145,147 @@ export const getProductBySlug = ({
 const getLastDays = (days: number) =>
   new Date(Date.now() - 24 * days * 60 * 60 * 1000)
 
+export const getShopifyImports = async ({
+  storeId,
+  filter,
+  orderBy = {
+    createdAt: 'desc',
+  },
+  page = 1,
+  pageSize = 20,
+}: {
+  storeId: string
+  filter?: {
+    status?: ShopifyImportStatus
+  }
+  orderBy?: {
+    createdAt?: 'desc' | 'asc'
+  }
+  page?: number
+  pageSize?: number
+}): Promise<{
+  count: number
+  imports: (ShopifyImport & { products: number })[]
+}> => {
+  const where: Prisma.ShopifyImportWhereInput = {
+    storeId,
+    status: filter?.status,
+  }
+  const [count, imports] = await prisma.$transaction([
+    prisma.shopifyImport.count({ where }),
+    prisma.shopifyImport.findMany({
+      orderBy,
+      where,
+      include: {
+        _count: {
+          select: {
+            products: true,
+          },
+        },
+      },
+      take: pageSize,
+      skip: pageSize * Math.max(page - 1, 0),
+    }),
+  ])
+  return {
+    count,
+    imports: imports.map((p) => ({ ...p, products: p._count.products })),
+  }
+}
+
+export const touchShopifyImport = async (storeId: string) =>
+  prisma.shopifyImport.create({
+    data: {
+      storeId,
+    },
+  })
+
+export const updateShopifyImportStatus = async ({
+  id,
+  status,
+}: {
+  id: string
+  status: ShopifyImportStatus
+}): Promise<ShopifyImport | null> => {
+  let item: ShopifyImport | undefined
+  if (status === 'imported') {
+    item = await prisma.$transaction(async ($prisma) => {
+      await $prisma.product.updateMany({
+        data: {
+          shopifyImportId: null,
+        },
+        where: {
+          shopifyImportId: id,
+        },
+      })
+      return await $prisma.shopifyImport.update({
+        data: {
+          status,
+        },
+        where: {
+          id,
+        },
+      })
+    })
+  } else {
+    item = await prisma.shopifyImport.update({
+      data: {
+        status,
+      },
+      where: {
+        id,
+      },
+    })
+  }
+  return item || null
+}
+
+export const reviewProductFromShopifyImport = async (
+  productId: string
+): Promise<Product | null> => {
+  const [shouldClose, product] = await prisma.$transaction(async ($prisma) => {
+    const og = await $prisma.product.findFirst({
+      include: {
+        shopifyImport: {
+          include: {
+            _count: {
+              select: {
+                products: true,
+              },
+            },
+          },
+        },
+      },
+      where: {
+        id: productId,
+        shopifyImportId: {
+          not: null,
+        },
+      },
+    })
+    if (!og) return [null, null]
+    await $prisma.product.update({
+      where: {
+        id: og.id,
+      },
+      data: {
+        shopifyImportId: null,
+      },
+    })
+    const product = await getProductById(og.id)
+    return [
+      og.shopifyImport && og.shopifyImport?._count.products == 1
+        ? og.shopifyImportId
+        : null,
+      product,
+    ]
+  })
+  if (shouldClose) {
+    updateShopifyImportStatus({ id: shouldClose, status: 'imported' })
+  }
+  return product
+}
+
 export const getProductsByStore = async ({
   storeId,
   filter,
@@ -158,6 +301,7 @@ export const getProductsByStore = async ({
     public?: boolean
     archived?: boolean
     categoryId?: string | null
+    shopifyImportId?: string | null
   }
   orderBy?: {
     name?: 'desc' | 'asc'
@@ -219,6 +363,7 @@ export const getProductsByStore = async ({
     public: filter?.public,
     archived: filter?.archived || false,
     storeCategoryId: filter?.categoryId,
+    shopifyImportId: filter?.shopifyImportId || null,
     AND,
   }
   const [count, products] = await prisma.$transaction([
@@ -247,6 +392,7 @@ export const getProductsByStore = async ({
         minQuantity: true,
         meta: true,
         archivedAt: true,
+        shopifyImportId: true,
         tags: {
           include: {
             tag: true,
@@ -467,6 +613,7 @@ export const upsertProduct = async (
       public: product.public!,
       description: product.description,
       meta: product.meta,
+
       store: {
         connect: {
           id: product.storeId!,

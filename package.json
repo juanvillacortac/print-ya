@@ -18,7 +18,7 @@
     "dev:web": "turbo run dev --continue --scope=web",
     "dev:lib": "turbo run dev --filter='./packages/*' --parallel",
     "generate": "turbo run generate",
-    "db:push": "turbo run generate",
+    "db:push": "turbo run db:push",
     "start:node": "pnpm run start:node --filter web"
   },
   "devDependencies": {
