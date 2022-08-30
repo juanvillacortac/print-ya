@@ -1,7 +1,3 @@
-if (typeof global === 'undefined') {
-  globalThis.global = typeof window !== 'undefined' ? window : globalThis
-}
-
 import { invalidate } from '$app/navigation'
 import type { QueryKey, tRPCRouter } from '@shackcart/trpc'
 import trpcTransformer from 'trpc-transformer'
