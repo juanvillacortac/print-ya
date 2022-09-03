@@ -32,6 +32,7 @@ export default createServer()
         await $prisma.productModifierItem.deleteMany({})
         await $prisma.productModifier.deleteMany({})
         await $prisma.product.deleteMany({})
+        await $prisma.shopifyImport.deleteMany({})
       })
       return {
         ok: true,

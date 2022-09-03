@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { Redis } from '@upstash/redis'
 import { marked } from 'marked'
 import { createServer } from '../shared.js'
+import type { StoreData } from '@shackcart/db'
 
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {

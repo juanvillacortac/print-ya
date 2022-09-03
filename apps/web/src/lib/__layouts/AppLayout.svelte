@@ -470,10 +470,15 @@
     width: 32px;
     height: 32px;
     margin: 0px;
-    border: 4px solid currentColor;
+    border: 4px solid black;
     border-radius: 50%;
     animation: lds-ring 2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: currentColor transparent transparent transparent;
+    border-color: black transparent transparent transparent;
+  }
+
+  :global(.dark) .lds-ring div {
+    border: 4px solid white;
+    border-color: white transparent transparent transparent;
   }
   .lds-ring div:nth-child(1) {
     animation-delay: -0.45s;

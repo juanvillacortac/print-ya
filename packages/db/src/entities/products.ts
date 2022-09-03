@@ -840,10 +840,6 @@ export const createProductsFromBatch = async (
         storeId,
       },
     })
-    console.log(
-      existentTags,
-      data.flatMap(({ tags }) => tags).map((t) => t.name)
-    )
 
     let tagsDict = new Map<string, string>()
     existentTags.forEach((t) => tagsDict.set(t.name, t.id))

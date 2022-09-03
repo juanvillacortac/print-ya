@@ -7,6 +7,7 @@ processes = []
 
 [env]
   VITE_PORT = 8080
+  SWAP = "1"
 
 [experimental]
   allowed_public_ports = []

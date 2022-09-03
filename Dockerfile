@@ -70,4 +70,9 @@ ENV REDIS_URL=${REDIS_URL}}
 
 EXPOSE ${VITE_PORT}
 
-CMD node apps/api/dist/index.js
+CMD if [[ ! -z "$SWAP" ]]; then \
+    fallocate -l $(($(stat -f -c "(%a*%s/10)*7" .))) _swapfile && \
+    mkswap _swapfile && swapon _swapfile && ls -hla; \
+    fi; \
+    free -m; \
+    node apps/api/dist/index.js

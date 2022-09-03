@@ -27,6 +27,7 @@
   import Ufo from '$lib/components/__Ufo.svelte'
   import type { InferQueryInput, InferQueryOutput } from '@shackcart/trpc'
   import { clamp } from '$lib/utils/math'
+  import { goto } from '$app/navigation'
 
   export let items: InferQueryOutput<'shopify:list'>['imports'] | undefined =
     undefined
@@ -292,7 +293,75 @@
         <div
           class="flex flex-col divide-y-1 divide-gray-300 w-full dark:divide-gray-600"
         >
-          {#each items as i, idx}{/each}
+          {#each items as i, idx}
+            <button
+              class="flex flex-col space-y-2 w-full p-2 text-gray-700 dark:text-gray-400"
+              on:click={() =>
+                i.status === 'pending'
+                  ? goto(
+                      `/stores/${$layoutData.store?.slug}/products/import/${i.id}`
+                    )
+                  : null}
+            >
+              <div class="flex w-full items-center justify-between">
+                <div class="flex space-x-2 items-center">
+                  <div class="flex w-12ch">
+                    <p
+                      class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform text-dark-900 whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 dark:text-gray-100 hover:overflow-visible "
+                      title="Copy to clipboard"
+                      on:click={() =>
+                        typeof navigator == 'undefined'
+                          ? null
+                          : navigator.clipboard.writeText(i.id)}
+                      use:tooltip
+                    >
+                      {i.id}
+                    </p>
+                  </div>
+                </div>
+                <p class="text-xs">
+                  {i.createdAt.toLocaleString()}
+                </p>
+              </div>
+              <div class="flex ml-auto">
+                {#if i.status === 'failed'}
+                  <div
+                    class="rounded flex font-bold space-x-1 bg-red-600 shadow text-xs p-1 text-gray-100 items-center"
+                  >
+                    <WarningAlt16 />
+                    <span> Import failed </span>
+                  </div>
+                {:else if i.status === 'imported'}
+                  <div
+                    class="rounded flex font-bold space-x-1 bg-green-600 shadow text-xs p-1 text-gray-100 items-center"
+                  >
+                    <Checkmark16 />
+                    <span> Imported </span>
+                  </div>
+                {:else if i.status === 'processing'}
+                  <div
+                    class="rounded flex font-bold space-x-1 bg-blue-600 shadow text-xs p-1 text-gray-100 items-center"
+                  >
+                    <Hourglass16
+                      class="roll !animate-loop !animate-duration-1500"
+                    />
+                    <span> Processing... </span>
+                  </div>
+                {:else if i.status === 'pending'}
+                  <a
+                    class="rounded flex font-bold space-x-1 bg-purple-600 shadow text-xs p-1 text-gray-100 items-center hover:underline"
+                    href="import/{i.id}"
+                    data-sveltekit-prefetch
+                  >
+                    <span>
+                      Review {i.products} products
+                    </span>
+                    <Launch16 />
+                  </a>
+                {/if}
+              </div>
+            </button>
+          {/each}
         </div>
       {:else}
         <table
