@@ -55,14 +55,14 @@ const queries = createServer()
         url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
         token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
       })
-      // const storeData = store
-      //   ? await (
-      //       await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-      //     )?.json
-      //   : undefined
+      const storeData = store
+        ? await (
+            await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+          )?.json
+        : undefined
       return {
         store,
-        storeData: {},
+        storeData,
       }
     },
   })
@@ -74,14 +74,14 @@ const queries = createServer()
         url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
         token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
       })
-      // const storeData = store
-      //   ? await (
-      //       await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-      //     )?.json
-      //   : undefined
+      const storeData = store
+        ? await (
+            await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+          )?.json
+        : undefined
       return {
         store,
-        storeData: {},
+        storeData,
       }
     },
   })

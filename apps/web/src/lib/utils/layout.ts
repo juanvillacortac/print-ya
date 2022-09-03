@@ -5,7 +5,7 @@ import type { LayoutData } from '@shackcart/db'
 import { isCanonical } from './host'
 
 export function getLayoutType<T extends { url: URL }>({ url }: T): LayoutType {
-  if (url.searchParams.get('store')) return 'store'
+  // if (url.searchParams.get('store')) return 'store'
   if (!isCanonical(url.host)) {
     return 'store'
   }

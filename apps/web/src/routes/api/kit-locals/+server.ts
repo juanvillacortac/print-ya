@@ -10,3 +10,5 @@ export const GET: RequestHandler = ({ locals }) => {
     layoutType,
   })
 }
+
+export const prerender = false

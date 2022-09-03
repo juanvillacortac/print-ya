@@ -54,3 +54,5 @@ export const GET: RequestHandler = async (event) => {
     })),
   })
 }
+
+export const prerender = false
