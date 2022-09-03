@@ -48,7 +48,6 @@ const app = async () => {
               let decoded: any
               try {
                 decoded = await req.jwtVerify()
-                console.log('JWT', decoded)
               } catch (err) {
                 if (
                   !err.code ||
