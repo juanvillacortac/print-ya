@@ -857,8 +857,8 @@ export const createProductsFromBatch = async (
       return products.count
     },
     {
-      maxWait: 100000,
-      timeout: 120000,
+      maxWait: 1000000,
+      timeout: 1200000,
     }
   )
   return batch
