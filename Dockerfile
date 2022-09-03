@@ -43,9 +43,9 @@ FROM node:alpine AS runner
 WORKDIR /app
 
 # Don't run production as root
-RUN addgroup --system --gid 1001 shackcart
-RUN adduser --system --uid 1001 shackcart
-USER shackcart
+# RUN addgroup --system --gid 1001 shackcart
+# RUN adduser --system --uid 1001 shackcart
+# USER shackcart
 COPY --from=installer /app .
 
 ARG VITE_PORT=8080
