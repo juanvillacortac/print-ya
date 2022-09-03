@@ -41,7 +41,7 @@
   let searchId = ''
 
   onMount(() => {
-    const interval = setInterval(() => search(), 5000)
+    const interval = setInterval(() => search('no_clear'), 5000)
     return () => {
       clearInterval(interval)
     }
@@ -49,10 +49,12 @@
 
   export const search = (..._deps: any[]) => {
     const find = async () => {
-      waitTimeout = setTimeout(() => {
-        items = undefined
-        tick()
-      }, 100)
+      if (!_deps?.length || _deps[0] !== 'no_clear') {
+        waitTimeout = setTimeout(() => {
+          items = undefined
+          tick()
+        }, 100)
+      }
       const filtered = await trpc().query('shopify:list', {
         storeId: $layoutData.store!.id,
         filter: {
@@ -64,7 +66,9 @@
         },
         page: pageNumber,
       })
-      clearTimeout(waitTimeout)
+      if (!_deps?.length || _deps[0] !== 'no_clear') {
+        clearTimeout(waitTimeout)
+      }
       items = filtered.imports
       total = filtered.count
       wait = true
