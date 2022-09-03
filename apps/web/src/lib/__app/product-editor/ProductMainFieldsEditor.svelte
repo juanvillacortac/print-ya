@@ -16,6 +16,7 @@
   import { expoOut } from 'svelte/easing'
   import { fly, scale, slide } from 'svelte/transition'
   import type { InferQueryOutput } from '@shackcart/trpc'
+  import { browser } from '$app/environment'
 
   export let product: Partial<Product>
   $: store = $layoutData.store
@@ -252,10 +253,12 @@
         <label class="font-bold text-xs mb-2 block" for="fieldId">
           Description
         </label>
-        <Editor
-          value={product.description || ''}
-          on:change={(e) => (product.description = e.detail.value)}
-        />
+        {#if browser}
+          <Editor
+            value={product.description || ''}
+            on:change={(e) => (product.description = e.detail.value)}
+          />
+        {/if}
       </div>
     </div>
   {/if}

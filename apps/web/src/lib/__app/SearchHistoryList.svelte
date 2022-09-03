@@ -27,6 +27,8 @@
   let pageNumber = 1
   $: pages = Math.ceil((total || 1) / 20)
 
+  let frame: HTMLDivElement | undefined
+
   let timeout: NodeJS.Timeout
   let waitTimeout: NodeJS.Timeout
   let nameSearch = ''
@@ -53,6 +55,7 @@
       entries = filtered.entries
       total = filtered.count
       wait = true
+      if (frame) frame.scrollTop = 0
     }
     if (timeout) {
       clearTimeout(timeout)
@@ -158,115 +161,74 @@
         </select>
       </div>
     </div>
-    <div
-      class="flex items-end lg:space-x-2 lg:items-center <lg:flex-col-reverse"
-    >
-      <div class="flex space-x-2 items-center <lg:pt-4">
-        <button
-          title="Previous page"
-          use:tooltip
-          on:click={() => {
-            pageNumber = clamp({ min: 1, max: pages, val: pageNumber - 1 })
-          }}
-        >
-          <ChevronLeft24 />
-        </button>
-        <div
-          class="flex font-bold space-x-2 text-xs text-gray-400 uppercase items-center"
-        >
-          <select
-            bind:value={pageNumber}
-            class="bg-transparent font-bold py-1 appearance-none !border-none !outline-none"
-          >
-            {#each Array.from({ length: pages })
-              .fill({})
-              .map((_, idx) => idx + 1) as n}
-              <option value={n}>{n}</option>
-            {/each}
-          </select>
-          <!-- <p>{pageNumber}</p> -->
-          <span>/</span>
-          <p>{pages}</p>
+    <Submenu>
+      <button
+        class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 whitespace-nowrap items-center hover:border-gray-300 dark:hover:border-gray-500"
+        type="button"
+        slot="button"
+      >
+        <div class="text-xs">Sort by</div>
+        <ChevronSort16 /></button
+      >
+      <div
+        class="flex flex-col font-bold divide-y-1 divide-gray-300 text-xs text-gray-80 dark:divide-gray-600 dark:text-white"
+        slot="body"
+      >
+        <div class="flex flex-col space-y-3 pb-3">
+          <p class="font-bold">Search term</p>
+          <label class="flex font-normal space-x-2 text-xs">
+            <input
+              type="radio"
+              value={sorters.searchTerm.asc}
+              bind:group={sortBy}
+            />
+            <div class="flex space-x-1 items-center">
+              <ChevronUp16 />
+              <span>Ascending</span>
+            </div>
+          </label>
+          <label class="flex font-normal space-x-2 text-xs">
+            <input
+              type="radio"
+              value={sorters.searchTerm.desc}
+              bind:group={sortBy}
+              checked
+            />
+            <div class="flex space-x-1 items-center">
+              <ChevronDown16 />
+              <span>Descending</span>
+            </div>
+          </label>
         </div>
-        <button
-          title="Next page"
-          use:tooltip
-          on:click={() => {
-            pageNumber = clamp({ min: 1, max: pages, val: pageNumber + 1 })
-          }}
-        >
-          <ChevronRight24 />
-        </button>
-      </div>
-      <Submenu>
-        <button
-          class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 whitespace-nowrap items-center hover:border-gray-300 dark:hover:border-gray-500"
-          type="button"
-          slot="button"
-        >
-          <div class="text-xs">Sort by</div>
-          <ChevronSort16 /></button
-        >
-        <div
-          class="flex flex-col font-bold divide-y-1 divide-gray-300 text-xs text-gray-80 dark:divide-gray-600 dark:text-white"
-          slot="body"
-        >
-          <div class="flex flex-col space-y-3 pb-3">
-            <p class="font-bold">Search term</p>
-            <label class="flex font-normal space-x-2 text-xs">
-              <input
-                type="radio"
-                value={sorters.searchTerm.asc}
-                bind:group={sortBy}
-              />
-              <div class="flex space-x-1 items-center">
-                <ChevronUp16 />
-                <span>Ascending</span>
-              </div>
-            </label>
-            <label class="flex font-normal space-x-2 text-xs">
-              <input
-                type="radio"
-                value={sorters.searchTerm.desc}
-                bind:group={sortBy}
-                checked
-              />
-              <div class="flex space-x-1 items-center">
-                <ChevronDown16 />
-                <span>Descending</span>
-              </div>
-            </label>
-          </div>
 
-          <div class="flex flex-col space-y-3 pt-3">
-            <p class="font-bold">Creation date</p>
-            <label class="flex font-normal space-x-2 text-xs">
-              <input
-                type="radio"
-                value={sorters.createdAt.asc}
-                bind:group={sortBy}
-              />
-              <div class="flex space-x-1 items-center">
-                <ChevronUp16 />
-                <span>Ascending</span>
-              </div>
-            </label>
-            <label class="flex font-normal space-x-2 text-xs">
-              <input
-                type="radio"
-                value={sorters.createdAt.desc}
-                bind:group={sortBy}
-                checked
-              />
-              <div class="flex space-x-1 items-center">
-                <ChevronDown16 />
-                <span>Descending</span>
-              </div>
-            </label>
-          </div>
+        <div class="flex flex-col space-y-3 pt-3">
+          <p class="font-bold">Creation date</p>
+          <label class="flex font-normal space-x-2 text-xs">
+            <input
+              type="radio"
+              value={sorters.createdAt.asc}
+              bind:group={sortBy}
+            />
+            <div class="flex space-x-1 items-center">
+              <ChevronUp16 />
+              <span>Ascending</span>
+            </div>
+          </label>
+          <label class="flex font-normal space-x-2 text-xs">
+            <input
+              type="radio"
+              value={sorters.createdAt.desc}
+              bind:group={sortBy}
+              checked
+            />
+            <div class="flex space-x-1 items-center">
+              <ChevronDown16 />
+              <span>Descending</span>
+            </div>
+          </label>
         </div>
-      </Submenu>
-    </div>
+      </div>
+    </Submenu>
   </div>
   {#if entries && !entries.length}
     <div
@@ -281,6 +243,7 @@
   {:else}
     <div
       class="bg-white border rounded-lg flex border-gray-300 w-full max-h-65vh relative overflow-auto dark:bg-gray-800 dark:border-gray-700"
+      bind:this={frame}
     >
       {#if !entries}
         <div class="h-64vh w-full skeleton" />
@@ -426,6 +389,47 @@
           </tbody>
         </table>
       {/if}
+    </div>
+    <div class="flex w-full items-center justify-between">
+      <span class="font-bold text-xs leading-0">
+        {total || 0} entries found
+      </span>
+      <div class="flex space-x-2 items-center">
+        <button
+          title="Previous page"
+          use:tooltip
+          on:click={() => {
+            pageNumber = clamp({ min: 1, max: pages, val: pageNumber - 1 })
+          }}
+        >
+          <ChevronLeft24 />
+        </button>
+        <div
+          class="flex font-bold space-x-2 text-xs text-gray-400 uppercase items-center"
+        >
+          <select
+            bind:value={pageNumber}
+            class="bg-transparent font-bold py-1 appearance-none !border-none !outline-none"
+          >
+            {#each Array.from({ length: pages })
+              .fill({})
+              .map((_, idx) => idx + 1) as n}
+              <option value={n}>{n}</option>
+            {/each}
+          </select>
+          <span>/</span>
+          <p>{pages}</p>
+        </div>
+        <button
+          title="Next page"
+          use:tooltip
+          on:click={() => {
+            pageNumber = clamp({ min: 1, max: pages, val: pageNumber + 1 })
+          }}
+        >
+          <ChevronRight24 />
+        </button>
+      </div>
     </div>
   {/if}
 </div>

@@ -156,7 +156,8 @@ export const getShopifyImports = async ({
 }: {
   storeId: string
   filter?: {
-    status?: ShopifyImportStatus
+    id?: string
+    status?: ShopifyImportStatus[]
   }
   orderBy?: {
     createdAt?: 'desc' | 'asc'
@@ -169,7 +170,16 @@ export const getShopifyImports = async ({
 }> => {
   const where: Prisma.ShopifyImportWhereInput = {
     storeId,
-    status: filter?.status,
+    id: filter?.id
+      ? {
+          startsWith: filter.id,
+        }
+      : undefined,
+    status: filter?.status
+      ? {
+          in: filter.status,
+        }
+      : undefined,
   }
   const [count, imports] = await prisma.$transaction([
     prisma.shopifyImport.count({ where }),
@@ -690,6 +700,7 @@ export const createProductsFromBatch = async (
       slug: p.slug || '',
       storeId,
       storeCategoryId: p.storeCategoryId,
+      shopifyImportId: p.shopifyImportId || undefined,
       template: p.template,
       templateDraft: p.template,
     }
@@ -768,13 +779,14 @@ export const createProductsFromBatch = async (
   const batch = await prisma.$transaction(async ($prisma) => {
     const products = await $prisma.product.createMany({
       data: data.map(({ product }) => ({
+        storeId,
         id: product.id,
         name: product.name,
         price: product.price || 0.1,
         slug: product.slug,
         meta: product.meta,
         type: product.type,
-        storeId: product.storeId,
+        shopifyImportId: product.shopifyImportId,
         template: product.template,
         templateDraft: product.templateDraft,
         storeCategoryId: product.storeCategoryId,
@@ -783,6 +795,7 @@ export const createProductsFromBatch = async (
       })),
       skipDuplicates: true,
     })
+
     const modifiers = await $prisma.productModifier.createMany({
       data: data
         .flatMap(({ modifiers }) => modifiers)
@@ -809,14 +822,42 @@ export const createProductsFromBatch = async (
           percentage: i.percentage,
         })),
     })
+    const tags = await $prisma.productTag.createMany({
+      data: data
+        .flatMap(({ tags }) => tags)
+        .map((t) => ({
+          name: t.name,
+          storeId,
+        })),
+
+      skipDuplicates: true,
+    })
+    const existentTags = await $prisma.productTag.findMany({
+      where: {
+        name: {
+          in: data.flatMap(({ tags }) => tags).map((t) => t.name),
+        },
+        storeId,
+      },
+    })
+    console.log(
+      existentTags,
+      data.flatMap(({ tags }) => tags).map((t) => t.name)
+    )
+
+    let tagsDict = new Map<string, string>()
+    existentTags.forEach((t) => tagsDict.set(t.name, t.id))
+
+    const tagsOnProducts = await $prisma.tagsOnProducts.createMany({
+      data: data
+        .flatMap(({ tags }) => tags)
+        .map((t) => ({
+          productId: t.productId,
+          productTagId: tagsDict.get(t.name) || '',
+        })),
+      skipDuplicates: true,
+    })
+    return products.count
   })
-  // const
-  // const batch = await prisma.$transaction(
-  //   data.map((p) =>
-  //     prisma.product.create({
-  //       data: p,
-  //     })
-  //   )
-  // )
-  return products.length
+  return batch
 }

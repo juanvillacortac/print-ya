@@ -140,7 +140,7 @@
                 {href}
                 use:contenteditable
                 class:hover:underline={!editable}
-                sveltekit:prefetch>{@html text}</a
+                data-sveltekit-prefetch>{@html text}</a
               >
             {:else}
               <a
@@ -194,7 +194,7 @@
           </button>
         {/if}
         <div class="flex space-x-4 items-center">
-          <a href="/" class="flex" sveltekit:prefetch>
+          <a href="/" class="flex" data-sveltekit-prefetch>
             <Image
               src={$layoutData.store?.logo || ''}
               class="rounded-sm p-px h-2rem lg:h-3rem dark:bg-white dark:bg-opacity-20"
@@ -363,7 +363,7 @@
                   {href}
                   use:contenteditable
                   class:hover:underline={!editable}
-                  sveltekit:prefetch>{@html text}</a
+                  data-sveltekit-prefetch>{@html text}</a
                 >
               {:else}
                 <a
@@ -475,7 +475,7 @@
             {#if $layoutStore.announcementBar.href.startsWith('/')}
               <a
                 href={$layoutStore.announcementBar.href}
-                sveltekit:prefetch
+                data-sveltekit-prefetch
                 class="<sm:text-xs hover:underline"
                 >{@html $layoutStore.announcementBar.text}</a
               >
@@ -595,7 +595,7 @@
                 {href}
                 use:contenteditable
                 class:hover:underline={!editable}
-                sveltekit:prefetch>{@html text}</a
+                data-sveltekit-prefetch>{@html text}</a
               >
             {:else}
               <a

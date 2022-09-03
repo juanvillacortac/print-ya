@@ -12,21 +12,25 @@
   // NProgress css
   import '$lib/styles/__nprogress.css'
 
+  export let data: LayoutData
+
   NProgress.configure({
     minimum: 0.16,
     showSpinner: false,
   })
 
   $: {
-    if ($navigating && $navigating.from.pathname !== $navigating.to.pathname) {
+    if (
+      $navigating &&
+      $navigating.from.pathname !== $navigating.to.pathname &&
+      data.layoutData.layout === 'store'
+    ) {
       NProgress.start()
     }
     if (!$navigating) {
       NProgress.done()
     }
   }
-
-  export let data: LayoutData
 
   onDestroy(() => {
     if (!$navigating) {

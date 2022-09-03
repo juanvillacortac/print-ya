@@ -1,11 +1,6 @@
 <script lang="ts">
   import 'bytemd/dist/index.css'
-  import type {
-    Product,
-    ProductModifier,
-    Store,
-    TemplateSource,
-  } from '@shackcart/db'
+  import type { Product, ProductModifier, TemplateSource } from '@shackcart/db'
   import { notifications } from '$lib/components/notifications'
   import { goto } from '$app/navigation'
   import {

@@ -56,6 +56,7 @@ const queries = createServer()
           categoryId: z.string().cuid().optional(),
           public: z.boolean().optional(),
           archived: z.boolean().optional(),
+          shopifyImportId: z.string().optional(),
         })
         .optional(),
       orderBy: z

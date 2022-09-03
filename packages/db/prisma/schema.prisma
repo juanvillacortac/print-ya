@@ -138,7 +138,9 @@ model ProductTag {
 enum ShopifyImportStatus {
   pending
   in_review
+  processing
   imported
+  failed
 }
 
 model ShopifyImport {
@@ -146,7 +148,7 @@ model ShopifyImport {
   store   Store  @relation(fields: [storeId], references: [id])
   storeId String
 
-  status    ShopifyImportStatus @default(pending)
+  status    ShopifyImportStatus @default(processing)
   createdAt DateTime            @default(now())
 
   products Product[]

@@ -1,4 +1,4 @@
-import type { ExternalFetch, Handle } from '@sveltejs/kit'
+import type { Handle } from '@sveltejs/kit'
 import { handleSession } from 'svelte-kit-cookie-session'
 import { appRoutes, getLayoutType } from '$lib/utils/layout'
 import { getDefaultHost } from '$lib/utils/host'
@@ -41,9 +41,7 @@ const logic: Handle = async ({ event, resolve }) => {
     )
   }
 
-  response = await resolve(event, {
-    ssr: event.locals.layoutType !== 'app',
-  })
+  response = await resolve(event)
 
   if (
     event.locals.layoutType === 'store' &&

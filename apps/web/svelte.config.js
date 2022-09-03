@@ -20,10 +20,6 @@ const config = {
   preprocess: [preprocess(), optimizeImports()],
   kit: {
     adapter: adapter(),
-    prerender: {
-      default: false,
-      enabled: false,
-    },
     env: {
       dir: '../../',
     },

@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 patchedDependencies:
   '@sveltejs/adapter-vercel@1.0.0-next.71':
-    hash: e5kzcnbbtmzxgnipf65gg6lm5u
+    hash: 4yk6g4dnp5sdhyhjw2p67m2k2i
     path: patches/@sveltejs__adapter-vercel@1.0.0-next.71.patch
 
 importers:
@@ -107,8 +107,8 @@ importers:
       '@sveltejs/adapter-netlify': ^1.0.0-next.55
       '@sveltejs/adapter-node': 1.0.0-next.82
       '@sveltejs/adapter-static': ^1.0.0-next.29
-      '@sveltejs/adapter-vercel': 1.0.0-next.71
-      '@sveltejs/kit': 1.0.0-next.448
+      '@sveltejs/adapter-vercel': 1.0.0-next.72
+      '@sveltejs/kit': 1.0.0-next.463
       '@sveltejs/svelte-virtual-list': ^3.0.1
       '@tiptap/core': ^2.0.0-beta.182
       '@tiptap/extension-bullet-list': ^2.0.0-beta.29
@@ -305,8 +305,8 @@ importers:
       '@sveltejs/adapter-netlify': 1.0.0-next.71
       '@sveltejs/adapter-node': 1.0.0-next.82
       '@sveltejs/adapter-static': 1.0.0-next.39
-      '@sveltejs/adapter-vercel': 1.0.0-next.71_e5kzcnbbtmzxgnipf65gg6lm5u_encoding@0.1.13
-      '@sveltejs/kit': 1.0.0-next.448_fhgkwirxvgjw2igda6zmhiisma
+      '@sveltejs/adapter-vercel': 1.0.0-next.72_encoding@0.1.13
+      '@sveltejs/kit': 1.0.0-next.463_fhgkwirxvgjw2igda6zmhiisma
       '@types/bcrypt': 5.0.0
       '@types/geoip-lite': 1.4.1
       '@types/three': 0.135.0
@@ -1750,8 +1750,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/adapter-vercel/1.0.0-next.71_e5kzcnbbtmzxgnipf65gg6lm5u_encoding@0.1.13:
-    resolution: {integrity: sha512-Tj8za7fMXheaiB6hNqv61jr/AmAUm+G8huoY1cIvtSqqBHzGmiZH+GFK1Tq/e8e0XR2Xb/ZpZCQSyrFLU2grIQ==}
+  /@sveltejs/adapter-vercel/1.0.0-next.72_encoding@0.1.13:
+    resolution: {integrity: sha512-oNs8FQaYC2NnwDcvX/jc9MDNqXc9HxwGPQNkd+1vBpFVWZl9mShQgCcOMzfTOIH0ka984jYNa0ZawYYHex79xg==}
     dependencies:
       '@vercel/nft': 0.22.0_encoding@0.1.13
       esbuild: 0.14.54
@@ -1759,18 +1759,17 @@ packages:
       - encoding
       - supports-color
     dev: true
-    patched: true
 
-  /@sveltejs/kit/1.0.0-next.448_fhgkwirxvgjw2igda6zmhiisma:
-    resolution: {integrity: sha512-x1ufQj04uP2eidZMJXubWLQXF3UvDnFUrugNwKZBkuoSekv7kWb3cRop2Q24/QpSrqYVV4aMeeZ2OoHcASsxGQ==}
+  /@sveltejs/kit/1.0.0-next.463_fhgkwirxvgjw2igda6zmhiisma:
+    resolution: {integrity: sha512-r08t2FTbWC/eem1j70HcdsRPj+L0X/aXiTqQkyUgn5/3yBxxx4jXQqlkzBtYsjxZ4x+94yWQxYQTYXD6PxWM5g==}
     engines: {node: '>=16.14'}
     hasBin: true
     requiresBuild: true
     peerDependencies:
       svelte: ^3.44.0
-      vite: ^3.0.0
+      vite: ^3.1.0-beta.1
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 1.0.1_fhgkwirxvgjw2igda6zmhiisma
+      '@sveltejs/vite-plugin-svelte': 1.0.4_fhgkwirxvgjw2igda6zmhiisma
       cookie: 0.5.0
       devalue: 3.1.2
       kleur: 4.1.5
@@ -1793,13 +1792,13 @@ packages:
     resolution: {integrity: sha512-aF9TptS7NKKS7/TqpsxQBSDJ9Q0XBYzBehCeIC5DzdMEgrJZpIYao9LRLnyyo6SVodpapm2B7FE/Lj+FSA5/SQ==}
     dev: false
 
-  /@sveltejs/vite-plugin-svelte/1.0.1_fhgkwirxvgjw2igda6zmhiisma:
-    resolution: {integrity: sha512-PorCgUounn0VXcpeJu+hOweZODKmGuLHsLomwqSj+p26IwjjGffmYQfVHtiTWq+NqaUuuHWWG7vPge6UFw4Aeg==}
+  /@sveltejs/vite-plugin-svelte/1.0.4_fhgkwirxvgjw2igda6zmhiisma:
+    resolution: {integrity: sha512-UZco2fdj0OVuRWC0SUJjEOftITc2IeHLFJNp00ym9MuQ9dShnlO4P29G8KUxRlcS7kSpzHuko6eCR9MOALj7lQ==}
     engines: {node: ^14.18.0 || >= 16}
     peerDependencies:
       diff-match-patch: ^1.0.5
       svelte: ^3.44.0
-      vite: ^3.0.0
+      vite: ^3.0.0 || ^3.1.0-beta.1
     peerDependenciesMeta:
       diff-match-patch:
         optional: true

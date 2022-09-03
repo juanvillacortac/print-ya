@@ -8,7 +8,7 @@ index 0d0ba443385ca92344ed22fe8d77bf8c617273ce..93b680422d96ce49e7623c60590e3c10
  					external,
 -					sourcemap: 'linked'
 +					sourcemap: 'linked',
-+					banner: { js: 'var global = globalThis;' } 
++					define: { global: 'globalThis' } 
  				});
  
  				write(

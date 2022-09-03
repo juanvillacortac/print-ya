@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { createServer } from 'src/shared.js'
 import { api } from '@shackcart/shared'
-import { importProducts } from 'src/workers/shopify-import.js'
+import { prisma } from '@shackcart/db'
 
 const coords = z.object({
   latitude: z.number(),
@@ -17,45 +17,22 @@ const lookup = async (coords: Coords) => {
   return res as any
 }
 
-const importRouter = createServer().mutation('importFromShopify', {
-  input: z.object({
-    supabasePath: z.string(),
-    storeId: z.string().cuid(),
-    categoryId: z.string().cuid().optional(),
-    userId: z.string().cuid(),
-  }),
-  resolve: async ({ input, ctx }) => {
-    const { categoryId, storeId, supabasePath, userId } = input
-    await importProducts({
-      supabasePath,
-      categoryId,
-      userId,
-      storeId,
-    })
-  },
-})
-
 export default createServer()
   .query('geocoding', {
     input: coords,
     resolve: ({ input }) => lookup(input),
   })
-  .mutation('importShopifyProducts', {
-    input: z.object({
-      supabasePath: z.string(),
-      storeId: z.string().cuid(),
-      categoryId: z.string().cuid().optional(),
-    }),
-    resolve: async ({ input, ctx }) => {
-      const { userId } = await ctx.session.auth({ verify: true })
-      if (!userId)
-        return {
-          ok: false,
-        }
-
-      const caller = importRouter.createCaller(ctx)
-
-      caller.mutation('importFromShopify', { ...input, userId })
+  .query('deleteAllProducts', {
+    resolve: async ({}) => {
+      await prisma.$transaction(async ($prisma) => {
+        await $prisma.orderItem.deleteMany({})
+        await $prisma.orderFee.deleteMany({})
+        await $prisma.tagsOnProducts.deleteMany({})
+        await $prisma.order.deleteMany({})
+        await $prisma.productModifierItem.deleteMany({})
+        await $prisma.productModifier.deleteMany({})
+        await $prisma.product.deleteMany({})
+      })
       return {
         ok: true,
       }

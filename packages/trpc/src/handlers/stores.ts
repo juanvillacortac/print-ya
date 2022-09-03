@@ -6,7 +6,6 @@ import { z } from 'zod'
 import { Redis } from '@upstash/redis'
 import { marked } from 'marked'
 import { createServer } from '../shared.js'
-import type { StoreData } from '@shackcart/db'
 
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {
@@ -56,14 +55,14 @@ const queries = createServer()
         url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
         token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
       })
-      const storeData = store
-        ? await (
-            await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-          )?.json
-        : undefined
+      // const storeData = store
+      //   ? await (
+      //       await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+      //     )?.json
+      //   : undefined
       return {
         store,
-        storeData,
+        storeData: {},
       }
     },
   })
@@ -75,14 +74,14 @@ const queries = createServer()
         url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
         token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
       })
-      const storeData = store
-        ? await (
-            await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-          )?.json
-        : undefined
+      // const storeData = store
+      //   ? await (
+      //       await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+      //     )?.json
+      //   : undefined
       return {
         store,
-        storeData,
+        storeData: {},
       }
     },
   })

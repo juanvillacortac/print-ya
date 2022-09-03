@@ -19,8 +19,8 @@
     "@sveltejs/adapter-netlify": "^1.0.0-next.55",
     "@sveltejs/adapter-node": "1.0.0-next.82",
     "@sveltejs/adapter-static": "^1.0.0-next.29",
-    "@sveltejs/adapter-vercel": "1.0.0-next.71",
-    "@sveltejs/kit": "1.0.0-next.448",
+    "@sveltejs/adapter-vercel": "1.0.0-next.72",
+    "@sveltejs/kit": "1.0.0-next.463",
     "@types/bcrypt": "^5.0.0",
     "@types/geoip-lite": "^1.4.1",
     "@types/three": "^0.135.0",
@@ -144,10 +144,5 @@
     "typewriter-editor": "^0.7.8",
     "windicss": "^3.5.1",
     "zod": "^3.17.3"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@sveltejs/adapter-vercel@1.0.0-next.71": "../../patches/@sveltejs__adapter-vercel@1.0.0-next.71.patch"
-    }
   }
 }

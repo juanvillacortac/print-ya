@@ -84,8 +84,8 @@
       >
         <a
           href={getCategoryLink('')}
-          sveltekit:prefetch
-          sveltekit:noscroll
+          data-sveltekit-prefetch
+          data-sveltekit-noscroll
           class="flex space-x-2 text-xs hover:underline"
         >
           <Categories16 />
@@ -94,8 +94,8 @@
         {#each store?.categories || [] as category}
           <a
             href={getCategoryLink(category.slug)}
-            sveltekit:prefetch
-            sveltekit:noscroll
+            data-sveltekit-prefetch
+            data-sveltekit-noscroll
             class="flex space-x-2 text-xs hover:underline"
           >
             <Categories16 />
@@ -118,7 +118,7 @@
             href={getPageLink(Math.max(pageNumber - 1, 1))}
             disabled={pageNumber === 1}
             title="Previous page"
-            sveltekit:prefetch
+            data-sveltekit-prefetch
             use:tooltip
           >
             <ChevronLeft24 />
@@ -140,7 +140,7 @@
           </div>
           <a
             href={getPageLink(Math.min(pageNumber + 1, pages))}
-            sveltekit:prefetch
+            data-sveltekit-prefetch
             title="Next page"
             use:tooltip
           >

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores'
+  import { navigating, page } from '$app/stores'
   import { preferences, layoutData } from '$lib'
   import { notifications } from '$lib/components/notifications'
   import { tooltip } from '$lib/components/tooltip'
@@ -27,12 +27,14 @@
   import Image from '$lib/components/caravaggio/Image.svelte'
   import { getAbsoluteURL } from '$lib/utils/host'
   import { beforeNavigate } from '$app/navigation'
-  import { fly, scale } from 'svelte/transition'
+  import { fade, fly, scale } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import trpc from '$lib/trpc/client'
   import { writable } from 'svelte/store'
   import { setContext } from 'svelte'
   import { api } from '@shackcart/shared'
+  import { portal } from 'svelte-portal'
+  import { browser } from '$app/environment'
 
   $: path = $page.url.pathname
   $: store = $layoutData.store
@@ -118,11 +120,45 @@
     if (!el) return
     gradientVisible = el.offsetWidth + el.scrollLeft < el?.scrollWidth
   }
+
+  let spinnerTimer: NodeJS.Timeout | undefined
+  let showSpinner = false
+  function startSpinner() {
+    spinnerTimer = setTimeout(() => {
+      showSpinner = true
+    }, 200)
+  }
+  function stopSpinner() {
+    showSpinner = false
+    clearTimeout(spinnerTimer)
+  }
+
+  $: if ($navigating) {
+    startSpinner()
+  } else {
+    stopSpinner()
+  }
 </script>
 
 <svelte:head>
   <title>{pageTitle}</title>
 </svelte:head>
+
+{#if showSpinner && browser}
+  <div
+    class="cursor-wait flex h-full w-full top-0 z-99 fixed items-center justify-center backdrop-filter backdrop-blur-md"
+    transition:fade={{ duration: 400, easing: expoOut }}
+    use:portal
+  >
+    <div class="bg-black h-full w-full opacity-70 absolute" />
+    <div class="lds-ring">
+      <div />
+      <div />
+      <div />
+      <div />
+    </div>
+  </div>
+{/if}
 
 {#if $page.data.user && !$page.data.hideLayout}
   <Favicons
@@ -190,7 +226,7 @@
                 use:tooltip
                 class="flex hover:text-black dark:hover:text-white"
                 in:scale|local={{ start: 0.8, duration: 400, easing: expoOut }}
-                sveltekit:prefetch
+                data-sveltekit-prefetch
                 class:text-black={current}
                 class:dark:text-white={current}
                 href={p.href}
@@ -240,18 +276,6 @@
         class="bg-white border-r flex flex-col h-full  border-light-900 p-4 text-gray-400 z-60 justify-between sidebar dark:bg-gray-900 dark:border-gray-700"
         class:open={sidebar}
       >
-        <!-- <div
-          class="opacity-50 right-[calc(-52px-16px)] bottom-4 absolute sm:hidden"
-        >
-          <button
-            class="rounded-full outline-none bg-blue-500 shadow text-white p-4"
-            on:click={() => (sidebar = !sidebar)}
-          >
-            <ChevronLeft20
-              class="transform duration-400 {!sidebar ? 'rotate-180' : ''}"
-            />
-          </button>
-        </div> -->
         <div class="flex flex-col h-full space-y-6">
           <a
             class="flex h-24px w-24px relative items-center justify-center"
@@ -293,7 +317,7 @@
               use:tooltip
               class="flex hover:text-black dark:hover:text-white"
               in:scale|local={{ start: 0.8, duration: 400, easing: expoOut }}
-              sveltekit:prefetch
+              data-sveltekit-prefetch
               class:text-black={current}
               class:dark:text-white={current}
               href={p.href}
@@ -351,12 +375,13 @@
             <a
               class="flex <sm:hidden"
               title="Go back"
-              sveltekit:prefetch
+              data-sveltekit-prefetch
               use:tooltip
-              href={$page.url.pathname.substring(
-                0,
-                $page.url.pathname.lastIndexOf('/')
-              )}><ChevronLeft24 class="flex" /></a
+              href={$page.data.backLink ||
+                $page.url.pathname.substring(
+                  0,
+                  $page.url.pathname.lastIndexOf('/')
+                )}><ChevronLeft24 class="flex" /></a
             >
             <div
               class="flex mr-auto items-start sm:space-x-4 sm:items-center <sm:flex-col <sm:space-y-4"
@@ -378,10 +403,11 @@
                   class="flex mr-4 sm:hidden"
                   title="Go back"
                   use:tooltip
-                  href={$page.url.pathname.substring(
-                    0,
-                    $page.url.pathname.lastIndexOf('/')
-                  )}><ChevronLeft24 /></a
+                  href={$page.data.backLink ||
+                    $page.url.pathname.substring(
+                      0,
+                      $page.url.pathname.lastIndexOf('/')
+                    )}><ChevronLeft24 /></a
                 >
                 <a
                   class="font-bold font-title text-black text-xl dark:text-white"
@@ -424,6 +450,42 @@
     }
     .sidebar {
       @apply transition-transform top-0 left-0 duration-400 fixed;
+    }
+  }
+
+  .lds-ring {
+    display: flex;
+    position: relative;
+    width: 32px;
+    height: 32px;
+  }
+  .lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin: 0px;
+    border: 4px solid currentColor;
+    border-radius: 50%;
+    animation: lds-ring 2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: currentColor transparent transparent transparent;
+  }
+  .lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+  .lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+  .lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+  @keyframes lds-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
     }
   }
 </style>

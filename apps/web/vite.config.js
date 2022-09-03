@@ -20,11 +20,6 @@ export default defineConfig({
     ),
     __VERCEL_URL__: JSON.stringify(process.env.VERCEL_URL),
   },
-  esbuild: {
-    define: {
-      global: 'globalThis',
-    },
-  },
   server: {
     hmr: {
       clientPort: process.env.GITPOD_WORKSPACE_URL ? 443 : 5173,

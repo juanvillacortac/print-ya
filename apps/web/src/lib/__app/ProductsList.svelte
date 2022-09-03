@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores'
   import trpc from '$lib/trpc/client'
   import { tick } from 'svelte'
   import {
+    Checkmark16,
     ChevronDown16,
+    ChevronLeft24,
+    ChevronRight24,
     ChevronSort16,
     ChevronUp16,
     Redo16,
@@ -20,12 +22,20 @@
   import { layoutData } from '$lib/stores'
   import { getBasicTemplate } from '@shackcart/db/dist/utils'
   import type { InferQueryInput, InferQueryOutput } from '@shackcart/trpc'
+  import { tooltip } from '$lib/components/tooltip'
+  import { clamp } from '$lib/utils/math'
 
   export let archived = false
+  export let importId: string | undefined = undefined
   export let products:
     | InferQueryOutput<'products:list'>['products']
     | undefined = undefined
   export let total: number | undefined = undefined
+
+  let pageNumber = 1
+  $: pages = Math.ceil((total || 1) / 20)
+
+  let frame: HTMLDivElement | undefined
 
   let timeout: NodeJS.Timeout
   let waitTimeout: NodeJS.Timeout
@@ -45,16 +55,19 @@
           name: nameSearch || undefined,
           categoryId: categoryId || undefined,
           public: visible || undefined,
+          shopifyImportId: importId || undefined,
           archived,
         },
         orderBy: {
           [sortBy.prop]: sortBy.sort,
         },
+        page: pageNumber,
       })
       clearTimeout(waitTimeout)
       products = filtered.products
       total = filtered.count
       wait = true
+      if (frame) frame.scrollTop = 0
     }
     if (timeout) {
       clearTimeout(timeout)
@@ -119,8 +132,21 @@
     wait = false
   }
 
+  const resetPagination = () => {
+    pageNumber = 1
+  }
+
+  $: if (nameSearch || !nameSearch || sortBy || categoryId || !categoryId) {
+    resetPagination()
+  }
+
   $: if (browser) {
-    search(nameSearch, visible, categoryId, sortBy)
+    search(nameSearch, visible, categoryId, sortBy, pageNumber)
+  }
+
+  const reviewProduct = async (id: string) => {
+    await trpc().mutation('shopify:reviewProduct', id)
+    search()
   }
 
   const deleteProduct = async (id: string) => {
@@ -167,70 +193,78 @@
         </select>
       </div>
     </div>
-    <Submenu>
-      <button
-        class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 whitespace-nowrap items-center hover:border-gray-300 dark:hover:border-gray-500"
-        type="button"
-        slot="button"
-      >
-        <div class="text-xs">Sort by</div>
-        <ChevronSort16 /></button
-      >
-      <div
-        class="flex flex-col font-bold divide-y-1 divide-gray-300 text-xs text-gray-80 dark:divide-gray-600 dark:text-white"
-        slot="body"
-      >
-        <div class="flex flex-col space-y-3 pb-3">
-          <p class="font-bold">Product name</p>
-          <label class="flex font-normal space-x-2 text-xs">
-            <input type="radio" value={sorters.name.asc} bind:group={sortBy} />
-            <div class="flex space-x-1 items-center">
-              <ChevronUp16 />
-              <span>Ascending</span>
-            </div>
-          </label>
-          <label class="flex font-normal space-x-2 text-xs">
-            <input
-              type="radio"
-              value={sorters.name.desc}
-              bind:group={sortBy}
-              checked
-            />
-            <div class="flex space-x-1 items-center">
-              <ChevronDown16 />
-              <span>Descending</span>
-            </div>
-          </label>
-        </div>
+    <div
+      class="flex items-end lg:space-x-2 lg:items-center <lg:flex-col-reverse"
+    >
+      <Submenu>
+        <button
+          class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 whitespace-nowrap items-center hover:border-gray-300 dark:hover:border-gray-500"
+          type="button"
+          slot="button"
+        >
+          <div class="text-xs">Sort by</div>
+          <ChevronSort16 /></button
+        >
+        <div
+          class="flex flex-col font-bold divide-y-1 divide-gray-300 text-xs text-gray-80 dark:divide-gray-600 dark:text-white"
+          slot="body"
+        >
+          <div class="flex flex-col space-y-3 pb-3">
+            <p class="font-bold">Product name</p>
+            <label class="flex font-normal space-x-2 text-xs">
+              <input
+                type="radio"
+                value={sorters.name.asc}
+                bind:group={sortBy}
+              />
+              <div class="flex space-x-1 items-center">
+                <ChevronUp16 />
+                <span>Ascending</span>
+              </div>
+            </label>
+            <label class="flex font-normal space-x-2 text-xs">
+              <input
+                type="radio"
+                value={sorters.name.desc}
+                bind:group={sortBy}
+                checked
+              />
+              <div class="flex space-x-1 items-center">
+                <ChevronDown16 />
+                <span>Descending</span>
+              </div>
+            </label>
+          </div>
 
-        <div class="flex flex-col space-y-3 pt-3">
-          <p class="font-bold">Creation date</p>
-          <label class="flex font-normal space-x-2 text-xs">
-            <input
-              type="radio"
-              value={sorters.createdAt.asc}
-              bind:group={sortBy}
-            />
-            <div class="flex space-x-1 items-center">
-              <ChevronUp16 />
-              <span>Ascending</span>
-            </div>
-          </label>
-          <label class="flex font-normal space-x-2 text-xs">
-            <input
-              type="radio"
-              value={sorters.createdAt.desc}
-              bind:group={sortBy}
-              checked
-            />
-            <div class="flex space-x-1 items-center">
-              <ChevronDown16 />
-              <span>Descending</span>
-            </div>
-          </label>
+          <div class="flex flex-col space-y-3 pt-3">
+            <p class="font-bold">Creation date</p>
+            <label class="flex font-normal space-x-2 text-xs">
+              <input
+                type="radio"
+                value={sorters.createdAt.asc}
+                bind:group={sortBy}
+              />
+              <div class="flex space-x-1 items-center">
+                <ChevronUp16 />
+                <span>Ascending</span>
+              </div>
+            </label>
+            <label class="flex font-normal space-x-2 text-xs">
+              <input
+                type="radio"
+                value={sorters.createdAt.desc}
+                bind:group={sortBy}
+                checked
+              />
+              <div class="flex space-x-1 items-center">
+                <ChevronDown16 />
+                <span>Descending</span>
+              </div>
+            </label>
+          </div>
         </div>
-      </div>
-    </Submenu>
+      </Submenu>
+    </div>
   </div>
   {#if products && !products.length}
     <div
@@ -245,6 +279,7 @@
   {:else}
     <div
       class="bg-white border rounded-lg flex border-gray-300 w-full max-h-65vh relative overflow-auto dark:bg-gray-800 dark:border-gray-700"
+      bind:this={frame}
     >
       {#if !products}
         <div class="h-64vh w-full skeleton" />
@@ -285,7 +320,7 @@
                     <a
                       href="products/{product?.slug}"
                       class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
-                      sveltekit:prefetch
+                      data-sveltekit-prefetch
                     >
                       {product.name}
                     </a>
@@ -333,10 +368,18 @@
                   </p>
                 </div>
                 <div class="flex space-x-2 items-center <sm:ml-auto">
-                  {#if !product.archived}
+                  {#if product.shopifyImportId}
+                    <button
+                      class="border-transparent rounded flex space-x-1 border-2 p-1 text-green-500 duration-200 items-center hover:border-green-500"
+                      type="button"
+                      on:click={() => reviewProduct(product.id)}
+                    >
+                      <div class="text-xs">Approve product</div>
+                      <Checkmark16 /></button
+                    >
+                  {:else if !product.archived}
                     <button
                       class="border-transparent rounded flex space-x-1 border-2 p-1 text-red-500 duration-200 items-center hover:border-red-500"
-                      title="Delete product"
                       type="button"
                       on:click={() => deleteProduct(product.id)}
                     >
@@ -346,7 +389,6 @@
                   {:else}
                     <button
                       class="border-transparent rounded flex space-x-1 border-2 p-1 text-green-500 duration-200 items-center hover:border-green-500"
-                      title="Restore product"
                       type="button"
                       on:click={() => deleteProduct(product.id)}
                     >
@@ -356,8 +398,8 @@
                   {/if}
                   <a
                     class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 items-center hover:border-gray-300 dark:hover:border-gray-500"
-                    title="View details"
-                    href="products/{product.slug}"
+                    href="/stores/{$layoutData.store
+                      ?.slug}/products/{product.slug}"
                   >
                     <div class="text-xs">View product</div>
                     <View16 /></a
@@ -368,6 +410,47 @@
           {/each}
         </div>
       {/if}
+    </div>
+    <div class="flex w-full items-center justify-between">
+      <span class="font-bold text-xs leading-0">
+        {total || 0} products found
+      </span>
+      <div class="flex space-x-2 items-center">
+        <button
+          title="Previous page"
+          use:tooltip
+          on:click={() => {
+            pageNumber = clamp({ min: 1, max: pages, val: pageNumber - 1 })
+          }}
+        >
+          <ChevronLeft24 />
+        </button>
+        <div
+          class="flex font-bold space-x-2 text-xs text-gray-400 uppercase items-center"
+        >
+          <select
+            bind:value={pageNumber}
+            class="bg-transparent font-bold py-1 appearance-none !border-none !outline-none"
+          >
+            {#each Array.from({ length: pages })
+              .fill({})
+              .map((_, idx) => idx + 1) as n}
+              <option value={n}>{n}</option>
+            {/each}
+          </select>
+          <span>/</span>
+          <p>{pages}</p>
+        </div>
+        <button
+          title="Next page"
+          use:tooltip
+          on:click={() => {
+            pageNumber = clamp({ min: 1, max: pages, val: pageNumber + 1 })
+          }}
+        >
+          <ChevronRight24 />
+        </button>
+      </div>
     </div>
   {/if}
 </div>

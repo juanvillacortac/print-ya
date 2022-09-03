@@ -29,7 +29,12 @@
   import { bag, layoutData } from '$lib/stores'
   import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
-import { getBasicTemplate, getCostFromProductModifiers, getTemplateFieldsFromModifiers, getTotalFromProductModifiers } from '@shackcart/db/dist/utils';
+  import {
+    getBasicTemplate,
+    getCostFromProductModifiers,
+    getTemplateFieldsFromModifiers,
+    getTotalFromProductModifiers,
+  } from '@shackcart/db/dist/utils'
 
   const countries = getCountries()
 

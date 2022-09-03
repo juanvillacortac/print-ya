@@ -109,7 +109,7 @@
             <a
               href="/products?category={c.slug}"
               class="flex flex-col space-y-4 duration-200 hover:text-red-500"
-              sveltekit:prefetch
+              data-sveltekit-prefetch
             >
               <div
                 class="bg-black flex font-bold font-title text-white text-center w-full p-6 text-3xl aspect-square items-center justify-center"

@@ -2,8 +2,7 @@
   import 'bytemd/dist/index.css'
   import { goto } from '$app/navigation'
 
-  import { page } from '$app/stores'
-  import { pageSubtitle, redisWritable, layoutData } from '$lib'
+  import { redisWritable, layoutData } from '$lib'
   import { squareratio } from '$lib/actions/aspectratio'
   import Image from '$lib/components/caravaggio/Image.svelte'
   import type { CaravaggioOptions } from '$lib/components/caravaggio/urlBuilder'
@@ -17,6 +16,7 @@
   import trpc, { invalidateQuery } from '$lib/trpc/client'
   import { Editor } from 'bytemd'
   import { supabase } from '@shackcart/shared'
+  import { browser } from '$app/environment'
 
   let store = { ...$layoutData.store! }
   const contactEmailTemplate = redisWritable(
@@ -437,19 +437,23 @@
     <div class="flex flex-col w-full">
       <div class="flex flex-col space-y-2 text-xs w-full">
         <span class="font-bold text-xs"> Contact form email template </span>
-        <Editor
-          value={$contactEmailTemplate}
-          on:change={(e) => ($contactEmailTemplate = e.detail.value)}
-        />
+        {#if browser}
+          <Editor
+            value={$contactEmailTemplate}
+            on:change={(e) => ($contactEmailTemplate = e.detail.value)}
+          />
+        {/if}
       </div>
     </div>
     <div class="flex flex-col w-full">
       <div class="flex flex-col space-y-2 text-xs w-full">
         <span class="font-bold text-xs"> FAQ content </span>
-        <Editor
-          value={$faqContent}
-          on:change={(e) => ($faqContent = e.detail.value)}
-        />
+        {#if browser}
+          <Editor
+            value={$faqContent}
+            on:change={(e) => ($faqContent = e.detail.value)}
+          />
+        {/if}
       </div>
     </div>
   </div>

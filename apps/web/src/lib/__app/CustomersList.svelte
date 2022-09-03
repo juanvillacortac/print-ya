@@ -6,6 +6,8 @@
   import { tick } from 'svelte'
   import {
     ChevronDown16,
+    ChevronLeft24,
+    ChevronRight24,
     ChevronSort16,
     ChevronUp16,
     Launch16,
@@ -18,11 +20,17 @@
   import { goto } from '$app/navigation'
   import { layoutData } from '$lib/stores'
   import type { InferQueryInput, InferQueryOutput } from '@shackcart/trpc'
+  import { clamp } from '$lib/utils/math'
 
   export let customers:
     | InferQueryOutput<'customer:list'>['customers']
     | undefined = undefined
   export let total: number | undefined = undefined
+
+  let pageNumber = 1
+  $: pages = Math.ceil((total || 1) / 20)
+
+  let frame: HTMLDivElement | undefined
 
   let timeout: NodeJS.Timeout
   let waitTimeout: NodeJS.Timeout
@@ -42,11 +50,13 @@
         orderBy: {
           [sortBy.prop]: sortBy.sort,
         },
+        page: pageNumber,
       })
       clearTimeout(waitTimeout)
       customers = filtered.customers
       total = filtered.count
       wait = true
+      if (frame) frame.scrollTop = 0
     }
     if (timeout) {
       clearTimeout(timeout)
@@ -281,6 +291,7 @@
   {:else}
     <div
       class="bg-white border rounded-lg flex border-gray-300 w-full max-h-65vh relative overflow-auto dark:bg-gray-800 dark:border-gray-700"
+      bind:this={frame}
     >
       {#if !customers}
         <div class="h-64vh w-full skeleton" />
@@ -439,6 +450,47 @@
           </tbody>
         </table>
       {/if}
+    </div>
+    <div class="flex w-full items-center justify-between">
+      <span class="font-bold text-xs leading-0">
+        {total || 0} customers found
+      </span>
+      <div class="flex space-x-2 items-center">
+        <button
+          title="Previous page"
+          use:tooltip
+          on:click={() => {
+            pageNumber = clamp({ min: 1, max: pages, val: pageNumber - 1 })
+          }}
+        >
+          <ChevronLeft24 />
+        </button>
+        <div
+          class="flex font-bold space-x-2 text-xs text-gray-400 uppercase items-center"
+        >
+          <select
+            bind:value={pageNumber}
+            class="bg-transparent font-bold py-1 appearance-none !border-none !outline-none"
+          >
+            {#each Array.from({ length: pages })
+              .fill({})
+              .map((_, idx) => idx + 1) as n}
+              <option value={n}>{n}</option>
+            {/each}
+          </select>
+          <span>/</span>
+          <p>{pages}</p>
+        </div>
+        <button
+          title="Next page"
+          use:tooltip
+          on:click={() => {
+            pageNumber = clamp({ min: 1, max: pages, val: pageNumber + 1 })
+          }}
+        >
+          <ChevronRight24 />
+        </button>
+      </div>
     </div>
   {/if}
 </div>

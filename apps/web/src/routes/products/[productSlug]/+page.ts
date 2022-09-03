@@ -12,11 +12,8 @@ export const load: PageLoad = async ({ params, fetch, parent }) => {
     productSlug: params.productSlug,
   })
 
-  // const data = await get(
-  //   `/api/stores/${store?.slug}/products/${params.productSlug}`,
-  //   { fetch }
-  // )
-  if (!product || !product.public) throw error(404)
+  if (!product || product.shopifyImportId || product.archived) throw error(404)
+
   return {
     product,
     title: product.name,

@@ -1,17 +1,12 @@
 import trpc from '$lib/trpc/client'
 import { fetchLayoutData } from '$lib/utils/layout'
-import { api } from '@shackcart/shared'
-import { redirect } from '@sveltejs/kit'
 import type { SvelteComponent } from 'svelte/internal'
 import type { LayoutLoad } from './$types'
 
 export const load: LayoutLoad = async ({ url, fetch, params }) => {
-  const { fullHost, host, userAgent, layoutType } = await api.get<App.Locals>(
-    '/api/kit-locals',
-    {
-      fetch: fetch as any,
-    }
-  )
+  const { fullHost, host, userAgent, layoutType } = (await (
+    await fetch('/api/kit-locals')
+  ).json()) as App.Locals
 
   const { notFound, layoutData } = await fetchLayoutData(
     { url, fetch, params },
@@ -25,7 +20,7 @@ export const load: LayoutLoad = async ({ url, fetch, params }) => {
       layoutComponent = (await import('$lib/__layouts/AppLayout.svelte'))
         .default as any
       break
-    case 'store':
+    default:
       if (!layoutData.store) {
         layoutComponent = (await import('$lib/__layouts/AppLayout.svelte'))
           .default as any
