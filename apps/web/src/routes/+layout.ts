@@ -42,3 +42,5 @@ export const load: LayoutLoad = async ({ url, fetch, params }) => {
     layoutComponent,
   }
 }
+
+export const prerender = false
