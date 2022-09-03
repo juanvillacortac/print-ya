@@ -313,7 +313,10 @@
                   <p
                     class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform text-gray-800 text-gray-80 whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 dark:text-white hover:overflow-visible"
                     title="Copy to clipboard"
-                    on:click={() => navigator.clipboard.writeText(o.id)}
+                    on:click={() =>
+                      typeof navigator == 'undefined'
+                        ? null
+                        : navigator.clipboard.writeText(o.id)}
                     use:tooltip
                   >
                     {o.id}
@@ -436,7 +439,7 @@
                     <p
                       class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
                       title="Copy to clipboard"
-                      on:click={() => navigator.clipboard.writeText(o.id)}
+                      on:click={() => typeof navigator == 'undefined' ? null : navigator.clipboard.writeText(o.id)}
                       use:tooltip
                     >
                       {o.id}

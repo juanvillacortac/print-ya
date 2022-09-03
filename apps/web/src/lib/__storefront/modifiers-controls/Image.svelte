@@ -12,6 +12,7 @@
 
   let uploadingImage = false
   const onModifierImagePaste = async (m: ProductModifier) => {
+    if (typeof navigator == 'undefined') return
     try {
       const fileUrl = await navigator.clipboard.readText()
       value.value = fileUrl

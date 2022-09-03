@@ -1064,7 +1064,9 @@
                 class="rounded cursor-pointer font-bold font-mono bg-gray-100 p-1 dark:bg-gray-700"
                 title="Copy address"
                 on:click={() => {
-                  navigator.clipboard.writeText(order.billingData.ip)
+                  typeof navigator == 'undefined'
+                    ? null
+                    : navigator.clipboard.writeText(order.billingData.ip)
                 }}
                 use:tooltip>{order.billingData.ip}</span
               >

@@ -176,43 +176,6 @@
 
 {#if browser}
   <div class="flex flex-col h-screen w-full overflow-hidden">
-    <!-- <div
-      class="bg-white flex shadow w-full p-4 z-50 justify-between items-center dark:bg-gray-800"
-    >
-      <h2 class="font-bold text-xl">ShackCart</h2>
-      <div class="flex space-x-4 items-center">
-        <button
-          class="rounded-lg font-bold border-2 border-blue-500 text-sm py-2 px-2 transform-gpu text-blue-500 duration-200 hover:shadow hover:-translate-y-px"
-          on:click={save}>Export as image</button
-        >
-        <button
-          on:click={() =>
-            navigator.clipboard.writeText(
-              `${window.location.protocol}//${window.location.host}${
-                window.location.pathname
-              }?data=${window.encodeURIComponent(
-                window.btoa(JSON.stringify($editor))
-              )}`
-            )}
-          title="Copy share link"
-          class="flex"
-          use:tooltip
-        >
-          <Share24 />
-        </button>
-        <button
-          on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
-          class="flex relative"
-          title="Toggle theme"
-          use:tooltip
-          style="width: 24px; height: 24px"
-        >
-          <div class="absolute">
-            <svelte:component this={$preferences.darkMode ? Moon24 : Sun24} />
-          </div>
-        </button>
-      </div>
-    </div> -->
     <div
       class="bg-white border-b flex border-light-900 w-full p-2 px-4 z-50 justify-between items-center dark:bg-gray-800  dark:border-gray-800"
     >

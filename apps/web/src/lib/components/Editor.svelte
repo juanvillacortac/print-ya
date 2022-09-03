@@ -163,6 +163,7 @@
           <button
             class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
             on:click={() => {
+              if (typeof navigator == 'undefined') return
               navigator.clipboard.writeText(modelValue)
               notifications.send('Copied to clipboard!', 'default', 1000)
             }}

@@ -104,7 +104,10 @@
           <button
             title="Copy"
             use:tooltip
-            on:click={() => navigator.clipboard.writeText($page.error.stack)}
+            on:click={() =>
+              typeof navigator == 'undefined'
+                ? null
+                : navigator.clipboard.writeText($page.error.stack)}
             class="border rounded flex bg-gray-100 border-gray-300 shadow-lg opacity-50 p-2 duration-200 dark:bg-gray-800 dark:border-gray-600 hover:opacity-100"
           >
             <Copy16 />

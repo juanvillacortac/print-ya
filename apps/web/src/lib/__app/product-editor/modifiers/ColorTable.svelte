@@ -156,11 +156,13 @@
                 title="Click to paste HEX from clipboard"
                 use:tooltip
                 on:click={() =>
-                  navigator.clipboard.readText().then((text) => {
-                    if (text.match(/#[a-fA-F\d]+/)) {
-                      i.name = text
-                    }
-                  })}
+                  typeof navigator == 'undefined'
+                    ? null
+                    : navigator.clipboard.readText().then((text) => {
+                        if (text.match(/#[a-fA-F\d]+/)) {
+                          i.name = text
+                        }
+                      })}
                 class="border rounded cursor-pointer bg-gray-50 border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
                 bind:value={i.name}
                 required

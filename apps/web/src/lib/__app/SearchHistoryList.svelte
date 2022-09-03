@@ -270,7 +270,9 @@
                       class="rounded cursor-pointer font-bold font-mono bg-gray-100 p-1 dark:bg-gray-700"
                       title="Copy address"
                       on:click={() => {
-                        navigator.clipboard.writeText(e.ip)
+                        typeof navigator == 'undefined'
+                          ? null
+                          : navigator.clipboard.writeText(e.ip)
                       }}
                       use:tooltip>{e.ip}</span
                     >
@@ -369,7 +371,9 @@
                           class="rounded cursor-pointer font-bold font-mono bg-gray-100 p-1 dark:bg-gray-700"
                           title="Copy address"
                           on:click={() => {
-                            navigator.clipboard.writeText(e.ip)
+                            typeof navigator == 'undefined'
+                              ? null
+                              : navigator.clipboard.writeText(e.ip)
                           }}
                           use:tooltip>{e.ip}</span
                         >

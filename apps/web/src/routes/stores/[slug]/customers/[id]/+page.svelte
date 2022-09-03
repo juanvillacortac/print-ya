@@ -17,7 +17,10 @@
       <p
         class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
         title="Copy to clipboard"
-        on:click={() => navigator.clipboard.writeText(data.customer.id)}
+        on:click={() =>
+          typeof navigator == 'undefined'
+            ? null
+            : navigator.clipboard.writeText(data.customer.id)}
         use:tooltip
       >
         {data.customer.id}

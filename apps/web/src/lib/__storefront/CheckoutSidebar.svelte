@@ -398,6 +398,7 @@
 
   let detectingShipping = false
   const fillAddress = (mode: 'shipping' | 'billing') => {
+    if (typeof navigator == 'undefined') return
     detectingShipping = true
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
