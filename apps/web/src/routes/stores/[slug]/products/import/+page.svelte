@@ -139,6 +139,7 @@
         />
         <button
           class="border-dashed rounded-lg flex flex-col space-x-4 border-3 border-gray-300 w-full p-4 items-center !mx-auto dark:border-gray-600"
+          type="button"
           on:click={() => document.getElementById('csv-input')?.click()}
         >
           <CloudUpload32 class="text-gray-500" />
