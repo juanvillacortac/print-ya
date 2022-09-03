@@ -76,7 +76,7 @@
       <h3 class="font-bold text-xs block">Product fields</h3>
     </div>
   </div>
-  {#if showing}
+  {#if showing && browser}
     <div
       class="flex flex-col space-y-4 <lg:pb-12"
       transition:slide|local={{ duration: 400, easing: expoOut }}
