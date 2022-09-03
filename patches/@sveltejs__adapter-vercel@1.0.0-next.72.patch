@@ -1,0 +1,13 @@
+diff --git a/index.js b/index.js
+index 37027c836f7a9c8eae371321d9a228e825bda2f6..4f201f4950ab581730cf054e7301bb72dcc81228 100644
+--- a/index.js
++++ b/index.js
+@@ -190,7 +190,7 @@ export default function ({ external = [], edge, split } = {}) {
+ 					format: 'esm',
+ 					external,
+ 					sourcemap: 'linked',
+-					banner: { js: 'globalThis.global = globalThis;' }
++					define: { global: 'globalThis' }
+ 				});
+ 
+ 				write(
