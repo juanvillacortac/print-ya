@@ -435,6 +435,7 @@ export const getProductsByStore = async ({
           },
         }
       : undefined,
+    shopifyImportId: filter?.shopifyImportId || null,
     AND,
   }
   const [count, products] = await prisma.$transaction([
