@@ -43,7 +43,7 @@
   }
 
   $: filteredProducts = s(products, $search || '', ['name']).filter((p) =>
-    $category ? p.storeCategory?.slug === $category : true
+    $category ? p.categories?.some((c) => c.name === $category) : true
   )
 </script>
 
@@ -54,7 +54,7 @@
     <a href="/products" class="hover:underline">Favorites</a>
     <span>/</span>
     <p>
-      {$category ? categories.find((c) => c.slug === $category)?.name : 'All'}
+      {$category ? categories.find((c) => c.name === $category)?.name : 'All'}
     </p>
   </div>
   <h3 class="font-bold font-title text-black text-3xl dark:text-white">

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
-  import { toPng, toSvg } from 'html-to-image'
+  import { toPng } from 'html-to-image'
   import { preferences } from '$lib'
   import type { CompiledTemplate, TemplateSource } from '@shackcart/db'
 

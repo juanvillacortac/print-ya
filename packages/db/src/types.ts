@@ -2,7 +2,6 @@ import type {
   Customer as _Customer,
   User as _User,
   Store as _Store,
-  StoreCategory as _StoreCategory,
   ProductModifier as _ProductModifier,
   ProductModifierItem as _ProductModifierItem,
   Order as _Order,
@@ -22,13 +21,13 @@ import type {
   SearchHistory as _SearchHistory,
   TagsOnProducts,
   ProductTag,
+  ProductCategory,
 } from '@prisma/client'
 
 export {
   _Customer,
   _User,
   _Store,
-  _StoreCategory,
   _ProductModifier,
   _ProductModifierItem,
   _Order,
@@ -36,6 +35,7 @@ export {
   _OrderItem,
   _Product,
   _SearchHistory,
+  ProductCategory,
   ShopifyImport,
   ShopifyImportStatus,
   Account,
@@ -52,14 +52,10 @@ export {
 
 export type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
 
-export type StoreCategory = _StoreCategory
-
 export type Store = _Store & {
   contactData?: any
-  categories?: (StoreCategory & {
-    _count: {
-      products: number
-    }
+  categories?: (ProductCategory & {
+    count: number
   })[]
 }
 
@@ -79,14 +75,14 @@ export type ProductModifier = Omit<_ProductModifier, 'ordinal'> & {
 export type Product = _Product & {
   template: any
   meta?: any
-  storeCategory: StoreCategory | null
+  categories: Omit<ProductCategory, 'storeId'>[]
   tags: Omit<ProductTag, 'storeId'>[]
   modifiers: ProductModifier[]
 }
 
 export type StripedProduct = Omit<_Product, 'templateDraft'> & {
   template: any
-  storeCategory: StoreCategory | null
+  categories?: Omit<ProductCategory, 'storeId'>[]
 }
 
 export type OrderItem = _OrderItem & {
@@ -121,7 +117,7 @@ export type SearchHistory = Overwrite<
   _SearchHistory,
   {
     customer: Customer | null
-    category: StoreCategory | null
+    category: ProductCategory | null
   }
 >
 

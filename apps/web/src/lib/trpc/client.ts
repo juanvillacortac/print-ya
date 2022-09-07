@@ -21,4 +21,6 @@ const trpc = (fetch?: LoadEvent['fetch'], server?: boolean, token?: string) => {
 export default trpc
 
 export const invalidateQuery = (...keys: Exclude<QueryKey, symbol>[]) =>
-  invalidate((href) => keys.some((key) => href.includes(`/api/trpc/${key}`)))
+  invalidate((href) =>
+    keys.some((key) => href.pathname.includes(`/api/trpc/${key}`))
+  )

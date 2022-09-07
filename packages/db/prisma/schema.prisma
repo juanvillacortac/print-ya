@@ -84,17 +84,16 @@ model Store {
 
   logo            String?
   favicon         String?
-  categories      StoreCategory[]
   products        Product[]
   paymentGateways PaymentGateway[]
   orders          Order[]
   customers       Customer[]
 
-  contactData   Json?
-  ProductTag    ProductTag[]
-  SearchHistory SearchHistory[]
-  // ShopifyImport ShopifyImport[]
-  ShopifyImport ShopifyImport[]
+  contactData       Json?
+  ProductTag        ProductTag[]
+  SearchHistory     SearchHistory[]
+  ShopifyImport     ShopifyImport[]
+  productCategories ProductCategory[]
 }
 
 model PaymentGateway {
@@ -104,18 +103,6 @@ model PaymentGateway {
   active   Boolean @default(true)
   store    Store?  @relation(fields: [storeId], references: [id])
   storeId  String?
-}
-
-model StoreCategory {
-  id            String          @id @default(cuid())
-  slug          String
-  store         Store           @relation(fields: [storeId], references: [id])
-  storeId       String
-  name          String
-  products      Product[]
-  SearchHistory SearchHistory[]
-
-  @@unique([slug, storeId])
 }
 
 enum ProductType {
@@ -133,6 +120,28 @@ model ProductTag {
   storeId  String
 
   @@unique([name, storeId])
+}
+
+model ProductCategory {
+  id    String @id @default(cuid())
+  store Store  @relation(fields: [storeId], references: [id])
+  name  String
+
+  products_categories CategoriesOnProducts[]
+  storeId             String
+
+  SearchHistory SearchHistory[]
+
+  @@unique([name, storeId])
+}
+
+model CategoriesOnProducts {
+  product    Product         @relation(fields: [productId], references: [id])
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
+  productId  String
+  categoryId String
+
+  @@id([productId, categoryId])
 }
 
 enum ShopifyImportStatus {
@@ -184,15 +193,13 @@ model Product {
   template      Json?
   templateDraft Json?
 
-  storeCategory   StoreCategory? @relation(fields: [storeCategoryId], references: [id], onDelete: Cascade)
-  storeCategoryId String?
-
   orderItems OrderItem[]
 
   tags TagsOnProducts[]
 
-  shopifyImport   ShopifyImport? @relation(fields: [shopifyImportId], references: [id])
-  shopifyImportId String?
+  shopifyImport       ShopifyImport?         @relation(fields: [shopifyImportId], references: [id])
+  shopifyImportId     String?
+  products_categories CategoriesOnProducts[]
 
   @@unique([slug, storeId])
 }
@@ -313,8 +320,8 @@ model SearchHistory {
   id String @id @default(cuid())
 
   searchTerm String
-  category   StoreCategory? @relation(fields: [storeCategoryId], references: [id])
-  customer   Customer?      @relation(fields: [customerId], references: [id])
+  category   ProductCategory? @relation(fields: [storeCategoryId], references: [id])
+  customer   Customer?        @relation(fields: [customerId], references: [id])
   ip         String
 
   store           Store   @relation(fields: [storeId], references: [id])

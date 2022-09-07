@@ -21,23 +21,6 @@ const mutations = createServer()
       },
     })
   })
-  .mutation('upsertCategory', {
-    input: z.object({
-      id: z.string(),
-      name: z.string(),
-      storeId: z.string().cuid(),
-    }),
-    resolve: async ({ ctx, input }) => {
-      const { userId } = ctx
-      const store = await (
-        await db.getUserStores({ userId })
-      ).find((s) => s.id === input.storeId)
-      if (!store) {
-        throw new Error('not allowed')
-      }
-      return await db.upsertStoreCategory(input)
-    },
-  })
   .mutation('upsert', {
     input: (input: unknown) => input as Partial<db.Store>,
     resolve: async ({ ctx, input }) => {
@@ -64,6 +47,7 @@ const queries = createServer()
       return {
         store,
         storeData,
+        // storeData: {} as StoreData,
       }
     },
   })
@@ -83,6 +67,7 @@ const queries = createServer()
       return {
         store,
         storeData,
+        // storeData: {} as StoreData,
       }
     },
   })

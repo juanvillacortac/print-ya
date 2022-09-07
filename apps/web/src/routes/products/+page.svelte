@@ -1,7 +1,7 @@
 <script lang="ts">
   import Catalog from '$lib/__storefront/products/Catalog.svelte'
   import { page as page_ } from '$app/stores'
-  import { createQueryStore } from '$lib'
+  import { createQueryStore, layoutData } from '$lib'
   import { writable } from 'svelte/store'
   import Searchbar from '$lib/__storefront/Searchbar.svelte'
   import type { PageData } from './$types'
@@ -23,7 +23,7 @@
     $category404 = ''
   }
 
-  $: categories = $page_.data.store?.categories || []
+  $: categories = $layoutData.store?.categories || []
 </script>
 
 <div class="flex flex-col mx-auto space-y-4 w-full p-4 lg:w-[90%]">
@@ -33,7 +33,7 @@
     <a href="/products" class="hover:underline">Products</a>
     <span>/</span>
     <p>
-      {$category ? categories.find((c) => c.slug === $category)?.name : 'All'}
+      {$category ? categories.find((c) => c.name === $category)?.name : 'All'}
     </p>
   </div>
   {#if data.products?.length}

@@ -21,6 +21,7 @@
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'
   import { getBasicTemplate } from '@shackcart/db/dist/utils'
+  import { clamp } from '$lib/utils/math'
 
   const dispatch = createEventDispatcher<{ search: string }>()
 
@@ -93,7 +94,7 @@
         </a>
         {#each store?.categories || [] as category}
           <a
-            href={getCategoryLink(category.slug)}
+            href={getCategoryLink(category.name)}
             data-sveltekit-prefetch
             data-sveltekit-noscroll
             class="flex space-x-2 text-xs hover:underline"
@@ -113,39 +114,41 @@
         <span class="font-bold text-xs leading-0">
           {count} products found
         </span>
-        <div class="flex space-x-4 items-center">
-          <a
-            href={getPageLink(Math.max(pageNumber - 1, 1))}
-            disabled={pageNumber === 1}
+        <div class="flex space-x-2 items-center">
+          <button
             title="Previous page"
-            data-sveltekit-prefetch
             use:tooltip
+            on:click={() => {
+              pageNumber = clamp({ min: 1, max: pages, val: pageNumber - 1 })
+            }}
           >
             <ChevronLeft24 />
-          </a>
-          <div class="flex font-bold space-x-2 text-xs text-gray-400 uppercase">
-            <!-- <select
+          </button>
+          <div
+            class="flex font-bold space-x-2 text-xs text-gray-400 uppercase items-center"
+          >
+            <select
               bind:value={pageNumber}
-              class="bg-transparent font-bold !border-none !outline-none !appearance-none"
+              class="bg-transparent font-bold py-1 appearance-none !border-none !outline-none"
             >
               {#each Array.from({ length: pages })
                 .fill({})
                 .map((_, idx) => idx + 1) as n}
                 <option value={n}>{n}</option>
               {/each}
-            </select> -->
-            <p>{pageNumber}</p>
+            </select>
             <span>/</span>
             <p>{pages}</p>
           </div>
-          <a
-            href={getPageLink(Math.min(pageNumber + 1, pages))}
-            data-sveltekit-prefetch
+          <button
             title="Next page"
             use:tooltip
+            on:click={() => {
+              pageNumber = clamp({ min: 1, max: pages, val: pageNumber + 1 })
+            }}
           >
             <ChevronRight24 />
-          </a>
+          </button>
         </div>
       </div>
       <div
@@ -183,13 +186,15 @@
                   class="font-bold text-sm <sm:text-xl hover:underline"
                   >{p.name}</a
                 >
-                {#if p.storeCategory}
-                  <a
-                    href="/products?category={p.storeCategory?.slug}"
-                    class="text-xs text-blue-500 hover:underline"
-                    >{p.storeCategory?.name}</a
-                  >
-                {/if}
+                <div class="flex flex-wrap -m-1">
+                  {#each p.categories || [] as category}
+                    <a
+                      href="/products?category={encodeURI(category.name)}"
+                      class="rounded bg-gray-200 m-1 text-xs leading-none max-w-14ch p-1 transform duration-200 overflow-hidden whitespace-nowrap overflow-ellipsis dark:bg-gray-600 hover:scale-102 hover:underline"
+                      >{category.name}</a
+                    >
+                  {/each}
+                </div>
               </div>
               <div class="flex w-full justify-between items-end">
                 <p class="font-bold self-end">

@@ -1,6 +1,6 @@
 import { utils } from '@shackcart/shared'
 import { prisma } from 'src/prisma.js'
-import type { Store, StoreCategory } from 'src/types.js'
+import type { Store } from 'src/types.js'
 
 export const getUserStores = ({
   userId,
@@ -32,14 +32,17 @@ export const getStore = async ({
       customDomain,
     },
     include: {
-      categories: {
+      productCategories: {
         include: {
-          products: {
+          products_categories: {
             where: {
-              archived: false,
+              product: {
+                archived: false,
+              },
             },
             select: {
-              id: true,
+              productId: true,
+              categoryId: true,
             },
           },
         },
@@ -52,84 +55,14 @@ export const getStore = async ({
   return store
     ? {
         ...store,
-        categories: store.categories.map((c) => ({
-          ...c,
-          _count: {
-            products: c.products.length,
-          },
+        categories: store.productCategories.map((c) => ({
+          id: c.id,
+          name: c.name,
+          storeId: c.storeId,
+          count: c.products_categories.length,
         })),
       }
     : null
-}
-
-export const getStoreBySubdomain = ({
-  slug,
-}: {
-  slug: string
-}): Promise<Store | null> =>
-  prisma.store.findUnique({
-    where: {
-      slug,
-    },
-    include: {
-      categories: {
-        include: {
-          _count: {
-            select: {
-              products: true,
-            },
-          },
-        },
-        orderBy: {
-          name: 'asc',
-        },
-      },
-    },
-  })
-
-export const upsertStoreCategory = async (
-  category: Omit<StoreCategory, 'slug'>
-): Promise<StoreCategory> => {
-  let c: StoreCategory | null
-  if (category.id) {
-    c = await prisma.storeCategory.findFirst({
-      where: { id: category.id, storeId: category.storeId },
-    })
-    if (!c && !category.id) {
-      throw new Error('not allowed')
-    }
-    return await prisma.storeCategory.update({
-      where: {
-        id: c?.id,
-      },
-      data: {
-        name: category.name,
-      },
-    })
-  }
-  let slug = utils.slugify(category.name)
-  const coincidences = await prisma.storeCategory.findMany({
-    where: {
-      slug: {
-        startsWith: slug,
-      },
-      storeId: category.storeId,
-    },
-  })
-  if (coincidences.length) {
-    slug = `${slug}-${coincidences.length}`
-  }
-  return await prisma.storeCategory.create({
-    data: {
-      name: category.name,
-      slug,
-      store: {
-        connect: {
-          id: category.storeId,
-        },
-      },
-    },
-  })
 }
 
 export const upsertStore = async (

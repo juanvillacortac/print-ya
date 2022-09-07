@@ -124,17 +124,30 @@
             />
           {/if}
           <div
-            class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative pointer-events-none darkborder-gray-700 dark:border-gray-700"
+            class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative darkborder-gray-700 dark:border-gray-700"
+            class:pointer-events-none={!product.meta?.templateImage}
+            on:dragenter|preventDefault|stopPropagation={(e) => {}}
+            on:dragover|preventDefault|stopPropagation={(e) => {}}
+            on:dragend|preventDefault|stopPropagation={(e) => {}}
+            on:drop|preventDefault={(e) => {
+              if (e.dataTransfer && !product.meta?.templateImage) {
+                const dt = e.dataTransfer
+                const files = [...dt.files]
+                if (files?.length && files[0].type.startsWith('image')) {
+                  uploadImage({ currentTarget: { files } })
+                }
+              }
+            }}
           >
-            {#if product.meta?.templateImage}
+            {#if product.meta?.templateImage && !uploading}
               <Image
                 {options}
                 src={product.meta?.templateImage}
-                class="rounded object-cover w-full aspect-square"
+                class="rounded object-cover w-full aspect-square pointer-events-none"
               />
             {:else}
               <div
-                class="flex flex-col text-center w-full text-gray-400 items-center justify-center aspect-square"
+                class="flex flex-col text-center w-full text-gray-400 items-center justify-center aspect-square pointer-events-none"
                 use:squareratio
               >
                 <Image32 class="mb-1" />

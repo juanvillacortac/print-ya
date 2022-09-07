@@ -126,7 +126,6 @@ export async function parseShopifyProductsCSV(
         internalId: crypto_.randomUUID(),
         name: p.Title,
         type: 'template',
-        storeCategoryId: categoryId,
         shopifyImportId,
         slug,
         meta: {

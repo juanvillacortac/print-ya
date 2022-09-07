@@ -32,7 +32,7 @@
     "declarations": "tsc --emitDeclarationOnly --declaration",
     "format": "prisma format",
     "generate": "prisma generate",
-    "db:push": "cp ../../.env . && prisma db push && rm .env",
+    "db:push": "cp ../../.env . && prisma db push --accept-data-loss && rm .env",
     "lint": "eslint ./src --fix",
     "prebuild": "pnpm run generate",
     "predev": "tsup",

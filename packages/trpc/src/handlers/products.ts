@@ -14,6 +14,20 @@ import { createServer } from '../shared.js'
 
 const order = z.enum(['desc', 'asc'])
 
+const categories = createServer()
+  .mutation('delete', {
+    input: z.string().cuid(),
+    resolve: ({ input }) => db.deleteCategory(input),
+  })
+  .mutation('upsert', {
+    input: z.object({
+      id: z.string().cuid().optional(),
+      name: z.string(),
+      storeId: z.string().cuid().optional(),
+    }),
+    resolve: ({ input }) => db.upsertCategory(input),
+  })
+
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {
     const { userId } = await ctx.session.auth({ verify: true })
@@ -150,4 +164,7 @@ const queries = createServer()
     },
   })
 
-export default createServer().merge(mutations).merge(queries)
+export default createServer()
+  .merge(mutations)
+  .merge(queries)
+  .merge('categories:', categories)

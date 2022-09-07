@@ -9,11 +9,12 @@
 
   async function submitSearch() {
     await goto(getSearchUrl())
-    trpc().mutation('analytics:searchHistory:create', {
-      storeId: $layoutData.store!.id,
-      searchTerm: search,
-      categorySlug: category || undefined,
-    })
+    if (search && category) {
+      trpc().mutation('analytics:searchHistory:create', {
+        storeId: $layoutData.store!.id,
+        searchTerm: search,
+      })
+    }
     search = ''
     category = ''
   }
@@ -43,7 +44,7 @@
   >
     <option value="">All products</option>
     {#each $layoutData.store?.categories || [] as category}
-      <option value={category.slug}>{category.name}</option>
+      <option value={category.id}>{category.name}</option>
     {/each}
   </select>
   <button

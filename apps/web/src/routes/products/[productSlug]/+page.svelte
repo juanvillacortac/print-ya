@@ -51,11 +51,11 @@
     <a href="/" class="hover:underline">Home</a>
     <span>/</span>
     <a href="/products" class="hover:underline">Products</a>
-    <span>/</span>
-    <a
+    <!-- <span>/</span> -->
+    <!-- <a
       href="/products?category={product?.storeCategory?.slug}"
       class="hover:underline">{product.storeCategory?.name}</a
-    >
+    > -->
   </div>
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
   <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-2">
@@ -76,6 +76,15 @@
           <div class="font-bold text-lg text-black dark:text-white">
             Total: ${total.toLocaleString()}
           </div>
+        </div>
+        <div class="flex flex-wrap -m-1">
+          {#each product.categories || [] as category}
+            <a
+              href="/products?category={encodeURI(category.name)}"
+              class="rounded bg-gray-200 m-1 text-xs leading-none max-w-14ch p-1 transform duration-200 overflow-hidden whitespace-nowrap overflow-ellipsis dark:bg-gray-600 hover:scale-102 hover:underline"
+              >{category.name}</a
+            >
+          {/each}
         </div>
         <div class="flex w-full lg:w-7/10">
           <ModifiersControls bind:product bind:modifiers />

@@ -15,7 +15,7 @@ export const load: PageLoad = async ({ fetch, url, parent }) => {
       search: url.searchParams.get('search') || undefined,
       page: !page || Number.isNaN(+page) ? undefined : +page,
       categoryId: categorySlug
-        ? categories?.find((c) => c.slug === categorySlug)?.id
+        ? categories?.find((c) => c.name === categorySlug)?.id
         : undefined,
     },
     fetch

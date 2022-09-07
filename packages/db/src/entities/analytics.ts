@@ -4,27 +4,24 @@ import type { SearchHistory } from 'src/types.js'
 export const createSearchEntry = async ({
   ip,
   searchTerm,
-  categorySlug,
+  categoryId,
   storeId,
   customerId,
 }: {
   ip: string
   searchTerm: string
   storeId: string
-  categorySlug?: string
+  categoryId?: string
   customerId?: string
 }): Promise<SearchHistory> => {
   return await prisma.searchHistory.create({
     data: {
       ip,
       searchTerm,
-      category: categorySlug
+      category: categoryId
         ? {
             connect: {
-              slug_storeId: {
-                slug: categorySlug,
-                storeId,
-              },
+              id: categoryId,
             },
           }
         : undefined,
@@ -58,7 +55,7 @@ export const listSearchEntries = async ({
   storeId: string
   filter?: {
     searchTerm?: string
-    categorySlug?: string
+    categoryId?: string
     customerId?: string
   }
   page: number
@@ -103,10 +100,9 @@ export const listSearchEntries = async ({
     ]
   const where: Prisma.SearchHistoryWhereInput = {
     storeId,
-    category: filter?.categorySlug
+    category: filter?.categoryId
       ? {
-          slug: filter.categorySlug,
-          id: storeId,
+          id: filter.categoryId,
         }
       : undefined,
     AND,

@@ -344,7 +344,7 @@
                     {/if}
                   </div>
                 </div>
-                <div class="flex flex-col space-y-1">
+                <!-- <div class="flex flex-col space-y-1">
                   <p class="font-bold text-xs text-black dark:text-white">
                     Category
                   </p>
@@ -355,7 +355,7 @@
                   {:else}
                     <div class="">N/A</div>
                   {/if}
-                </div>
+                </div> -->
                 <div class="flex flex-col space-y-1">
                   <p class="font-bold text-xs text-black dark:text-white">
                     Base price

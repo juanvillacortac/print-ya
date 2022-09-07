@@ -30,7 +30,7 @@
     <div class="w-full grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {#each $layoutData.store?.categories || [] as c}
         <a
-          href="/products?category={c.slug}"
+          href="/products?category={encodeURIComponent(c.name)}"
           class="flex flex-col space-y-4 duration-200 hover:text-red-500"
           data-sveltekit-prefetch
         >

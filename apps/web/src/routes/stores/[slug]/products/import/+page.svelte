@@ -41,6 +41,7 @@
       if (el) {
         el.value = ''
       }
+      csv = undefined
     }
   }
 
@@ -49,6 +50,7 @@
   let csv: File | undefined
   let submitDialog = false
   let done = false
+  let hovering = false
   let search: () => void | undefined
 
   const navHeight: Writable<number> = getContext('navHeight')
@@ -113,7 +115,7 @@
           When the products have been imported we will send you an email.
         </div>
       {:else}
-        <div class="flex space-x-4 items-center">
+        <!-- <div class="flex space-x-4 items-center">
           <div class="flex flex-col space-y-2 w-full">
             <p class="font-bold text-xs">Import to a category (optional)</p>
             <select
@@ -125,7 +127,7 @@
               {/each}
             </select>
           </div>
-        </div>
+        </div> -->
         <input
           type="file"
           accept=".csv"
@@ -138,13 +140,34 @@
           }}
         />
         <button
-          class="border-dashed rounded-lg flex flex-col space-x-4 border-3 border-gray-300 w-full p-4 items-center !mx-auto dark:border-gray-600"
+          class="border-dashed rounded-lg flex flex-col border-3 border-gray-300 w-full p-4 items-center !mx-auto dark:border-gray-600"
           type="button"
           on:click={() => document.getElementById('csv-input')?.click()}
+          on:dragenter|preventDefault|stopPropagation={(e) => {
+            hovering = true
+          }}
+          on:dragover|preventDefault|stopPropagation={(e) => {}}
+          on:dragend|preventDefault|stopPropagation={(e) => {
+            hovering = false
+          }}
+          on:drop|preventDefault={(e) => {
+            if (e.dataTransfer) {
+              const dt = e.dataTransfer
+              const files = [...dt.files]
+              if (files?.length && files[0].type == 'text/csv') {
+                csv = files[0]
+              }
+              hovering = false
+            }
+          }}
         >
-          <CloudUpload32 class="text-gray-500" />
-          <div class="font-bold text-center text-sm text-gray-500">
-            {uploading ? 'Uploading...' : csv?.name || 'Upload CSV file'}
+          <CloudUpload32 class="text-gray-500 pointer-events-none" />
+          <div
+            class="font-bold text-center text-sm text-gray-500 pointer-events-none"
+          >
+            {uploading
+              ? 'Uploading...'
+              : csv?.name || (hovering ? 'Drop file' : 'Upload a CSV file')}
           </div>
         </button>
         <div class="flex space-x-2 items-center justify-end">

@@ -8,6 +8,8 @@ import type {
   _Product,
   ShopifyImportStatus,
   ShopifyImport,
+  ProductCategory,
+  Overwrite,
 } from 'src/types.js'
 
 export const getTags = ({
@@ -38,7 +40,11 @@ export const getProductById = (id: string): Promise<Product | null> =>
         id,
       },
       include: {
-        storeCategory: true,
+        products_categories: {
+          include: {
+            category: true,
+          },
+        },
         tags: {
           include: {
             tag: true,
@@ -66,6 +72,9 @@ export const getProductById = (id: string): Promise<Product | null> =>
     })
     .then((data) => {
       if (data) {
+        // @ts-ignore
+        data.categories =
+          data.products_categories?.map((pc) => pc.category) || []
         // @ts-ignore
         data.tags = data.tags?.map((t) => t.tag) || []
         data.modifiers = data!.modifiers!.map((m) => {
@@ -98,7 +107,11 @@ export const getProductBySlug = ({
         },
       },
       include: {
-        storeCategory: true,
+        products_categories: {
+          include: {
+            category: true,
+          },
+        },
         tags: {
           include: {
             tag: true,
@@ -126,6 +139,9 @@ export const getProductBySlug = ({
     })
     .then((data) => {
       if (data) {
+        // @ts-ignore
+        data.categories =
+          data.products_categories?.map((pc) => pc.category) || []
         // @ts-ignore
         data.tags = data.tags?.map((t) => t.tag) || []
         data.modifiers = data!.modifiers!.map((m) => {
@@ -250,6 +266,46 @@ export const updateShopifyImportStatus = async ({
   return item || null
 }
 
+export const deleteCategory = async (
+  categoryId: string
+): Promise<ProductCategory> => {
+  const category = await prisma.$transaction(async ($prisma) => {
+    await $prisma.categoriesOnProducts.deleteMany({
+      where: {
+        categoryId,
+      },
+    })
+    const category = await $prisma.productCategory.delete({
+      where: {
+        id: categoryId,
+      },
+    })
+    return category
+  })
+  return category
+}
+
+export const upsertCategory = async ({
+  id,
+  name,
+  storeId,
+}: Overwrite<
+  ProductCategory,
+  Partial<Pick<ProductCategory, 'id' | 'storeId'>>
+>): Promise<ProductCategory> =>
+  prisma.productCategory.upsert({
+    create: {
+      name,
+      storeId: storeId || '',
+    },
+    update: {
+      name,
+    },
+    where: {
+      id: id || '',
+    },
+  })
+
 export const reviewProductFromShopifyImport = async (
   productId: string
 ): Promise<Product | null> => {
@@ -372,8 +428,13 @@ export const getProductsByStore = async ({
     storeId,
     public: filter?.public,
     archived: filter?.archived || false,
-    storeCategoryId: filter?.categoryId,
-    shopifyImportId: filter?.shopifyImportId || null,
+    products_categories: filter?.categoryId
+      ? {
+          some: {
+            categoryId: filter.categoryId,
+          },
+        }
+      : undefined,
     AND,
   }
   const [count, products] = await prisma.$transaction([
@@ -393,8 +454,6 @@ export const getProductsByStore = async ({
         slug: true,
         description: true,
         store: true,
-        storeCategory: true,
-        storeCategoryId: true,
         storeId: true,
         updatedAt: true,
         archived: true,
@@ -403,6 +462,11 @@ export const getProductsByStore = async ({
         meta: true,
         archivedAt: true,
         shopifyImportId: true,
+        products_categories: {
+          include: {
+            category: true,
+          },
+        },
         tags: {
           include: {
             tag: true,
@@ -413,7 +477,11 @@ export const getProductsByStore = async ({
   ])
   return {
     count,
-    products: products.map((p) => ({ ...p, tags: p.tags.map((t) => t.tag) })),
+    products: products.map((p) => ({
+      ...p,
+      categories: p.products_categories.map((pc) => pc.category),
+      tags: p.tags.map((t) => t.tag),
+    })),
   }
 }
 
@@ -433,6 +501,14 @@ export const upsertProduct = async (
     })
     if (!c) {
       throw new Error('not allowed')
+    }
+
+    if (product.categories) {
+      await prisma.categoriesOnProducts.deleteMany({
+        where: {
+          productId: product.id,
+        },
+      })
     }
 
     if (product.tags) {
@@ -462,20 +538,42 @@ export const upsertProduct = async (
               ? new Date()
               : null
             : undefined,
-        storeCategory:
-          product.storeCategoryId === null
-            ? {
-                disconnect: true,
-              }
-            : product.storeCategoryId
-            ? {
-                connect: {
-                  id: product.storeCategoryId || undefined,
-                },
-              }
-            : undefined,
+        // storeCategory:
+        //   product.storeCategoryId === null
+        //     ? {
+        //         disconnect: true,
+        //       }
+        //     : product.storeCategoryId
+        //     ? {
+        //         connect: {
+        //           id: product.storeCategoryId || undefined,
+        //         },
+        //       }
+        //     : undefined,
         template: product.template,
         templateDraft: product.templateDraft as Prisma.InputJsonObject,
+        products_categories: {
+          create: product.categories
+            ? product.categories.map((c) => {
+                return {
+                  category: {
+                    connectOrCreate: {
+                      create: {
+                        name: c.name,
+                        storeId: product.storeId || '',
+                      },
+                      where: {
+                        name_storeId: {
+                          name: c.name,
+                          storeId: product.storeId || '',
+                        },
+                      },
+                    },
+                  },
+                }
+              })
+            : [],
+        },
         tags: {
           create: product.tags
             ? product.tags.map((t) => {
@@ -629,10 +727,27 @@ export const upsertProduct = async (
           id: product.storeId!,
         },
       },
-      storeCategory: {
-        connect: {
-          id: product.storeCategoryId!,
-        },
+      products_categories: {
+        create: product.categories
+          ? product.categories.map((c) => {
+              return {
+                category: {
+                  connectOrCreate: {
+                    create: {
+                      name: c.name,
+                      storeId: product.storeId || '',
+                    },
+                    where: {
+                      name_storeId: {
+                        name: c.name,
+                        storeId: product.storeId || '',
+                      },
+                    },
+                  },
+                },
+              }
+            })
+          : [],
       },
       tags: {
         create: product.tags
@@ -699,7 +814,6 @@ export const createProductsFromBatch = async (
       meta: p.meta,
       slug: p.slug || '',
       storeId,
-      storeCategoryId: p.storeCategoryId,
       shopifyImportId: p.shopifyImportId || undefined,
       template: p.template,
       templateDraft: p.template,
@@ -731,48 +845,6 @@ export const createProductsFromBatch = async (
           percentage: i.percentage,
         }))
       ) || []
-    // tags: {
-    //   create: product.tags
-    //     ? product.tags.map((t) => {
-    //         return {
-    //           tag: {
-    //             connectOrCreate: {
-    //               create: {
-    //                 name: t.name,
-    //                 storeId,
-    //               },
-    //               where: {
-    //                 name_storeId: {
-    //                   name: t.name,
-    //                   storeId: storeId,
-    //                 },
-    //               },
-    //             },
-    //           },
-    //         }
-    //       })
-    //     : [],
-    // },
-    // modifiers: {
-    //   create: product
-    //     .modifiers!.filter((m) => m.active)
-    //     .map((m, idx) => ({
-    //       id: m.id,
-    //       ordinal: idx,
-    //       name: m.name,
-    //       type: m.type,
-    //       defaultValue: m.defaultValue || undefined,
-    //       templateAccessor: m.templateAccessor || undefined,
-    //       items: {
-    //         create: m.items!.map((i, idx) => ({
-    //           ordinal: idx,
-    //           name: i.name,
-    //           cost: i.cost,
-    //           meta: i.meta,
-    //           percentage: i.percentage,
-    //         })),
-    //       },
-    //     })),
     return { product, tags, modifiers, items }
   })
 
@@ -790,7 +862,6 @@ export const createProductsFromBatch = async (
           shopifyImportId: product.shopifyImportId,
           template: product.template,
           templateDraft: product.templateDraft,
-          storeCategoryId: product.storeCategoryId,
           description: product.description,
           public: product.public,
         })),
