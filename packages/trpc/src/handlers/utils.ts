@@ -24,19 +24,17 @@ export default createServer()
   })
   .query('deleteAllProducts', {
     resolve: async ({}) => {
-      await prisma.$transaction(async ($prisma) => {
-        await $prisma.orderItem.deleteMany({})
-        await $prisma.orderFee.deleteMany({})
-        await $prisma.tagsOnProducts.deleteMany({})
-        await $prisma.categoriesOnProducts.deleteMany({})
-        await $prisma.productTag.deleteMany({})
-        await $prisma.productCategory.deleteMany({})
-        await $prisma.order.deleteMany({})
-        await $prisma.productModifierItem.deleteMany({})
-        await $prisma.productModifier.deleteMany({})
-        await $prisma.product.deleteMany({})
-        await $prisma.shopifyImport.deleteMany({})
-      })
+      await prisma.orderItem.deleteMany({})
+      await prisma.orderFee.deleteMany({})
+      await prisma.tagsOnProducts.deleteMany({})
+      await prisma.categoriesOnProducts.deleteMany({})
+      await prisma.productTag.deleteMany({})
+      await prisma.productCategory.deleteMany({})
+      await prisma.order.deleteMany({})
+      await prisma.productModifierItem.deleteMany({})
+      await prisma.productModifier.deleteMany({})
+      await prisma.product.deleteMany({})
+      await prisma.shopifyImport.deleteMany({})
       return {
         ok: true,
       }
