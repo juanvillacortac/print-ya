@@ -17,7 +17,7 @@ export default createServer()
     input: z.object({
       supabasePath: z.string(),
       storeId: z.string().cuid(),
-      categoryId: z.string().cuid().optional(),
+      categories: z.array(z.string()).optional(),
     }),
     resolve: async ({ input, ctx }) => {
       const { userId } = await ctx.session.auth({ verify: true })

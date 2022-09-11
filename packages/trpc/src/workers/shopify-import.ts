@@ -13,13 +13,13 @@ sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
 export type ImportInput = {
   supabasePath: string
   importId: string
-  categoryId?: string
+  categories?: string[]
   storeId: string
   userId: string
 }
 
 export const importProducts = async (input: ImportInput) => {
-  const { supabasePath, categoryId, storeId, userId, importId } = input
+  const { supabasePath, categories, storeId, userId, importId } = input
   try {
     const blob = await supabase.downloadFile({
       bucket: 'assets',
@@ -29,13 +29,13 @@ export const importProducts = async (input: ImportInput) => {
 
     const body = await blob.text()
 
-    const products = await parseShopifyProductsCSV(
-      categoryId || undefined,
-      importId,
-      {
+    const products = await parseShopifyProductsCSV({
+      categories,
+      shopifyImportId: importId,
+      obj: {
         body,
-      }
-    )
+      },
+    })
 
     const count = await db.createProductsFromBatch(products, storeId)
 
@@ -103,11 +103,15 @@ export const importProducts = async (input: ImportInput) => {
   }
 }
 
-export async function parseShopifyProductsCSV(
-  categoryId: string | undefined,
-  shopifyImportId: string,
+export async function parseShopifyProductsCSV({
+  categories = [],
+  obj,
+  shopifyImportId,
+}: {
+  categories?: string[]
+  shopifyImportId: string
   obj: { body: string } | { filePath: string } | never
-): Promise<(Partial<db.Product> & { internalId: string })[]> {
+}): Promise<(Partial<db.Product> & { internalId: string })[]> {
   let data: any[]
   if ('body' in obj) {
     data = await csvtojson().fromString(obj.body)
@@ -121,6 +125,7 @@ export async function parseShopifyProductsCSV(
     (p) => {
       const { meta, modifiers } = generateDefaultModifiers()
       const id = nanoid(6).toLocaleLowerCase()
+      const tags = String(p['Tags']).split(', ')
       let slug = `${utils.slugify(p.Title)}-${id}`
       const product: Partial<db.Product> & { internalId: string } = {
         internalId: crypto_.randomUUID(),
@@ -133,12 +138,16 @@ export async function parseShopifyProductsCSV(
           templateImage: p['Image Src'],
           ...meta,
         },
-        tags: String(p['Tags'])
-          .split(', ')
-          .map((t) => ({
-            name: t,
+        categories: categories
+          .filter((c) => tags.includes(c))
+          .map((c) => ({
+            name: c,
             id: '',
           })),
+        tags: tags.map((t) => ({
+          name: t,
+          id: '',
+        })),
         description: p['Body (HTML)'],
         public: false,
         price: Number.parseFloat(p['Variant Price']),
@@ -155,7 +164,7 @@ export default createServer().mutation('create', {
     supabasePath: z.string(),
     storeId: z.string().cuid(),
     importId: z.string().cuid(),
-    categoryId: z.string().cuid().optional(),
+    categories: z.array(z.string()).optional(),
     userId: z.string().cuid(),
   }),
   resolve: async ({ input }) => {

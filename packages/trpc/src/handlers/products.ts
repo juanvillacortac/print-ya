@@ -27,6 +27,18 @@ const categories = createServer()
     }),
     resolve: ({ input }) => db.upsertCategory(input),
   })
+  .mutation('migrate', {
+    input: z.object({
+      tags: z.array(z.string()),
+      storeId: z.string().cuid(),
+    }),
+    resolve: async ({ input }) => {
+      const count = await db.migrateCategories(input.tags, input.storeId)
+      return {
+        count,
+      }
+    },
+  })
 
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {

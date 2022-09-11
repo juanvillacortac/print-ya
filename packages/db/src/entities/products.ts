@@ -819,6 +819,12 @@ export const createProductsFromBatch = async (
       template: p.template,
       templateDraft: p.template,
     }
+    const categories =
+      p.categories?.map((t) => ({
+        name: t.name,
+        productId: product.id,
+        storeId: storeId,
+      })) || []
     const tags =
       p.tags?.map((t) => ({
         name: t.name,
@@ -846,7 +852,7 @@ export const createProductsFromBatch = async (
           percentage: i.percentage,
         }))
       ) || []
-    return { product, tags, modifiers, items }
+    return { product, tags, modifiers, items, categories }
   })
 
   const batch = await prisma.$transaction(
@@ -926,6 +932,29 @@ export const createProductsFromBatch = async (
           })),
         skipDuplicates: true,
       })
+
+      const existentCategories = await $prisma.productCategory.findMany({
+        where: {
+          name: {
+            in: data.flatMap(({ categories }) => categories).map((t) => t.name),
+          },
+          storeId,
+        },
+      })
+
+      let categoriesDict = new Map<string, string>()
+      existentCategories.forEach((t) => categoriesDict.set(t.name, t.id))
+
+      const categoriesOnProducts =
+        await $prisma.categoriesOnProducts.createMany({
+          data: data
+            .flatMap(({ categories }) => categories)
+            .map((t) => ({
+              productId: t.productId,
+              categoryId: categoriesDict.get(t.name) || '',
+            })),
+          skipDuplicates: true,
+        })
       return products.count
     },
     {
@@ -934,4 +963,49 @@ export const createProductsFromBatch = async (
     }
   )
   return batch
+}
+
+export async function migrateCategories(tags: string[], storeId: string) {
+  await prisma.productCategory.createMany({
+    data: tags.map((name) => ({
+      name,
+      storeId,
+    })),
+    skipDuplicates: true,
+  })
+  const categories = await prisma.productCategory.findMany({
+    where: {
+      name: {
+        in: tags,
+      },
+      storeId,
+    },
+  })
+  const map = new Map(categories.map((c) => [c.name, c.id]))
+  const matched = (
+    await prisma.tagsOnProducts.findMany({
+      include: {
+        tag: true,
+      },
+      where: {
+        product: {
+          archived: false,
+        },
+        tag: {
+          storeId,
+          name: {
+            in: tags,
+          },
+        },
+      },
+    })
+  ).map((t) => ({
+    categoryId: map.get(t.tag.name) || '',
+    productId: t.productId,
+  }))
+  const { count } = await prisma.categoriesOnProducts.createMany({
+    data: matched,
+    skipDuplicates: true,
+  })
+  return count
 }
