@@ -9,7 +9,7 @@
 
   async function submitSearch() {
     await goto(getSearchUrl())
-    if (search && category) {
+    if (search) {
       trpc().mutation('analytics:searchHistory:create', {
         storeId: $layoutData.store!.id,
         searchTerm: search,
