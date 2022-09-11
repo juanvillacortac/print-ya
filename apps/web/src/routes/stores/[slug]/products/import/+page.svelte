@@ -24,23 +24,23 @@
   import { flip } from 'svelte/animate'
 
   async function upload() {
-    // if (!csv) return
+    if (!csv) return
     uploading = true
     try {
-      // const { path } = await supabase.uploadFile({
-      //   file: csv,
-      //   bucket: 'assets',
-      //   path: '/shopify',
-      // })
-      // await trpc().mutation('shopify:create', {
-      //   categories: [...new Set(tagsToCategories)],
-      //   storeId: $layoutData.store!.id,
-      //   supabasePath: path,
-      // })
-      await trpc().mutation('products:categories:migrate', {
-        tags: [...new Set(tagsToCategories)],
-        storeId: $layoutData.store!.id,
+      const { path } = await supabase.uploadFile({
+        file: csv,
+        bucket: 'assets',
+        path: '/shopify',
       })
+      await trpc().mutation('shopify:create', {
+        categories: [...new Set(tagsToCategories)],
+        storeId: $layoutData.store!.id,
+        supabasePath: path,
+      })
+      // await trpc().mutation('products:categories:migrate', {
+      //   tags: [...new Set(tagsToCategories)],
+      //   storeId: $layoutData.store!.id,
+      // })
       resetImport()
       done = true
       if (search) search()

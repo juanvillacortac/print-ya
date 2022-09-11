@@ -278,7 +278,7 @@
           </button>
           <button
             on:click={() => {
-              api.del('/login', {}).then(() => {
+              api.del('/api/auth', {}).then(() => {
                 // if (!logout) return
                 if ($page.url.pathname.startsWith('/account')) {
                   window.location.replace('/login')

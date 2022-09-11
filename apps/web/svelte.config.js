@@ -9,7 +9,7 @@ const adapter = () => {
     case 'node':
       return node()
     case 'vercel':
-      return vercel()
+      return vercel({ edge: true })
     default:
       return auto()
   }
@@ -23,11 +23,7 @@ const config = {
     env: {
       dir: '../../',
     },
-    methodOverride: {
-      parameter: '_method',
-      allowed: ['PUT', 'PATCH', 'DELETE'],
-    },
-    inlineStyleThreshold: 48 / 0.0009765625,
+    inlineStyleThreshold: Infinity,
   },
 }
 

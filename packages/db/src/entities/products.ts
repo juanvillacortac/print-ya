@@ -926,6 +926,7 @@ export const createProductsFromBatch = async (
       const tagsOnProducts = await $prisma.tagsOnProducts.createMany({
         data: data
           .flatMap(({ tags }) => tags)
+          .filter((t) => tagsDict.get(t.name))
           .map((t) => ({
             productId: t.productId,
             productTagId: tagsDict.get(t.name) || '',
@@ -949,6 +950,7 @@ export const createProductsFromBatch = async (
         await $prisma.categoriesOnProducts.createMany({
           data: data
             .flatMap(({ categories }) => categories)
+            .filter((t) => categoriesDict.get(t.name))
             .map((t) => ({
               productId: t.productId,
               categoryId: categoriesDict.get(t.name) || '',

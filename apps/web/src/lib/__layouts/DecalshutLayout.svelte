@@ -278,7 +278,7 @@
                   <button
                     class="flex space-x-2 items-center disabled:cursor-not-allowed disabled:opacity-50 hover:not-disabled:underline"
                     on:click={() => {
-                      api.del('/login', {}).then(() => {
+                      api.del('/api/auth', {}).then(() => {
                         // if (!logout) return
                         if ($page.url.pathname.startsWith('/account')) {
                           window.location.replace('/login')
