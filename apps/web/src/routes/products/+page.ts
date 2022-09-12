@@ -7,13 +7,13 @@ export const load: PageLoad = async ({ fetch, url, parent }) => {
   } = await parent()
   const categories = store?.categories || []
   const categorySlug = url.searchParams.get('category')
-  const page = url.searchParams.get('page')
+  const page = url.searchParams.get('page') || ''
 
   const { count, products } = await fetchProducts(
     {
       storeSlug: store?.slug || '',
       search: url.searchParams.get('search') || undefined,
-      page: !page || Number.isNaN(+page) ? undefined : +page,
+      page: +page || 1,
       categoryId: categorySlug
         ? categories?.find((c) => c.name === categorySlug)?.id
         : undefined,
