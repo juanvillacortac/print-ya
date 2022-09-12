@@ -81,7 +81,7 @@ const payment = createServer()
       .nullable()
       .describe('Stripe payment intent client secret'),
     resolve: async ({ input: { amount, currency, storeId } }) => {
-      const key = await redis.get<string>(`store:${storeId}:stripe:secret`)
+      const key = await redis.get<string>(`store:${storeId}:stripe:private`)
       const stripe = new Stripe(
         key || '',
         // 'sk_test_51I7RL6J2WplztltUOlXaPetKyPuxBVvltv3Sw1saE28kDZRUBHiabRq4x4CifO8szv41kI8ed5zYp6de3Be36tZ200UiY7OksM',
