@@ -1,7 +1,10 @@
+import type { MailDataRequired } from '@sendgrid/mail'
 import * as db from '@shackcart/db'
+import { utils } from '@shackcart/shared'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createServer } from '../shared.js'
+import sendgrid from '@sendgrid/mail'
 
 const order = z.enum(['desc', 'asc'])
 
@@ -16,8 +19,33 @@ export default createServer()
       storeId: z.string().cuid(),
     }),
     resolve: async ({ ctx, input }) => {
+      sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
       try {
         const { body } = await db.registerCustomer(input)
+        const store = await db.getStore({ id: input.storeId })
+
+        const loginUrl = utils.getAbsoluteURL({
+          path: `/login`,
+          subdomain: !store?.customDomain ? store?.slug : undefined,
+          host: store?.customDomain || undefined,
+        })
+        const msg: MailDataRequired = {
+          to: input.email,
+          from: {
+            name: store?.name || 'ShackCart',
+            email: `${store?.slug}@shackcart.com`,
+          },
+
+          headers: {
+            Priority: 'Urgent',
+            Importance: 'high',
+          },
+          subject: `Welcome to ${store?.name}, ${input.firstName}!`,
+          html: `<h1>Welcome, ${input.firstName}!</h1>
+<p><strong>Your new password is:</strong> ${input.password}</p>
+<p>You can login to your new account <a href="${loginUrl}">here</a>.</p>`,
+        }
+        await sendgrid.send(msg)
         return ctx.session.setCustomer(body.customerId)
       } catch (err) {
         console.error(err.message)
