@@ -8,6 +8,11 @@ import { marked } from 'marked'
 import { createServer } from '../shared.js'
 import type { StoreData } from '@shackcart/db'
 
+const redis = new Redis({
+  url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+  token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
+})
+
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {
     const { userId } = await ctx.session.auth({ verify: true })
@@ -35,10 +40,6 @@ const queries = createServer()
     input: z.string(),
     resolve: async ({ input }) => {
       const store = await db.getStore({ slug: input })
-      const redis = new Redis({
-        url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
-        token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
-      })
       const storeData = store
         ? await (
             await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
@@ -55,10 +56,6 @@ const queries = createServer()
     input: z.string(),
     resolve: async ({ input }) => {
       const store = await db.getStore({ host: input })
-      const redis = new Redis({
-        url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
-        token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
-      })
       const storeData = store
         ? await (
             await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
@@ -72,37 +69,102 @@ const queries = createServer()
     },
   })
 
-const payment = createServer().mutation('createStripeIntent', {
-  input: z.object({
-    currency: z.string().min(3).max(3),
-    amount: z.number().min(0.5),
-  }),
-  output: z.string().nullable().describe('Stripe payment intent client secret'),
-  resolve: async ({ input: { amount, currency } }) => {
-    const stripe = new Stripe(
-      'sk_test_51I7RL6J2WplztltUOlXaPetKyPuxBVvltv3Sw1saE28kDZRUBHiabRq4x4CifO8szv41kI8ed5zYp6de3Be36tZ200UiY7OksM',
-      {
-        // @ts-ignore
-        apiVersion: null,
-        typescript: true,
-      }
-    )
+const payment = createServer()
+  .mutation('createStripeIntent', {
+    input: z.object({
+      currency: z.string().min(3).max(3),
+      amount: z.number().min(0.5),
+      storeId: z.string(),
+    }),
+    output: z
+      .string()
+      .nullable()
+      .describe('Stripe payment intent client secret'),
+    resolve: async ({ input: { amount, currency, storeId } }) => {
+      const key = await redis.get<string>(`store:${storeId}:stripe:secret`)
+      const stripe = new Stripe(
+        key || '',
+        // 'sk_test_51I7RL6J2WplztltUOlXaPetKyPuxBVvltv3Sw1saE28kDZRUBHiabRq4x4CifO8szv41kI8ed5zYp6de3Be36tZ200UiY7OksM',
+        {
+          // @ts-ignore
+          apiVersion: null,
+          typescript: true,
+        }
+      )
 
-    try {
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.trunc(amount * 100),
-        currency,
-        payment_method_types: ['card'],
-      })
-      return paymentIntent.client_secret
-    } catch (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message,
-      })
-    }
-  },
-})
+      try {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.trunc(amount * 100),
+          currency,
+          payment_method_types: ['card'],
+        })
+        return paymentIntent.client_secret
+      } catch (error) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message,
+        })
+      }
+    },
+  })
+  .mutation('setGatewaysCredentials', {
+    input: z.object({
+      storeId: z.string(),
+      stripe: z
+        .object({
+          publicKey: z.string().optional(),
+          privateKey: z.string().optional(),
+        })
+        .optional(),
+      paypal: z
+        .object({
+          clientId: z.string().optional(),
+        })
+        .optional(),
+    }),
+    resolve: async ({ input: { storeId, paypal, stripe } }) => {
+      if (stripe?.publicKey) {
+        await redis.set<string>(
+          `store:${storeId}:stripe:public`,
+          stripe.publicKey
+        )
+      }
+      if (stripe?.privateKey) {
+        await redis.set<string>(
+          `store:${storeId}:stripe:private`,
+          stripe.privateKey
+        )
+      }
+      if (paypal?.clientId) {
+        await redis.set<string>(
+          `store:${storeId}:paypal:clientId`,
+          paypal.clientId
+        )
+      }
+      return {
+        ok: true,
+      }
+    },
+  })
+  .query('gatewaysPublicCredentials', {
+    input: z.string({ description: 'Store Id' }),
+    resolve: async ({ input }) => {
+      const stripePublicKey = await redis.get<string>(
+        `store:${input}:stripe:public`
+      )
+      const paypalClientId = await redis.get<string>(
+        `store:${input}:paypal:clientId`
+      )
+      return {
+        stripe: {
+          publicKey: stripePublicKey,
+        },
+        paypal: {
+          clientId: paypalClientId,
+        },
+      }
+    },
+  })
 
 export default createServer()
   .merge(mutations)
@@ -123,10 +185,6 @@ export default createServer()
         if (!store) {
           return { ok: false }
         }
-        const redis = new Redis({
-          url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
-          token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
-        })
         let template =
           (
             await redis.get<{ json: string }>(

@@ -33,11 +33,14 @@
   import type { BagItem } from '$lib'
   import { customer, layoutData, redisWritable } from '$lib/stores'
   import { getTotalFromProductModifiers } from '@shackcart/db/dist/utils'
+  import type { InferQueryOutput } from '@shackcart/trpc'
 
   const countries = getCountries()
 
   let stripe: Stripe | null
   let paypal: PayPalNamespace | null
+
+  export let credentials: InferQueryOutput<'stores:payment:gatewaysPublicCredentials'>
 
   const stripeKey = redisWritable<string | undefined>(
     undefined,
@@ -50,11 +53,12 @@
 
   onMount(async () => {
     stripe = await loadStripe(
-      'pk_test_51I7RL6J2WplztltUdJyNQb1xLxVbXhB6QUu3R753Vuxq1xatD8cpU49K5m3q0fPfnK4ayhMPfg8xjLxxbrVqHjG600IC5Q2yzL'
+      credentials.stripe.publicKey || ''
+      // 'pk_test_51I7RL6J2WplztltUdJyNQb1xLxVbXhB6QUu3R753Vuxq1xatD8cpU49K5m3q0fPfnK4ayhMPfg8xjLxxbrVqHjG600IC5Q2yzL'
     )
     paypal = await loadScript({
-      'client-id':
-        'AeFkK76hZkhCrPuLpM1yAiCHXSzro1INVTH2S0WFmzuWekXPCIh4tdAGW569cRVRGIoLIUdOwrggqo-T',
+      'client-id': credentials.paypal.clientId || '',
+      // 'AeFkK76hZkhCrPuLpM1yAiCHXSzro1INVTH2S0WFmzuWekXPCIh4tdAGW569cRVRGIoLIUdOwrggqo-T',
     })
   })
 
@@ -152,6 +156,7 @@
     trpc().mutation('stores:payment:createStripeIntent', {
       amount: total,
       currency: 'usd',
+      storeId: $layoutData.store?.id || '',
     })
 
   let cardElement: any

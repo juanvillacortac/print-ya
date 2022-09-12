@@ -17,6 +17,7 @@
   import { Editor } from 'bytemd'
   import { supabase } from '@shackcart/shared'
   import { browser } from '$app/environment'
+  import type { InferMutationInput } from '@shackcart/trpc'
 
   let store = { ...$layoutData.store! }
   const contactEmailTemplate = redisWritable(
@@ -32,6 +33,15 @@
 
   let email = (store.contactData as any)?.email || ''
   let phone = (store.contactData as any)?.phone || ''
+  let credentials = {
+    paypal: {
+      clientId: '',
+    },
+    stripe: {
+      privateKey: '',
+      publicKey: '',
+    },
+  }
 
   const options: CaravaggioOptions = {
     progressive: true,
@@ -458,8 +468,36 @@
     </div>
   </div>
 
-  <div
+  <form
     class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
+    on:submit|preventDefault={async () => {
+      saving = true
+      try {
+        const data = await trpc().mutation(
+          'stores:payment:setGatewaysCredentials',
+          {
+            ...credentials,
+            storeId: $layoutData.store?.id || '',
+          }
+        )
+
+        if (data.ok) {
+          credentials = {
+            paypal: {
+              clientId: '',
+            },
+            stripe: {
+              privateKey: '',
+              publicKey: '',
+            },
+          }
+        }
+      } catch (err) {
+        console.log(err.message, err.error)
+      } finally {
+        saving = false
+      }
+    }}
   >
     <h5 class="font-bold font-title text-sm">Payment gateways</h5>
     <div
@@ -479,8 +517,7 @@
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
             type="text"
             style="text-security:disc; -webkit-text-security:disc;"
-            required
-            bind:value={store.name}
+            bind:value={credentials.stripe.publicKey}
           />
         </div>
         <div class="flex flex-col w-full">
@@ -489,8 +526,7 @@
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
             type="text"
             style="text-security:disc; -webkit-text-security:disc;"
-            required
-            bind:value={store.name}
+            bind:value={credentials.stripe.privateKey}
           />
         </div>
       </div>
@@ -511,10 +547,9 @@
           class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
           type="text"
           style="text-security:disc; -webkit-text-security:disc;"
-          required
-          bind:value={store.name}
+          bind:value={credentials.paypal.clientId}
         />
       </div>
     </div>
-  </div>
+  </form>
 </div>

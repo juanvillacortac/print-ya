@@ -32,6 +32,7 @@
     getTemplateFieldsFromModifiers,
     getTotalFromProductModifiers,
   } from '@shackcart/db/dist/utils'
+  import type { PageData } from './$types'
   let mounted = false
   onMount(() => {
     const unsuscribe = bag.subscribe((items) => {
@@ -167,6 +168,8 @@
     bag.setItem(product, modifiers, newModifiers)
     $disableTransition = false
   }
+
+  export let data: PageData
 </script>
 
 <svelte:head>
@@ -182,6 +185,7 @@
   bind:order={$currentOrder}
   bind:open={checkout}
   dark={$preferences.darkMode}
+  credentials={data.gatewaysKeys}
   items={$bag}
   {products}
 />
