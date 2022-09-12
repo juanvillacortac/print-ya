@@ -47,6 +47,7 @@
       {...data}
       bind:page={pageNumber}
       on:search={(e) => {
+        pageNumber = 1
         $search = e.detail
       }}
     />
