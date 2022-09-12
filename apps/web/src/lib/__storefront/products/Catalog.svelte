@@ -229,6 +229,47 @@
           </div>
         {/each}
       </div>
+      <div class="flex h-33px w-full items-center justify-between">
+        <span class="font-bold text-xs leading-0">
+          {count} products found
+        </span>
+        <div class="flex space-x-2 items-center">
+          <button
+            title="Previous page"
+            use:tooltip
+            on:click={() => {
+              pageNumber = clamp({ min: 1, max: pages, val: pageNumber - 1 })
+            }}
+          >
+            <ChevronLeft24 />
+          </button>
+          <div
+            class="flex font-bold space-x-2 text-xs text-gray-400 uppercase items-center"
+          >
+            <select
+              bind:value={pageNumber}
+              class="bg-transparent font-bold py-1 appearance-none !border-none !outline-none"
+            >
+              {#each Array.from({ length: pages })
+                .fill({})
+                .map((_, idx) => idx + 1) as n}
+                <option value={n}>{n}</option>
+              {/each}
+            </select>
+            <span>/</span>
+            <p>{pages}</p>
+          </div>
+          <button
+            title="Next page"
+            use:tooltip
+            on:click={() => {
+              pageNumber = clamp({ min: 1, max: pages, val: pageNumber + 1 })
+            }}
+          >
+            <ChevronRight24 />
+          </button>
+        </div>
+      </div>
     </div>
   {:else}
     <div

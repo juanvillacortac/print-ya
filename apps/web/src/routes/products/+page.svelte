@@ -23,6 +23,9 @@
     $category404 = ''
   }
 
+  let pageNumber = !$page || Number.isNaN(+$page) ? 1 : +$page
+  $: $page = `${pageNumber}`
+
   $: categories = $layoutData.store?.categories || []
 </script>
 
@@ -39,7 +42,7 @@
   {#if data.products?.length}
     <Catalog
       {...data}
-      page={!$page || Number.isNaN(+$page) ? 1 : +$page}
+      bind:page={pageNumber}
       on:search={(e) => {
         $search = e.detail
       }}
