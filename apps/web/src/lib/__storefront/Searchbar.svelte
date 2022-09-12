@@ -13,6 +13,7 @@
       trpc().mutation('analytics:searchHistory:create', {
         storeId: $layoutData.store!.id,
         searchTerm: search,
+        categorySlug: category,
       })
     }
     search = ''
