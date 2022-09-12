@@ -5,6 +5,7 @@
   import { writable } from 'svelte/store'
   import Searchbar from '$lib/__storefront/Searchbar.svelte'
   import type { PageData } from './$types'
+  import trpc from '$lib/trpc/client'
 
   export let data: PageData
 
@@ -49,6 +50,12 @@
       on:search={(e) => {
         pageNumber = 1
         $search = e.detail
+        if ($search.trim()) {
+          trpc().mutation('analytics:searchHistory:create', {
+            storeId: $layoutData.store?.id || '',
+            searchTerm: $search,
+          })
+        }
       }}
     />
   {:else}

@@ -14,7 +14,7 @@ const searchMutations = createServer().mutation('create', {
     const entry = await db.createSearchEntry({
       ip: ctx.ip,
       searchTerm: input.searchTerm,
-      categorySlug: input.categorySlug,
+      // categorySlug: input.categorySlug,
       storeId: input.storeId,
       customerId: customer ? customer.id : undefined,
     })
