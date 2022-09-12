@@ -22,7 +22,7 @@
   $: {
     if (
       $navigating &&
-      $navigating.from.pathname !== $navigating.to.pathname &&
+      // $navigating.from?.url.pathname !== $navigating.to?.url.pathname &&
       data.layoutData.layout === 'store'
     ) {
       NProgress.start()

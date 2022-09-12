@@ -23,8 +23,11 @@
     $category404 = ''
   }
 
-  let pageNumber = !$page || Number.isNaN(+$page) ? 1 : +$page
-  $: $page = `${pageNumber}`
+  let pageNumber = +$page || 1
+  $: {
+    $page = `${pageNumber}`
+    console.log($page)
+  }
 
   $: categories = $layoutData.store?.categories || []
 </script>
