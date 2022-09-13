@@ -14,10 +14,7 @@
   import StripeLogo from '$lib/components/__StripeLogo.svelte'
   import PaypalLogo from '$lib/components/__PaypalLogo.svelte'
   import trpc, { invalidateQuery } from '$lib/trpc/client'
-  import { Editor } from 'bytemd'
   import { supabase } from '@shackcart/shared'
-  import { browser } from '$app/environment'
-  import type { InferMutationInput } from '@shackcart/trpc'
 
   let store = { ...$layoutData.store! }
   const contactEmailTemplate = redisWritable(
@@ -447,23 +444,33 @@
     <div class="flex flex-col w-full">
       <div class="flex flex-col space-y-2 text-xs w-full">
         <span class="font-bold text-xs"> Contact form email template </span>
-        {#if browser}
+        <textarea
+          required
+          class="bg-white border rounded border-gray-300 h-24 text-sm leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          bind:value={$contactEmailTemplate}
+        />
+        <!-- {#if browser}
           <Editor
             value={$contactEmailTemplate}
             on:change={(e) => ($contactEmailTemplate = e.detail.value)}
           />
-        {/if}
+        {/if} -->
       </div>
     </div>
     <div class="flex flex-col w-full">
       <div class="flex flex-col space-y-2 text-xs w-full">
         <span class="font-bold text-xs"> FAQ content </span>
-        {#if browser}
+        <textarea
+          required
+          class="bg-white border rounded border-gray-300 h-24 text-sm leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          bind:value={$faqContent}
+        />
+        <!-- {#if browser}
           <Editor
             value={$faqContent}
             on:change={(e) => ($faqContent = e.detail.value)}
           />
-        {/if}
+        {/if} -->
       </div>
     </div>
   </div>

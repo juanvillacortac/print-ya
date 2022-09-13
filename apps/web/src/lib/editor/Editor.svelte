@@ -8,9 +8,8 @@
   import CommandList from './CommandList.svelte'
   import { slashVisible, slashItems, slashProps } from './stores'
 
-  let content = `<p>Hello world 🌎 Type '/' for commands.</p>`
-  let output: JSONContent | undefined = undefined
-  let isEmpty = true
+  export let value: string | null | undefined
+  let isEmpty = !value?.trim()
 
   let selectedIndex = 0
   $: selectedIndex = $slashVisible ? selectedIndex : 0
@@ -57,6 +56,7 @@
           class: 'focus:outline-none',
         },
       },
+      content: value || '',
       extensions: [
         StarterKit,
         Link,
@@ -69,7 +69,7 @@
         editor = editor
       },
       onUpdate: ({ editor }) => {
-        output = editor.getJSON()
+        value = editor.getHTML()
         isEmpty = editor.isEmpty
       },
     })
@@ -92,10 +92,6 @@
 <CommandList {selectedIndex} />
 
 <style>
-  .editor {
-    @apply p-4;
-  }
-
   .editor :global(a) {
     @apply cursor-pointer text-blue-400;
   }
@@ -105,21 +101,18 @@
 
   .editor :global(h1),
   .editor :global(h2),
-  .editor :global(h3),
-  .editor :global(h4),
-  .editor :global(h5),
-  .editor :global(h6) {
+  .editor :global(h3) {
     @apply font-bold font-title;
   }
 
   .editor :global(h1) {
-    @apply text-4xl;
+    @apply text-2xl;
   }
   .editor :global(h2) {
-    @apply text-3xl;
+    @apply text-xl;
   }
   .editor :global(h3) {
-    @apply text-2xl;
+    @apply text-lg;
   }
 
   .editor :global(ul) {

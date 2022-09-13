@@ -76,176 +76,152 @@
   let showing = false
 </script>
 
-<div
-  class="bg-white border rounded-lg flex flex-col h-full space-y-4 border-gray-300 w-full p-4 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600"
->
-  <div class="flex w-full justify-between items-center">
-    <div class="flex space-x-4 items-center">
-      <button
-        class="rounded flex p-1 duration-200"
-        title="Show/hide items"
-        use:tooltip
-        on:click={() => (showing = !showing)}
-        type="button"
-        ><ChevronRight16
-          class="transform duration-200 transition-transform {showing
-            ? 'rotate-90'
-            : ''}"
-        /></button
-      >
-      <h3 class="font-bold text-xs block">Product custom design</h3>
+<div class="flex flex-col h-full space-y-4 w-full">
+  <div class="w-full grid gap-4 items-start sm:grid-cols-2">
+    <div class="flex flex-col space-y-2">
+      <div class="font-bold text-xs">Design image</div>
+      <div class="relative">
+        {#if product.meta?.templateImage && !disabled}
+          <button
+            type="button"
+            class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
+            title="Delete image"
+            on:click={() => (product.meta.templateImage = '')}
+            use:tooltip
+          >
+            <Close24 />
+          </button>
+        {:else if !uploading && !disabled}
+          <input
+            type="file"
+            name=""
+            class="cursor-pointer flex h-full w-full opacity-0 absolute"
+            accept="image/*"
+            on:change={(e) => uploadImage(e)}
+          />
+        {/if}
+        <div
+          class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative darkborder-gray-700 dark:border-gray-700"
+          class:pointer-events-none={!product.meta?.templateImage}
+          on:dragenter|preventDefault|stopPropagation={(e) => {}}
+          on:dragover|preventDefault|stopPropagation={(e) => {}}
+          on:dragend|preventDefault|stopPropagation={(e) => {}}
+          on:drop|preventDefault={(e) => {
+            if (e.dataTransfer && !product.meta?.templateImage) {
+              const dt = e.dataTransfer
+              const files = [...dt.files]
+              if (files?.length && files[0].type.startsWith('image')) {
+                uploadImage({ currentTarget: { files } })
+              }
+            }
+          }}
+        >
+          {#if product.meta?.templateImage && !uploading}
+            <Image
+              {options}
+              src={product.meta?.templateImage}
+              class="rounded object-cover w-full aspect-square pointer-events-none"
+            />
+          {:else}
+            <div
+              class="flex flex-col text-center w-full text-gray-400 items-center justify-center aspect-square pointer-events-none"
+              use:squareratio
+            >
+              <Image32 class="mb-1" />
+              <span class="font-normal block"
+                >{disabled
+                  ? 'Without image'
+                  : uploading
+                  ? 'Uploading image...'
+                  : 'Upload an image'}</span
+              >
+            </div>
+          {/if}
+        </div>
+      </div>
+    </div>
+    <div class="grid gap-4 grid-cols-1 lg:grid-cols-2">
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Default template text
+        </label>
+        <input
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          type="text"
+          bind:value={product.meta.templateText}
+          {disabled}
+        />
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Image modifier
+        </label>
+        <select
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          bind:value={product.meta.templateImageModifier}
+        >
+          <option value="">No modifier</option>
+          {#each modifiers.filter((m) => m.type === 'image') as { id, name }}
+            <option value={id}>{name}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Color modifier
+        </label>
+        <select
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          bind:value={product.meta.templateColorModifier}
+        >
+          <option value="">No modifier</option>
+          {#each modifiers.filter((m) => m.type === 'color') as { id, name }}
+            <option value={id}>{name}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Text modifier
+        </label>
+        <select
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          bind:value={product.meta.templateTextModifier}
+        >
+          <option value="">No modifier</option>
+          {#each modifiers.filter((m) => m.type === 'text') as { id, name } (id)}
+            <option value={id}>{name}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Font modifier
+        </label>
+        <select
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          bind:value={product.meta.templateFontModifier}
+        >
+          <option value="">No modifier</option>
+          {#each modifiers.filter((m) => m.type === 'font') as { id, name } (id)}
+            <option value={id}>{name}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="font-bold text-xs mb-2 block" for="fieldId">
+          Mirror modifier
+        </label>
+        <select
+          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
+          bind:value={product.meta.templateMirrorModifier}
+        >
+          <option value="">No modifier</option>
+          {#each modifiers.filter((m) => m.type === 'toggle') as { id, name } (id)}
+            <option value={id}>{name}</option>
+          {/each}
+        </select>
+      </div>
     </div>
   </div>
-  {#if showing}
-    <div
-      class="w-full grid gap-4 items-start sm:grid-cols-2"
-      transition:slide|local={{ duration: 400, easing: expoOut }}
-    >
-      <div class="flex flex-col space-y-2">
-        <div class="font-bold text-xs">Design image</div>
-        <div class="relative">
-          {#if product.meta?.templateImage && !disabled}
-            <button
-              type="button"
-              class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
-              title="Delete image"
-              on:click={() => (product.meta.templateImage = '')}
-              use:tooltip
-            >
-              <Close24 />
-            </button>
-          {:else if !uploading && !disabled}
-            <input
-              type="file"
-              name=""
-              class="cursor-pointer flex h-full w-full opacity-0 absolute"
-              accept="image/*"
-              on:change={(e) => uploadImage(e)}
-            />
-          {/if}
-          <div
-            class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative darkborder-gray-700 dark:border-gray-700"
-            class:pointer-events-none={!product.meta?.templateImage}
-            on:dragenter|preventDefault|stopPropagation={(e) => {}}
-            on:dragover|preventDefault|stopPropagation={(e) => {}}
-            on:dragend|preventDefault|stopPropagation={(e) => {}}
-            on:drop|preventDefault={(e) => {
-              if (e.dataTransfer && !product.meta?.templateImage) {
-                const dt = e.dataTransfer
-                const files = [...dt.files]
-                if (files?.length && files[0].type.startsWith('image')) {
-                  uploadImage({ currentTarget: { files } })
-                }
-              }
-            }}
-          >
-            {#if product.meta?.templateImage && !uploading}
-              <Image
-                {options}
-                src={product.meta?.templateImage}
-                class="rounded object-cover w-full aspect-square pointer-events-none"
-              />
-            {:else}
-              <div
-                class="flex flex-col text-center w-full text-gray-400 items-center justify-center aspect-square pointer-events-none"
-                use:squareratio
-              >
-                <Image32 class="mb-1" />
-                <span class="font-normal block"
-                  >{disabled
-                    ? 'Without image'
-                    : uploading
-                    ? 'Uploading image...'
-                    : 'Upload an image'}</span
-                >
-              </div>
-            {/if}
-          </div>
-        </div>
-      </div>
-      <div class="grid gap-4 grid-cols-1 lg:grid-cols-2">
-        <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">
-            Default template text
-          </label>
-          <input
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            type="text"
-            bind:value={product.meta.templateText}
-            {disabled}
-          />
-        </div>
-        <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">
-            Image modifier
-          </label>
-          <select
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={product.meta.templateImageModifier}
-          >
-            <option value="">No modifier</option>
-            {#each modifiers.filter((m) => m.type === 'image') as { id, name }}
-              <option value={id}>{name}</option>
-            {/each}
-          </select>
-        </div>
-        <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">
-            Color modifier
-          </label>
-          <select
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={product.meta.templateColorModifier}
-          >
-            <option value="">No modifier</option>
-            {#each modifiers.filter((m) => m.type === 'color') as { id, name }}
-              <option value={id}>{name}</option>
-            {/each}
-          </select>
-        </div>
-        <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">
-            Text modifier
-          </label>
-          <select
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={product.meta.templateTextModifier}
-          >
-            <option value="">No modifier</option>
-            {#each modifiers.filter((m) => m.type === 'text') as { id, name } (id)}
-              <option value={id}>{name}</option>
-            {/each}
-          </select>
-        </div>
-        <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">
-            Font modifier
-          </label>
-          <select
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={product.meta.templateFontModifier}
-          >
-            <option value="">No modifier</option>
-            {#each modifiers.filter((m) => m.type === 'font') as { id, name } (id)}
-              <option value={id}>{name}</option>
-            {/each}
-          </select>
-        </div>
-        <div class="flex flex-col w-full">
-          <label class="font-bold text-xs mb-2 block" for="fieldId">
-            Mirror modifier
-          </label>
-          <select
-            class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:shadow-outline"
-            bind:value={product.meta.templateMirrorModifier}
-          >
-            <option value="">No modifier</option>
-            {#each modifiers.filter((m) => m.type === 'toggle') as { id, name } (id)}
-              <option value={id}>{name}</option>
-            {/each}
-          </select>
-        </div>
-      </div>
-    </div>
-  {/if}
 </div>

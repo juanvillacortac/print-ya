@@ -22,12 +22,21 @@
   import Image from './caravaggio/Image.svelte'
   import { flip } from 'svelte/animate'
   import { clamp } from '$lib/utils/math'
+  import { writable } from 'svelte/store'
+  import { getContext } from 'svelte'
 
-  /** @type {{
+  /** @typedef {{
    *  path: string
    *  url: string
-   * }[]} */
+   * }[]} Mockups */
+
+  /** @type Mockups */
   export let mockups = []
+
+  /** @type {import('svelte/store').Writable<Mockups>} */
+  const globalMockups = getContext('global-mockups') || writable([])
+
+  $: mergedMockups = [...mockups, ...($globalMockups || [])]
 
   /** @type {import('@shackcart/db').TemplateSource} */
   export let template
@@ -92,7 +101,7 @@
   let gallery = false
   export let showFonts = false
 
-  $: if (!mockups?.length && gallery) {
+  $: if (!mergedMockups?.length && gallery) {
     gallery = false
   }
 </script>
@@ -137,7 +146,7 @@
           </div>
           <div class="flex-grow h-full w-full overflow-auto">
             <div class="w-full grid px-10px gap-4 grid-cols-2">
-              {#each mockups as { url, path }, idx (path)}
+              {#each mergedMockups as { url, path }, idx (path)}
                 <div
                   class="flex w-full"
                   animate:flip={{ duration: 400, easing: expoOut }}
@@ -302,7 +311,7 @@
             >
               <Camera24 class="flex font-bold" />
             </button>
-            {#if mockups?.length}
+            {#if mergedMockups?.length}
               <button
                 class="flex text-gray-500 preview-button"
                 title="Set background from gallery"

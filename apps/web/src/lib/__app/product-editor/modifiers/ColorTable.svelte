@@ -2,6 +2,7 @@
   import { tooltip } from '$lib/components/tooltip'
   import type { ProductModifier } from '@shackcart/db'
   import { Information16, TrashCan16 } from 'carbon-icons-svelte'
+  import { tick } from 'svelte'
   import { writable } from 'svelte/store'
   import { fly } from 'svelte/transition'
 
@@ -28,6 +29,7 @@
     if (modifier.items.length > $items.length) {
       $items.push({
         ...modifier.items[modifier.items?.length - 1],
+        name: modifier.items[modifier.items?.length - 1].name || '#000000',
         internalId: (Math.random() + 1).toString(36).substring(7),
       })
       $items = $items
@@ -38,9 +40,7 @@
   const deleteItem = (
     i: Pick<Unarray<typeof modifier['items']>, 'id' | 'internalId'>
   ) => {
-    const idx = modifier.items.findIndex((ii) =>
-      i.id ? ii.id == i.id : ii.internalId == i.internalId
-    )
+    const idx = $items.findIndex((ii) => ii.internalId == i.internalId)
     $items[idx].active = false
     if (!$items[idx].id) {
       const newList = $items
@@ -106,7 +106,7 @@
       </tr>
     </thead>
     <tbody class="z-10 relative">
-      {#each $items?.filter((i) => i.active) as i, idx (i.internalId)}
+      {#each $items.filter((i) => i.active) as i, idx (i.internalId)}
         <tr
           in:fly|local={{ x: -20 }}
           draggable={!disabled}
@@ -131,10 +131,14 @@
             <div class="flex space-x-2 items-center">
               <div class="h-32px w-32px relative">
                 <input
-                  id="color-{i.id}"
+                  id="color-{i.internalId}"
                   type="color"
-                  bind:value={i.name}
+                  value={i.name || '#000000'}
                   class="h-0 opacity-0 w-0 overflow-hidden absolute"
+                  on:input={(e) =>
+                    (i.name = e.currentTarget?.value || '#000000')}
+                  on:change={(e) =>
+                    (i.name = e.currentTarget?.value || '#000000')}
                   {disabled}
                 />
                 <button
@@ -143,7 +147,7 @@
                   type="button"
                   {disabled}
                   on:click={() =>
-                    document.getElementById(`color-${i.id}`)?.click()}
+                    document.getElementById(`color-${i.internalId}`)?.click()}
                   style="will-change: transform; background-color: {i.name ||
                     'black'}"
                 />

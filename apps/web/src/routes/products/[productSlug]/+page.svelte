@@ -173,7 +173,9 @@
             q: 100,
           }}
         />
-        <div class="border-t pt-4 pb-2 prose-sm !w-full dark:border-gray-600">
+        <div
+          class="border-t space-y-2 text-sm pt-4 pb-2 description !w-full dark:border-gray-600"
+        >
           <Markdown source={product.description || 'No description'} />
         </div>
         <div
@@ -238,5 +240,32 @@
   }
   .quantity {
     -moz-appearance: textfield;
+  }
+
+  .description :global(a) {
+    @apply cursor-pointer text-blue-400;
+  }
+  .description :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .description :global(h1),
+  .description :global(h2),
+  .description :global(h3) {
+    @apply font-bold font-title;
+  }
+
+  .description :global(h1) {
+    @apply text-2xl;
+  }
+  .description :global(h2) {
+    @apply text-xl;
+  }
+  .description :global(h3) {
+    @apply text-lg;
+  }
+
+  .description :global(ul) {
+    @apply list-disc pl-6;
   }
 </style>

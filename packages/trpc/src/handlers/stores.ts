@@ -8,10 +8,64 @@ import { marked } from 'marked'
 import { createServer } from '../shared.js'
 import type { StoreData } from '@shackcart/db'
 
-const redis = new Redis({
-  url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
-  token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
-})
+const sharedDataMutations = createServer()
+  .middleware(async ({ ctx, next }) => {
+    const { userId } = await ctx.session.auth({ verify: true })
+    if (!userId) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+    }
+    const redis = new Redis({
+      url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+      token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
+    })
+    return next({
+      ctx: {
+        ...ctx,
+        userId,
+        redis,
+      },
+    })
+  })
+  .mutation('setMockups', {
+    input: z.object({
+      storeId: z.string(),
+      mockups: z.array(
+        z.object({
+          path: z.string(),
+          url: z.string(),
+        })
+      ),
+    }),
+    resolve: async ({ ctx, input }) => {
+      await ctx.redis.set(
+        `stores:${input.storeId}:shared:mockups`,
+        input.mockups
+      )
+    },
+  })
+
+const sharedDataQueries = createServer()
+  .middleware(async ({ ctx, next }) => {
+    const redis = new Redis({
+      url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+      token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
+    })
+    return next({
+      ctx: {
+        ...ctx,
+        redis,
+      },
+    })
+  })
+  .query('getMockups', {
+    input: z.string(),
+    resolve: async ({ input, ctx }) => {
+      const mockups = await ctx.redis.get<Record<'path' | 'url', string>[]>(
+        `stores:${input}:shared:mockups`
+      )
+      return mockups || []
+    },
+  })
 
 const mutations = createServer()
   .middleware(async ({ ctx, next }) => {
@@ -35,14 +89,25 @@ const mutations = createServer()
     },
   })
 
+const sharedDataRouter = createServer()
+  .merge(sharedDataQueries)
+  .merge(sharedDataMutations)
+
 const queries = createServer()
+  .middleware(async ({ ctx, next }) => {
+    const redis = new Redis({
+      url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+      token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
+    })
+    return next({ ctx: { ...ctx, redis } })
+  })
   .query('getBySlug', {
     input: z.string(),
-    resolve: async ({ input }) => {
+    resolve: async ({ input, ctx }) => {
       const store = await db.getStore({ slug: input })
       const storeData = store
         ? await (
-            await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+            await ctx.redis.get<{ json: StoreData }>(`storeData:${store.id}`)
           )?.json
         : undefined
       return {
@@ -54,11 +119,11 @@ const queries = createServer()
   })
   .query('getByHost', {
     input: z.string(),
-    resolve: async ({ input }) => {
+    resolve: async ({ input, ctx }) => {
       const store = await db.getStore({ host: input })
       const storeData = store
         ? await (
-            await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+            await ctx.redis.get<{ json: StoreData }>(`storeData:${store.id}`)
           )?.json
         : undefined
       return {
@@ -70,6 +135,13 @@ const queries = createServer()
   })
 
 const payment = createServer()
+  .middleware(async ({ ctx, next }) => {
+    const redis = new Redis({
+      url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+      token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
+    })
+    return next({ ctx: { ...ctx, redis } })
+  })
   .mutation('createStripeIntent', {
     input: z.object({
       currency: z.string().min(3).max(3),
@@ -80,7 +152,10 @@ const payment = createServer()
       .string()
       .nullable()
       .describe('Stripe payment intent client secret'),
-    resolve: async ({ input: { amount, currency, storeId } }) => {
+    resolve: async ({
+      input: { amount, currency, storeId },
+      ctx: { redis },
+    }) => {
       const key = await redis.get<string>(`store:${storeId}:stripe:private`)
       const stripe = new Stripe(
         key || '',
@@ -122,7 +197,7 @@ const payment = createServer()
         })
         .optional(),
     }),
-    resolve: async ({ input: { storeId, paypal, stripe } }) => {
+    resolve: async ({ input: { storeId, paypal, stripe }, ctx: { redis } }) => {
       if (stripe?.publicKey) {
         await redis.set<string>(
           `store:${storeId}:stripe:public`,
@@ -148,7 +223,7 @@ const payment = createServer()
   })
   .query('gatewaysPublicCredentials', {
     input: z.string({ description: 'Store Id' }),
-    resolve: async ({ input }) => {
+    resolve: async ({ input, ctx: { redis } }) => {
       const stripePublicKey = await redis.get<string>(
         `store:${input}:stripe:public`
       )
@@ -170,6 +245,14 @@ export default createServer()
   .merge(mutations)
   .merge(queries)
   .merge('payment:', payment)
+  .merge('sharedData:', sharedDataRouter)
+  .middleware(async ({ ctx, next }) => {
+    const redis = new Redis({
+      url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+      token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
+    })
+    return next({ ctx: { ...ctx, redis } })
+  })
   .mutation('marketing:sendContactEmail', {
     input: z.object({
       storeId: z.string().cuid(),
@@ -178,7 +261,7 @@ export default createServer()
       email: z.string().email(),
       message: z.string(),
     }),
-    resolve: async ({ input }) => {
+    resolve: async ({ input, ctx: { redis } }) => {
       try {
         sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '')
         const store = await db.getStore({ id: input.storeId })

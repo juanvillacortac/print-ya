@@ -32,6 +32,14 @@ export const load: LayoutLoad = async ({ url, fetch, params }) => {
       break
   }
 
+  let mockups: Record<'path' | 'url', string>[] = []
+  // if (layoutData.store) {
+  //   mockups = await trpc(fetch).query(
+  //     'stores:sharedData:getMockups',
+  //     layoutData.store.id
+  //   )
+  // }
+
   return {
     fullHost,
     host,
@@ -40,6 +48,7 @@ export const load: LayoutLoad = async ({ url, fetch, params }) => {
     notFound,
     layoutData,
     layoutComponent,
+    mockups,
   }
 }
 

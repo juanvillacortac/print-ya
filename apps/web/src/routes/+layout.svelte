@@ -14,6 +14,10 @@
 
   export let data: LayoutData
 
+  const mockups = writable(data.mockups)
+  $: $mockups = data.mockups
+  setContext('global-mockups', mockups)
+
   NProgress.configure({
     minimum: 0.16,
     showSpinner: false,
@@ -41,7 +45,8 @@
   import { preferences } from '$lib'
   import { browser } from '$app/environment'
   import Toast from '$lib/components/Toast.svelte'
-  import { onDestroy } from 'svelte'
+  import { onDestroy, setContext } from 'svelte'
+  import { writable } from 'svelte/store'
 
   $: if (browser)
     document.documentElement.classList.toggle('dark', $preferences.darkMode)

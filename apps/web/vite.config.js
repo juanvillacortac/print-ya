@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     sveltekit(),
     WindiCSS({
-      config: './windi.config.js',
+      config: '../../windi.config.js',
     }),
     svg(),
     // imagetools(),

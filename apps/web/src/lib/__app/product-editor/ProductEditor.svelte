@@ -2,7 +2,7 @@
   import 'bytemd/dist/index.css'
   import type { Product, ProductModifier, TemplateSource } from '@shackcart/db'
   import { notifications } from '$lib/components/notifications'
-  import { goto } from '$app/navigation'
+  import { goto, invalidateAll } from '$app/navigation'
   import {
     Copy16,
     Launch16,
@@ -12,7 +12,7 @@
     ViewOff16,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
-  import { writable } from 'svelte/store'
+  import { writable, type Writable } from 'svelte/store'
   import ProductModifiersEditor from './ProductModifiersEditor.svelte'
   import ProductMainFieldsEditor from './ProductMainFieldsEditor.svelte'
   import ProductMockupImagesEditor from './ProductMockupImagesEditor.svelte'
@@ -22,10 +22,14 @@
   import Submenu from '$lib/components/Submenu.svelte'
   import BasicTemplateEditor from './BasicTemplateEditor.svelte'
   import { layoutData } from '$lib/stores'
-  import { page } from '$app/stores'
   import { getBasicTemplate } from '@shackcart/db/dist/utils'
+  import { slide } from 'svelte/transition'
+  import { expoOut } from 'svelte/easing'
+  import { getContext } from 'svelte'
 
   $: store = $layoutData.store!
+
+  let mode: 'main' | 'template' | 'mockups' | 'modifiers' = 'main'
 
   export let product: Partial<Product> & Pick<Product, 'meta' | 'modifiers'> = {
     price: 0.01,
@@ -34,6 +38,29 @@
     meta: {},
     modifiers: [],
   }
+
+  $: modes = [
+    {
+      kind: 'main',
+      title: 'Main fields',
+      valid: () => true,
+    },
+    {
+      kind: 'modifiers',
+      title: 'Modifiers',
+      valid: () => true,
+    },
+    {
+      kind: 'template',
+      title: 'Design editor',
+      valid: () => product.type === 'template',
+    },
+    {
+      kind: 'mockups',
+      title: 'Mockups images',
+      valid: () => product.type?.startsWith('template'),
+    },
+  ]
 
   const template = writable(
     (product?.template as TemplateSource) || {
@@ -129,6 +156,21 @@
     }
   }
 
+  let useGlobalMockups = !product.meta?.ignoreGlobalMockups
+
+  $: if (!product.meta?.mockups) {
+    product.meta = {
+      ...(product.meta || {}),
+      mockups: [],
+    }
+  }
+
+  $: product.meta.ignoreGlobalMockups = !useGlobalMockups
+
+  const globalMockups =
+    getContext<Writable<Record<'path' | 'url', string>[]>>('global-mockups') ||
+    writable<Record<'path' | 'url', string>[]>([])
+
   $: submit = async () => {
     if (!validate()) {
       return
@@ -171,13 +213,20 @@
           internalId: (Math.random() + 1).toString(36).substring(7),
         })),
       }))
-      invalidateQuery('products:getBySlug')
+      invalidateAll()
     } catch (err) {
       console.log(err.message, err.error)
     } finally {
       saving = false
     }
   }
+
+  // $: if ($globalMockups) {
+  //   trpc().mutation('stores:sharedData:setMockups', {
+  //     mockups: $globalMockups,
+  //     storeId: $layoutData.store?.id || '',
+  //   })
+  // }
 
   const deleteProduct = async () => {
     saving = true
@@ -319,14 +368,61 @@
       class="flex flex-col space-y-6 w-full"
       class:lg:col-span-2={product.type?.startsWith('template')}
     >
-      <ProductMainFieldsEditor bind:product />
-      {#if product.type === 'template'}
-        <BasicTemplateEditor bind:product {modifiers} />
-      {/if}
-      {#if product.type?.startsWith('template')}
-        <ProductMockupImagesEditor bind:product />
-      {/if}
-      <ProductModifiersEditor bind:modifiers disabled={product.archived} />
+      <div
+        class="border rounded-lg flex flex-col space-y-4 bg-gray-50 border-gray-300 p-4 dark:bg-gray-800 dark:border-gray-600"
+      >
+        <div
+          class="flex flex-wrap text-sm w-full text-gray-500 gap-4 items-center !font-bold"
+        >
+          {#each modes.filter((m) => m.valid()) as m}
+            <button
+              type="button"
+              class="border-transparent font-bold border-b-2 pb-1 hover:text-gray-800 dark:hover:text-white"
+              class:border-gray-800={m.kind == mode}
+              class:dark:border-white={m.kind == mode}
+              class:text-gray-800={m.kind == mode}
+              class:dark:text-white={m.kind == mode}
+              on:click={() => {
+                // @ts-ignore
+                mode = m.kind
+              }}>{m.title}</button
+            >
+          {/each}
+        </div>
+        <div class="flex w-full">
+          {#if mode == 'main'}
+            <ProductMainFieldsEditor bind:product />
+          {:else if mode == 'template'}
+            <BasicTemplateEditor bind:product {modifiers} />
+          {:else if mode == 'mockups'}
+            <div class="flex flex-col space-y-4 w-full">
+              <label class="flex font-bold space-x-2 text-xs items-center">
+                <input type="checkbox" bind:checked={useGlobalMockups} />
+                <span>Use global mockups</span>
+              </label>
+              <div
+                class:opacity-50={product.meta.ignoreGlobalMockups}
+                class:cursor-not-allowed={product.meta.ignoreGlobalMockups}
+                class:filter={product.meta.ignoreGlobalMockups}
+                class:brightness-50={product.meta.ignoreGlobalMockups}
+              >
+                <ProductMockupImagesEditor
+                  title="Global mockups images"
+                  bind:mockups={$globalMockups}
+                  disabled={product.archived ||
+                    product.meta.ignoreGlobalMockups}
+                />
+              </div>
+              <ProductMockupImagesEditor bind:mockups={product.meta.mockups} />
+            </div>
+          {:else if mode == 'modifiers'}
+            <ProductModifiersEditor
+              bind:modifiers
+              disabled={product.archived}
+            />
+          {/if}
+        </div>
+      </div>
     </div>
     {#if product.type?.startsWith('template')}
       <TemplatePreview
