@@ -177,6 +177,10 @@
     }
     try {
       saving = true
+      await trpc().mutation('stores:sharedData:setMockups', {
+        mockups: $globalMockups,
+        storeId: $layoutData.store?.id || '',
+      })
       const data = await trpc().mutation('products:upsert', {
         storeSlug: store.slug,
         data: {
