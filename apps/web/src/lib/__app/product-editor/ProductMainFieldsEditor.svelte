@@ -165,7 +165,7 @@
       </label>
       {#if browser}
         <div
-          class="border rounded bg-gray-700 border-gray-300 text-sm w-full p-2 relative dark:border-gray-600"
+          class="bg-white border rounded border-gray-300 text-sm w-full p-2 relative dark:bg-gray-700 dark:border-gray-600"
         >
           <Editor bind:value={product.description} />
         </div>
