@@ -83,7 +83,9 @@
     } catch (error) {
       alert(error.message)
     } finally {
-      event.currentTarget.value = ''
+      if (ref) {
+        ref.value = ''
+      }
       uploading = false
     }
   }
