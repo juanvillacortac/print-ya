@@ -124,6 +124,7 @@
                   ...(template || {}),
                 }}
                 mockups={product.meta?.mockups}
+                ignoreGlobalMockups={product.meta?.ignoreGlobalMockups}
               />
             {:else}
               <div

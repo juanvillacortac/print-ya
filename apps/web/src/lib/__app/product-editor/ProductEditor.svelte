@@ -431,6 +431,7 @@
     {#if product.type?.startsWith('template')}
       <TemplatePreview
         mockups={product.meta?.mockups}
+        ignoreGlobalMockups={product.meta?.ignoreGlobalMockups}
         template={product.type === 'template'
           ? getBasicTemplate(product)
           : $template}

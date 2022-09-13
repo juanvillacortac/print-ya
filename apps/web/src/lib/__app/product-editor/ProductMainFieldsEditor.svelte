@@ -163,18 +163,16 @@
       <label class="font-bold text-xs mb-2 block" for="fieldId">
         Description
       </label>
-      {#if browser}
-        <div
-          class="bg-white border rounded border-gray-300 text-sm w-full p-2 relative dark:bg-gray-700 dark:border-gray-600"
-        >
-          <Editor bind:value={product.description} />
-        </div>
-        <!-- <svelte:component
+      <div
+        class="bg-white border rounded border-gray-300 text-sm w-full p-2 relative dark:bg-gray-700 dark:border-gray-600"
+      >
+        <Editor bind:value={product.description} />
+      </div>
+      <!-- <svelte:component
             this={editor}
             value={product.description || ''}
             on:change={(e) => (product.description = e.detail.value)}
           /> -->
-      {/if}
     </div>
     <div class="grid gap-4 grid-cols-1 lg:grid-cols-2">
       <div class="flex flex-col space-y-2 w-full z-40">

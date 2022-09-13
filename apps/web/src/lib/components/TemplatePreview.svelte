@@ -33,10 +33,14 @@
   /** @type Mockups */
   export let mockups = []
 
+  export let ignoreGlobalMockups = false
+
   /** @type {import('svelte/store').Writable<Mockups>} */
   const globalMockups = getContext('global-mockups') || writable([])
 
-  $: mergedMockups = [...mockups, ...($globalMockups || [])]
+  $: mergedMockups = ignoreGlobalMockups
+    ? mockups
+    : [...mockups, ...($globalMockups || [])]
 
   /** @type {import('@shackcart/db').TemplateSource} */
   export let template
