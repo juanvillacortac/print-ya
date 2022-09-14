@@ -52,8 +52,9 @@ export const getStore = async ({
       })
     )
   )
+  const { productCategories, ...data } = store
   return {
-    ...store,
+    ...data,
     categories: store.productCategories.map((c, idx) => ({
       id: c.id,
       name: c.name,
