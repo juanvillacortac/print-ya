@@ -11,7 +11,7 @@ import { login } from '@shackcart/db'
 
 const app = async () => {
   const app = fastify({
-    logger: false,
+    logger: import.meta.env.PROD,
   })
 
   app.register(cors, {
