@@ -18,6 +18,10 @@ export const session = handleSession({
 const logic: Handle = async ({ event, resolve }) => {
   let response: Response
 
+  if (event.request.headers.get('x-vercel-id')) {
+    console.log(event.request.headers.get('x-vercel-id'))
+  }
+
   event.locals = {
     ...event.locals,
     layoutType: getLayoutType(event),
