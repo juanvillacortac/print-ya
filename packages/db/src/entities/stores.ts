@@ -33,36 +33,34 @@ export const getStore = async ({
     },
     include: {
       productCategories: {
-        include: {
-          products_categories: {
-            where: {
-              product: {
-                archived: false,
-              },
-            },
-            select: {
-              productId: true,
-              categoryId: true,
-            },
-          },
-        },
         orderBy: {
           name: 'asc',
         },
       },
     },
   })
-  return store
-    ? {
-        ...store,
-        categories: store.productCategories.map((c) => ({
-          id: c.id,
-          name: c.name,
-          storeId: c.storeId,
-          count: c.products_categories.length,
-        })),
-      }
-    : null
+  if (!store) return null
+  const categories = await prisma.$transaction(
+    store.productCategories.map((c) =>
+      prisma.categoriesOnProducts.count({
+        where: {
+          categoryId: c.id,
+          product: {
+            archived: false,
+          },
+        },
+      })
+    )
+  )
+  return {
+    ...store,
+    categories: store.productCategories.map((c, idx) => ({
+      id: c.id,
+      name: c.name,
+      storeId: c.storeId,
+      count: categories[idx],
+    })),
+  }
 }
 
 export const upsertStore = async (

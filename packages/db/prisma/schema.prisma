@@ -94,6 +94,7 @@ model Store {
   SearchHistory     SearchHistory[]
   ShopifyImport     ShopifyImport[]
   productCategories ProductCategory[]
+  ModifiersGroup    ModifiersGroup[]
 }
 
 model PaymentGateway {
@@ -221,17 +222,38 @@ model ProductImage {
   productId String?
 }
 
+model ModifiersGroup {
+  id   String @id @default(cuid())
+  name String
+
+  store Store @relation(fields: [storeId], references: [id])
+
+  ModifiersOnModifiersGroup ModifiersOnModifiersGroup[]
+  storeId                   String
+}
+
+model ModifiersOnModifiersGroup {
+  group             ModifiersGroup  @relation(fields: [modifiersGroupId], references: [id])
+  modifier          ProductModifier @relation(fields: [productModifierId], references: [id])
+  modifiersGroupId  String
+  productModifierId String
+
+  @@id([modifiersGroupId, productModifierId])
+}
+
 model ProductModifier {
   id               String                @id @default(cuid())
   name             String
   type             String                @default("select")
   active           Boolean               @default(true)
-  product          Product?              @relation(fields: [productId], references: [id])
   defaultValue     String?
   templateAccessor String?
   productId        String?
+  product          Product?              @relation(fields: [productId], references: [id])
   items            ProductModifierItem[]
   ordinal          Int                   @default(0)
+
+  ModifiersOnModifiersGroup ModifiersOnModifiersGroup[]
 }
 
 model ProductModifierItem {
