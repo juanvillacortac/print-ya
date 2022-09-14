@@ -19,7 +19,7 @@
   import FontTable from './modifiers/FontTable.svelte'
   import UpsellEditor from './modifiers/UpsellEditor.svelte'
   import { writable } from 'svelte/store'
-  import cuid from 'cuid'
+import { onMount } from 'svelte';
 
   type Unarray<T> = T extends Array<infer U> ? U : T
 
@@ -33,6 +33,11 @@
   export let accessors = false
 
   const modifiersStore = writable(modifiers)
+
+  let cuid: () => string
+  onMount(async () => {
+    cuid = await (await import('cuid')).default
+  })
 
   $: if ($modifiersStore && !mounted) {
     modifiersStore.update((modifiers) =>

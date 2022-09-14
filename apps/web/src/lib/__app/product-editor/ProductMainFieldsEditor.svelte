@@ -10,12 +10,9 @@
     Close16,
     Information16,
   } from 'carbon-icons-svelte'
-  import cuid from 'cuid'
   import { flip } from 'svelte/animate'
-  import { expoOut } from 'svelte/easing'
   import { fly, scale, slide } from 'svelte/transition'
   import type { InferQueryOutput } from '@shackcart/trpc'
-  import { browser } from '$app/environment'
   import { search } from '$lib/utils/search'
   import { onMount } from 'svelte'
   import Editor from '$lib/editor/Editor.svelte'
@@ -26,7 +23,10 @@
   $: store = $layoutData.store
   let showing = false
 
-  onMount(async () => {})
+  let cuid: () => string
+  onMount(async () => {
+    cuid = await (await import('cuid')).default
+  })
 
   let tagInput = ''
   let tags: InferQueryOutput<'products:listTags'> = []
