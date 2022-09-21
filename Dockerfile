@@ -1,3 +1,13 @@
+FROM node:alpine AS builder
+RUN apk update && apk add git
+# Set working directory
+WORKDIR /app
+RUN npm i -g turbo@canary pnpm
+COPY . .
+
+# Add lockfile and package.json's of isolated subworkspace
+FROM node:alpine AS installer
+
 ARG PUBLIC_SUPABASE_URL
 ARG PUBLIC_SUPABASE_ANON_KEY
 ARG DATABASE_URL
@@ -20,15 +30,6 @@ ENV VITE_PORT=${VITE_PORT}
 ENV PUBLIC_CANONICAL_HOST=${PUBLIC_CANONICAL_HOST}
 ENV REDIS_URL=${REDIS_URL}
 
-FROM node:alpine AS builder
-RUN apk update && apk add git
-# Set working directory
-WORKDIR /app
-RUN npm i -g turbo@canary pnpm
-COPY . .
-
-# Add lockfile and package.json's of isolated subworkspace
-FROM node:alpine AS installer
 RUN apk update && apk add git
 WORKDIR /app
 RUN npm i -g turbo@canary pnpm
@@ -42,6 +43,10 @@ RUN pnpm install
 RUN pnpx turbo run build --filter=api...
 
 FROM node:alpine AS runner
+
+ARG VITE_PORT=8080
+EXPOSE ${VITE_PORT}
+
 WORKDIR /app
 
 # Don't run production as root
@@ -49,8 +54,6 @@ WORKDIR /app
 # RUN adduser --system --uid 1001 shackcart
 # USER shackcart
 COPY --from=installer /app .
-
-EXPOSE ${VITE_PORT}
 
 CMD if [[ ! -z "$SWAP" ]]; then \
     fallocate -l $(($(stat -f -c "(%a*%s/10)*7" .))) _swapfile && \
