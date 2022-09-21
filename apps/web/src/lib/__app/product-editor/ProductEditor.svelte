@@ -1,11 +1,15 @@
 <script lang="ts">
-  import 'bytemd/dist/index.css'
   import type { Product, ProductModifier, TemplateSource } from '@shackcart/db'
   import { notifications } from '$lib/components/notifications'
   import { goto, invalidateAll } from '$app/navigation'
   import {
+    Close16,
+    Close24,
+    ColorPalette16,
     Copy16,
+    Folder16,
     Launch16,
+    Search16,
     Template16,
     TrashCan16,
     View16,
@@ -23,9 +27,12 @@
   import BasicTemplateEditor from './BasicTemplateEditor.svelte'
   import { layoutData } from '$lib/stores'
   import { getBasicTemplate } from '@shackcart/db/dist/utils'
-  import { slide } from 'svelte/transition'
+  import { fade, fly, slide } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import { getContext } from 'svelte'
+  import { portal } from 'svelte-portal'
+  import ProductsGroupsList from '../ProductsGroupsList.svelte'
+  import GroupSelector from '../GroupSelector.svelte'
 
   $: store = $layoutData.store!
 
@@ -158,11 +165,8 @@
 
   let useGlobalMockups = !product.meta?.ignoreGlobalMockups
 
-  $: if (!product.meta?.mockups) {
-    product.meta = {
-      ...(product.meta || {}),
-      mockups: [],
-    }
+  $: if (!product.mockups) {
+    product.mockups = []
   }
 
   $: product.meta.ignoreGlobalMockups = !useGlobalMockups
@@ -195,6 +199,8 @@
           minQuantity: product.minQuantity,
           tags: product.tags,
           categories: product.categories,
+          productsGroupId: product.productsGroupId,
+          templateFromGroup: product.templateFromGroup,
           modifiers,
           storeId: store.id,
         },
@@ -261,35 +267,39 @@
   let modifiers: (ProductModifier & { internalId?: string })[] = [
     ...(product?.modifiers! || []),
   ]
+
+  let groupModifiers: (ProductModifier & { internalId?: string })[] = [
+    ...(product?.group?.modifiers! || []),
+  ]
 </script>
 
-<h2
-  class="font-bold font-title mx-auto my-2 text-black text-xl w-full lg:max-w-10/10 dark:text-white"
->
-  <span>
-    {product.id ? title : 'New product'}&nbsp;
-  </span>
-  {#if product.id}
-    <a
-      class="border-transparent inline hover:border-current"
-      href={getAbsoluteURL({
-        subdomain: !store.customDomain ? store.slug : undefined,
-        host: store.customDomain || undefined,
-        path: `/products/${product.slug}`,
-      })}
-      target="__blank"
-      title="View product on production"
-      use:tooltip
-    >
-      <Launch16 class="!inline-flex" />
-    </a>
-  {/if}
-</h2>
 <form
   on:submit|preventDefault|stopPropagation={submit}
   class="flex flex-col mx-auto space-y-4 w-full lg:max-w-10/10"
 >
-  <div class="flex flex-col space-y-4 lg:items-end">
+  <div class="flex lg:justify-between lg:items-center <lg:flex-col">
+    <h3
+      class="font-bold font-title mx-auto my-2 text-black text-xl w-full lg:max-w-10/10 dark:text-white"
+    >
+      <span>
+        {product.id ? title : 'New product'}&nbsp;
+      </span>
+      {#if product.id}
+        <a
+          class="border-transparent inline hover:border-current"
+          href={getAbsoluteURL({
+            subdomain: !store.customDomain ? store.slug : undefined,
+            host: store.customDomain || undefined,
+            path: `/products/${product.slug}`,
+          })}
+          target="__blank"
+          title="View product on production"
+          use:tooltip
+        >
+          <Launch16 class="!inline-flex" />
+        </a>
+      {/if}
+    </h3>
     <div
       class="flex justify-end items-end lg:space-x-2 lg:items-center <lg:flex-col <lg:space-y-4"
     >
@@ -395,9 +405,71 @@
         </div>
         <div class="flex w-full">
           {#if mode == 'main'}
-            <ProductMainFieldsEditor bind:product />
+            <div class="flex flex-col space-y-4 w-full">
+              <ProductMainFieldsEditor bind:product />
+              <div class="w-full grid gap-4 lg:grid-cols-2">
+                <div class="flex flex-col w-full">
+                  <div class="font-bold text-xs mb-2 block" for="fieldId">
+                    Products group
+                  </div>
+                  <GroupSelector
+                    bind:group={product.group}
+                    on:select={({ detail }) => {
+                      product.productsGroupId = detail.id
+                    }}
+                    on:remove={() => {
+                      product.productsGroupId = null
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           {:else if mode == 'template'}
-            <BasicTemplateEditor bind:product {modifiers} />
+            <div class="flex flex-col space-y-4 w-full">
+              {#if product.productsGroupId}
+                <label class="flex font-bold space-x-2 text-xs items-center">
+                  <input
+                    type="checkbox"
+                    bind:checked={product.templateFromGroup}
+                  />
+                  <span>Use groups settings for rendering</span>
+                </label>
+                {#if product.templateFromGroup && product.group}
+                  <div
+                    class="border rounded-lg flex flex-col space-y-4 border-gray-300 w-full p-4 dark:border-gray-600"
+                    transition:slide|local={{ duration: 400, easing: expoOut }}
+                  >
+                    <div
+                      class="flex space-x-2 w-full items-center justify-between"
+                    >
+                      <div class="flex space-x-2 items-center">
+                        <Folder16 />
+                        <div class="font-bold text-xs">Group settings</div>
+                      </div>
+                    </div>
+                    <div class="flex w-full opacity-50 pointer-events-none">
+                      <BasicTemplateEditor
+                        product={product.group}
+                        group
+                        modifiers={product.group?.modifiers}
+                        disabled
+                      />
+                    </div>
+                  </div>
+                {/if}
+              {/if}
+              <div
+                class="border rounded-lg flex flex-col space-y-4 border-gray-300 w-full p-4 dark:border-gray-600"
+              >
+                <div class="flex space-x-2 w-full items-center justify-between">
+                  <div class="flex space-x-2 items-center">
+                    <ColorPalette16 />
+                    <div class="font-bold text-xs">Design settings</div>
+                  </div>
+                </div>
+                <BasicTemplateEditor bind:product {modifiers} />
+              </div>
+            </div>
           {:else if mode == 'mockups'}
             <div class="flex flex-col space-y-4 w-full">
               <label class="flex font-bold space-x-2 text-xs items-center">
@@ -417,20 +489,30 @@
                     product.meta.ignoreGlobalMockups}
                 />
               </div>
-              <ProductMockupImagesEditor bind:mockups={product.meta.mockups} />
+              <ProductMockupImagesEditor bind:mockups={product.mockups} />
             </div>
           {:else if mode == 'modifiers'}
-            <ProductModifiersEditor
-              bind:modifiers
-              disabled={product.archived}
-            />
+            <div class="flex flex-col space-y-4 w-full">
+              <ProductModifiersEditor
+                bind:modifiers
+                disabled={product.archived}
+              />
+              {#if product.group}
+                <ProductModifiersEditor
+                  icon={Folder16}
+                  title="Group modifiers"
+                  bind:modifiers={product.group.modifiers}
+                  disabled
+                />
+              {/if}
+            </div>
           {/if}
         </div>
       </div>
     </div>
     {#if product.type?.startsWith('template')}
       <TemplatePreview
-        mockups={product.meta?.mockups}
+        mockups={product?.mockups}
         ignoreGlobalMockups={product.meta?.ignoreGlobalMockups}
         template={product.type === 'template'
           ? getBasicTemplate(product)

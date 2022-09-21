@@ -76,9 +76,11 @@
   {@html fontsTag}
 </svelte:head>
 
-<svelte:component this={data.layoutComponent}>
-  <slot />
-</svelte:component>
+<div data-sveltekit-prefetch>
+  <svelte:component this={data.layoutComponent}>
+    <slot />
+  </svelte:component>
+</div>
 
 <Toast />
 

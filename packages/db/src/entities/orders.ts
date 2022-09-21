@@ -1,6 +1,6 @@
 import { prisma } from 'src/prisma.js'
 import { nanoid } from 'nanoid'
-import type { Order, Overwrite, StrippedOrder } from 'src/types.js'
+import type { Order, Overwrite, StripedOrder } from 'src/types.js'
 
 export const getOrder = (
   orderId: string,
@@ -23,23 +23,8 @@ export const getOrder = (
       items: {
         include: {
           product: {
-            select: {
-              id: true,
-              name: true,
-              createdAt: true,
-              price: true,
-              type: true,
-              public: true,
-              slug: true,
-              description: true,
-              store: true,
-              storeId: true,
-              updatedAt: true,
-              template: true,
-              minQuantity: true,
-              meta: true,
-              archived: true,
-              archivedAt: true,
+            include: {
+              group: true,
             },
           },
         },
@@ -66,7 +51,7 @@ export const getOrdersByStore = async ({
     createdAt?: 'desc' | 'asc'
     total?: 'desc' | 'asc'
   }
-}): Promise<StrippedOrder[]> =>
+}): Promise<StripedOrder[]> =>
   prisma.order.findMany({
     where: {
       storeId,
@@ -99,7 +84,7 @@ export const getOrdersByStore = async ({
       items: true,
     },
     orderBy,
-  }) as Promise<StrippedOrder[]>
+  }) as Promise<StripedOrder[]>
 
 export const createOrder = async ({
   order,
@@ -165,30 +150,14 @@ export const createOrder = async ({
       items: {
         include: {
           product: {
-            select: {
-              id: true,
-              name: true,
-              archived: true,
-              createdAt: true,
-              price: true,
-              type: true,
-              public: true,
-              slug: true,
-              description: true,
-              store: true,
-              storeId: true,
-              shopifyImportId: true,
-              updatedAt: true,
-              template: true,
-              minQuantity: true,
-              meta: true,
-              archivedAt: true,
+            include: {
+              group: true,
             },
           },
         },
       },
     },
-  }) as Promise<Order>
+  }) as unknown as Promise<Order>
 
 export const updateOrder = async (
   order: Overwrite<
@@ -303,29 +272,13 @@ export const updateOrder = async (
       items: {
         include: {
           product: {
-            select: {
-              id: true,
-              name: true,
-              createdAt: true,
-              price: true,
-              type: true,
-              shopifyImportId: true,
-              archived: true,
-              public: true,
-              slug: true,
-              description: true,
-              store: true,
-              storeId: true,
-              updatedAt: true,
-              template: true,
-              minQuantity: true,
-              meta: true,
-              archivedAt: true,
+            include: {
+              group: true,
             },
           },
         },
       },
     },
   })
-  return updated as Order
+  return updated as unknown as Order
 }

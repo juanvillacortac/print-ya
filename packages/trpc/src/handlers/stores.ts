@@ -8,6 +8,28 @@ import { marked } from 'marked'
 import { createServer } from '../shared.js'
 import type { StoreData } from '@shackcart/db'
 
+const getStore = async ({
+  redis,
+  slug,
+  host,
+}: {
+  redis: Redis
+  slug?: string
+  host?: string
+}) => {
+  const store = await db.getStore({ slug, host })
+  const storeData = store
+    ? await (
+        await redis.get<{ json: StoreData }>(`storeData:${store.id}`)
+      )?.json
+    : undefined
+  return {
+    store,
+    storeData,
+    // storeData: {} as StoreData,
+  }
+}
+
 const sharedDataMutations = createServer()
   .middleware(async ({ ctx, next }) => {
     const { userId } = await ctx.session.auth({ verify: true })
@@ -64,6 +86,7 @@ const sharedDataQueries = createServer()
         `stores:${input}:shared:mockups`
       )
       return mockups || []
+      return []
     },
   })
 
@@ -103,35 +126,13 @@ const queries = createServer()
   })
   .query('getBySlug', {
     input: z.string(),
-    resolve: async ({ input, ctx }) => {
-      const store = await db.getStore({ slug: input })
-      const storeData = store
-        ? await (
-            await ctx.redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-          )?.json
-        : undefined
-      return {
-        store,
-        storeData,
-        // storeData: {} as StoreData,
-      }
-    },
+    resolve: async ({ input: slug, ctx: { redis } }) =>
+      getStore({ redis, slug }),
   })
   .query('getByHost', {
     input: z.string(),
-    resolve: async ({ input, ctx }) => {
-      const store = await db.getStore({ host: input })
-      const storeData = store
-        ? await (
-            await ctx.redis.get<{ json: StoreData }>(`storeData:${store.id}`)
-          )?.json
-        : undefined
-      return {
-        store,
-        storeData,
-        // storeData: {} as StoreData,
-      }
-    },
+    resolve: async ({ input: host, ctx: { redis } }) =>
+      getStore({ redis, host }),
   })
 
 const payment = createServer()

@@ -85,7 +85,6 @@
       >
         <a
           href={getCategoryLink('')}
-          data-sveltekit-prefetch
           data-sveltekit-noscroll
           class="flex space-x-2 text-xs hover:underline"
         >
@@ -95,7 +94,6 @@
         {#each store?.categories || [] as category}
           <a
             href={getCategoryLink(category.name)}
-            data-sveltekit-prefetch
             data-sveltekit-noscroll
             class="flex space-x-2 text-xs hover:underline"
           >

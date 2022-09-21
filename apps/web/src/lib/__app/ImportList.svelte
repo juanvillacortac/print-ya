@@ -4,7 +4,7 @@
     OrderFee,
     ShopifyImport,
     ShopifyImportStatus,
-    StrippedOrder,
+    StripedOrder,
   } from '@shackcart/db'
   import trpc from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
@@ -351,7 +351,6 @@
                   <a
                     class="rounded flex font-bold space-x-1 bg-purple-600 shadow text-xs p-1 text-gray-100 items-center hover:underline"
                     href="import/{i.id}"
-                    data-sveltekit-prefetch
                   >
                     <span>
                       Review {i.products} products
@@ -437,7 +436,6 @@
                       <a
                         class="rounded flex font-bold space-x-1 bg-purple-600 shadow text-xs p-1 text-gray-100 items-center hover:underline"
                         href="import/{i.id}"
-                        data-sveltekit-prefetch
                       >
                         <span>
                           Review {i.products} products

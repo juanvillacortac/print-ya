@@ -1,4 +1,5 @@
 import { router } from '@trpc/server'
+import { Redis } from '@upstash/redis'
 
 export type tRPCContext = {
   session: {
@@ -11,4 +12,16 @@ export type tRPCContext = {
   ip: string
 }
 
-export const createServer = () => router<tRPCContext>()
+export const createServer = () =>
+  router<tRPCContext>().middleware(async ({ ctx, next }) => {
+    const redis = new Redis({
+      url: process.env.PUBLIC_UPSTASH_REDIS_URL || '',
+      token: process.env.PUBLIC_UPSTASH_REDIS_TOKEN || '',
+    })
+    return next({
+      ctx: {
+        ...ctx,
+        redis,
+      },
+    })
+  })

@@ -40,7 +40,7 @@
 
   $: mergedMockups = ignoreGlobalMockups
     ? mockups
-    : [...mockups, ...($globalMockups || [])]
+    : [...(mockups || []), ...($globalMockups || [])]
 
   /** @type {import('@shackcart/db').TemplateSource} */
   export let template

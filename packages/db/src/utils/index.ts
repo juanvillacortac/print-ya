@@ -3,6 +3,7 @@ import type {
   ModifiersMap,
   Product,
   ProductModifier,
+  ProductsGroup,
   TemplateSource,
 } from 'src/types.js'
 
@@ -11,12 +12,16 @@ export const getTemplateFieldsFromModifiers = (
   modifiers: ModifiersMap
 ) => {
   let fields = ''
+  const merged = [
+    ...(product.group?.modifiers || []),
+    ...(product?.modifiers || []),
+  ]
   const mappedModifiers = Object.entries(modifiers || {}).map(
     ([mId, mValue]) =>
-      [
-        mValue.modifier || product.modifiers?.find((m) => m.id === mId),
-        mValue,
-      ] as [ProductModifier, { value?: string; itemId?: string }]
+      [mValue.modifier || merged.find((m) => m.id === mId), mValue] as [
+        ProductModifier,
+        { value?: string; itemId?: string }
+      ]
   )
   const items = mappedModifiers
     .filter(
@@ -52,7 +57,11 @@ export const getCostFromProductModifiers = (
   Object.entries(modifiers || {})
     .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
     .map(([mId, mValue]) => {
-      const modifier: ProductModifier | undefined = product.modifiers.find(
+      const merged = [
+        ...(product.group?.modifiers || []),
+        ...(product?.modifiers || []),
+      ]
+      const modifier: ProductModifier | undefined = merged.find(
         (m) => m.id === mId
       )
       if (mValue.itemIds) {
@@ -93,7 +102,7 @@ export const DEFAULT_TEMPLATE_HTML = `<script>
   class="overflow-hidden w-full h-full flex items-center {{= image ? \`'justify-between \${text ? 'pt-10' : 'py-10'}\` : 'justify-center' }} flex-col space-y-2 {{= locals.mirror ? 'mirror' : '' }}"
   style="--image: url({{=imageUrl}})"
 >
-  {{ if (image) { }}<div class="flex h-full bg-red-500 w-full image"></div>{{ } }}
+  {{ if (image) { }}<div class="flex h-full w-full image"></div>{{ } }}
   <script>- textComponent(text) </script>
 </div>`
 
@@ -121,26 +130,79 @@ export const DEFAULT_TEMPLATE_CSS = `{{ if (locals.font) { }}
   background-repeat: no-repeat;
 }`
 
-export function getBasicTemplate<T extends Partial<Product>>(
+type ProductShape = {
+  modifiers?: ProductModifier[]
+  meta?: ProductsGroup['meta']
+  templateFromGroup?: boolean
+}
+
+export function getBasicTemplate<
+  T extends ProductShape & {
+    group?: ProductShape | null
+  }
+>(
   product: T,
-  modifiers?: ModifiersMap | any
+  modifiers?: ModifiersMap | any,
+  override?: {
+    html?: string
+    css?: string
+  }
 ): TemplateSource {
   let customFields = ''
-  if (modifiers && product.modifiers) {
-    for (const modifier of product.modifiers) {
-      if (modifier.id === product.meta.templateTextModifier) {
+  let modifiersList = product.modifiers || []
+  if (product.templateFromGroup) {
+    modifiersList = modifiersList.concat(product.group?.modifiers || [])
+  }
+  const fallback: NonNullable<ProductsGroup['meta']> = {
+    templateTextModifier: product.templateFromGroup
+      ? product.meta.templateTextModifier ||
+        product.group?.meta?.templateTextModifier
+      : product.meta.templateTextModifier,
+
+    templateColorModifier: product.templateFromGroup
+      ? product.meta.templateColorModifier ||
+        product.group?.meta?.templateColorModifier
+      : product.meta.templateColorModifier,
+
+    templateImageModifier: product.templateFromGroup
+      ? product.meta.templateImageModifier ||
+        product.group?.meta?.templateImageModifier
+      : product.meta.templateImageModifier,
+
+    templateMirrorModifier: product.templateFromGroup
+      ? product.meta.templateMirrorModifier ||
+        product.group?.meta?.templateMirrorModifier
+      : product.meta.templateMirrorModifier,
+
+    templateFontModifier: product.templateFromGroup
+      ? product.meta.templateFontModifier ||
+        product.group?.meta?.templateFontModifier
+      : product.meta.templateFontModifier,
+
+    templateText: product.templateFromGroup
+      ? product.meta.templateText || product.group?.meta?.templateText
+      : product.meta.templateText,
+
+    mockups: [],
+  }
+  product.group?.meta && product.templateFromGroup
+    ? product.group.meta
+    : product.meta
+  if (modifiers && modifiersList) {
+    for (const modifier of modifiersList) {
+      if (modifier.id === fallback.templateTextModifier) {
         modifier.templateAccessor = 'text'
       }
-      if (modifier.id === product.meta.templateColorModifier) {
+      if (modifier.id === fallback.templateColorModifier) {
         modifier.templateAccessor = 'color'
       }
-      if (modifier.id === product.meta.templateImageModifier) {
+      if (modifier.id === fallback.templateImageModifier) {
         modifier.templateAccessor = 'image'
       }
-      if (modifier.id === product.meta.templateMirrorModifier) {
+      if (modifier.id === fallback.templateMirrorModifier) {
         modifier.templateAccessor = 'mirror'
       }
-      if (modifier.id === product.meta.templateFontModifier) {
+      if (modifier.id === fallback.templateFontModifier) {
         modifier.templateAccessor = 'font'
       }
     }
@@ -148,13 +210,13 @@ export function getBasicTemplate<T extends Partial<Product>>(
   }
   let fields = {
     ...JSON.parse(customFields || '{}'),
-    __defaultText__: product.meta?.templateText || '',
-    __defaultImage__: product.meta?.templateImage || '',
+    __defaultText__: fallback.templateText || '',
+    __defaultImage__: fallback.templateImage || '',
   }
 
   return {
-    html: DEFAULT_TEMPLATE_HTML,
-    css: DEFAULT_TEMPLATE_CSS,
+    html: override?.html || DEFAULT_TEMPLATE_HTML,
+    css: override?.css || DEFAULT_TEMPLATE_CSS,
     fields: JSON.stringify(fields),
     windi: true,
     width: 13,

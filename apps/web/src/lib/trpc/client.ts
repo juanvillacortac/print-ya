@@ -5,7 +5,7 @@ import type { LoadEvent } from '@sveltejs/kit'
 import { PUBLIC_API_URL } from '$env/static/public'
 import { createTRPCClient } from '@trpc/client'
 
-const trpc = (fetch?: LoadEvent['fetch'], server?: boolean, token?: string) => {
+function trpc(fetch?: LoadEvent['fetch'], server?: boolean, token?: string) {
   return createTRPCClient<tRPCRouter>({
     url: server ? `${PUBLIC_API_URL}/trpc` : `/api/trpc`,
     transformer: trpcTransformer,

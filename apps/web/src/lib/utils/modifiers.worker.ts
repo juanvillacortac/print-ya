@@ -1,7 +1,12 @@
 self.window = self
 
 import { browser } from '$app/environment'
-import type { ModifiersMap, Product, TemplateSource } from '@shackcart/db'
+import type {
+  ModifiersMap,
+  Product,
+  ProductsGroup,
+  TemplateSource,
+} from '@shackcart/db'
 import { getTemplateFieldsFromModifiers } from './modifiers'
 
 const DEFAULT_TEMPLATE_HTML = `<script>
@@ -42,26 +47,69 @@ const DEFAULT_TEMPLATE_CSS = `{{ if (locals.font) { }}
   background-repeat: no-repeat;
 }`
 
-function getBasicTemplate<T extends Partial<Product>>(
+export function getBasicTemplate<T extends Partial<Product>>(
   product: T,
-  modifiers?: ModifiersMap | any
+  modifiers?: ModifiersMap | any,
+  override?: {
+    html?: string
+    css?: string
+  }
 ): TemplateSource {
   let customFields = ''
-  if (modifiers && product.modifiers) {
-    for (const modifier of product.modifiers) {
-      if (modifier.id === product.meta.templateTextModifier) {
+  let modifiersList = product.modifiers || []
+  if (product.templateFromGroup) {
+    modifiersList = modifiersList.concat(product.group?.modifiers || [])
+  }
+  const meta: NonNullable<ProductsGroup['meta']> = {
+    templateTextModifier: product.templateFromGroup
+      ? product.meta.templateTextModifier ||
+        product.group?.meta?.templateTextModifier
+      : product.meta.templateTextModifier,
+
+    templateColorModifier: product.templateFromGroup
+      ? product.meta.templateColorModifier ||
+        product.group?.meta?.templateColorModifier
+      : product.meta.templateColorModifier,
+
+    templateImageModifier: product.templateFromGroup
+      ? product.meta.templateImageModifier ||
+        product.group?.meta?.templateImageModifier
+      : product.meta.templateImageModifier,
+
+    templateMirrorModifier: product.templateFromGroup
+      ? product.meta.templateMirrorModifier ||
+        product.group?.meta?.templateMirrorModifier
+      : product.meta.templateMirrorModifier,
+
+    templateFontModifier: product.templateFromGroup
+      ? product.meta.templateFontModifier ||
+        product.group?.meta?.templateFontModifier
+      : product.meta.templateFontModifier,
+
+    templateText: product.templateFromGroup
+      ? product.meta.templateText || product.group?.meta?.templateText
+      : product.meta.templateText,
+
+    mockups: [],
+  }
+  product.group?.meta && product.templateFromGroup
+    ? product.group.meta
+    : product.meta
+  if (modifiers && modifiersList) {
+    for (const modifier of modifiersList) {
+      if (modifier.id === meta.templateTextModifier) {
         modifier.templateAccessor = 'text'
       }
-      if (modifier.id === product.meta.templateColorModifier) {
+      if (modifier.id === meta.templateColorModifier) {
         modifier.templateAccessor = 'color'
       }
-      if (modifier.id === product.meta.templateImageModifier) {
+      if (modifier.id === meta.templateImageModifier) {
         modifier.templateAccessor = 'image'
       }
-      if (modifier.id === product.meta.templateMirrorModifier) {
+      if (modifier.id === meta.templateMirrorModifier) {
         modifier.templateAccessor = 'mirror'
       }
-      if (modifier.id === product.meta.templateFontModifier) {
+      if (modifier.id === meta.templateFontModifier) {
         modifier.templateAccessor = 'font'
       }
     }
@@ -69,13 +117,13 @@ function getBasicTemplate<T extends Partial<Product>>(
   }
   let fields = {
     ...JSON.parse(customFields || '{}'),
-    __defaultText__: product.meta?.templateText || '',
-    __defaultImage__: product.meta?.templateImage || '',
+    __defaultText__: meta.templateText || '',
+    __defaultImage__: meta.templateImage || '',
   }
 
   return {
-    html: DEFAULT_TEMPLATE_HTML,
-    css: DEFAULT_TEMPLATE_CSS,
+    html: override?.html || DEFAULT_TEMPLATE_HTML,
+    css: override?.css || DEFAULT_TEMPLATE_CSS,
     fields: JSON.stringify(fields),
     windi: true,
     width: 13,

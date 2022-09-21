@@ -1,0 +1,25 @@
+import { File, FormData, Headers, Request, Response, fetch } from 'undici'
+import { ReadableStream, TransformStream, WritableStream } from 'stream/web'
+import { webcrypto as crypto } from 'crypto'
+
+/** @type {Record<string, any>} */
+const globals = {
+  crypto,
+  fetch,
+  Response,
+  Request,
+  Headers,
+  ReadableStream,
+  TransformStream,
+  WritableStream,
+  FormData,
+}
+
+for (const name in globals) {
+  Object.defineProperty(globalThis, name, {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: globals[name],
+  })
+}

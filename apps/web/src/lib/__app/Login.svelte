@@ -103,6 +103,10 @@
         type="submit"
         >{loading ? 'Loading...' : isLogin ? 'Log in' : 'Register'}</button
       >
+      <a
+        class="text-xs text-blue-500 self-end inline hover:underline"
+        href="/login/recover">Lost your password?</a
+      >
     </form>
   </div>
 </div>

@@ -3,6 +3,7 @@ import type { LayoutType } from '@shackcart/db'
 import type { LoadEvent } from '@sveltejs/kit'
 import type { LayoutData } from '@shackcart/db'
 import { isCanonical } from './host'
+import type { SvelteComponent } from 'svelte'
 
 export function getLayoutType<T extends { url: URL }>({ url }: T): LayoutType {
   // if (url.searchParams.get('store')) return 'store'
@@ -44,7 +45,6 @@ export async function fetchLayoutData<
   { url, fetch, params }: T,
   layoutType: LayoutType
 ): Promise<{ layoutData: LayoutData; notFound?: boolean }> {
-  const client = trpc(fetch)
   let layoutData: LayoutData = {
     layout: layoutType,
   }
@@ -55,7 +55,7 @@ export async function fetchLayoutData<
       try {
         layoutData = {
           ...layoutData,
-          ...(await client.query('stores:getByHost', url.host)),
+          ...(await trpc(fetch).query('stores:getByHost', url.host)),
         }
         if (!layoutData.store) {
           let slug = url.searchParams.get('store')
@@ -65,7 +65,7 @@ export async function fetchLayoutData<
           if (slug) {
             layoutData = {
               ...layoutData,
-              ...(await client.query('stores:getBySlug', slug)),
+              ...(await trpc(fetch).query('stores:getBySlug', slug)),
             }
           }
         }
@@ -77,22 +77,48 @@ export async function fetchLayoutData<
         console.log(err)
       }
     default:
-      if (params.slug) {
-        const { store, storeData } = await client.query(
-          'stores:getBySlug',
-          params.slug
-        )
-        const user = await client.query('user:whoami')
-        if (store && store.userId === user?.id) {
-          layoutData.store = store
-          layoutData.storeData = storeData
-        } else {
-          isRouteValid = false
-        }
-      }
+      // if (params.slug) {
+      //   const { store, storeData } = await client.query(
+      //     'stores:getBySlug',
+      //     params.slug
+      //   )
+      //   const user = await client.query('user:whoami')
+      //   if (store && store.userId === user?.id) {
+      //     layoutData.store = store
+      //     layoutData.storeData = storeData
+      //   } else {
+      //     isRouteValid = false
+      //   }
+      // }
+      // return {
+      //   notFound: !isRouteValid,
+      //   layoutData,
+      // }
       return {
         notFound: !isRouteValid,
         layoutData,
       }
   }
+}
+
+export async function getSvelteLayoutComponent(layoutData: LayoutData) {
+  let layoutComponent: new () => SvelteComponent
+  switch (layoutData?.layout || 'app') {
+    case 'app':
+      // @ts-ignore
+      layoutComponent = (await import('$lib/__layouts/AppLayout.svelte'))
+        .default as any
+      break
+    default:
+      if (!layoutData.store) {
+        // @ts-ignore
+        layoutComponent = (await import('$lib/__layouts/AppLayout.svelte'))
+          .default as any
+      } else {
+        layoutComponent = // @ts-ignore
+          (await import('$lib/__layouts/DecalshutLayout.svelte')).default as any
+      }
+      break
+  }
+  return layoutComponent
 }

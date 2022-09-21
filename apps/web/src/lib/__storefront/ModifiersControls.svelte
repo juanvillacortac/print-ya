@@ -14,7 +14,10 @@
 
   export let modifiers = createModifiersMap(product)
 
-  $: productModifiers = product?.modifiers || []
+  $: productModifiers = [
+    ...(product?.modifiers || []),
+    ...(product.group?.modifiers || []),
+  ]
 
   $: fontsItems = productModifiers.filter!((m) => m.type === 'font')
     .map((m) => m.items || [])
@@ -36,7 +39,7 @@
 </svelte:head>
 
 <div class="flex flex-col space-y-4 w-full">
-  {#each product?.modifiers || [] as m}
+  {#each productModifiers || [] as m}
     {@const item = modifiers[m.id]
       ? m.items?.find((i) => i.id === modifiers[m.id]?.itemId)
       : undefined}

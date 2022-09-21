@@ -58,7 +58,6 @@
     {#each actions as a}
       <a
         class="bg-white border rounded-lg flex flex-col h-full space-y-2 border-gray-300 w-full p-4 transform transition-transform duration-200 relative overflow-hidden items-center dark:bg-gray-800 dark:border-gray-600 hover:scale-105"
-        data-sveltekit-prefetch
         href="/stores/{$layoutData.store?.slug}{a.href}"
         style="will-change: transform"
       >

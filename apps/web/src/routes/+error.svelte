@@ -68,9 +68,8 @@
         <div class="w-full grid gap-6 sm:grid-cols-2 lg:px-16 lg:grid-cols-4">
           {#each $layoutData.store.categories || [] as c}
             <a
-              href="/products?category={c.slug}"
+              href="/products?category={c.name}"
               class="flex flex-col space-y-4 duration-200 hover:text-red-500"
-              data-sveltekit-prefetch
             >
               <div
                 class="bg-black flex font-bold font-title text-white text-center w-full p-6 text-3xl aspect-square items-center justify-center"
@@ -91,14 +90,16 @@
     class:lg:-m-6={$layoutData.layout === 'app'}
   >
     <div class="font-bold text-6xl leading-[0.7]">
-      {$page.error.status || $page.status}
+      {$page.status}
     </div>
 
-    <p class="font-bold my-4">{$page.error.name}</p>
+    {#if $page.error?.name}
+      <p class="font-bold my-4">{$page.error?.name}</p>
+    {/if}
 
-    <p class="my-4">{$page.error.message}</p>
+    <p class="my-4">{$page.error?.message}</p>
 
-    {#if $page.error.stack}
+    {#if $page.error?.stack}
       <div class="w-full max-h-[35vh] relative lg:w-6/10">
         <div class="top-2 right-2 absolute">
           <button
@@ -107,7 +108,7 @@
             on:click={() =>
               typeof navigator == 'undefined'
                 ? null
-                : navigator.clipboard.writeText($page.error.stack)}
+                : navigator.clipboard.writeText($page.error?.stack || '')}
             class="border rounded flex bg-gray-100 border-gray-300 shadow-lg opacity-50 p-2 duration-200 dark:bg-gray-800 dark:border-gray-600 hover:opacity-100"
           >
             <Copy16 />

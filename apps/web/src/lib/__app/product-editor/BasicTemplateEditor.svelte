@@ -9,12 +9,11 @@
   import { tooltip } from '$lib/components/tooltip'
   import type { Product, ProductModifier } from '@shackcart/db'
   import { layoutData } from '$lib/stores'
-  import { ChevronRight16, Close24, Image32 } from 'carbon-icons-svelte'
-  import { expoOut } from 'svelte/easing'
-  import { slide } from 'svelte/transition'
+  import { Close24, Image32 } from 'carbon-icons-svelte'
   import { supabase } from '@shackcart/shared'
 
   export let product: Partial<Product>
+  export let group = false
   export let disabled = false
   export let modifiers: (Omit<ProductModifier, 'items'> & {
     internalId?: string
@@ -77,69 +76,71 @@
 </script>
 
 <div class="flex flex-col h-full space-y-4 w-full">
-  <div class="w-full grid gap-4 items-start sm:grid-cols-2">
-    <div class="flex flex-col space-y-2">
-      <div class="font-bold text-xs">Design image</div>
-      <div class="relative">
-        {#if product.meta?.templateImage && !disabled}
-          <button
-            type="button"
-            class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
-            title="Delete image"
-            on:click={() => (product.meta.templateImage = '')}
-            use:tooltip
-          >
-            <Close24 />
-          </button>
-        {:else if !uploading && !disabled}
-          <input
-            type="file"
-            name=""
-            class="cursor-pointer flex h-full w-full opacity-0 absolute"
-            accept="image/*"
-            on:change={(e) => uploadImage(e)}
-          />
-        {/if}
-        <div
-          class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative darkborder-gray-700 dark:border-gray-700"
-          class:pointer-events-none={!product.meta?.templateImage}
-          on:dragenter|preventDefault|stopPropagation={(e) => {}}
-          on:dragover|preventDefault|stopPropagation={(e) => {}}
-          on:dragend|preventDefault|stopPropagation={(e) => {}}
-          on:drop|preventDefault={(e) => {
-            if (e.dataTransfer && !product.meta?.templateImage) {
-              const dt = e.dataTransfer
-              const files = [...dt.files]
-              if (files?.length && files[0].type.startsWith('image')) {
-                uploadImage({ currentTarget: { files } })
-              }
-            }
-          }}
-        >
-          {#if product.meta?.templateImage && !uploading}
-            <Image
-              {options}
-              src={product.meta?.templateImage}
-              class="rounded object-cover w-full aspect-square pointer-events-none"
-            />
-          {:else}
-            <div
-              class="flex flex-col text-center w-full text-gray-400 items-center justify-center aspect-square pointer-events-none"
-              use:squareratio
+  <div class="w-full grid gap-4 items-start" class:sm:grid-cols-2={!group}>
+    {#if !group}
+      <div class="flex flex-col space-y-2">
+        <div class="font-bold text-xs">Design image</div>
+        <div class="relative">
+          {#if product.meta?.templateImage && !disabled}
+            <button
+              type="button"
+              class="bg-white rounded-full shadow p-1 transform top-0 right-0 z-20 translate-x-[25%] translate-y-[-25%] absolute dark:bg-gray-700"
+              title="Delete image"
+              on:click={() => (product.meta.templateImage = '')}
+              use:tooltip
             >
-              <Image32 class="mb-1" />
-              <span class="font-normal block"
-                >{disabled
-                  ? 'Without image'
-                  : uploading
-                  ? 'Uploading image...'
-                  : 'Upload an image'}</span
-              >
-            </div>
+              <Close24 />
+            </button>
+          {:else if !uploading && !disabled}
+            <input
+              type="file"
+              name=""
+              class="cursor-pointer flex h-full w-full opacity-0 absolute"
+              accept="image/*"
+              on:change={(e) => uploadImage(e)}
+            />
           {/if}
+          <div
+            class="border-dashed rounded-lg flex border-2 p-2 overflow-hidden relative darkborder-gray-700 dark:border-gray-700"
+            class:pointer-events-none={!product.meta?.templateImage}
+            on:dragenter|preventDefault|stopPropagation={(e) => {}}
+            on:dragover|preventDefault|stopPropagation={(e) => {}}
+            on:dragend|preventDefault|stopPropagation={(e) => {}}
+            on:drop|preventDefault={(e) => {
+              if (e.dataTransfer && !product.meta?.templateImage) {
+                const dt = e.dataTransfer
+                const files = [...dt.files]
+                if (files?.length && files[0].type.startsWith('image')) {
+                  uploadImage({ currentTarget: { files } })
+                }
+              }
+            }}
+          >
+            {#if product.meta?.templateImage && !uploading}
+              <Image
+                {options}
+                src={product.meta?.templateImage}
+                class="rounded object-cover w-full aspect-square pointer-events-none"
+              />
+            {:else}
+              <div
+                class="flex flex-col text-center w-full text-gray-400 items-center justify-center aspect-square pointer-events-none"
+                use:squareratio
+              >
+                <Image32 class="mb-1" />
+                <span class="font-normal block"
+                  >{disabled
+                    ? 'Without image'
+                    : uploading
+                    ? 'Uploading image...'
+                    : 'Upload an image'}</span
+                >
+              </div>
+            {/if}
+          </div>
         </div>
       </div>
-    </div>
+    {/if}
     <div class="grid gap-4 grid-cols-1 lg:grid-cols-2">
       <div class="flex flex-col w-full">
         <label class="font-bold text-xs mb-2 block" for="fieldId">

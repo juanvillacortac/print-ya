@@ -11,7 +11,6 @@ export const load: PageLoad = async ({ fetch, parent, url }) => {
         const user = await client.query('user:whoami')
         if (user) {
           throw redirect(302, '/')
-        } else {
         }
       }
       return {
@@ -21,7 +20,6 @@ export const load: PageLoad = async ({ fetch, parent, url }) => {
       const customer = await client.query('customer:whoami')
       if (customer) {
         throw redirect(302, '/')
-      } else {
       }
       return {
         loginPage: (await import('$lib/__storefront/Login.svelte')).default,

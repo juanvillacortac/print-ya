@@ -195,18 +195,25 @@
           <span>Don't have an account yet?</span>
           <a
             href="?register"
-            class="font-bold text-$sc-color-primary dark:text-red-500 hover:underline"
+            class="font-bold text-$sc-color-primary dark:text-white hover:underline"
             >Create account</a
           >
         {:else}
           <span>Do you have an account?</span>
           <a
             href="/login"
-            class="font-bold text-$sc-color-primary dark:text-red-500 hover:underline"
+            class="font-bold text-$sc-color-primary dark:text-white hover:underline"
             >Log in</a
           >
         {/if}
       </div>
+      {#if $isLogin}
+        <a
+          href="/login/recover"
+          class="font-bold text-$sc-color-primary text-xs dark:text-white hover:underline"
+          >Lost your password?</a
+        >
+      {/if}
     </form>
   </div>
 </div>

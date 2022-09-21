@@ -1,14 +1,108 @@
-import type { MailDataRequired } from '@sendgrid/mail'
 import * as db from '@shackcart/db'
 import { utils } from '@shackcart/shared'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createServer } from '../shared.js'
+import type { MailDataRequired } from '@sendgrid/mail'
 import sendgrid from '@sendgrid/mail'
 
 const order = z.enum(['desc', 'asc'])
 
+const passwordRecovery = createServer()
+  .mutation('recoverPassword', {
+    input: z.object({
+      newPassword: z.string().min(6),
+      token: z.string(),
+      storeId: z.string(),
+    }),
+    resolve: async ({ input, ctx }) => {
+      const { token, newPassword } = input
+      const key = `customers:passwordsTokens:${input.storeId}:${token}`
+      const email = await ctx.redis.get<string>(key)
+      // const email = tokenDB.get(token) || null
+      if (!email)
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Invalid token',
+        })
+      await db.updateCustomerPassword({
+        email,
+        newPassword,
+        storeId: input.storeId,
+      })
+      await ctx.redis.del(key)
+    },
+  })
+  .mutation('issuePasswordRecoveryToken', {
+    input: z.object({
+      email: z.string().email(),
+      storeId: z.string(),
+    }),
+    resolve: async ({ input, ctx }) => {
+      const store = await db.getStore({
+        id: input.storeId,
+      })
+      const user = await db.prisma.customer.findUnique({
+        where: {
+          email_storeId: input,
+        },
+      })
+      if (!user || !store) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Account not found',
+        })
+      }
+      const token = crypto
+        .randomUUID()
+        .replace(new RegExp('-', 'g'), '')
+        .toLowerCase()
+      console.log(token)
+      const key = `customers:passwordsTokens:${input.storeId}:${token}`
+      await ctx.redis.set(key, input.email, {
+        ex: 86400,
+      })
+      const url = utils.getAbsoluteURL({
+        path: `/login/recover?token=${token}`,
+        subdomain: !store?.customDomain ? store?.slug : undefined,
+        host: store?.customDomain || undefined,
+      })
+      const msg: MailDataRequired = {
+        to: input.email,
+        from: {
+          name: `${store.name}`,
+          email: `${store.slug}@shackcart.com`,
+        },
+
+        headers: {
+          Priority: 'Urgent',
+          Importance: 'high',
+        },
+        subject: `Password change`,
+        html: `<p><b>Hello, ${user.firstName}</b></p>
+          <p>We recently received a request for a forgotten password.</p>
+          <p>To change your password, please click on below link</p>
+          <p><a href="${url}">Reset your password</a></p>
+          <p>If you did not request this change, you do not need to do anything.</p>`,
+      }
+      await sendgrid.send(msg)
+      // tokenDB.set(token, input.email)
+    },
+  })
+  .query('checkPasswordRecoveryToken', {
+    input: z.object({
+      token: z.string(),
+      storeId: z.string(),
+    }),
+    resolve: async ({ input, ctx }) => {
+      const key = `customers:passwordsTokens:${input.storeId}:${input.token}`
+      const email = await ctx.redis.get<string>(key)
+      return { ok: email != null }
+    },
+  })
+
 export default createServer()
+  .merge(passwordRecovery)
   .mutation('register', {
     input: z.object({
       firstName: z.string(),

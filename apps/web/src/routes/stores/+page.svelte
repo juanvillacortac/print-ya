@@ -22,7 +22,6 @@
     <a
       class="bg-white border rounded-lg flex flex-col h-full space-y-1 border-gray-300 w-full p-4 transform transition-transform duration-200 relative overflow-hidden dark:bg-gray-800 dark:border-gray-600 hover:scale-105"
       href="/stores/{store.slug}"
-      data-sveltekit-prefetch
     >
       <Image
         src={store.favicon || ''}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { watchMedia } from '$lib'
-  import type { StrippedOrder } from '@shackcart/db'
+  import type { StripedOrder } from '@shackcart/db'
   import trpc from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
   import { tick } from 'svelte'
@@ -135,7 +135,7 @@
     search(nameSearch, sortBy)
   }
 
-  const getTotal = (order: StrippedOrder) => {
+  const getTotal = (order: StripedOrder) => {
     const total = order.total ?? 0
     return total
   }

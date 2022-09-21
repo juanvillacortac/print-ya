@@ -40,6 +40,8 @@ model Customer {
 
   createdAt     DateTime        @default(now())
   SearchHistory SearchHistory[]
+
+  @@unique([email, storeId])
 }
 
 enum CustomerAddressType {
@@ -67,6 +69,8 @@ model Account {
 
   user   User?   @relation(fields: [userId], references: [id])
   userId String?
+
+  @@unique([provider, customerId])
 }
 
 model Store {
@@ -94,7 +98,7 @@ model Store {
   SearchHistory     SearchHistory[]
   ShopifyImport     ShopifyImport[]
   productCategories ProductCategory[]
-  // ModifiersGroup    ModifiersGroup[]
+  ModifiersGroup    ProductsGroup[]
 }
 
 model PaymentGateway {
@@ -188,15 +192,20 @@ model Product {
 
   price Float
 
-  meta Json?
+  meta    Json?
+  mockups Json?
 
-  images        ProductImage[]
-  template      Json?
-  templateDraft Json?
+  images            ProductImage[]
+  template          Json?
+  templateDraft     Json?
+  templateFromGroup Boolean        @default(false)
 
   orderItems OrderItem[]
 
   tags TagsOnProducts[]
+
+  group           ProductsGroup? @relation(fields: [productsGroupId], references: [id])
+  productsGroupId String?
 
   shopifyImport       ShopifyImport?         @relation(fields: [shopifyImportId], references: [id])
   shopifyImportId     String?
@@ -222,24 +231,24 @@ model ProductImage {
   productId String?
 }
 
-// model ModifiersGroup {
-//   id   String @id @default(cuid())
-//   name String
+model ProductsGroup {
+  id   String @id @default(cuid())
+  name String @unique
 
-//   store Store @relation(fields: [storeId], references: [id])
+  createdAt DateTime @default(now())
 
-//   ModifiersOnModifiersGroup ModifiersOnModifiersGroup[]
-//   storeId                   String
-// }
+  store   Store?  @relation(fields: [storeId], references: [id])
+  storeId String?
 
-// model ModifiersOnModifiersGroup {
-//   group             ModifiersGroup  @relation(fields: [modifiersGroupId], references: [id])
-//   modifier          ProductModifier @relation(fields: [productModifierId], references: [id])
-//   modifiersGroupId  String
-//   productModifierId String
+  description String?
 
-//   @@id([modifiersGroupId, productModifierId])
-// }
+  modifiers ProductModifier[]
+
+  meta    Json?
+  mockups Json?
+
+  products Product[]
+}
 
 model ProductModifier {
   id               String                @id @default(cuid())
@@ -252,8 +261,8 @@ model ProductModifier {
   product          Product?              @relation(fields: [productId], references: [id])
   items            ProductModifierItem[]
   ordinal          Int                   @default(0)
-
-  // ModifiersOnModifiersGroup ModifiersOnModifiersGroup[]
+  productsGroup    ProductsGroup?        @relation(fields: [productsGroupId], references: [id])
+  productsGroupId  String?
 }
 
 model ProductModifierItem {

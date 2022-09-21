@@ -117,6 +117,28 @@ export const getProductBySlug = ({
             tag: true,
           },
         },
+        group: {
+          include: {
+            modifiers: {
+              where: {
+                active: true,
+              },
+              orderBy: {
+                ordinal: 'asc',
+              },
+              include: {
+                items: {
+                  where: {
+                    active: true,
+                  },
+                  orderBy: {
+                    ordinal: 'asc',
+                  },
+                },
+              },
+            },
+          },
+        },
         modifiers: {
           where: {
             active: true,
@@ -354,6 +376,7 @@ export const reviewProductFromShopifyImport = async (
 
 export const getProductsByStore = async ({
   storeId,
+  ids,
   filter,
   orderBy = {
     createdAt: 'desc',
@@ -362,9 +385,11 @@ export const getProductsByStore = async ({
   pageSize = 20,
 }: {
   storeId: string
+  ids?: string[]
   filter?: {
     name?: string
     public?: boolean
+    productsGroupId?: string
     archived?: boolean
     categoryId?: string | null
     shopifyImportId?: string | null
@@ -381,6 +406,15 @@ export const getProductsByStore = async ({
   products: StripedProduct[]
 }> => {
   let AND: Prisma.ProductWhereInput[] = []
+  if (ids)
+    AND = [
+      ...AND,
+      {
+        id: {
+          in: ids,
+        },
+      },
+    ]
   if (filter?.name)
     AND = [
       ...AND,
@@ -436,6 +470,7 @@ export const getProductsByStore = async ({
         }
       : undefined,
     shopifyImportId: filter?.shopifyImportId || null,
+    productsGroupId: filter?.productsGroupId,
     AND,
   }
   const [count, products] = await prisma.$transaction([
@@ -445,24 +480,8 @@ export const getProductsByStore = async ({
       where,
       take: pageSize,
       skip: pageSize * Math.max(page - 1, 0),
-      select: {
-        id: true,
-        name: true,
-        createdAt: true,
-        price: true,
-        type: true,
-        public: true,
-        slug: true,
-        description: true,
-        store: true,
-        storeId: true,
-        updatedAt: true,
-        archived: true,
-        template: true,
-        minQuantity: true,
-        meta: true,
-        archivedAt: true,
-        shopifyImportId: true,
+      include: {
+        group: true,
         products_categories: {
           include: {
             category: true,
@@ -479,7 +498,7 @@ export const getProductsByStore = async ({
   return {
     count,
     products: products.map((p) => ({
-      ...p,
+      ...(p as unknown as StripedProduct),
       categories: p.products_categories.map((pc) => pc.category),
       tags: p.tags.map((t) => t.tag),
     })),
@@ -531,8 +550,17 @@ export const upsertProduct = async (
         minQuantity: product.minQuantity || null,
         public: product.public,
         description: product.description,
+        templateFromGroup: product.templateFromGroup,
         meta: product.meta,
         archived: product.archived,
+        mockups: product.mockups,
+        group: product.productsGroupId
+          ? {
+              connect: {
+                id: product.productsGroupId,
+              },
+            }
+          : undefined,
         archivedAt:
           product.archived !== undefined || product.archived !== null
             ? product.archived
@@ -678,8 +706,8 @@ export const upsertProduct = async (
     }
 
     const final = await getProductBySlug({
-      storeId: product.storeId!,
-      slug: product.slug!,
+      storeId: c.storeId!,
+      slug: c.slug!,
     })
     return final
   }
@@ -722,12 +750,20 @@ export const upsertProduct = async (
       public: product.public!,
       description: product.description,
       meta: product.meta,
-
+      templateFromGroup: product.templateFromGroup,
+      mockups: product.mockups,
       store: {
         connect: {
           id: product.storeId!,
         },
       },
+      group: product.productsGroupId
+        ? {
+            connect: {
+              id: product.productsGroupId,
+            },
+          }
+        : undefined,
       products_categories: {
         create: product.categories
           ? product.categories.map((c) => {

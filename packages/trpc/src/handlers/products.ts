@@ -11,6 +11,7 @@ import {
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createServer } from '../shared.js'
+import productsGroup from './products-group.js'
 
 const order = z.enum(['desc', 'asc'])
 
@@ -80,6 +81,7 @@ const queries = createServer()
         .object({
           name: z.string().optional(),
           categoryId: z.string().cuid().optional(),
+          productsGroupId: z.string().cuid().optional(),
           public: z.boolean().optional(),
           archived: z.boolean().optional(),
           shopifyImportId: z.string().optional(),
@@ -180,3 +182,4 @@ export default createServer()
   .merge(mutations)
   .merge(queries)
   .merge('categories:', categories)
+  .merge('groups:', productsGroup)

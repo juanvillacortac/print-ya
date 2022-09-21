@@ -123,7 +123,7 @@
                 template={{
                   ...(template || {}),
                 }}
-                mockups={product.meta?.mockups}
+                mockups={product.mockups}
                 ignoreGlobalMockups={product.meta?.ignoreGlobalMockups}
               />
             {:else}

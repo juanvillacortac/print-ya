@@ -63,12 +63,12 @@ const app = async () => {
             },
             setUser: async (id: string) => {
               const token = await res.jwtSign({ id, type: 'user' })
-              res.header('x-token', token)
+              res.header('x-acccess-token', token)
               return token
             },
             setCustomer: async (id: string) => {
               const token = await res.jwtSign({ id, type: 'customer' })
-              res.header('x-token', token)
+              res.header('x-access-token', token)
               return token
             },
           },
@@ -97,8 +97,9 @@ const app = async () => {
   })
 
   if (import.meta.env.PROD) {
+    const port = +import.meta.env.VITE_PORT || 3000
     app.listen({
-      port: +import.meta.env.VITE_PORT || 3000,
+      port,
       host: '0.0.0.0',
     })
 
@@ -108,9 +109,7 @@ const app = async () => {
         process.exit(1)
       }
 
-      app.log.info(
-        `Server listening on port ${+import.meta.env.VITE_PORT || 3000}`
-      )
+      app.log.info(`Server listening on port ${port}`)
     })
   }
 

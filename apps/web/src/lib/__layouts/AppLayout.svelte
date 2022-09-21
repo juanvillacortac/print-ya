@@ -230,7 +230,6 @@
                   duration: 400,
                   easing: expoOut,
                 }}
-                data-sveltekit-prefetch
                 class:text-black={current}
                 class:dark:text-white={current}
                 href={p.href}
@@ -321,7 +320,6 @@
               use:tooltip
               class="flex hover:text-black dark:hover:text-white"
               in:scale|local={{ start: 0.8, duration: 400, easing: expoOut }}
-              data-sveltekit-prefetch
               class:text-black={current}
               class:dark:text-white={current}
               href={p.href}
@@ -379,7 +377,6 @@
             <a
               class="flex <sm:hidden"
               title="Go back"
-              data-sveltekit-prefetch
               use:tooltip
               href={$page.data.backLink ||
                 $page.url.pathname.substring(

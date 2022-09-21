@@ -8,6 +8,18 @@ export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, saltRounds)
 }
 
+export async function updateUserPassword({
+  email,
+  newPassword,
+}: Record<'email' | 'newPassword', string>) {
+  await prisma.user.update({
+    where: { email },
+    data: {
+      password: await hashPassword(newPassword),
+    },
+  })
+}
+
 export async function login({
   email,
   password,

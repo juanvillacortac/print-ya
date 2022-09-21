@@ -1,6 +1,6 @@
 <script lang="ts">
   import { layoutData, watchMedia } from '$lib'
-  import type { OrderFee, StrippedOrder } from '@shackcart/db'
+  import type { OrderFee, StripedOrder } from '@shackcart/db'
   import trpc from '$lib/trpc/client'
   import { tooltip } from '$lib/components/tooltip'
   import { tick } from 'svelte'
@@ -18,7 +18,7 @@
   import { goto } from '$app/navigation'
   import type { InferQueryInput } from '@shackcart/trpc'
 
-  export let orders: StrippedOrder[] | undefined = undefined
+  export let orders: StripedOrder[] | undefined = undefined
   export let customerId: string | undefined = undefined
   export let urlPrefix: string
   export let load = true
@@ -134,7 +134,7 @@
     search(idSearch, filter, sortBy, customerId)
   }
 
-  const getTotal = (order: StrippedOrder) => {
+  const getTotal = (order: StripedOrder) => {
     const total = order.total ?? 0
     return total
   }
@@ -439,7 +439,10 @@
                     <p
                       class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-gray-600 hover:overflow-visible "
                       title="Copy to clipboard"
-                      on:click={() => typeof navigator == 'undefined' ? null : navigator.clipboard.writeText(o.id)}
+                      on:click={() =>
+                        typeof navigator == 'undefined'
+                          ? null
+                          : navigator.clipboard.writeText(o.id)}
                       use:tooltip
                     >
                       {o.id}

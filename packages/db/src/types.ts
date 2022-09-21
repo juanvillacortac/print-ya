@@ -22,6 +22,8 @@ import type {
   TagsOnProducts,
   ProductTag,
   ProductCategory,
+  ProductsGroup as _ProductsGroup,
+  CategoriesOnProducts,
 } from '@prisma/client'
 
 export {
@@ -35,6 +37,8 @@ export {
   _OrderItem,
   _Product,
   _SearchHistory,
+  _ProductsGroup,
+  CategoriesOnProducts,
   ProductCategory,
   ShopifyImport,
   ShopifyImportStatus,
@@ -51,6 +55,7 @@ export {
 }
 
 export type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
+export type BestOmit<T, U extends keyof T> = Pick<T, Exclude<keyof T, U>>
 
 export type Store = _Store & {
   contactData?: any
@@ -67,23 +72,57 @@ export type ProductModifierItem = Omit<_ProductModifierItem, 'ordinal'> & {
   meta: any
 }
 
-export type ProductModifier = Omit<_ProductModifier, 'ordinal'> & {
+export type ProductModifier = BestOmit<
+  _ProductModifier,
+  'ordinal' | 'productsGroupId'
+> & {
   meta?: any
   items: ProductModifierItem[]
 }
 
-export type Product = _Product & {
-  template: any
-  meta?: any
-  categories: Omit<ProductCategory, 'storeId'>[]
-  tags: Omit<ProductTag, 'storeId'>[]
-  modifiers: ProductModifier[]
-}
+export type Product = Overwrite<
+  _Product,
+  {
+    template: any
+    meta?: any
+    categories: Omit<ProductCategory, 'storeId'>[]
+    tags: Omit<ProductTag, 'storeId'>[]
+    modifiers: ProductModifier[]
+    group: ProductsGroup | null
+    mockups: MockupItem[]
+  }
+>
 
-export type StripedProduct = Omit<_Product, 'templateDraft'> & {
-  template: any
-  categories?: Omit<ProductCategory, 'storeId'>[]
-}
+export type StripedProduct = Overwrite<
+  BestOmit<_Product, 'templateDraft'>,
+  {
+    template: any
+    group?: BestOmit<ProductsGroup, 'modifiers' | 'products'> | null
+    categories?: Omit<ProductCategory, 'storeId'>[]
+    mockups: MockupItem[]
+  }
+>
+
+export type MockupItem = Record<'path' | 'url', string>
+
+export type ProductsGroup = Overwrite<
+  _ProductsGroup,
+  {
+    mockups: MockupItem[]
+    meta?:
+      | (Record<string, any> & {
+          templateText?: string
+          templateTextModifier?: string
+          templateColorModifier?: string
+          templateImageModifier?: string
+          templateMirrorModifier?: string
+          templateFontModifier?: string
+        })
+      | any
+    modifiers: ProductModifier[]
+    products?: number
+  }
+>
 
 export type OrderItem = _OrderItem & {
   modifiers: ModifiersMap
@@ -105,7 +144,7 @@ export type Order = Overwrite<
   }
 >
 
-export type StrippedOrder = Overwrite<
+export type StripedOrder = Overwrite<
   Order,
   {
     customer: Customer | null

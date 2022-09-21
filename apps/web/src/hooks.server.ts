@@ -4,31 +4,86 @@ import { appRoutes, getLayoutType } from '$lib/utils/layout'
 import { getDefaultHost } from '$lib/utils/host'
 
 import { sequence } from '@sveltejs/kit/hooks'
-export const session = handleSession({
-  secret: 'secret',
-  expires: 7,
-  key: 'token',
-  cookie: {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
-  },
-})
+import { createTRPCProxy } from '$lib/trpc/proxy.server'
+import type { tRPCRouter } from '@shackcart/trpc'
+import { PUBLIC_API_URL } from '$env/static/public'
 
-const logic: Handle = async ({ event, resolve }) => {
-  let response: Response
+const privateQueries = [
+  'user:whoami',
+  'customer:whoami',
+  'orders:get',
+  'orders:list',
+  'customer:get',
+  'customer:list',
+  'customer:whoami',
+]
 
-  if (event.request.headers.get('x-vercel-id')) {
-    console.log(event.request.headers.get('x-vercel-id'))
+const handleAPI: Handle = async ({ event, resolve }) => {
+  const { url, locals } = event
+  const { token, layoutType } = locals
+
+  let headers: Record<string, string> = {}
+  if (token) {
+    headers.authorization = `Bearer ${token}`
   }
 
-  event.locals = {
-    ...event.locals,
-    layoutType: getLayoutType(event),
-    userAgent: event.request.headers.get('user-agent') || '',
-    host: event.url.host,
-    fullHost: `${event.url.protocol}//${event.url.host}`,
-    token: event.locals.session.data.token || undefined,
+  const { response, isTRPC } = await createTRPCProxy<tRPCRouter>({
+    headers,
+    resolve,
+    event,
+    url: `${PUBLIC_API_URL}/trpc`,
+    cache: {
+      enable: layoutType == 'store',
+      privateQueries,
+    },
+  })
+
+  if (response.headers.has('x-access-token')) {
+    await locals.session.set({
+      token: response.headers.get('x-access-token') || '',
+    })
+    response.headers.delete('x-access-token')
+  }
+
+  const privatePaths = ['/account', '/bag']
+  const isPublic =
+    layoutType == 'store' &&
+    !privatePaths.some((path) => url.pathname.startsWith(path))
+
+  if (!isTRPC && isPublic) {
+    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
+  }
+
+  return response
+}
+
+export const session = handleSession(
+  {
+    secret: 'secret',
+    expires: 7,
+    key: 'token',
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    },
+  },
+  async ({ event, resolve }) => {
+    event.locals = {
+      ...event.locals,
+      layoutType: getLayoutType(event),
+      userAgent: event.request.headers.get('user-agent') || '',
+      host: event.url.host,
+      fullHost: `${event.url.protocol}//${event.url.host}`,
+      token: event.locals.session.data.token || undefined,
+    }
+    return resolve(event)
+  }
+)
+
+const guard: Handle = async ({ event, resolve }) => {
+  if (event.request.headers.get('x-vercel-id')) {
+    console.log(event.request.headers.get('x-vercel-id'))
   }
 
   const isAppPage =
@@ -45,18 +100,7 @@ const logic: Handle = async ({ event, resolve }) => {
     )
   }
 
-  response = await resolve(event)
-
-  if (
-    event.locals.layoutType === 'store' &&
-    !event.url.pathname.startsWith('/account') &&
-    !event.url.pathname.startsWith('/bag') &&
-    !event.url.pathname.startsWith('/api/trpc')
-  ) {
-    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
-  }
-
-  return response
+  return resolve(event)
 }
 
-export const handle = sequence(session, logic)
+export const handle = sequence(session, handleAPI, guard)

@@ -1,4 +1,4 @@
-import './fetch-polyfill.js'
+import './polyfill.js'
 
 import * as _db from '@shackcart/db'
 

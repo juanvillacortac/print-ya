@@ -12,6 +12,11 @@ declare namespace App {
     fullHost?: string
     userAgent?: string
   }
+  interface PageError {
+    name?: string
+    message?: string
+    stack?: string
+  }
 }
 
 interface SessionData {

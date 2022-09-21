@@ -3,6 +3,8 @@
   import { tick } from 'svelte'
   import {
     Checkmark16,
+    CheckmarkFilled16,
+    CheckmarkOutline16,
     ChevronDown16,
     ChevronLeft24,
     ChevronRight24,
@@ -27,6 +29,8 @@
 
   export let archived = false
   export let importId: string | undefined = undefined
+  export let groupId: string | undefined = undefined
+  export let selection: 'all' | string[] | undefined
   export let products:
     | InferQueryOutput<'products:list'>['products']
     | undefined = undefined
@@ -42,7 +46,7 @@
   let nameSearch = ''
   let categoryId = ''
   let visible: boolean | '' = ''
-  const search = (..._deps: any[]) => {
+  export const search = (..._deps: any[]) => {
     const find = async () => {
       waitTimeout = setTimeout(() => {
         products = undefined
@@ -56,6 +60,7 @@
           categoryId: categoryId || undefined,
           public: visible || undefined,
           shopifyImportId: importId || undefined,
+          productsGroupId: groupId || undefined,
           archived,
         },
         orderBy: {
@@ -320,7 +325,6 @@
                     <a
                       href="products/{product?.slug}"
                       class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
-                      data-sveltekit-prefetch
                     >
                       {product.name}
                     </a>
@@ -368,42 +372,75 @@
                   </p>
                 </div>
                 <div class="flex space-x-2 items-center <sm:ml-auto">
-                  {#if product.shopifyImportId}
-                    <button
-                      class="border-transparent rounded flex space-x-1 border-2 p-1 text-green-500 duration-200 items-center hover:border-green-500"
-                      type="button"
-                      on:click={() => reviewProduct(product.id)}
-                    >
-                      <div class="text-xs">Approve product</div>
-                      <Checkmark16 /></button
-                    >
-                  {:else if !product.archived}
-                    <button
-                      class="border-transparent rounded flex space-x-1 border-2 p-1 text-red-500 duration-200 items-center hover:border-red-500"
-                      type="button"
-                      on:click={() => deleteProduct(product.id)}
-                    >
-                      <div class="text-xs">Send to trash</div>
-                      <TrashCan16 /></button
-                    >
-                  {:else}
-                    <button
-                      class="border-transparent rounded flex space-x-1 border-2 p-1 text-green-500 duration-200 items-center hover:border-green-500"
-                      type="button"
-                      on:click={() => deleteProduct(product.id)}
-                    >
-                      <div class="text-xs">Restore product</div>
-                      <Redo16 /></button
-                    >
+                  {#if !selection}
+                    {#if product.shopifyImportId}
+                      <button
+                        class="border-transparent rounded flex space-x-1 border-2 p-1 text-green-500 duration-200 items-center hover:border-green-500"
+                        type="button"
+                        on:click={() => reviewProduct(product.id)}
+                      >
+                        <div class="text-xs">Approve product</div>
+                        <Checkmark16 /></button
+                      >
+                    {:else if !product.archived}
+                      <button
+                        class="border-transparent rounded flex space-x-1 border-2 p-1 text-red-500 duration-200 items-center hover:border-red-500"
+                        type="button"
+                        on:click={() => deleteProduct(product.id)}
+                      >
+                        <div class="text-xs">Send to trash</div>
+                        <TrashCan16 /></button
+                      >
+                    {:else}
+                      <button
+                        class="border-transparent rounded flex space-x-1 border-2 p-1 text-green-500 duration-200 items-center hover:border-green-500"
+                        type="button"
+                        on:click={() => deleteProduct(product.id)}
+                      >
+                        <div class="text-xs">Restore product</div>
+                        <Redo16 /></button
+                      >
+                    {/if}
                   {/if}
                   <a
                     class="border-transparent rounded flex space-x-1 border-2 p-1 duration-200 items-center hover:border-gray-300 dark:hover:border-gray-500"
+                    target={selection ? '_blank' : undefined}
                     href="/stores/{$layoutData.store
-                      ?.slug}/products/{product.slug}"
+                      ?.slug}/products/{product.slug}{groupId
+                      ? '?from=group'
+                      : ''}"
                   >
                     <div class="text-xs">View product</div>
                     <View16 /></a
                   >
+                  {#if selection}
+                    {@const selected =
+                      selection === 'all' || selection.includes(product.id)}
+                    <button
+                      class="border-transparent rounded flex space-x-1 border-2 border-green-500 p-1 transition-colors text-green-500 duration-200 items-center"
+                      class:bg-green-500={selected}
+                      class:!text-white={selected}
+                      class:!dark:text-gray-800={selected}
+                      type="button"
+                      on:click={() => {
+                        if (selection === 'all' || !selection) return
+                        const set = new Set(selection)
+                        if (selected) {
+                          set.delete(product.id)
+                        } else {
+                          set.add(product.id)
+                        }
+                        selection = [...set]
+                      }}
+                    >
+                      <div class="text-xs">
+                        {selected ? 'Selected' : 'Select'}
+                      </div>
+                      <svelte:component
+                        this={selected ? CheckmarkFilled16 : Checkmark16}
+                      />
+                    </button>
+                  {/if}
                 </div>
               </div>
             </div>

@@ -2,7 +2,12 @@ import type { Product, ModifiersMap, ProductModifier } from '@shackcart/db'
 import { writable } from 'svelte/store'
 
 export const createModifiersMap = (product?: Product): ModifiersMap =>
-  product ? product.modifiers?.reduce((a, v) => ({ ...a, [v.id]: {} }), {}) : {}
+  product
+    ? [
+        ...(product.group?.modifiers || []),
+        ...(product?.modifiers || []),
+      ].reduce((a, v) => ({ ...a, [v.id]: {} }), {})
+    : {}
 
 export const createModifiersMapStore = (product?: Product) =>
   writable<ModifiersMap>(createModifiersMap(product))
@@ -12,12 +17,16 @@ export const getTemplateFieldsFromModifiers = (
   modifiers: ModifiersMap
 ) => {
   let fields = ''
+  const merged = [
+    ...(product.group?.modifiers || []),
+    ...(product?.modifiers || []),
+  ]
   const mappedModifiers = Object.entries(modifiers || {}).map(
     ([mId, mValue]) =>
-      [
-        mValue.modifier || product.modifiers?.find((m) => m.id === mId),
-        mValue,
-      ] as [ProductModifier, { value?: string; itemId?: string }]
+      [mValue.modifier || merged.find((m) => m.id === mId), mValue] as [
+        ProductModifier,
+        { value?: string; itemId?: string }
+      ]
   )
   const items = mappedModifiers
     .filter(
@@ -44,42 +53,3 @@ export const getTemplateFieldsFromModifiers = (
   }
   return fields
 }
-
-// export const getCostFromProductModifiers = (
-//   product: Product,
-//   modifiers: ModifiersMap,
-//   cost?: number
-// ) =>
-//   Object.entries(modifiers || {})
-//     .filter(([_, mValue]) => mValue?.itemId || mValue?.itemIds)
-//     .map(([mId, mValue]) => {
-//       const modifier: ProductModifier | undefined = product.modifiers.find(
-//         (m) => m.id === mId
-//       )
-//       if (mValue.itemIds) {
-//         const items =
-//           mValue.itemIds?.map((id) =>
-//             modifier?.items?.find((i) => i.id === id)
-//           ) || []
-//         const costs = items.map((item) =>
-//           item?.percentage
-//             ? (item?.cost / 100) * (cost ?? product.price)
-//             : item?.cost || 0
-//         )
-//         return costs.reduce((a, b) => a + b, 0)
-//       }
-//       const item = modifier?.items?.find((i) => i.id === mValue.itemId)
-//       const value = item?.percentage
-//         ? (item!.cost / 100) * (cost ?? product.price)
-//         : item?.cost || 0
-//       return value
-//     })
-//     .reduce((a, b) => a + b, 0)
-
-// export const getTotalFromProductModifiers = (
-//   product: Product,
-//   modifiers: ModifiersMap | any,
-//   cost?: number
-// ) =>
-//   getCostFromProductModifiers(product, modifiers, cost) +
-//   (cost ?? product.price)

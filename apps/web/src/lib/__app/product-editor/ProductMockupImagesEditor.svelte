@@ -13,7 +13,7 @@
   import { layoutData } from '$lib/stores'
   import { supabase } from '@shackcart/shared'
 
-  export let mockups: Record<'path' | 'url', string>[]
+  export let mockups: Record<'path' | 'url', string>[] | undefined
   export let disabled = false
   export let title = 'Mockups images'
 
@@ -99,7 +99,7 @@
   }
 
   $: {
-    // if (!product.meta?.mockups) {
+    // if (!product.mockups) {
     //   product.meta = {
     //     mockups: [],
     //   }

@@ -29,6 +29,7 @@
   $pageSubtitle = data.product?.name
 
   let modifiers: ModifiersMap
+  $: console.log(modifiers)
 
   $: template =
     data.product.type === 'template'
@@ -62,7 +63,7 @@
     {#if product.type.startsWith('template')}
       <TemplatePreview
         watermark
-        mockups={product.meta?.mockups}
+        mockups={product.mockups}
         ignoreGlobalMockups={product.meta?.ignoreGlobalMockups}
         {template}
       />

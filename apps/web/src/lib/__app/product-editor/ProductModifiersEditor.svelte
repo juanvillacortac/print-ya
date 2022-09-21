@@ -19,12 +19,14 @@
   import FontTable from './modifiers/FontTable.svelte'
   import UpsellEditor from './modifiers/UpsellEditor.svelte'
   import { writable } from 'svelte/store'
-import { onMount } from 'svelte';
+  import { onMount, type SvelteComponent } from 'svelte'
 
   type Unarray<T> = T extends Array<infer U> ? U : T
 
   let mounted = false
   export let disabled = false
+  export let title = ''
+  export let icon: any = undefined
 
   export let modifiers: (Omit<ProductModifier, 'items'> & {
     internalId?: string
@@ -194,7 +196,10 @@ import { onMount } from 'svelte';
 >
   <div class="flex w-full justify-between items-center">
     <div class="flex space-x-4 items-center">
-      <h3 class="font-bold text-xs block">Product modifiers</h3>
+      {#if icon}
+        <svelte:component this={icon} />
+      {/if}
+      <h3 class="font-bold text-xs block">{title || 'Product modifiers'}</h3>
     </div>
     {#if !disabled}
       <div class="flex space-x-1">

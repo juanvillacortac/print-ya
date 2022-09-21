@@ -9,6 +9,35 @@ async function hashPassword(password: string): Promise<string> {
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
 
+export async function updateCustomerPassword({
+  email,
+  storeId,
+  newPassword,
+}: Record<'email' | 'newPassword' | 'storeId', string>) {
+  console.log(email, storeId)
+  const customer = await prisma.customer.findUniqueOrThrow({
+    where: {
+      email_storeId: {
+        email,
+        storeId,
+      },
+    },
+  })
+  await prisma.account.update({
+    where: {
+      provider_customerId: {
+        customerId: customer.id,
+        provider: 'credentials',
+      },
+    },
+    data: {
+      authMeta: {
+        password: await hashPassword(newPassword),
+      },
+    },
+  })
+}
+
 export async function getCustomers({
   storeId,
   filter,
