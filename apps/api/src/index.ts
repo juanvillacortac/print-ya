@@ -63,7 +63,7 @@ const app = async () => {
             },
             setUser: async (id: string) => {
               const token = await res.jwtSign({ id, type: 'user' })
-              res.header('x-acccess-token', token)
+              res.header('x-access-token', token)
               return token
             },
             setCustomer: async (id: string) => {
