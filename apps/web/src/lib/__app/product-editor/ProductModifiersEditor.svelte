@@ -36,11 +36,6 @@
 
   const modifiersStore = writable(modifiers)
 
-  let cuid: () => string
-  onMount(async () => {
-    cuid = await (await import('cuid')).default
-  })
-
   $: if ($modifiersStore && !mounted) {
     modifiersStore.update((modifiers) =>
       modifiers.map((m) => ({
@@ -67,7 +62,7 @@
       ...modifiers,
       {
         internalId: newId,
-        id: cuid(),
+        id: crypto.randomUUID(),
         productId: null,
         active: true,
         name: '',

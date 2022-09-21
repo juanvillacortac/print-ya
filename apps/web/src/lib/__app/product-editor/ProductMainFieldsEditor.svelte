@@ -25,7 +25,7 @@
 
   let cuid: () => string
   onMount(async () => {
-    cuid = await (await import('cuid')).default
+    cuid = () => crypto.randomUUID()
   })
 
   let tagInput = ''
