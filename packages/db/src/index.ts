@@ -1,3 +1,4 @@
+import './polyfill.js'
 export * from './prisma.js'
 export * from './types.js'
 export * from './entities/analytics.js'

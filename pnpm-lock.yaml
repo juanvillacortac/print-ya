@@ -345,6 +345,7 @@ importers:
       scuid: ^1.1.0
       tsup: ^6.2.2
       typescript: ^4.7.4
+      undici: ^5.10.0
       vite: 3.0.8
       vite-dts: ^1.0.4
       vite-plugin-dts: ^1.4.1
@@ -359,6 +360,7 @@ importers:
       nanoid: 4.0.0
       scuid: 1.1.0
       typescript: 4.7.4
+      undici: 5.10.0
     devDependencies:
       '@shackcart/tsconfig': link:../tsconfig
       prisma: 4.2.1

@@ -56,6 +56,7 @@
     "cuid": "^2.1.8",
     "nanoid": "^4.0.0",
     "scuid": "^1.1.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "undici": "^5.10.0"
   }
 }

@@ -1,4 +1,3 @@
-import cuid from 'cuid'
 import type {
   ModifiersMap,
   Product,
@@ -6,6 +5,8 @@ import type {
   ProductsGroup,
   TemplateSource,
 } from 'src/types.js'
+
+const cuid = () => crypto.randomUUID()
 
 export const getTemplateFieldsFromModifiers = (
   product: Product,
