@@ -7,11 +7,14 @@ import { ViteWebfontDownload } from 'vite-plugin-webfont-dl'
 export default defineConfig({
   plugins: [
     sveltekit(),
-    ViteWebfontDownload([
-      'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap',
-      'https://fonts.googleapis.com/css2?family=Fira+Code&display=swap',
-      'https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700,900',
-    ]),
+    ViteWebfontDownload(
+      [
+        'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap',
+        'https://fonts.googleapis.com/css2?family=Fira+Code&display=swap',
+        'https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700,900',
+      ],
+      { injectAsStyleTag: true }
+    ),
     WindiCSS({
       config: '../../windi.config.js',
     }),
