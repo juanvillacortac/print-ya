@@ -2,19 +2,16 @@ import { sveltekit } from '@sveltejs/kit/vite'
 import svg from '@poppanator/sveltekit-svg'
 import WindiCSS from 'vite-plugin-windicss'
 import { defineConfig } from 'vite'
-import { ViteWebfontDownload } from 'vite-plugin-webfont-dl'
+import { VitePluginFonts } from 'vite-plugin-fonts'
 
 export default defineConfig({
   plugins: [
     sveltekit(),
-    ViteWebfontDownload(
-      [
-        'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap',
-        'https://fonts.googleapis.com/css2?family=Fira+Code&display=swap',
-        'https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700,900',
-      ],
-      { injectAsStyleTag: true }
-    ),
+    VitePluginFonts({
+      google: {
+        families: ['Source Sans Pro'],
+      },
+    }),
     WindiCSS({
       config: '../../windi.config.js',
     }),

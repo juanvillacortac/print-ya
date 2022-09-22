@@ -195,7 +195,6 @@ importers:
       typewriter-editor: ^0.7.8
       vite: 3.1.0-beta.1
       vite-imagetools: ^4.0.3
-      vite-plugin-webfont-dl: ^3.1.1
       vite-plugin-windicss: ^1.8.7
       windicss: ^3.5.1
       zod: ^3.17.3
@@ -327,7 +326,6 @@ importers:
       typescript: 4.7.4
       vite: 3.1.0-beta.1
       vite-imagetools: 4.0.4
-      vite-plugin-webfont-dl: 3.1.1_vite@3.1.0-beta.1
       vite-plugin-windicss: 1.8.7_vite@3.1.0-beta.1
 
   packages/db:
@@ -2601,14 +2599,6 @@ packages:
       - supports-color
     dev: false
 
-  /axios/0.25.0:
-    resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
-    dependencies:
-      follow-redirects: 1.15.1
-    transitivePeerDependencies:
-      - debug
-    dev: true
-
   /axios/0.26.1:
     resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
     dependencies:
@@ -4502,6 +4492,7 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
+    dev: false
 
   /follow-redirects/1.5.10:
     resolution: {integrity: sha512-0V5l4Cizzvqt5D44aTXbFZz+FtyXV1vrDN6qrelxtfYQKW0KO0W2T/hkE8xvGa/540LkZlkaUjO4ailYTFtHVQ==}
@@ -9211,17 +9202,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: false
-
-  /vite-plugin-webfont-dl/3.1.1_vite@3.1.0-beta.1:
-    resolution: {integrity: sha512-TR7EQ0IRL0yauWs328qUG+w4PPhdmAGQFyH/8ODDI0xseHEcHAt1Bd5H8Y9MAqjhOiPz8odjxt24lUizIVCNAw==}
-    peerDependencies:
-      vite: ^2 || ^3
-    dependencies:
-      axios: 0.25.0
-      vite: 3.1.0-beta.1
-    transitivePeerDependencies:
-      - debug
-    dev: true
 
   /vite-plugin-windicss/1.8.7_vite@3.1.0-beta.1:
     resolution: {integrity: sha512-/zwQ8+RV+MSkbG0IGqsEma6r2R01NzN/aNpNjJD7VVAkxAptNznqDXOObFTskkWfZ+9m6KJZCOuCPgAFtQIzEA==}
