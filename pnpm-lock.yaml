@@ -195,6 +195,7 @@ importers:
       typewriter-editor: ^0.7.8
       vite: 3.1.0-beta.1
       vite-imagetools: ^4.0.3
+      vite-plugin-fonts: ^0.6.0
       vite-plugin-windicss: ^1.8.7
       windicss: ^3.5.1
       zod: ^3.17.3
@@ -326,6 +327,7 @@ importers:
       typescript: 4.7.4
       vite: 3.1.0-beta.1
       vite-imagetools: 4.0.4
+      vite-plugin-fonts: 0.6.0_vite@3.1.0-beta.1
       vite-plugin-windicss: 1.8.7_vite@3.1.0-beta.1
 
   packages/db:
@@ -9184,6 +9186,15 @@ packages:
       vite: 3.0.8
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /vite-plugin-fonts/0.6.0_vite@3.1.0-beta.1:
+    resolution: {integrity: sha512-dV6nnLEju8k5EmvlBH6egxkVZ+rgc5zWsJr9+cNRXBMEDnpRGHcZPI260UEDNg2yB99wSTNER2eduEvZFbMIGw==}
+    peerDependencies:
+      vite: ^2.0.0 || ^3.0.0
+    dependencies:
+      fast-glob: 3.2.11
+      vite: 3.1.0-beta.1
     dev: true
 
   /vite-plugin-node/1.0.0_vite@3.0.8:
