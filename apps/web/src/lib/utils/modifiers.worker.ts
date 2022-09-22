@@ -90,6 +90,10 @@ export function getBasicTemplate<T extends Partial<Product>>(
       ? product.meta.templateText || product.group?.meta?.templateText
       : product.meta.templateText,
 
+    templateImage: product.templateFromGroup
+      ? product.meta.templateImage || product.group?.meta?.templateImage
+      : product.meta.templateImage,
+
     mockups: [],
   }
   product.group?.meta && product.templateFromGroup
