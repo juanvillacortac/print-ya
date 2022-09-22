@@ -13,6 +13,11 @@ export default defineConfig({
     // imagetools(),
   ],
   define: {
+    __API_URL__: JSON.stringify(
+      process.env.GITPOD_WORKSPACE_URL
+        ? process.env.GITPOD_WORKSPACE_URL.replace('https://', 'https://3000-')
+        : process.env.PUBLIC_API_URL || 'http://localhost:3000'
+    ),
     __LOCALHOST_HOST__: JSON.stringify(
       process.env.GITPOD_WORKSPACE_URL
         ? process.env.GITPOD_WORKSPACE_URL.replace('https://', '5173-')

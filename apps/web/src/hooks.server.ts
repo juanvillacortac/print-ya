@@ -6,7 +6,6 @@ import { getDefaultHost } from '$lib/utils/host'
 import { sequence } from '@sveltejs/kit/hooks'
 import { createTRPCProxy } from '$lib/trpc/proxy.server'
 import type { tRPCRouter } from '@shackcart/trpc'
-import { PUBLIC_API_URL } from '$env/static/public'
 
 const privateQueries = [
   'user:whoami',
@@ -31,7 +30,7 @@ const handleAPI: Handle = async ({ event, resolve }) => {
     headers,
     resolve,
     event,
-    url: `${PUBLIC_API_URL}/trpc`,
+    url: `${__API_URL__}/trpc`,
     cache: {
       enable: layoutType == 'store',
       privateQueries,

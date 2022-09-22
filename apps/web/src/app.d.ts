@@ -1,3 +1,4 @@
+declare const __API_URL__: string
 declare const __LOCALHOST_HOST__: string
 declare const __VERCEL_URL__: string
 
